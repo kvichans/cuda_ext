@@ -41,8 +41,8 @@ class Command:
         match   = re.match('.*File "([^"]+)", line (\d+)', text)    ##?? variants?
         if match is None:
             return
-        op_file  =     match.group(1)
-        op_line  = int(match.group(2))-1
+        op_file =     match.group(1)
+        op_line = int(match.group(2))-1
         pass;                  #LOG and log('op_line, op_file={}',(op_line, op_file))
         if not os.path.exists(op_file):
             return app.msg_status(NO_FILE_FOR_OPEN.format(op_file))
@@ -52,11 +52,13 @@ class Command:
    #def on_console_nav
    
     def add_indented_line_above(self):
+        app.redo= {'call':lambda:self.add_indented_line_above(), 'inf':'add_indented_line_above'}
         ed.cmd(cmds.cCommand_KeyUp)
         ed.cmd(cmds.cCommand_KeyEnd)
         ed.cmd(cmds.cCommand_KeyEnter)
        #def add_indented_line_above
     def add_indented_line_below(self):
+        app.redo= {'call':lambda:self.add_indented_line_below(), 'inf':'add_indented_line_below'}
         ed.cmd(cmds.cCommand_KeyEnd)
         ed.cmd(cmds.cCommand_KeyEnter)
        #def add_indented_line_below
@@ -66,6 +68,7 @@ class Command:
                 but only insert before current line
         ''' 
         pass;                  #LOG and log('')
+        app.redo= {'call':lambda:self.paste_to_1st_col(), 'inf':'paste_to_1st_col'}
         clip    = app.app_proc(app.PROC_GET_CLIP, '')
         if not clip:    return
         clip    = clip.replace('\r\n', '\n').replace('\r', '\n')
@@ -240,14 +243,17 @@ class Command:
         return True
        #def _find_cb_string_included_mlines
     def find_cb_string_next(self):
+        app.redo= {'call':lambda:self.find_cb_string_next(), 'inf':'find_cb_string_next'}
         self.find_cb_string('dn')
        #def find_cb_string_next
     def find_cb_string_prev(self):
+        app.redo= {'call':lambda:self.find_cb_string_prev(), 'inf':'find_cb_string_prev'}
         self.find_cb_string('up')
        #def find_cb_string_prev
 
     def open_selected(self):
         pass;                  #LOG and log('ok',)
+        app.redo= {'call':lambda:self.open_selected(), 'inf':'open_selected'}
         bs_dir  = os.path.dirname(ed.get_filename())
         crts    = ed.get_carets()
         for (cCrt, rCrt, cEnd, rEnd) in crts:
@@ -266,6 +272,7 @@ class Command:
     def replace_all_sel_to_cb(self):
         pass;                   LOG and log('ok',)
         pass;                   return
+        app.redo= {'call':lambda:self.replace_all_sel_to_cb(), 'inf':'replace_all_sel_to_cb'}
         crts    = ed.get_carets()
         if len(crts)>1:
             return app.msg_status(ONLY_SINGLE_CRT.format('Command'))
@@ -277,6 +284,7 @@ class Command:
             Pairs: [] {} () <> «»
         '''
         pass;                  #LOG and log('')
+        app.redo= {'call':lambda:self.jump_to_matching_bracket(), 'inf':'jump_to_matching_bracket'}
         crts    = ed.get_carets()
         if len(crts)>1:
             return app.msg_status(ONLY_SINGLE_CRT.format('Command'))
@@ -364,7 +372,8 @@ class Command:
             if ( group  ==edH.get_prop(app.PROP_INDEX_GROUP)
             and  tab_ind==edH.get_prop(app.PROP_INDEX_TAB)):
                 edH.focus() 
-                return
+                return True
+        return False
        #def _activate_tab
     def to_tab_g1_t1(self):   return self._activate_tab(0, 0)
     def to_tab_g1_t2(self):   return self._activate_tab(0, 1)
@@ -399,13 +408,28 @@ class Command:
        #def _activate_last_tab
     def to_tab_g1_last(self):   return self._activate_last_tab(0)
     def to_tab_g2_last(self):   return self._activate_last_tab(1)
-
-#   def copy_term(self):
-#       pass;                  #LOG and log('')
-#      #def copy_term
-#   def replace_term(self):
-#       pass;                  #LOG and log('')
-#      #def copy_term
+    def _activate_near_tab(self, gap):
+        pass;                   LOG and log('gap={}',gap)
+        group   = ed.get_prop(app.PROP_INDEX_GROUP)
+        t_ind   = ed.get_prop(app.PROP_INDEX_TAB)
+        if 1==gap:
+            if self._activate_tab(group,   t_ind+1): return
+            if self._activate_tab(group+1, 0      ): return
+            if self._activate_tab(0,       0      ): return
+        else: # -1==gap
+            if t_ind>0: return self._activate_tab(group, t_ind-1)
+            eds     = [app.Editor(h) for h in app.ed_handles()]
+            gts     = [(ed.get_prop(app.PROP_INDEX_GROUP), ed.get_prop(app.PROP_INDEX_TAB)) for ed in eds]
+            if group>0: 
+                group   = group-1
+                t_max   = max(t for (g,t) in gts if g==group)
+                return self._activate_tab(group, t_max)
+            g_max   = max(g for (g,t) in gts)
+            t_max   = max(t for (g,t) in gts if g==g_max)
+            self._activate_tab(g_max, t_max)
+       #def _activate_near_tab
+    def to_next_tab(self):   return self._activate_near_tab(1)
+    def to_prev_tab(self):   return self._activate_near_tab(-1)
 
    #class Command
 
@@ -417,10 +441,11 @@ ToDo
 [?][kv-kv][20nov15] Paste from clipboard, to 1st column for m-carets
 [+][kv-kv][20nov15] Find string from clipboard - next/prev: find_cb_string_next
 [+][kv-kv][20nov15] Jump to matching bracket: jump_to_matching_bracket
-[ ][kv-kv][20nov15] CopyTerm, ReplaceTerm
-[ ][kv-kv][20nov15] Comment/uncomment before cur term (or fix col?)
+[-][kv-kv][20nov15] CopyTerm, ReplaceTerm
+[-][kv-kv][20nov15] Comment/uncomment before cur term (or fix col?)
 [+][kv-kv][24nov15] Wrap for "Find string from clipboard"
 [ ][kv-kv][25nov15] Replace all as selected to cb-string: replace_all_sel_to_cb
 [+][kv-kv][25nov15] Open selected file: open_selected
 [+][kv-kv][25nov15] Catch on_console_nav
+[ ][kv-kv][26nov15] Scroll on_console_nav, Find*
 '''

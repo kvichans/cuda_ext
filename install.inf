@@ -151,3 +151,15 @@ section=commands
 caption=Activate tab #9 in group #2
 method=to_tab_g2_t9
 menu=0
+
+[item30]
+section=commands
+caption=Activate next tab (global loop)
+method=to_next_tab
+menu=0
+[item31]
+section=commands
+caption=Activate prev tab (global loop)
+method=to_prev_tab
+menu=0
+
