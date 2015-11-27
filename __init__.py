@@ -409,24 +409,17 @@ class Command:
     def to_tab_g1_last(self):   return self._activate_last_tab(0)
     def to_tab_g2_last(self):   return self._activate_last_tab(1)
     def _activate_near_tab(self, gap):
-        pass;                   LOG and log('gap={}',gap)
+        pass;                  #LOG and log('gap={}',gap)
+        eds     = [app.Editor(h) for h in app.ed_handles()]
+        if 1==len(eds):    return
+        gtes    = [(e.get_prop(app.PROP_INDEX_GROUP), e.get_prop(app.PROP_INDEX_TAB), e) for e in eds]
+        gtes    = list(enumerate(sorted(gtes)))
         group   = ed.get_prop(app.PROP_INDEX_GROUP)
         t_ind   = ed.get_prop(app.PROP_INDEX_TAB)
-        if 1==gap:
-            if self._activate_tab(group,   t_ind+1): return
-            if self._activate_tab(group+1, 0      ): return
-            if self._activate_tab(0,       0      ): return
-        else: # -1==gap
-            if t_ind>0: return self._activate_tab(group, t_ind-1)
-            eds     = [app.Editor(h) for h in app.ed_handles()]
-            gts     = [(ed.get_prop(app.PROP_INDEX_GROUP), ed.get_prop(app.PROP_INDEX_TAB)) for ed in eds]
-            if group>0: 
-                group   = group-1
-                t_max   = max(t for (g,t) in gts if g==group)
-                return self._activate_tab(group, t_max)
-            g_max   = max(g for (g,t) in gts)
-            t_max   = max(t for (g,t) in gts if g==g_max)
-            self._activate_tab(g_max, t_max)
+        for g_ind, (g, t, e) in gtes:
+            if g==group and t==t_ind:
+                g_ind   = (g_ind+gap) % len(gtes)
+                gtes[g_ind][1][2].focus()
        #def _activate_near_tab
     def to_next_tab(self):   return self._activate_near_tab(1)
     def to_prev_tab(self):   return self._activate_near_tab(-1)
