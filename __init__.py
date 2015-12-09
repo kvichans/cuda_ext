@@ -52,13 +52,11 @@ class Command:
    #def on_console_nav
    
     def add_indented_line_above(self):
-        app.redo= {'call':lambda:self.add_indented_line_above(), 'inf':'add_indented_line_above'}
         ed.cmd(cmds.cCommand_KeyUp)
         ed.cmd(cmds.cCommand_KeyEnd)
         ed.cmd(cmds.cCommand_KeyEnter)
        #def add_indented_line_above
     def add_indented_line_below(self):
-        app.redo= {'call':lambda:self.add_indented_line_below(), 'inf':'add_indented_line_below'}
         ed.cmd(cmds.cCommand_KeyEnd)
         ed.cmd(cmds.cCommand_KeyEnter)
        #def add_indented_line_below
@@ -68,7 +66,6 @@ class Command:
                 but only insert before current line
         ''' 
         pass;                  #LOG and log('')
-        app.redo= {'call':lambda:self.paste_to_1st_col(), 'inf':'paste_to_1st_col'}
         clip    = app.app_proc(app.PROC_GET_CLIP, '')
         if not clip:    return
         clip    = clip.replace('\r\n', '\n').replace('\r', '\n')
@@ -243,17 +240,14 @@ class Command:
         return True
        #def _find_cb_string_included_mlines
     def find_cb_string_next(self):
-        app.redo= {'call':lambda:self.find_cb_string_next(), 'inf':'find_cb_string_next'}
         self.find_cb_string('dn')
        #def find_cb_string_next
     def find_cb_string_prev(self):
-        app.redo= {'call':lambda:self.find_cb_string_prev(), 'inf':'find_cb_string_prev'}
         self.find_cb_string('up')
        #def find_cb_string_prev
 
     def open_selected(self):
         pass;                  #LOG and log('ok',)
-        app.redo= {'call':lambda:self.open_selected(), 'inf':'open_selected'}
         bs_dir  = os.path.dirname(ed.get_filename())
         crts    = ed.get_carets()
         for (cCrt, rCrt, cEnd, rEnd) in crts:
@@ -272,99 +266,12 @@ class Command:
     def replace_all_sel_to_cb(self):
         pass;                   LOG and log('ok',)
         pass;                   return
-        app.redo= {'call':lambda:self.replace_all_sel_to_cb(), 'inf':'replace_all_sel_to_cb'}
         crts    = ed.get_carets()
         if len(crts)>1:
             return app.msg_status(ONLY_SINGLE_CRT.format('Command'))
         (cCrt, rCrt, cEnd, rEnd)    = crts[0]
        #def replace_all_sel_to_cb
     
-    def jump_to_matching_bracket(self):
-        ''' Jump single (only!) caret to matching bracket.
-            Pairs: [] {} () <> «»
-        '''
-        pass;                  #LOG and log('')
-        app.redo= {'call':lambda:self.jump_to_matching_bracket(), 'inf':'jump_to_matching_bracket'}
-        crts    = ed.get_carets()
-        if len(crts)>1:
-            return app.msg_status(ONLY_SINGLE_CRT.format('Command'))
-        (cCrt, rCrt, cEnd, rEnd)    = crts[0]
-        if cEnd!=-1:
-            return app.msg_status(ONLY_FOR_NO_SEL.format('Command'))
-        crt_line=  ed.get_text_line(rCrt)
-        # Is there any bracket AFTER caret?
-        c_aft   = crt_line[cCrt]   if cCrt<len(crt_line) else ' '
-        c_bfr   = crt_line[cCrt-1] if cCrt>0             else ' '
-        pass;                  #LOG and log('c_bfr, c_aft={}', (c_bfr, c_aft))
-        (c_opn
-        ,c_cls
-        ,col)   = apx.icase(False,''
-                    ,c_aft=='[', ('[', ']', cCrt+1)
-                    ,c_aft=='{', ('{', '}', cCrt+1)
-                    ,c_aft=='(', ('(', ')', cCrt+1)
-                    ,c_aft=='<', ('<', '>', cCrt+1)
-                    ,c_aft=='«', ('«', '»', cCrt+1)
-                    ,c_aft==']', (']', '[', cCrt-1)
-                    ,c_aft=='}', ('}', '{', cCrt-1)
-                    ,c_aft==')', (')', '(', cCrt-1)
-                    ,c_aft=='>', ('>', '<', cCrt-1)
-                    ,c_aft=='»', ('»', '«', cCrt-1)
-                    ,c_bfr=='[', ('[', ']', cCrt  )
-                    ,c_bfr=='{', ('{', '}', cCrt  )
-                    ,c_bfr=='(', ('(', ')', cCrt  )
-                    ,c_bfr=='<', ('<', '>', cCrt  )
-                    ,c_bfr=='«', ('«', '»', cCrt  )
-                    ,c_bfr==']', (']', '[', cCrt-2)
-                    ,c_bfr=='}', ('}', '{', cCrt-2)
-                    ,c_bfr==')', (')', '(', cCrt-2)
-                    ,c_bfr=='>', ('>', '<', cCrt-2)
-                    ,c_bfr=='»', ('»', '«', cCrt-2)
-                    ,' ')
-        to_end  = c_opn in '[{(<«'  # »>)}]
-        line    = crt_line
-        row     = rCrt
-        pass;                  #LOG and log('c_opn,c_cls,to_end,col={}', (c_opn,c_cls,to_end,col))
-        cnt     = 1
-        while True:
-            for pos in (range(col, len(line)) if to_end else 
-                        range(col, -1, -1)):
-                c   = line[pos]
-                if False:pass
-                elif c==c_opn:
-                    cnt     = cnt+1
-                elif c==c_cls:
-                    cnt     = cnt-1
-                else:
-                    continue # for pos
-                pass;          #LOG and log('line, pos, c, cnt={}', (line, pos, c, cnt))
-                if 0==cnt:
-                    # Found!
-                    col     = pos
-                    break #for pos 
-            if 0==cnt:
-                break #while
-            if to_end:
-                row     = row+1
-                if row==ed.get_line_count():
-                    pass;  #LOG and log('not found')
-                    break #while
-                line    = ed.get_text_line(row)
-                col     = 0
-            else:
-                if row==0:
-                    pass;  #LOG and log('not found')
-                    break #while
-                row     = row-1
-                line    = ed.get_text_line(row)
-                col     = len(line)-1
-           #while
-        if 0==cnt:
-            pass;              #LOG and log('set_caret(col, row)={}', (col, row))
-            ed.set_caret(col, row)
-        else:
-            return app.msg_status(NO_PAIR_BRACKET.format(c_opn))
-       #def jump_to_matching_bracket
-
     def _activate_tab(self, group, tab_ind):
         pass;                  #LOG and log('')
         for h in app.ed_handles():
@@ -424,7 +331,88 @@ class Command:
     def to_next_tab(self):   return self._activate_near_tab(1)
     def to_prev_tab(self):   return self._activate_near_tab(-1)
 
+    def jump_to_matching_bracket(self):
+        ''' Jump single (only!) caret to matching bracket.
+            Pairs: [] {} () <> «»
+        '''
+        pass;                  #LOG and log('')
+        crts    = ed.get_carets()
+        if len(crts)>1:
+            return app.msg_status(ONLY_SINGLE_CRT.format('Command'))
+        (cCrt, rCrt, cEnd, rEnd)    = crts[0]
+        if cEnd!=-1:
+            return app.msg_status(ONLY_FOR_NO_SEL.format('Command'))
+
+        (c_opn, c_cls
+        ,col, row)  = find_matching_char(ed, cCrt, rCrt)
+
+        if c_opn!='' and -1!=col:
+            pass;              #LOG and log('set_caret(col, row)={}', (col, row))
+            ed.set_caret(col, row)
+        else:
+            return app.msg_status(NO_PAIR_BRACKET.format(c_opn))
+       #def jump_to_matching_bracket
+
    #class Command
+
+def find_matching_char(ed4find, cStart, rStart, opn2cls={'[':']', '{':'}', '(':')', '<':'>', '«':'»'}):
+    ''' Find matching (pair) char for char from position (cStart,rStart) (or prev) 
+    '''
+    cls2opn = {c:o for o,c in opn2cls.items()}
+    
+    crt_line=  ed4find.get_text_line(rStart)
+    # Is there any bracket AFTER caret?
+    c_aft   = crt_line[cStart]   if cStart<len(crt_line) else ' '
+    c_bfr   = crt_line[cStart-1] if cStart>0             else ' '
+    pass;                  #LOG and log('c_bfr, c_aft={}', (c_bfr, c_aft))
+
+    if False:pass
+    elif c_aft in opn2cls: (c_opn, c_cls, col) = (c_aft, opn2cls[c_aft], cStart+1)
+    elif c_aft in cls2opn: (c_opn, c_cls, col) = (c_aft, cls2opn[c_aft], cStart-1)
+    elif c_bfr in opn2cls: (c_opn, c_cls, col) = (c_bfr, opn2cls[c_bfr], cStart  )
+    elif c_bfr in cls2opn: (c_opn, c_cls, col) = (c_bfr, cls2opn[c_bfr], cStart-2)
+    else: return (c_aft, '', -1, -1)
+
+    to_end  = c_opn in opn2cls
+    line    = crt_line
+    row     = rStart
+    pass;                  #LOG and log('c_opn,c_cls,to_end,col={}', (c_opn,c_cls,to_end,col))
+    cnt     = 1
+    while True:
+        for pos in (range(col, len(line)) if to_end else 
+                    range(col, -1, -1)):
+            c   = line[pos]
+            if False:pass
+            elif c==c_opn:
+                cnt     = cnt+1
+            elif c==c_cls:
+                cnt     = cnt-1
+            else:
+                continue # for pos
+            pass;          #LOG and log('line, pos, c, cnt={}', (line, pos, c, cnt))
+            if 0==cnt:
+                # Found!
+                col     = pos
+                break #for pos 
+        if 0==cnt:
+            break #while
+        if to_end:
+            row     = row+1
+            if row==ed4find.get_line_count():
+                pass;  #LOG and log('not found')
+                break #while
+            line    = ed4find.get_text_line(row)
+            col     = 0
+        else:
+            if row==0:
+                pass;  #LOG and log('not found')
+                break #while
+            row     = row-1
+            line    = ed4find.get_text_line(row)
+            col     = len(line)-1
+       #while
+    return (c_opn, c_cls, col, row) if cnt==0 else (c_opn, c_cls, -1, -1)
+   #def find_matching_char
 
 '''
 ToDo
@@ -441,4 +429,5 @@ ToDo
 [+][kv-kv][25nov15] Open selected file: open_selected
 [+][kv-kv][25nov15] Catch on_console_nav
 [ ][kv-kv][26nov15] Scroll on_console_nav, Find*
+[ ][at-kv][09dec15] Refactor: find_pair
 '''
