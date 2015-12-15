@@ -13,7 +13,6 @@ class Command:
     def add_indented_line_above(self):                  return RLS.add_indented_line_above()
     def add_indented_line_below(self):                  return RLS.add_indented_line_below()
     def paste_to_1st_col(self):                         return RLS.paste_to_1st_col()
-    def find_cb_string(self, updn, bgn_crt_fin='crt'):  return RLS.find_cb_string()
     def find_cb_string_next(self):                      return RLS.find_cb_string_next()
     def find_cb_string_prev(self):                      return RLS.find_cb_string_prev()
     def open_selected(self):                            return RLS.open_selected()

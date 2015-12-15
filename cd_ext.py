@@ -282,24 +282,6 @@ class Command:
                 return True
         return False
        #def _activate_tab
-    def to_tab_g1_t1(self):   return self._activate_tab(0, 0)
-    def to_tab_g1_t2(self):   return self._activate_tab(0, 1)
-    def to_tab_g1_t3(self):   return self._activate_tab(0, 2)
-    def to_tab_g1_t4(self):   return self._activate_tab(0, 3)
-    def to_tab_g1_t5(self):   return self._activate_tab(0, 4)
-    def to_tab_g1_t6(self):   return self._activate_tab(0, 5)
-    def to_tab_g1_t7(self):   return self._activate_tab(0, 6)
-    def to_tab_g1_t8(self):   return self._activate_tab(0, 7)
-    def to_tab_g1_t9(self):   return self._activate_tab(0, 8)
-    def to_tab_g2_t1(self):   return self._activate_tab(1, 0)
-    def to_tab_g2_t2(self):   return self._activate_tab(1, 1)
-    def to_tab_g2_t3(self):   return self._activate_tab(1, 2)
-    def to_tab_g2_t4(self):   return self._activate_tab(1, 3)
-    def to_tab_g2_t5(self):   return self._activate_tab(1, 4)
-    def to_tab_g2_t6(self):   return self._activate_tab(1, 5)
-    def to_tab_g2_t7(self):   return self._activate_tab(1, 6)
-    def to_tab_g2_t8(self):   return self._activate_tab(1, 7)
-    def to_tab_g2_t9(self):   return self._activate_tab(1, 8)
     def _activate_last_tab(self, group):
         pass;                  #LOG and log('')
         max_ind = -1
@@ -313,8 +295,6 @@ class Command:
         if last_ed is not None:
             last_ed.focus()
        #def _activate_last_tab
-    def to_tab_g1_last(self):   return self._activate_last_tab(0)
-    def to_tab_g2_last(self):   return self._activate_last_tab(1)
     def _activate_near_tab(self, gap):
         pass;                  #LOG and log('gap={}',gap)
         eds     = [app.Editor(h) for h in app.ed_handles()]
@@ -328,8 +308,6 @@ class Command:
                 g_ind   = (g_ind+gap) % len(gtes)
                 gtes[g_ind][1][2].focus()
        #def _activate_near_tab
-    def to_next_tab(self):   return self._activate_near_tab(1)
-    def to_prev_tab(self):   return self._activate_near_tab(-1)
 
     def jump_to_matching_bracket(self):
         ''' Jump single (only!) caret to matching bracket.
@@ -430,4 +408,5 @@ ToDo
 [+][kv-kv][25nov15] Catch on_console_nav
 [ ][kv-kv][26nov15] Scroll on_console_nav, Find*
 [ ][at-kv][09dec15] Refactor: find_pair
+[ ][kv-kv][15dec15] Find cb-string via cmd_FinderAction (for use next/prev after)
 '''
