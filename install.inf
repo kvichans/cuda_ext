@@ -1,6 +1,6 @@
 [info]
-title=CudaText Extentions
-desc=New commands for CudaText
+title=CudaExt
+desc=Additional commands for CudaText in Commands dialog (not visible in Plugins menu)
 type=cudatext-plugin
 subdir=cuda_ext
 
@@ -163,3 +163,43 @@ caption=Activate prev tab (global loop)
 method=to_prev_tab
 menu=0
 
+[item40]
+section=commands
+caption=Move splitter to expand tree panel
+method=more_tree
+menu=0
+[item41]
+section=commands
+caption=Move splitter to narrow tree panel
+method=less_tree
+menu=0
+[item42]
+section=commands
+caption=Move splitter to expand bottom panel
+method=more_bottom
+menu=0
+[item43]
+section=commands
+caption=Move splitter to narrow bottom panel
+method=less_bottom
+menu=0
+[item44]
+section=commands
+caption=Move splitter to expand top-left group
+method=more_main_grp
+menu=0
+[item45]
+section=commands
+caption=Move splitter to narrow top-left group
+method=less_main_grp
+menu=0
+[item44]
+section=commands
+caption=Move splitter to expand active group
+method=more_curr_grp
+menu=0
+[item45]
+section=commands
+caption=Move splitter to narrow active group
+method=less_curr_grp
+menu=0

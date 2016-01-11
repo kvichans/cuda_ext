@@ -1,8 +1,8 @@
 ''' Plugin for CudaText editor
 Authors:
-    Andrey Kvichansky    (kvichans on githab.com)
+    Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '0.9.1 2015-12-15'
+    '0.9.2 2016-01-10'
 ToDo: (see end of file)
 '''
 
@@ -308,6 +308,143 @@ class Command:
                 g_ind   = (g_ind+gap) % len(gtes)
                 gtes[g_ind][1][2].focus()
        #def _activate_near_tab
+
+    def _move_splitter(self, what, factor):
+        ''' Move one of splitters
+            Params:
+                what    Which splitter and changing width or height 
+                            'into'          - into tab, direction as is
+                            'left'          - tree
+                            'bott'          - console/output/...
+                            'main'          - top-left group, 
+                                                width if has right neighbor
+                                                else height
+                            'curr'          - active group, 
+                                                self     width  if has right  neighbor
+                                                neighbor width  if has left   neighbor
+                                                self     height if has bottom neighbor
+                                                neighbor height if has upper  neighbor
+                factor  Multiplier for relation pos of splitter.
+                            NewPos  = int(factor * OldPos)
+        '''
+        pass;                  #LOG and log('what, factor={}',(what, factor))
+        id_splt     = ''
+        pos_old     = 0
+        prn_size    = 0
+        if False:pass
+        elif what=='into':  # In tab 
+            return
+        
+        elif what=='left':  # Tree
+            id_splt     = 'L'
+        elif what=='bott':  # Bottom
+            id_splt     = 'B'
+        
+        else:               # Groups
+            # 2HORZ     0 G1 1
+            # 2VERT     0
+            #           G1
+            #           1
+            # 3HORZ     0 G1 1 G2 2
+            # 3VERT     0
+            #           G1
+            #           1
+            #           G2
+            #           2
+            # 3PLUS     0 G3 1 
+            #                G2 
+            #                2 
+            # 4HORZ     0 G1 1 G2 2 G3 3
+            # 4VERT     0
+            #           G1
+            #           1
+            #           G2
+            #           2
+            #           G3
+            #           3
+            # 4GRID     0 G1 1
+            #           G3
+            #           2 G2 3
+            # 6GRID     0 G1 1 G2 2
+            #           G3
+            #           3 G1 4 G2 5
+            grouping    = app.app_proc(app.PROC_GET_GROUPING, '')
+            cur_grp     = ed.get_prop(app.PROP_INDEX_GROUP)
+            if False:pass
+            elif grouping==app.GROUPS_ONE:
+                return      # No splitter
+
+            elif (what=='main' 
+            and   grouping!=app.GROUPS_3PLUS):      id_splt = 'G1'
+            elif (what=='main' 
+            and   grouping==app.GROUPS_3PLUS):      id_splt = 'G3'
+
+            #     what=='curr'
+            elif cur_grp==0:
+                if False:pass
+                elif grouping==app.GROUPS_2HORZ:    id_splt = 'G1'  # w-self
+                elif grouping==app.GROUPS_2VERT:    id_splt = 'G1'  # h-self
+                elif grouping==app.GROUPS_3HORZ:    id_splt = 'G1'  # w-self
+                elif grouping==app.GROUPS_3VERT:    id_splt = 'G1'  # h-self
+                elif grouping==app.GROUPS_3PLUS:    id_splt = 'G3'  # w-self
+                elif grouping==app.GROUPS_4HORZ:    id_splt = 'G1'  # w-self
+                elif grouping==app.GROUPS_4VERT:    id_splt = 'G1'  # h-self
+                elif grouping==app.GROUPS_4GRID:    id_splt = 'G1'  # w-self
+                elif grouping==app.GROUPS_6GRID:    id_splt = 'G1'  # w-self
+
+            elif cur_grp==1:
+                if False:pass
+                elif grouping==app.GROUPS_2HORZ:    id_splt ='-G1'  # w-left
+                elif grouping==app.GROUPS_2VERT:    id_splt ='-G1'  # h-top
+                elif grouping==app.GROUPS_3HORZ:    id_splt = 'G2'  # w-self
+                elif grouping==app.GROUPS_3VERT:    id_splt = 'G2'  # h-self
+                elif grouping==app.GROUPS_3PLUS:    id_splt = 'G2'  # h-self
+                elif grouping==app.GROUPS_4HORZ:    id_splt = 'G2'  # w-self
+                elif grouping==app.GROUPS_4VERT:    id_splt = 'G2'  # h-self
+                elif grouping==app.GROUPS_4GRID:    id_splt ='-G1'  # w-left
+                elif grouping==app.GROUPS_6GRID:    id_splt = 'G2'  # w-self
+
+            elif cur_grp==2:
+                if False:pass
+                elif grouping==app.GROUPS_3HORZ:    id_splt ='-G2'  # w-left
+                elif grouping==app.GROUPS_3VERT:    id_splt ='-G2'  # h-top
+                elif grouping==app.GROUPS_3PLUS:    id_splt ='-G2'  # h-top
+                elif grouping==app.GROUPS_4HORZ:    id_splt = 'G3'  # w-self
+                elif grouping==app.GROUPS_4VERT:    id_splt = 'G3'  # h-self
+                elif grouping==app.GROUPS_4GRID:    id_splt = 'G2'  # w-self
+                elif grouping==app.GROUPS_6GRID:    id_splt ='-G2'  # w-left
+
+            elif cur_grp==3:
+                if False:pass
+                elif grouping==app.GROUPS_4HORZ:    id_splt ='-G3'  # w-left
+                elif grouping==app.GROUPS_4VERT:    id_splt ='-G3'  # h-top
+                elif grouping==app.GROUPS_4GRID:    id_splt ='-G2'  # w-left
+                elif grouping==app.GROUPS_6GRID:    id_splt = 'G1'  # w-self
+
+            elif cur_grp==4:
+                if False:pass
+                elif grouping==app.GROUPS_6GRID:    id_splt = 'G2'  # w-self
+
+            elif cur_grp==5:
+                if False:pass
+                elif grouping==app.GROUPS_6GRID:    id_splt ='-G2'  # w-left
+
+            else:
+                return
+        if id_splt[0]=='-':
+            id_splt = id_splt[1:]
+            factor  = 2 - factor
+
+        (vh, shown, pos_old, prn_size)  = app.app_proc(app.PROC_GET_SPLIT, id_splt)
+        pass;                  #LOG and log('id_splt, vh, shown, pos_old, prn_size={}',(id_splt, vh, shown, pos_old, prn_size))
+        if not shown:           return
+        pos_new     = int(factor * pos_old) 
+        pass;                  #LOG and log('pos_new={}',(pos_new))
+        pos_new     = max(100, min(prn_size-100, pos_new))
+        pass;                  #LOG and log('pos_new={}',(pos_new))
+        if pos_new==pos_old:    return
+        app.app_proc(app.PROC_SET_SPLIT, '{};{}'.format(id_splt, pos_new))
+       #def _move_splitter
 
     def jump_to_matching_bracket(self):
         ''' Jump single (only!) caret to matching bracket.
