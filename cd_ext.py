@@ -12,6 +12,7 @@ from    cudatext    import ed
 import  cudatext_cmd    as cmds
 import  cudax_lib       as apx
 from    cudax_lib   import log
+from    .word_proc  import *
 
 # Localization
 ONLY_SINGLE_CRT         = "{} doesn't work with multi-carets"
@@ -248,18 +249,23 @@ class Command:
 
     def open_selected(self):
         pass;                  #LOG and log('ok',)
-        bs_dir  = os.path.dirname(ed.get_filename())
         crts    = ed.get_carets()
-        for (cCrt, rCrt, cEnd, rEnd) in crts:
-            if -1==cEnd: continue
-            if rCrt!=rEnd: continue
-            (rTx1, cTx1), (rTx2, cTx2) = apx.minmax((rCrt, cCrt), (rEnd, cEnd))
-            selTx   = ed.get_text_substr(cTx1, rTx1, cTx2, rTx2)
-            op_file = os.path.join(bs_dir, selTx)
-            if not os.path.exists(op_file):
-                app.msg_status(NO_FILE_FOR_OPEN.format(op_file))
-                continue
-            op_ed   = _file_open(op_file)
+        if len(crts)!=1: return
+        
+        seltext = ed.get_text_sel()
+        if not seltext:
+            res = get_word_info(CHARS_FILENAME)
+            if res is None: return
+            x0, y0, nlen, seltext = res
+            if not seltext: return
+
+        bs_dir  = os.path.dirname(ed.get_filename())
+        op_file = os.path.join(bs_dir, seltext)
+        if not os.path.isfile(op_file):
+            app.msg_status(NO_FILE_FOR_OPEN.format(op_file))
+            return
+        op_ed   = _file_open(op_file)
+        if not op_ed is None:
             op_ed.focus()
        #def open_selected
     
