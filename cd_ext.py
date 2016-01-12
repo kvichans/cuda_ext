@@ -287,11 +287,12 @@ class Command:
         pass;                  #LOG and log('pointed={}',pointed)
         if not pointed: return
         op_file     = os.path.join(bs_dir, pointed)
-        if not os.path.exists(op_file):
+        if not os.path.isfile(op_file): #don't allow folder
             app.msg_status(NO_FILE_FOR_OPEN.format(op_file))
             return
         op_ed       = _file_open(op_file)
-        op_ed.focus()
+        if op_ed: #file open cancelled?
+            op_ed.focus()
        #def open_selected
     
     def _activate_tab(self, group, tab_ind):
