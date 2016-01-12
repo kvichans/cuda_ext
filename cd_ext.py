@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '0.9.2 2016-01-10'
+    '0.9.3 2016-01-12'
 ToDo: (see end of file)
 '''
 
@@ -101,176 +101,198 @@ class Command:
            #for
        #def paste_to_1st_col
 
-    def find_cb_string(self, updn, bgn_crt_fin='crt'):
-        ''' Find clipboard value in text.
-            Params
-                updn            'up'|'dn' - direction
-                bgn_crt_fin     'bgn'|'crt'|'fin' - start point
-        '''
+#   def find_cb_string(self, updn, bgn_crt_fin='crt'):
+#       ''' Find clipboard value in text.
+#           Params
+#               updn            'up'|'dn' - direction
+#               bgn_crt_fin     'bgn'|'crt'|'fin' - start point
+#       '''
+#       clip    = app.app_proc(app.PROC_GET_CLIP, '')
+#       if ''==clip:    return
+#       clip    = clip.replace('\r\n', '\n').replace('\r', '\n')
+#       pass;                  #LOG and log('clip={}',repr(clip))
+#       crts    = ed.get_carets()
+#       if len(crts)>1:
+#           return app.msg_status(ONLY_SINGLE_CRT.format('Command'))
+#       # Prepare bgn-, crt-, fin-point
+#       (cBgn, rBgn)    = (0, 0)
+#       (cCrt, rCrt
+#       ,cEnd, rEnd)    = crts[0]
+#       lst_line_ind    = ed.get_line_count()-1
+#       lst_line        = ed.get_text_line(lst_line_ind)
+#       (cFin, rFin)    = (max(0, len(lst_line)-1), lst_line_ind)
+#       if bgn_crt_fin=='crt':
+#           # Some cases for natural (not wrap) find
+#           if updn=='dn' and (cFin, rFin) == (cCrt, rCrt):
+#               # Caret at finish - immediately find from start
+#               return self.find_cb_string(updn, bgn_crt_fin='bgn')
+#           if updn=='up' and (cBgn, rBgn) == (cCrt, rCrt):
+#               # Caret at start - immediately find from finish
+#               return self.find_cb_string(updn, bgn_crt_fin='fin')
+#           if updn=='dn' and (cBgn, rBgn) == (cCrt, rCrt):
+#               # Caret already at start - switch wrap off
+#               bgn_crt_fin = 'bgn'
+#           if updn=='up' and (cFin, rFin) == (cCrt, rCrt):
+#               # Caret already at finish - switch wrap off
+#               bgn_crt_fin = 'fin'
+#       (cPnt, rPnt
+#       ,cEnd, rEnd)    = apx.icase(False,0
+#                           ,bgn_crt_fin=='bgn', (cBgn, rBgn, cBgn, rBgn)
+#                           ,bgn_crt_fin=='crt', (cCrt, rCrt, cEnd, rEnd)
+#                           ,bgn_crt_fin=='fin', (cFin, rFin, cFin, rFin)
+#                           )
+#       # Main part
+#       if '\n' not in clip:
+#           # 1) Find inside each line
+#           row     = rPnt
+#           line    = ed.get_text_line(row)
+#           pos     = line.find(clip, cPnt) if updn=='dn' else line.rfind(clip, 0, cPnt)
+#           while -1==pos:
+#               row     = apx.icase(updn=='dn', row+1,   updn=='up', row-1,   -1)
+#               if row<0 or row==ed.get_line_count():
+#                   break #while
+#               line    = ed.get_text_line(row)
+#               pos     = line.find(clip) if updn=='dn' else line.rfind(clip)
+#           if False:pass
+#           elif -1==pos  and bgn_crt_fin!='crt':
+#               return app.msg_status(FIND_FAIL_FOR_STR.format(clip))
+#           elif -1==pos:#and bgn_crt_fin=='crt'
+#               # Wrap!
+#               return self.find_cb_string(updn, bgn_crt_fin=apx.icase(updn=='dn', 'bgn', 'fin'))
+#           elif updn=='dn':
+#               ed.set_caret(pos+len(clip), row, pos, row)
+#           elif updn=='up':
+#               ed.set_caret(pos, row, pos+len(clip), row)
+#           return
+#       # 2) Find m-line
+#       pass;                  #LOG and log('')
+#       clpls   = clip.split('\n')
+#       pass;                  #LOG and log('clpls={}',(clpls))
+#       clip    = repr(clip)
+#       if False:pass
+#       elif updn=='dn':
+#           found   = False
+#           row     = max(rPnt, rEnd if rEnd!=-1 else rPnt)
+#           if row+len(clpls) < ed.get_line_count():
+#               txtls   = [ed.get_text_line(r) for r in range(row, row+len(clpls))]
+#               pass;          #LOG and log('txtls={}',(txtls))
+#               while True:
+#                   if self._find_cb_string_included_mlines(txtls, clpls):
+#                       # Found!
+#                       found   = True
+#                       break #while
+#                   row     = row+1
+#                   pass;          #LOG and log('row={}',(row))
+#                   if row+len(clpls) >= ed.get_line_count():
+#                       pass;  #LOG and log('nfnd12',)
+#                       break #while
+#                   txtls   = txtls[1:]+[ed.get_text_line(row+len(clpls)-1)]
+#                   pass;      #LOG and log('txtls={}',(txtls))
+#                  #while
+#           if False:pass
+#           elif not found  and bgn_crt_fin!='crt':
+#               return app.msg_status(FIND_FAIL_FOR_STR.format(clip))
+#           elif not found:#and bgn_crt_fin=='crt'
+#               # Wrap!
+#               return self.find_cb_string(updn, bgn_crt_fin=apx.icase(updn=='dn', 'bgn', 'fin'))
+#           ed.set_caret(len(clpls[-1]), row+len(clpls)-1, len(txtls[0])-len(clpls[0]), row)
+#       elif updn=='up':
+#           found   = False
+#           row     = min(rPnt, rEnd if rEnd!=-1 else rPnt)
+#           if row-len(clpls)+1 >= 0:
+#               txtls   = [ed.get_text_line(r) for r in range(row-len(clpls)+1, row+1)]
+#               pass;          #LOG and log('txtls={}',(txtls))
+#               while True:
+#                   if self._find_cb_string_included_mlines(txtls, clpls):
+#                       # Found!
+#                       found   = True
+#                       break #while
+#                   row     = row-1
+#                   pass;          #LOG and log('row={}',(row))
+#                   if row-len(clpls)+1 < 0:
+#                       break #while
+#                   txtls   = [ed.get_text_line(row-len(clpls)+1)]+txtls[:-1]
+#                   pass;          #LOG and log('txtls={}',(txtls))
+#                  #while
+#           if False:pass
+#           elif not found  and bgn_crt_fin!='crt':
+#               return app.msg_status(FIND_FAIL_FOR_STR.format(clip))
+#           elif not found:#and bgn_crt_fin=='crt'
+#               # Wrap!
+#               return self.find_cb_string(updn, bgn_crt_fin=apx.icase(updn=='dn', 'bgn', 'fin'))
+#           ed.set_caret(len(clpls[-1]), row, len(txtls[0])-len(clpls[0]), row-len(clpls)+1)
+#      #def find_cb_string
+#   def _find_cb_string_included_mlines(self, txtls, clpls):
+#       if len(txtls)!=len(clpls):
+#           pass;              #LOG and log('fal l#l ',)
+#           return False
+#       if not  txtls[0].endswith(   clpls[0]):
+#           pass;              #LOG and log('fal ends t,c={}',(txtls[0], clpls[0]))
+#           return False
+#       if not  txtls[-1].startswith(clpls[-1]):
+#           pass;              #LOG and log('fal strt t,c={}',(txtls[-1], clpls[-1]))
+#           return False
+#       for ind in range(1, len(txtls)-1):
+#           if txtls[ind] !=         clpls[ind]:
+#               pass;          #LOG and log('fal4 eq ind={} t,c={}',ind, (txtls[0], clpls[0]))
+#               return False
+#       pass;                  #LOG and log('tru',)
+#       return True
+#      #def _find_cb_string_included_mlines
+    def find_cb_string_next(self):
+        self.find_cb_by_cmd('dn')
+       #self.find_cb_string('dn')
+    def find_cb_string_prev(self):
+        self.find_cb_by_cmd('up')
+       #self.find_cb_string('up')
+    def find_cb_by_cmd(self, updn):
         clip    = app.app_proc(app.PROC_GET_CLIP, '')
         if ''==clip:    return
-        clip    = clip.replace('\r\n', '\n').replace('\r', '\n')
-        pass;                  #LOG and log('clip={}',repr(clip))
-        crts    = ed.get_carets()
-        if len(crts)>1:
-            return app.msg_status(ONLY_SINGLE_CRT.format('Command'))
-        # Prepare bgn-, crt-, fin-point
-        (cBgn, rBgn)    = (0, 0)
-        (cCrt, rCrt
-        ,cEnd, rEnd)    = crts[0]
-        lst_line_ind    = ed.get_line_count()-1
-        lst_line        = ed.get_text_line(lst_line_ind)
-        (cFin, rFin)    = (max(0, len(lst_line)-1), lst_line_ind)
-        if bgn_crt_fin=='crt':
-            # Some cases for natural (not wrap) find
-            if updn=='dn' and (cFin, rFin) == (cCrt, rCrt):
-                # Caret at finish - immediately find from start
-                return self.find_cb_string(updn, bgn_crt_fin='bgn')
-            if updn=='up' and (cBgn, rBgn) == (cCrt, rCrt):
-                # Caret at start - immediately find from finish
-                return self.find_cb_string(updn, bgn_crt_fin='fin')
-            if updn=='dn' and (cBgn, rBgn) == (cCrt, rCrt):
-                # Caret already at start - switch wrap off
-                bgn_crt_fin = 'bgn'
-            if updn=='up' and (cFin, rFin) == (cCrt, rCrt):
-                # Caret already at finish - switch wrap off
-                bgn_crt_fin = 'fin'
-        (cPnt, rPnt
-        ,cEnd, rEnd)    = apx.icase(False,0
-                            ,bgn_crt_fin=='bgn', (cBgn, rBgn, cBgn, rBgn)
-                            ,bgn_crt_fin=='crt', (cCrt, rCrt, cEnd, rEnd)
-                            ,bgn_crt_fin=='fin', (cFin, rFin, cFin, rFin)
-                            )
-        # Main part
-        if '\n' not in clip:
-            # 1) Find inside each line
-            row     = rPnt
-            line    = ed.get_text_line(row)
-            pos     = line.find(clip, cPnt) if updn=='dn' else line.rfind(clip, 0, cPnt)
-            while -1==pos:
-                row     = apx.icase(updn=='dn', row+1,   updn=='up', row-1,   -1)
-                if row<0 or row==ed.get_line_count():
-                    break #while
-                line    = ed.get_text_line(row)
-                pos     = line.find(clip) if updn=='dn' else line.rfind(clip)
-            if False:pass
-            elif -1==pos  and bgn_crt_fin!='crt':
-                return app.msg_status(FIND_FAIL_FOR_STR.format(clip))
-            elif -1==pos:#and bgn_crt_fin=='crt'
-                # Wrap!
-                return self.find_cb_string(updn, bgn_crt_fin=apx.icase(updn=='dn', 'bgn', 'fin'))
-            elif updn=='dn':
-                ed.set_caret(pos+len(clip), row, pos, row)
-            elif updn=='up':
-                ed.set_caret(pos, row, pos+len(clip), row)
-            return
-        # 2) Find m-line
-        pass;                  #LOG and log('')
-        clpls   = clip.split('\n')
-        pass;                  #LOG and log('clpls={}',(clpls))
-        clip    = repr(clip)
-        if False:pass
-        elif updn=='dn':
-            found   = False
-            row     = max(rPnt, rEnd if rEnd!=-1 else rPnt)
-            if row+len(clpls) < ed.get_line_count():
-                txtls   = [ed.get_text_line(r) for r in range(row, row+len(clpls))]
-                pass;          #LOG and log('txtls={}',(txtls))
-                while True:
-                    if self._find_cb_string_included_mlines(txtls, clpls):
-                        # Found!
-                        found   = True
-                        break #while
-                    row     = row+1
-                    pass;          #LOG and log('row={}',(row))
-                    if row+len(clpls) >= ed.get_line_count():
-                        pass;  #LOG and log('nfnd12',)
-                        break #while
-                    txtls   = txtls[1:]+[ed.get_text_line(row+len(clpls)-1)]
-                    pass;      #LOG and log('txtls={}',(txtls))
-                   #while
-            if False:pass
-            elif not found  and bgn_crt_fin!='crt':
-                return app.msg_status(FIND_FAIL_FOR_STR.format(clip))
-            elif not found:#and bgn_crt_fin=='crt'
-                # Wrap!
-                return self.find_cb_string(updn, bgn_crt_fin=apx.icase(updn=='dn', 'bgn', 'fin'))
-            ed.set_caret(len(clpls[-1]), row+len(clpls)-1, len(txtls[0])-len(clpls[0]), row)
-        elif updn=='up':
-            found   = False
-            row     = min(rPnt, rEnd if rEnd!=-1 else rPnt)
-            if row-len(clpls)+1 >= 0:
-                txtls   = [ed.get_text_line(r) for r in range(row-len(clpls)+1, row+1)]
-                pass;          #LOG and log('txtls={}',(txtls))
-                while True:
-                    if self._find_cb_string_included_mlines(txtls, clpls):
-                        # Found!
-                        found   = True
-                        break #while
-                    row     = row-1
-                    pass;          #LOG and log('row={}',(row))
-                    if row-len(clpls)+1 < 0:
-                        break #while
-                    txtls   = [ed.get_text_line(row-len(clpls)+1)]+txtls[:-1]
-                    pass;          #LOG and log('txtls={}',(txtls))
-                   #while
-            if False:pass
-            elif not found  and bgn_crt_fin!='crt':
-                return app.msg_status(FIND_FAIL_FOR_STR.format(clip))
-            elif not found:#and bgn_crt_fin=='crt'
-                # Wrap!
-                return self.find_cb_string(updn, bgn_crt_fin=apx.icase(updn=='dn', 'bgn', 'fin'))
-            ed.set_caret(len(clpls[-1]), row, len(txtls[0])-len(clpls[0]), row-len(clpls)+1)
-       #def find_cb_string
-    def _find_cb_string_included_mlines(self, txtls, clpls):
-        if len(txtls)!=len(clpls):
-            pass;              #LOG and log('fal l#l ',)
-            return False
-        if not  txtls[0].endswith(   clpls[0]):
-            pass;              #LOG and log('fal ends t,c={}',(txtls[0], clpls[0]))
-            return False
-        if not  txtls[-1].startswith(clpls[-1]):
-            pass;              #LOG and log('fal strt t,c={}',(txtls[-1], clpls[-1]))
-            return False
-        for ind in range(1, len(txtls)-1):
-            if txtls[ind] !=         clpls[ind]:
-                pass;          #LOG and log('fal4 eq ind={} t,c={}',ind, (txtls[0], clpls[0]))
-                return False
-        pass;                  #LOG and log('tru',)
-        return True
-       #def _find_cb_string_included_mlines
-    def find_cb_string_next(self):
-        self.find_cb_string('dn')
-       #def find_cb_string_next
-    def find_cb_string_prev(self):
-        self.find_cb_string('up')
-       #def find_cb_string_prev
+        clip    = clip.replace('\r\n', '\n').replace('\r', '\n')    ##??
+        ed.cmd(cmds.cmd_FinderAction, chr(1).join([]
+            +['findprev' if updn=='up' else 'findnext']
+            +[clip]
+            +['']
+            +['fa']  # f - from caret,  a - wrapped
+        ))
+       #def find_cb_by_cmd
 
+    def replace_all_sel_to_cb(self):
+        crts    = ed.get_carets()
+        if len(crts)!=1: return
+        seltext = ed.get_text_sel()
+        if not seltext: return
+        clip    = app.app_proc(app.PROC_GET_CLIP, '')
+        ed.cmd(cmds.cmd_FinderAction, chr(1).join([]
+            +['repall']
+            +[seltext]
+            +[clip]
+            +['a']  # a - wrapped
+        ))
+       #def replace_all_sel_to_cb
+    
     def open_selected(self):
         pass;                  #LOG and log('ok',)
-        bs_dir  = os.path.dirname(ed.get_filename())
-        crts    = ed.get_carets()
-        for (cCrt, rCrt, cEnd, rEnd) in crts:
-            if -1==cEnd: continue
-            if rCrt!=rEnd: continue
-            (rTx1, cTx1), (rTx2, cTx2) = apx.minmax((rCrt, cCrt), (rEnd, cEnd))
-            selTx   = ed.get_text_substr(cTx1, rTx1, cTx2, rTx2)
-            op_file = os.path.join(bs_dir, selTx)
-            if not os.path.exists(op_file):
-                app.msg_status(NO_FILE_FOR_OPEN.format(op_file))
-                continue
-            op_ed   = _file_open(op_file)
-            op_ed.focus()
+        bs_dir      = os.path.dirname(ed.get_filename())
+        crts        = ed.get_carets()
+        if len(crts)!=1: return
+        (cCrt, rCrt
+        ,cEnd, rEnd)= crts[0]
+        pointed = ed.get_text_sel()
+        if not pointed:
+            # Empty selection, will use word/term
+            line    = ed.get_text_line(rCrt)
+            (pointed
+            ,where) = get_word_or_quoted(line, cCrt)
+        pass;                  #LOG and log('pointed={}',pointed)
+        if not pointed: return
+        op_file     = os.path.join(bs_dir, pointed)
+        if not os.path.exists(op_file):
+            app.msg_status(NO_FILE_FOR_OPEN.format(op_file))
+            return
+        op_ed       = _file_open(op_file)
+        op_ed.focus()
        #def open_selected
-    
-    def replace_all_sel_to_cb(self):
-        pass;                   LOG and log('ok',)
-        pass;                   return
-        crts    = ed.get_carets()
-        if len(crts)>1:
-            return app.msg_status(ONLY_SINGLE_CRT.format('Command'))
-        (cCrt, rCrt, cEnd, rEnd)    = crts[0]
-       #def replace_all_sel_to_cb
     
     def _activate_tab(self, group, tab_ind):
         pass;                  #LOG and log('')
@@ -479,7 +501,7 @@ def find_matching_char(ed4find, cStart, rStart, opn2cls={'[':']', '{':'}', '(':'
     # Is there any bracket AFTER caret?
     c_aft   = crt_line[cStart]   if cStart<len(crt_line) else ' '
     c_bfr   = crt_line[cStart-1] if cStart>0             else ' '
-    pass;                  #LOG and log('c_bfr, c_aft={}', (c_bfr, c_aft))
+    pass;                      #LOG and log('c_bfr, c_aft={}', (c_bfr, c_aft))
 
     if False:pass
     elif c_aft in opn2cls: (c_opn, c_cls, col) = (c_aft, opn2cls[c_aft], cStart+1)
@@ -491,7 +513,7 @@ def find_matching_char(ed4find, cStart, rStart, opn2cls={'[':']', '{':'}', '(':'
     to_end  = c_opn in opn2cls
     line    = crt_line
     row     = rStart
-    pass;                  #LOG and log('c_opn,c_cls,to_end,col={}', (c_opn,c_cls,to_end,col))
+    pass;                      #LOG and log('c_opn,c_cls,to_end,col={}', (c_opn,c_cls,to_end,col))
     cnt     = 1
     while True:
         for pos in (range(col, len(line)) if to_end else 
@@ -504,7 +526,7 @@ def find_matching_char(ed4find, cStart, rStart, opn2cls={'[':']', '{':'}', '(':'
                 cnt     = cnt-1
             else:
                 continue # for pos
-            pass;          #LOG and log('line, pos, c, cnt={}', (line, pos, c, cnt))
+            pass;              #LOG and log('line, pos, c, cnt={}', (line, pos, c, cnt))
             if 0==cnt:
                 # Found!
                 col     = pos
@@ -514,13 +536,13 @@ def find_matching_char(ed4find, cStart, rStart, opn2cls={'[':']', '{':'}', '(':'
         if to_end:
             row     = row+1
             if row==ed4find.get_line_count():
-                pass;  #LOG and log('not found')
+                pass;          #LOG and log('not found')
                 break #while
             line    = ed4find.get_text_line(row)
             col     = 0
         else:
             if row==0:
-                pass;  #LOG and log('not found')
+                pass;          #LOG and log('not found')
                 break #while
             row     = row-1
             line    = ed4find.get_text_line(row)
@@ -528,6 +550,43 @@ def find_matching_char(ed4find, cStart, rStart, opn2cls={'[':']', '{':'}', '(':'
        #while
     return (c_opn, c_cls, col, row) if cnt==0 else (c_opn, c_cls, -1, -1)
    #def find_matching_char
+
+def get_word_or_quoted(text, start, not_word_chars='[](){}', quot_chars="'"+'"'):      # '"
+    ''' Find word or 'smth' or "smth" around start.
+        Return      (found, pos_of_found)
+    '''
+    if not text or not(0<=start<=len(text)):   return ('', -1)
+    text        = ' '+text+' '
+    start       = start+1
+    bgn, end    = -1, -1
+    left_cond   = ' '
+    # Backward
+    pos         = start-1
+    while 0<=pos:
+        c       = text[pos]
+        if c.isspace() or c in not_word_chars:
+            left_cond   = ' '
+            bgn         = pos+1
+            break
+        if c in quot_chars:
+            left_cond   = c
+            bgn         = pos+1
+            break
+        pos    -= 1
+    # Forward
+    pos         = start
+    while pos<len(text):
+        c       = text[pos]
+        if left_cond==' ' and (c.isspace() or c in not_word_chars):
+            end         = pos
+            break
+        if left_cond!=' ' and c in quot_chars:
+            end         = pos
+            break
+        pos    += 1
+    
+    return (text[bgn:end], bgn-1) if bgn!=-1 and end!=-1 else ('', -1)
+   #def get_word_or_quoted
 
 '''
 ToDo
