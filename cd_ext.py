@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '0.9.3 2016-01-12'
+    '0.9.4 2016-01-14'
 ToDo: (see end of file)
 '''
 
@@ -13,12 +13,16 @@ import  cudatext_cmd    as cmds
 import  cudax_lib       as apx
 from    cudax_lib   import log
 
+FROM_API_VERSION= '1.0.119'
+
 # Localization
-ONLY_SINGLE_CRT         = "{} doesn't work with multi-carets"
-ONLY_FOR_NO_SEL         = "{} works when no selection"
-NO_PAIR_BRACKET         = "Cannot find matching bracket for '{}'"
-FIND_FAIL_FOR_STR       = "Cannot find: {}"
-NO_FILE_FOR_OPEN        = "Cannot open: {}"
+ONLY_SINGLE_CRT     = "{} doesn't work with multi-carets"
+ONLY_FOR_NO_SEL     = "{} works when no selection"
+NO_PAIR_BRACKET     = "Cannot find matching bracket for '{}'"
+FIND_FAIL_FOR_STR   = "Cannot find: {}"
+NO_FILE_FOR_OPEN    = "Cannot open: {}"
+NEED_UPDATE         = "Need update CudaText"
+EMPTY_CLIP          = "Empty value in clipboard"
 
 pass;                           # Logging
 pass;                          #from pprint import pformat
@@ -239,36 +243,47 @@ class Command:
 #       pass;                  #LOG and log('tru',)
 #       return True
 #      #def _find_cb_string_included_mlines
-    def find_cb_string_next(self):
-        self.find_cb_by_cmd('dn')
-       #self.find_cb_string('dn')
-    def find_cb_string_prev(self):
-        self.find_cb_by_cmd('up')
-       #self.find_cb_string('up')
-    def find_cb_by_cmd(self, updn):
+    def  find_cb_string_next(self): self._find_cb_by_cmd('dn')
+    def  find_cb_string_prev(self): self._find_cb_by_cmd('up')
+    def _find_cb_by_cmd(self, updn):
+        if app.app_api_version()<FROM_API_VERSION:  return app.msg_status(NEED_UPDATE)
         clip    = app.app_proc(app.PROC_GET_CLIP, '')
         if ''==clip:    return
         clip    = clip.replace('\r\n', '\n').replace('\r', '\n')    ##??
+        user_opt= app.app_proc(app.PROC_GET_FIND_OPTIONS, '')
+        # c - Case, r - RegEx,  w - Word,  f - From-caret,  a - Wrapp,  b - Back
+        find_opt= 'f'
+        find_opt= find_opt + ('c' if 'c' in user_opt else '')   # As user: Case
+        find_opt= find_opt + ('w' if 'w' in user_opt else '')   # As user: Word
+        find_opt= find_opt + ('a' if 'a' in user_opt else '')   # As user: Wrap
         ed.cmd(cmds.cmd_FinderAction, chr(1).join([]
             +['findprev' if updn=='up' else 'findnext']
             +[clip]
             +['']
-            +['fa']  # f - from caret,  a - wrapped
+            +[find_opt]
         ))
+        app.app_proc(app.PROC_SET_FIND_OPTIONS, user_opt)
        #def find_cb_by_cmd
 
     def replace_all_sel_to_cb(self):
+        if app.app_api_version()<FROM_API_VERSION:  return app.msg_status(NEED_UPDATE)
         crts    = ed.get_carets()
-        if len(crts)!=1: return
+        if len(crts)>1: return app.msg_status(ONLY_SINGLE_CRT.format('Command'))
         seltext = ed.get_text_sel()
         if not seltext: return
         clip    = app.app_proc(app.PROC_GET_CLIP, '')
+        user_opt= app.app_proc(app.PROC_GET_FIND_OPTIONS, '')
+        # c - Case, r - RegEx,  w - Word,  f - From-caret,  a - Wrapp,  b - Back
+        find_opt= 'a'
+        find_opt= find_opt + ('c' if 'c' in user_opt else '')   # As user: Case
+        find_opt= find_opt + ('w' if 'w' in user_opt else '')   # As user: Case
         ed.cmd(cmds.cmd_FinderAction, chr(1).join([]
             +['repall']
             +[seltext]
             +[clip]
-            +['a']  # a - wrapped
+            +[find_opt]  # a - wrapped
         ))
+        app.app_proc(app.PROC_SET_FIND_OPTIONS, user_opt)
        #def replace_all_sel_to_cb
     
     def open_selected(self):

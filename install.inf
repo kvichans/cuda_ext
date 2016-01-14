@@ -38,6 +38,12 @@ caption=Find clipboard string: prev
 method=find_cb_string_prev
 menu=0
 
+[item101]
+section=commands
+caption=Replace all fragment as selected with clipboard value
+method=replace_all_sel_to_cb
+menu=0
+
 [item7]
 section=commands
 caption=Open file by selected name

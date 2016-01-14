@@ -1,4 +1,8 @@
 
+0.9.4 (2016-01-14)
+added: Replace all as selection to clip
+rework: Finding clip saves user settings
+
 0.9.2 (2016-01-11)
 added: Move splitters
 
