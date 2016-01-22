@@ -10,208 +10,208 @@ events=on_console_nav
 
 [item2]
 section=commands
-caption=Add indented line above
+caption=CudaExt: Add indented line above
 method=add_indented_line_above
 menu=0
 
 [item3]
 section=commands
-caption=Add indented line below
+caption=CudaExt: Add indented line below
 method=add_indented_line_below
 menu=0
 
 [item4]
 section=commands
-caption=Paste to first column
+caption=CudaExt: Paste to first column
 method=paste_to_1st_col
 menu=0
 
 [item5]
 section=commands
-caption=Find clipboard string: next
+caption=CudaExt: Find clipboard string: next
 method=find_cb_string_next
 menu=0
 
 [item6]
 section=commands
-caption=Find clipboard string: prev
+caption=CudaExt: Find clipboard string: prev
 method=find_cb_string_prev
 menu=0
 
 [item101]
 section=commands
-caption=Replace all fragment as selected with clipboard value
+caption=CudaExt: Replace all fragment as selected with clipboard value
 method=replace_all_sel_to_cb
 menu=0
 
 [item7]
 section=commands
-caption=Open file by selected name
+caption=CudaExt: Open file by selected name
 method=open_selected
 menu=0
 
 [item8]
 section=commands
-caption=Jump to matching bracket
+caption=CudaExt: Jump to matching bracket
 method=jump_to_matching_bracket
 menu=0
 
 [item10]
 section=commands
-caption=Activate last tab in group #1
+caption=CudaExt: Activate last tab in group #1
 method=to_tab_g1_last
 menu=0
 [item11]
 section=commands
-caption=Activate tab #1 in group #1
+caption=CudaExt: Activate tab #1 in group #1
 method=to_tab_g1_t1
 menu=0
 [item12]
 section=commands
-caption=Activate tab #2 in group #1
+caption=CudaExt: Activate tab #2 in group #1
 method=to_tab_g1_t2
 menu=0
 [item13]
 section=commands
-caption=Activate tab #3 in group #1
+caption=CudaExt: Activate tab #3 in group #1
 method=to_tab_g1_t3
 menu=0
 [item14]
 section=commands
-caption=Activate tab #4 in group #1
+caption=CudaExt: Activate tab #4 in group #1
 method=to_tab_g1_t4
 menu=0
 [item15]
 section=commands
-caption=Activate tab #5 in group #1
+caption=CudaExt: Activate tab #5 in group #1
 method=to_tab_g1_t5
 menu=0
 [item16]
 section=commands
-caption=Activate tab #6 in group #1
+caption=CudaExt: Activate tab #6 in group #1
 method=to_tab_g1_t6
 menu=0
 [item17]
 section=commands
-caption=Activate tab #7 in group #1
+caption=CudaExt: Activate tab #7 in group #1
 method=to_tab_g1_t7
 menu=0
 [item18]
 section=commands
-caption=Activate tab #8 in group #1
+caption=CudaExt: Activate tab #8 in group #1
 method=to_tab_g1_t8
 menu=0
 [item19]
 section=commands
-caption=Activate tab #9 in group #1
+caption=CudaExt: Activate tab #9 in group #1
 method=to_tab_g1_t9
 menu=0
 
 [item20]
 section=commands
-caption=Activate last tab in group #2
+caption=CudaExt: Activate last tab in group #2
 method=to_tab_g2_last
 menu=0
 [item21]
 section=commands
-caption=Activate tab #1 in group #2
+caption=CudaExt: Activate tab #1 in group #2
 method=to_tab_g2_t1
 menu=0
 [item22]
 section=commands
-caption=Activate tab #2 in group #2
+caption=CudaExt: Activate tab #2 in group #2
 method=to_tab_g2_t2
 menu=0
 [item23]
 section=commands
-caption=Activate tab #3 in group #2
+caption=CudaExt: Activate tab #3 in group #2
 method=to_tab_g2_t3
 menu=0
 [item24]
 section=commands
-caption=Activate tab #4 in group #2
+caption=CudaExt: Activate tab #4 in group #2
 method=to_tab_g2_t4
 menu=0
 [item25]
 section=commands
-caption=Activate tab #5 in group #2
+caption=CudaExt: Activate tab #5 in group #2
 method=to_tab_g2_t5
 menu=0
 [item26]
 section=commands
-caption=Activate tab #6 in group #2
+caption=CudaExt: Activate tab #6 in group #2
 method=to_tab_g2_t6
 menu=0
 [item27]
 section=commands
-caption=Activate tab #7 in group #2
+caption=CudaExt: Activate tab #7 in group #2
 method=to_tab_g2_t7
 menu=0
 [item28]
 section=commands
-caption=Activate tab #8 in group #2
+caption=CudaExt: Activate tab #8 in group #2
 method=to_tab_g2_t8
 menu=0
 [item29]
 section=commands
-caption=Activate tab #9 in group #2
+caption=CudaExt: Activate tab #9 in group #2
 method=to_tab_g2_t9
 menu=0
 
 [item30]
 section=commands
-caption=Activate next tab (global loop)
+caption=CudaExt: Activate next tab (global loop)
 method=to_next_tab
 menu=0
 [item31]
 section=commands
-caption=Activate prev tab (global loop)
+caption=CudaExt: Activate prev tab (global loop)
 method=to_prev_tab
 menu=0
 
 [item40]
 section=commands
-caption=Move splitter to expand tree panel
+caption=CudaExt: Move splitter to expand tree panel
 method=more_tree
 menu=0
 [item41]
 section=commands
-caption=Move splitter to narrow tree panel
+caption=CudaExt: Move splitter to narrow tree panel
 method=less_tree
 menu=0
 [item42]
 section=commands
-caption=Move splitter to expand bottom panel
+caption=CudaExt: Move splitter to expand bottom panel
 method=more_bottom
 menu=0
 [item43]
 section=commands
-caption=Move splitter to narrow bottom panel
+caption=CudaExt: Move splitter to narrow bottom panel
 method=less_bottom
 menu=0
 [item44]
 section=commands
-caption=Move splitter to expand top-left group
+caption=CudaExt: Move splitter to expand top-left group
 method=more_main_grp
 menu=0
 [item45]
 section=commands
-caption=Move splitter to narrow top-left group
+caption=CudaExt: Move splitter to narrow top-left group
 method=less_main_grp
 menu=0
 [item44]
 section=commands
-caption=Move splitter to expand active group
+caption=CudaExt: Move splitter to expand active group
 method=more_curr_grp
 menu=0
 [item45]
 section=commands
-caption=Move splitter to narrow active group
+caption=CudaExt: Move splitter to narrow active group
 method=less_curr_grp
 menu=0
 
 [item50]
 section=commands
-caption=Edit stream comment chars for lexer
+caption=CudaExt: Edit stream comment chars for lexer
 method=edit_strcomment_chars
 menu=0
