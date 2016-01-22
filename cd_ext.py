@@ -596,17 +596,17 @@ class Command:
                       ,'val='+pair_df[0]
                       ,'props=1,0,1'    # ro,mono,border
                       ])] # i= 3
-            +[C1.join(['type=label'     ,POS_FMT(l=GAP,             t=GAP+45+at4lbl,r=GAP+100, b=0)
+            +[C1.join(['type=label'     ,POS_FMT(l=GAP,             t=GAP+50+at4lbl,r=GAP+100, b=0)
                       ,'cap=&Finish chars'
                       ])] # i= 4
-            +[C1.join(['type=edit'      ,POS_FMT(l=GAP+100,         t=GAP+45,       r=GAP+100+150, b=0)
+            +[C1.join(['type=edit'      ,POS_FMT(l=GAP+100,         t=GAP+50,       r=GAP+100+150, b=0)
                       ,'val='+pair[1]
                       ])] # i= 5
-            +[C1.join(['type=edit'      ,POS_FMT(l=GAP+100+150+GAP, t=GAP+45,       r=GAP+100+150+GAP+150, b=0)
+            +[C1.join(['type=edit'      ,POS_FMT(l=GAP+100+150+GAP, t=GAP+50,       r=GAP+100+150+GAP+150, b=0)
                       ,'val='+pair_df[1]
                       ,'props=1,0,1'    # ro,mono,border
                       ])] # i= 6
-            +[C1.join(['type=check'     ,POS_FMT(l=GAP+100,         t=GAP+70,       r=GAP+20+GAP+85, b=0)
+            +[C1.join(['type=check'     ,POS_FMT(l=GAP+100,         t=GAP+80,       r=GAP+20+GAP+85, b=0)
                       ,'cap=Only full lines'
                       ,'val='+('1' if only_ln else '0')
                       ])] # i= 7
