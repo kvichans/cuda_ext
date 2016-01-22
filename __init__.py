@@ -50,4 +50,5 @@ class Command:
     def less_main_grp(self):                    return RLS._move_splitter('main', 0.95)
     def more_curr_grp(self):                    return RLS._move_splitter('curr', 1.05)
     def less_curr_grp(self):                    return RLS._move_splitter('curr', 0.95)
+    def edit_strcomment_chars(self):            return RLS.edit_strcomment_chars()
    #class Command

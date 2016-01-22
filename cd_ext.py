@@ -2,11 +2,11 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '0.9.4 2016-01-14'
+    '0.9.5 2016-01-22'
 ToDo: (see end of file)
 '''
 
-import  re, os
+import  re, os, sys, json
 import  cudatext        as app
 from    cudatext    import ed
 import  cudatext_cmd    as cmds
@@ -23,11 +23,57 @@ FIND_FAIL_FOR_STR   = "Cannot find: {}"
 NO_FILE_FOR_OPEN    = "Cannot open: {}"
 NEED_UPDATE         = "Need update CudaText"
 EMPTY_CLIP          = "Empty value in clipboard"
+NO_LEXER            = "No lexer"
+UPDATE_FILE         = "File '{}' is updated"
+USE_NOT_EMPTY       = "Set not empty values"
 
 pass;                           # Logging
 pass;                          #from pprint import pformat
 pass;                          #pfrm15=lambda d:pformat(d,width=15)
 pass;                           LOG = (-2==-2)  # Do or dont logging.
+
+C1      = chr(1)
+C2      = chr(2)
+POS_FMT = 'pos={l},{t},{r},{b}'.format
+GAP     = 5
+def top_plus_for_os(what_control, base_control='edit'):
+    ''' Addition for what_top to align text with base.
+        Params
+            what_control    'check'/'label'/'edit'/'button'/'combo'/'combo_ro'
+            base_control    'check'/'label'/'edit'/'button'/'combo'/'combo_ro'
+    '''
+    if what_control==base_control:
+        return 0
+    env = sys.platform
+    if base_control=='edit': 
+        if env=='win32':
+            return apx.icase(what_control=='check',    1
+                            ,what_control=='label',    3
+                            ,what_control=='button',  -1
+                            ,what_control=='combo_ro',-1
+                            ,what_control=='combo',    0
+                            ,True,                     0)
+        if env=='linux':
+            return apx.icase(what_control=='check',    1
+                            ,what_control=='label',    5
+                            ,what_control=='button',   1
+                            ,what_control=='combo_ro', 0
+                            ,what_control=='combo',   -1
+                            ,True,                     0)
+        if env=='darwin':
+            return apx.icase(what_control=='check',    2
+                            ,what_control=='label',    3
+                            ,what_control=='button',   0
+                            ,what_control=='combo_ro', 1
+                            ,what_control=='combo',    0
+                            ,True,                     0)
+        return 0
+       #if base_control=='edit'
+    return top_plus_for_os(what_control, 'edit') - top_plus_for_os(base_control, 'edit')
+   #def top_plus_for_os
+at4chk  = top_plus_for_os('check')
+at4lbl  = top_plus_for_os('label')
+at4btn  = top_plus_for_os('button')
 
 def _file_open(op_file):
     if not app.file_open(op_file):
@@ -505,6 +551,92 @@ class Command:
         else:
             return app.msg_status(NO_PAIR_BRACKET.format(c_opn))
        #def jump_to_matching_bracket
+
+    def edit_strcomment_chars(self):
+        lex     = ed.get_prop(app.PROP_LEXER_CARET)
+        if not lex: return app.msg_status(NO_LEXER)
+        def_lexs_json   = os.path.join(apx.get_def_setting_dir()         , 'default_lexers.json')
+        usr_lexs_json   = os.path.join(app.app_path(app.APP_DIR_SETTINGS), 'user_lexers.json')
+        def_lexs        = apx._json_loads(open(def_lexs_json).read())
+        usr_lexs        = apx._json_loads(open(usr_lexs_json).read()) if os.path.exists(usr_lexs_json) else {"Comments":{}, "CommentsForLines":{}}
+        pass;                  #LOG and log('usr_lexs={}',usr_lexs)
+        only_ln         = False
+        pair_df         = ['','']
+        pair            = ['','']
+        if False:pass
+        elif lex in   def_lexs["Comments"]:
+            pair_df = def_lexs["Comments"].get(lex)
+        elif lex in   def_lexs["CommentsForLines"]:
+            pair_df = def_lexs["CommentsForLines"].get(lex)
+            only_ln = True
+        if False:pass
+        elif lex in   usr_lexs["Comments"]:
+            pair    = usr_lexs["Comments"].get(lex)
+        elif lex in   usr_lexs["CommentsForLines"]:
+            pair    = usr_lexs["CommentsForLines"].get(lex)
+            only_ln = True
+        elif lex in   def_lexs["Comments"]:
+            pair    = def_lexs["Comments"].get(lex)
+        elif lex in   def_lexs["CommentsForLines"]:
+            pair    = def_lexs["CommentsForLines"].get(lex)
+            only_ln = True
+        while True:
+            DLG_W   = GAP*3+100+150*2
+            ans     = app.dlg_custom('Stream comment chars for lexer "{}"'.format(lex)   ,DLG_W, 140, '\n'.join([]
+            +[C1.join(['type=label'     ,POS_FMT(l=GAP+100+150+GAP, t=GAP+2,        r=GAP+100+150+GAP+150, b=0)
+                      ,'cap=Default values'
+                      ])] # i= 0
+            +[C1.join(['type=label'     ,POS_FMT(l=GAP,             t=GAP+20+at4lbl,r=GAP+100, b=0)
+                      ,'cap=&Start chars'
+                      ])] # i= 1
+            +[C1.join(['type=edit'      ,POS_FMT(l=GAP+100,         t=GAP+20,       r=GAP+100+150, b=0)
+                      ,'val='+pair[0]
+                      ])] # i= 2
+            +[C1.join(['type=edit'      ,POS_FMT(l=GAP+100+150+GAP, t=GAP+20,       r=GAP+100+150+GAP+150, b=0)
+                      ,'val='+pair_df[0]
+                      ,'props=1,0,1'    # ro,mono,border
+                      ])] # i= 3
+            +[C1.join(['type=label'     ,POS_FMT(l=GAP,             t=GAP+45+at4lbl,r=GAP+100, b=0)
+                      ,'cap=&Finish chars'
+                      ])] # i= 4
+            +[C1.join(['type=edit'      ,POS_FMT(l=GAP+100,         t=GAP+45,       r=GAP+100+150, b=0)
+                      ,'val='+pair[1]
+                      ])] # i= 5
+            +[C1.join(['type=edit'      ,POS_FMT(l=GAP+100+150+GAP, t=GAP+45,       r=GAP+100+150+GAP+150, b=0)
+                      ,'val='+pair_df[1]
+                      ,'props=1,0,1'    # ro,mono,border
+                      ])] # i= 6
+            +[C1.join(['type=check'     ,POS_FMT(l=GAP+100,         t=GAP+70,       r=GAP+20+GAP+85, b=0)
+                      ,'cap=Only full lines'
+                      ,'val='+('1' if only_ln else '0')
+                      ])] # i= 7
+            +[C1.join(['type=button'   ,POS_FMT(l=DLG_W-GAP*2-100*2,t=GAP+105,      r=DLG_W-GAP*2-100*1, b=0)
+                      ,'cap=OK'
+                      ,'props=1'        #default
+                      ])] # i= 8
+            +[C1.join(['type=button'   ,POS_FMT(l=DLG_W-GAP*1-100*1,t=GAP+105,      r=DLG_W-GAP*1-100*0, b=0)
+                      ,'cap=Cancel'
+                      ])] # i= 9
+            ), 0)    # start focus
+            if ans is None or ans[0]== 9:    return
+            (ans_i
+            ,vals)      = ans
+            vals        = vals.splitlines()
+            pair        = [vals[ 2], vals[ 5]]
+            only_ln     = vals[ 7]=='1'
+            # Checking
+            if not pair[0] or not pair[1]:
+                app.msg_box(USE_NOT_EMPTY, app.MB_OK)
+                continue #while
+            break #while 
+           #while
+           
+        #Saving
+        usr_lexs["Comments"         if only_ln else "CommentsForLines"].pop(lex, None)
+        usr_lexs["CommentsForLines" if only_ln else "Comments"        ][lex] = pair
+        open(usr_lexs_json, 'w').write(json.dumps(usr_lexs, indent=2))
+        app.msg_status(UPDATE_FILE.format(usr_lexs_json))
+       #def edit_strcomment_chars
 
    #class Command
 

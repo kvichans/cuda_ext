@@ -1,4 +1,7 @@
 
+0.9.5 (2016-01-22)
+added: Edit stream comment chars for lexer
+
 0.9.4 (2016-01-14)
 added: Replace all as selection to clip
 rework: Finding clip saves user settings

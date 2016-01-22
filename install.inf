@@ -209,3 +209,9 @@ section=commands
 caption=Move splitter to narrow active group
 method=less_curr_grp
 menu=0
+
+[item50]
+section=commands
+caption=Edit stream comment chars for lexer
+method=edit_strcomment_chars
+menu=0
