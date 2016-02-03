@@ -51,4 +51,6 @@ class Command:
     def more_curr_grp(self):                    return RLS._move_splitter('curr', 1.05)
     def less_curr_grp(self):                    return RLS._move_splitter('curr', 0.95)
     def edit_strcomment_chars(self):            return RLS.edit_strcomment_chars()
+    def scroll_to_center(self):                 return RLS.scroll_to_center()
+    def align_in_lines_by_sep(self):            return RLS.align_in_lines_by_sep()
    #class Command

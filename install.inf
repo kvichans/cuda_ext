@@ -34,7 +34,7 @@ menu=0
 
 [item6]
 section=commands
-caption=CudaExt: Find clipboard string: prev
+caption=CudaExt: Find clipboard string: previous
 method=find_cb_string_prev
 menu=0
 
@@ -165,7 +165,7 @@ method=to_next_tab
 menu=0
 [item31]
 section=commands
-caption=CudaExt: Activate prev tab (global loop)
+caption=CudaExt: Activate previous tab (global loop)
 method=to_prev_tab
 menu=0
 
@@ -214,4 +214,16 @@ menu=0
 section=commands
 caption=CudaExt: Edit stream comment chars for lexer
 method=edit_strcomment_chars
+menu=0
+
+[item60]
+section=commands
+caption=CudaExt: Scroll current line to screen center
+method=scroll_to_center
+menu=0
+
+[item70]
+section=commands
+caption=CudaExt: Align in lines by separator
+method=align_in_lines_by_sep
 menu=0

@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.0.1 2016-01-22'
+    '1.0.2 2016-02-03'
 ToDo: (see end of file)
 '''
 
@@ -26,6 +26,9 @@ EMPTY_CLIP          = "Empty value in clipboard"
 NO_LEXER            = "No lexer"
 UPDATE_FILE         = "File '{}' is updated"
 USE_NOT_EMPTY       = "Set not empty values"
+ONLY_FOR_ML_SEL     = "{} works with multiline selection"
+NO_SPR_IN_LINES     = "No seperator '{}' in selected lines"
+DONT_NEED_CHANGE    = "Dont need any changes"
 
 pass;                           # Logging
 pass;                          #from pprint import pformat
@@ -86,6 +89,9 @@ def _file_open(op_file):
    #def _file_open
    
 class Command:
+    def __init__(self):
+        self.data4_align_in_lines_by_sep  = ''
+        
     def on_console_nav(self, ed_self, text):
         pass;                  #LOG and log('text={}',text)
         match   = re.match('.*File "([^"]+)", line (\d+)', text)    ##?? variants?
@@ -425,6 +431,7 @@ class Command:
             id_splt     = 'B'
         
         else:               # Groups
+            # [('G'+str(i), list(zip(('|','V','P','F'), app.app_proc(app.PROC_GET_SPLIT, 'G'+str(i))))) for i in (1,2,3)]
             # 2HORZ     0 G1 1
             # 2VERT     0
             #           G1
@@ -435,9 +442,12 @@ class Command:
             #           1
             #           G2
             #           2
-            # 3PLUS     0 G3 1 
+            # 1P2VERT   0 G3 1 
             #                G2 
             #                2 
+            # 1P2HORZ   0
+            #           G3 
+            #           1 G2 2 
             # 4HORZ     0 G1 1 G2 2 G3 3
             # 4VERT     0
             #           G1
@@ -459,9 +469,16 @@ class Command:
                 return      # No splitter
 
             elif (what=='main' 
-            and   grouping!=app.GROUPS_3PLUS):      id_splt = 'G1'
+#           and   grouping!=app.GROUPS_3PLUS):      id_splt = 'G1'
+            and   grouping!=app.GROUPS_1P2VERT
+            and   grouping!=app.GROUPS_1P2HORZ):    id_splt = 'G1'
+            
             elif (what=='main' 
-            and   grouping==app.GROUPS_3PLUS):      id_splt = 'G3'
+#           and   grouping==app.GROUPS_3PLUS):      id_splt = 'G3'
+            and   grouping==app.GROUPS_1P2VERT):    id_splt = 'G3'
+
+            elif (what=='main' 
+            and   grouping==app.GROUPS_1P2HORZ):    id_splt = 'G3'
 
             #     what=='curr'
             elif cur_grp==0:
@@ -470,7 +487,9 @@ class Command:
                 elif grouping==app.GROUPS_2VERT:    id_splt = 'G1'  # h-self
                 elif grouping==app.GROUPS_3HORZ:    id_splt = 'G1'  # w-self
                 elif grouping==app.GROUPS_3VERT:    id_splt = 'G1'  # h-self
-                elif grouping==app.GROUPS_3PLUS:    id_splt = 'G3'  # w-self
+#               elif grouping==app.GROUPS_3PLUS:    id_splt = 'G3'  # w-self
+                elif grouping==app.GROUPS_1P2VERT:  id_splt = 'G3'  # w-self
+                elif grouping==app.GROUPS_1P2HORZ:  id_splt = 'G3'  # h-self
                 elif grouping==app.GROUPS_4HORZ:    id_splt = 'G1'  # w-self
                 elif grouping==app.GROUPS_4VERT:    id_splt = 'G1'  # h-self
                 elif grouping==app.GROUPS_4GRID:    id_splt = 'G1'  # w-self
@@ -482,7 +501,9 @@ class Command:
                 elif grouping==app.GROUPS_2VERT:    id_splt ='-G1'  # h-top
                 elif grouping==app.GROUPS_3HORZ:    id_splt = 'G2'  # w-self
                 elif grouping==app.GROUPS_3VERT:    id_splt = 'G2'  # h-self
-                elif grouping==app.GROUPS_3PLUS:    id_splt = 'G2'  # h-self
+#               elif grouping==app.GROUPS_3PLUS:    id_splt = 'G2'  # h-self
+                elif grouping==app.GROUPS_1P2VERT:  id_splt = 'G2'  # h-self
+                elif grouping==app.GROUPS_1P2HORZ:  id_splt = 'G2'  # w-self
                 elif grouping==app.GROUPS_4HORZ:    id_splt = 'G2'  # w-self
                 elif grouping==app.GROUPS_4VERT:    id_splt = 'G2'  # h-self
                 elif grouping==app.GROUPS_4GRID:    id_splt ='-G1'  # w-left
@@ -492,7 +513,9 @@ class Command:
                 if False:pass
                 elif grouping==app.GROUPS_3HORZ:    id_splt ='-G2'  # w-left
                 elif grouping==app.GROUPS_3VERT:    id_splt ='-G2'  # h-top
-                elif grouping==app.GROUPS_3PLUS:    id_splt ='-G2'  # h-top
+#               elif grouping==app.GROUPS_3PLUS:    id_splt ='-G2'  # h-top
+                elif grouping==app.GROUPS_1P2VERT:  id_splt ='-G2'  # h-top
+                elif grouping==app.GROUPS_1P2HORZ:  id_splt ='-G2'  # w-left
                 elif grouping==app.GROUPS_4HORZ:    id_splt = 'G3'  # w-self
                 elif grouping==app.GROUPS_4VERT:    id_splt = 'G3'  # h-self
                 elif grouping==app.GROUPS_4GRID:    id_splt = 'G2'  # w-self
@@ -638,6 +661,65 @@ class Command:
         app.msg_status(UPDATE_FILE.format(usr_lexs_json))
        #def edit_strcomment_chars
 
+    def scroll_to_center(self):
+       #wraped      = apx.get_opt('wrap_mode', False, apx.CONFIG_LEV_FILE)
+       #last_on_top = apx.get_opt('show_last_line_on_top', False)
+        txt_lines   = ed.get_line_count()
+        old_top_line= ed.get_top()
+        scr_lines   = ed.get_prop(app.PROP_VISIBLE_LINES)
+        crt_line    = ed.get_carets()[0][1]
+        
+        new_top_line= crt_line - int(scr_lines/2)
+        new_top_line= max(new_top_line, 0)
+        new_top_line= min(new_top_line, txt_lines-1)
+        pass;                  #LOG and log('cur, old, new, scr={}',(crt_line, old_top_line, new_top_line, scr_lines))
+        
+        if new_top_line!=old_top_line:
+            ed.set_top(new_top_line)
+       #def scroll_to_center
+    
+    def align_in_lines_by_sep(self):
+        ''' Add spaces for aline text in some lines
+            Example. Start lines
+                a= 0
+                b
+                c  = 1
+            Aligned lines
+                a  = 0
+                b
+                c  = 1
+        '''
+        crts    = ed.get_carets()
+        if len(crts)>1:
+            return app.msg_status(ONLY_SINGLE_CRT.format('Command'))
+        (cCrt, rCrt
+        ,cEnd, rEnd)    = crts[0]
+        if rEnd==-1 or rEnd==rCrt:
+            return app.msg_status(ONLY_FOR_ML_SEL.format('Command'))
+        spr     = app.dlg_input('Enter separator string', self.data4_align_in_lines_by_sep)
+        spr     = spr.strip()
+        if not spr:
+            return # Esc
+        self.data4_align_in_lines_by_sep    = spr
+        ((rTx1, cTx1)
+        ,(rTx2, cTx2))  = apx.minmax((rCrt, cCrt), (rEnd, cEnd))
+        ls_txt  = ed.get_text_substr(0,rTx1, 0,rTx2+(0 if 0==cEnd else 1))
+        if spr not in ls_txt: 
+            return app.msg_status(NO_SPR_IN_LINES.format(spr))
+        lines   = ls_txt.splitlines()
+        ln_poss = [(ln, ln.find(spr)) for ln in lines]
+        max_pos =    max([p for (l,p) in ln_poss])
+        if max_pos== min([p if p>=0 else max_pos for (l,p) in ln_poss]):
+            return app.msg_status(DONT_NEED_CHANGE)
+        nlines  = [ln       if pos==-1 or max_pos==pos else 
+                   ln[:pos]+' '*(max_pos-pos)+ln[pos:]
+                   for (ln,pos) in ln_poss
+                  ]
+        ed.delete(0,rTx1, 0,rTx2+(0 if 0==cEnd else 1))
+        ed.insert(0,rTx1, '\n'.join(nlines)+'\n')
+        ed.set_caret(0,rTx1+len(nlines), 0, rTx1)
+       #def align_in_lines_by_sep
+    
    #class Command
 
 def find_matching_char(ed4find, cStart, rStart, opn2cls={'[':']', '{':'}', '(':')', '<':'>', '«':'»'}):
@@ -747,10 +829,10 @@ ToDo
 [-][kv-kv][20nov15] CopyTerm, ReplaceTerm
 [-][kv-kv][20nov15] Comment/uncomment before cur term (or fix col?)
 [+][kv-kv][24nov15] Wrap for "Find string from clipboard"
-[ ][kv-kv][25nov15] Replace all as selected to cb-string: replace_all_sel_to_cb
+[+][kv-kv][25nov15] Replace all as selected to cb-string: replace_all_sel_to_cb
 [+][kv-kv][25nov15] Open selected file: open_selected
 [+][kv-kv][25nov15] Catch on_console_nav
-[ ][kv-kv][26nov15] Scroll on_console_nav, Find*
-[ ][at-kv][09dec15] Refactor: find_pair
-[ ][kv-kv][15dec15] Find cb-string via cmd_FinderAction (for use next/prev after)
+[+][kv-kv][26nov15] Scroll on_console_nav, Find*
+[+][at-kv][09dec15] Refactor: find_pair
+[+][kv-kv][15dec15] Find cb-string via cmd_FinderAction (for use next/prev after)
 '''
