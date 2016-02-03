@@ -697,7 +697,7 @@ class Command:
         if rEnd==-1 or rEnd==rCrt:
             return app.msg_status(ONLY_FOR_ML_SEL.format('Command'))
         spr     = app.dlg_input('Enter separator string', self.data4_align_in_lines_by_sep)
-        spr     = spr.strip()
+        spr     = '' if spr is None else spr.strip()
         if not spr:
             return # Esc
         self.data4_align_in_lines_by_sep    = spr
