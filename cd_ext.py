@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.0.2 2016-02-03'
+    '1.0.3 2016-02-14'
 ToDo: (see end of file)
 '''
 
@@ -665,7 +665,7 @@ class Command:
        #wraped      = apx.get_opt('wrap_mode', False, apx.CONFIG_LEV_FILE)
        #last_on_top = apx.get_opt('show_last_line_on_top', False)
         txt_lines   = ed.get_line_count()
-        old_top_line= ed.get_top()
+        old_top_line= ed.get_prop(app.PROP_LINE_TOP) if app.app_api_version()>='1.0.126' else ed.get_top()
         scr_lines   = ed.get_prop(app.PROP_VISIBLE_LINES)
         crt_line    = ed.get_carets()[0][1]
         
@@ -675,7 +675,10 @@ class Command:
         pass;                  #LOG and log('cur, old, new, scr={}',(crt_line, old_top_line, new_top_line, scr_lines))
         
         if new_top_line!=old_top_line:
-            ed.set_top(new_top_line)
+            if app.app_api_version()>='1.0.126':
+                ed.set_prop(app.PROP_LINE_TOP, str(new_top_line))
+            else: # old
+                ed.set_top(new_top_line)
        #def scroll_to_center
     
     def align_in_lines_by_sep(self):
