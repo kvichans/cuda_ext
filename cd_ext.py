@@ -772,7 +772,7 @@ class Command:
             new_stem    = vals[ 1]
             new_ext     = vals[ 3]
         
-            if ans_s=='Cancel' or \
+            if ans_s=='cancel' or \
                new_stem==old_stem and new_ext==old_ext:
                return
            
