@@ -1,3 +1,8 @@
+1.0.4 (2016-02-24)
+added: rename current file
+added: open file(s) near current tab
+added: move tab to new pos
+
 1.0.3 (2016-02-14)
 adapt: get|set_top -> ed.get|set_prop(app.PROP_LINE_TOP)
 

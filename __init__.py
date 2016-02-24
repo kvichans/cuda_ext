@@ -53,4 +53,8 @@ class Command:
     def edit_strcomment_chars(self):            return RLS.edit_strcomment_chars()
     def scroll_to_center(self):                 return RLS.scroll_to_center()
     def align_in_lines_by_sep(self):            return RLS.align_in_lines_by_sep()
+    def rename_file(self):                      return RLS.rename_file()
+    def open_file_near_right(self):             return RLS._open_file_near('right')
+    def open_file_near_left(self):              return RLS._open_file_near('left')
+    def move_tab(self):                         return RLS.move_tab()
    #class Command

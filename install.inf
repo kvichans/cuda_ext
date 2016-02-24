@@ -227,3 +227,27 @@ section=commands
 caption=CudaExt: Align in lines by separator
 method=align_in_lines_by_sep
 menu=0
+
+[item80]
+section=commands
+caption=CudaExt: Rename file...
+method=rename_file
+menu=0
+
+[item81]
+section=commands
+caption=CudaExt: Open file(s) in nearest right tab(s)...
+method=open_file_near_right
+menu=0
+
+[item82]
+section=commands
+caption=CudaExt: Open file(s) in nearest left tab(s)...
+method=open_file_near_left
+menu=0
+
+[item83]
+section=commands
+caption=CudaExt: Move tab to position...
+method=move_tab
+menu=0

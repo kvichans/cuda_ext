@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.0.3 2016-02-14'
+    '1.0.4 2016-02-24'
 ToDo: (see end of file)
 '''
 
@@ -723,6 +723,115 @@ class Command:
         ed.set_caret(0,rTx1+len(nlines), 0, rTx1)
        #def align_in_lines_by_sep
     
+    def rename_file(self):
+        old_path= ed.get_filename()
+        if not old_path:
+            return ed.cmd(cmds.cmd_FileSaveAs)
+        old_fn  = os.path.basename(old_path)
+        has_ext = '.' in old_fn
+        old_stem= old_fn[: old_fn.rindex('.')]  if has_ext else old_fn
+        old_ext = old_fn[1+old_fn.rindex('.'):] if has_ext else ''
+        DLG_W,\
+        DLG_H   = (300, 80)
+        new_stem= old_stem
+        new_ext = old_ext
+        while True:
+            ans = app.dlg_custom('Rename file'   ,DLG_W, DLG_H, '\n'.join([]
+                +[C1.join(['type=label'     ,POS_FMT(l=GAP,             t=GAP,          r=GAP+200, b=0)
+                          ,'cap=Enter new file name'
+                          ])] # i= 0
+                +[C1.join(['type=edit'      ,POS_FMT(l=GAP,             t=GAP+18,       r=GAP+200, b=0)
+                          ,'val='+old_stem
+                          ])] # i= 1
+                +[C1.join(['type=label'     ,POS_FMT(l=GAP+200+2,       t=GAP+18+at4lbl,r=GAP+200+8, b=0)
+                          ,'cap={}'.format('.' if has_ext else '')
+                          ])] # i= 2
+                +[C1.join(['type=edit'      ,POS_FMT(l=GAP+200+8,       t=GAP+18,       r=DLG_W-GAP, b=0)
+                          ,'en={}'.format(       1 if has_ext else 0)   # enable
+                         #,'props=0,0,{}'.format(1 if has_ext else 0)   # ro,mono,border
+                          ,'val='+old_ext
+                          ])] # i= 3
+                # OK
+                +[C1.join(['type=button'    ,POS_FMT(l=DLG_W-GAP*2-82*2-2,t=DLG_H-GAP-23,r=DLG_W-GAP*2-82-2,b=0)
+                          ,'cap=OK'
+                          ,'props=1' #default
+                          ])] # i= 4
+                +[C1.join(['type=button'    ,POS_FMT(l=DLG_W-GAP-82,    t=DLG_H-GAP-23,r=DLG_W-GAP,b=0)
+                          ,'cap=Cancel'
+                          ])] # i= 5
+                 ), 1)    # start focus
+            if ans is None:  
+                return
+            (ans_i
+            ,vals)      = ans
+            vals        = vals.splitlines()
+            ans_s       = apx.icase(False,''
+                           ,ans_i== 4,'ok'
+                           ,ans_i== 5,'cancel'
+                           )
+            new_stem    = vals[ 1]
+            new_ext     = vals[ 3]
+        
+            if ans_s=='Cancel' or \
+               new_stem==old_stem and new_ext==old_ext:
+               return
+           
+            new_path    = os.path.dirname(old_path) + os.sep + new_stem + ('.'+new_ext if has_ext else '')
+            if os.path.isdir(new_path):
+                app.msg_box("It is existed directory\n{}\n\nChoose another name.".format(new_path), app.MB_OK)
+                continue#while
+            if os.path.isfile(new_path):
+                if app.ID_NO==app.msg_box("File already exists.\nReplace?", app.MB_YESNO):
+                    continue#while
+            break#while
+           #while
+
+        group       = ed.get_prop(app.PROP_INDEX_GROUP)
+        tab_pos     = ed.get_prop(app.PROP_INDEX_TAB)
+        crt         = ed.get_carets()[0]
+
+        if ed.get_prop(app.PROP_MODIFIED):
+            ans     = app.msg_box("Text modified.\nSave it?", app.MB_YESNOCANCEL)
+            if ans==app.ID_CANCEL:  return
+            if ans==app.ID_NO:
+                ed.set_prop(app.PROP_MODIFIED, '0')     #? Changes lose!
+            if ans==app.ID_YES:
+                ed.save()
+        os.replace(old_path, new_path)
+        ed.cmd(cmds.cmd_FileClose)
+        app.file_open(new_path, group)
+        ed.set_prop(app.PROP_INDEX_TAB, str(tab_pos))
+        ed.set_caret(*crt)
+       #def rename_file
+    
+    def _open_file_near(self, where='right'):
+        cur_path= ed.get_filename()
+        init_dir= os.path.dirname(cur_path) if cur_path else ''
+        fls     = app.dlg_file(True, '*', init_dir, '')   # '*' - multi-select
+        if not fls: return
+        fls     = [fls] if isinstance(fls, str) else fls
+
+        group   = ed.get_prop(app.PROP_INDEX_GROUP)
+        tab_pos = ed.get_prop(app.PROP_INDEX_TAB)
+        if False:pass
+        elif where=='right':
+            for fl in reversed(fls):
+                app.file_open(fl, group)
+                ed.set_prop(app.PROP_INDEX_TAB, str(1+tab_pos))
+        elif where=='left':
+            for fl in fls:
+                app.file_open(fl, group)
+                ed.set_prop(app.PROP_INDEX_TAB, str(tab_pos))
+                tab_pos +=1
+       #def open_file_near
+    
+    def move_tab(self):
+        old_pos = ed.get_prop(app.PROP_INDEX_TAB)
+        new_pos = app.dlg_input('New position', str(old_pos+1))
+        if new_pos is None: return
+        new_pos = max(1, int(new_pos))
+        ed.set_prop(app.PROP_INDEX_TAB, str(new_pos-1))
+       #def move_tab
    #class Command
 
 def find_matching_char(ed4find, cStart, rStart, opn2cls={'[':']', '{':'}', '(':')', '<':'>', '«':'»'}):
