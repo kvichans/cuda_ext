@@ -3,6 +3,7 @@ title=CudaExt
 desc=Additional commands for CudaText in Commands dialog (not visible in Plugins menu)
 type=cudatext-plugin
 subdir=cuda_ext
+homepage=https://github.com/kvichans/cuda_ext
 
 [item1]
 section=events
@@ -24,6 +25,18 @@ menu=0
 section=commands
 caption=CudaExt: Paste to first column
 method=paste_to_1st_col
+menu=0
+
+[item104]
+section=commands
+caption=CudaExt: Paste with indent above
+method=paste_with_indent_above
+menu=0
+
+[item105]
+section=commands
+caption=CudaExt: Paste with indent below
+method=paste_with_indent_below
 menu=0
 
 [item5]

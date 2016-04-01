@@ -1,3 +1,6 @@
+1.0.5 (2016-04-01)
+added: paste with indent
+
 1.0.4 (2016-02-24)
 added: rename current file
 added: open file(s) near current tab

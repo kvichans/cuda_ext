@@ -2,33 +2,36 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.0.4 2016-02-24'
+    '1.0.5 2016-04-01'
 ToDo: (see end of file)
 '''
 
 import  re, os, sys, json
-import  cudatext        as app
-from    cudatext    import ed
-import  cudatext_cmd    as cmds
-import  cudax_lib       as apx
-from    cudax_lib   import log
+import  cudatext            as app
+from    cudatext        import ed
+import  cudatext_cmd        as cmds
+import  cudax_lib           as apx
+from    cudax_lib       import log
+from    .cd_plug_lib    import *
 
 FROM_API_VERSION= '1.0.119'
 
-# Localization
-ONLY_SINGLE_CRT     = "{} doesn't work with multi-carets"
-ONLY_FOR_NO_SEL     = "{} works when no selection"
-NO_PAIR_BRACKET     = "Cannot find matching bracket for '{}'"
-FIND_FAIL_FOR_STR   = "Cannot find: {}"
-NO_FILE_FOR_OPEN    = "Cannot open: {}"
-NEED_UPDATE         = "Need update CudaText"
-EMPTY_CLIP          = "Empty value in clipboard"
-NO_LEXER            = "No lexer"
-UPDATE_FILE         = "File '{}' is updated"
-USE_NOT_EMPTY       = "Set not empty values"
-ONLY_FOR_ML_SEL     = "{} works with multiline selection"
-NO_SPR_IN_LINES     = "No seperator '{}' in selected lines"
-DONT_NEED_CHANGE    = "Dont need any changes"
+# I18N
+_       = get_translation(__file__)
+
+ONLY_SINGLE_CRT     = _("{} doesn't work with multi-carets")
+ONLY_FOR_NO_SEL     = _("{} works when no selection")
+NO_PAIR_BRACKET     = _("Cannot find matching bracket for '{}'")
+FIND_FAIL_FOR_STR   = _("Cannot find: {}")
+NO_FILE_FOR_OPEN    = _("Cannot open: {}")
+NEED_UPDATE         = _("Need update CudaText")
+EMPTY_CLIP          = _("Empty value in clipboard")
+NO_LEXER            = _("No lexer")
+UPDATE_FILE         = _("File '{}' is updated")
+USE_NOT_EMPTY       = _("Set not empty values")
+ONLY_FOR_ML_SEL     = _("{} works with multiline selection")
+NO_SPR_IN_LINES     = _("No seperator '{}' in selected lines")
+DONT_NEED_CHANGE    = _("Text change not needed")
 
 pass;                           # Logging
 pass;                          #from pprint import pformat
@@ -39,51 +42,14 @@ C1      = chr(1)
 C2      = chr(2)
 POS_FMT = 'pos={l},{t},{r},{b}'.format
 GAP     = 5
-def top_plus_for_os(what_control, base_control='edit'):
-    ''' Addition for what_top to align text with base.
-        Params
-            what_control    'check'/'label'/'edit'/'button'/'combo'/'combo_ro'
-            base_control    'check'/'label'/'edit'/'button'/'combo'/'combo_ro'
-    '''
-    if what_control==base_control:
-        return 0
-    env = sys.platform
-    if base_control=='edit': 
-        if env=='win32':
-            return apx.icase(what_control=='check',    1
-                            ,what_control=='label',    3
-                            ,what_control=='button',  -1
-                            ,what_control=='combo_ro',-1
-                            ,what_control=='combo',    0
-                            ,True,                     0)
-        if env=='linux':
-            return apx.icase(what_control=='check',    1
-                            ,what_control=='label',    5
-                            ,what_control=='button',   1
-                            ,what_control=='combo_ro', 0
-                            ,what_control=='combo',   -1
-                            ,True,                     0)
-        if env=='darwin':
-            return apx.icase(what_control=='check',    2
-                            ,what_control=='label',    3
-                            ,what_control=='button',   0
-                            ,what_control=='combo_ro', 1
-                            ,what_control=='combo',    0
-                            ,True,                     0)
-        return 0
-       #if base_control=='edit'
-    return top_plus_for_os(what_control, 'edit') - top_plus_for_os(base_control, 'edit')
-   #def top_plus_for_os
-at4chk  = top_plus_for_os('check')
 at4lbl  = top_plus_for_os('label')
-at4btn  = top_plus_for_os('button')
 
 def _file_open(op_file):
     if not app.file_open(op_file):
         return None
     for h in app.ed_handles(): 
         op_ed   = app.Editor(h)
-        if os.path.samefile(op_file, op_ed.get_filename()):
+        if op_ed.get_filename() and os.path.samefile(op_file, op_ed.get_filename()):
             return op_ed
     return None
    #def _file_open
@@ -156,6 +122,69 @@ class Command:
                         ,app.CARET_SET_INDEX+icrt)
            #for
        #def paste_to_1st_col
+
+    def paste_with_indent(self, where='above'):
+        ''' Paste above/below with fitting indent of clip to indent of active line
+        '''
+        clip    = app.app_proc(app.PROC_GET_CLIP, '')
+        pass;                  #LOG and log('clip={}',repr(clip))
+        if not clip:        return app.msg_status(_('Empty clip'))
+        if not clip.strip():return app.msg_status(_('No text in clip'))
+        crts    = ed.get_carets()
+        if len(crts)>1:
+            return app.msg_status(ONLY_SINGLE_CRT.format('Command'))
+
+        use_tab = not apx.get_opt('tab_spaces')
+        sps_tab = ' '*apx.get_opt('tab_size')
+        pass;                  #LOG and log('use_tab,sps_tab={}',(use_tab,sps_tab))
+
+        (cCrt, rCrt, cEnd, rEnd) = crts[0]
+        r4ins   = min(rCrt, rCrt if -1==rEnd else rEnd)
+        ln_tx   = ed.get_text_line(r4ins)
+        
+        # Fit clip
+        lns_cl  = clip.splitlines()
+        def replaces_spaces_atstart(s, what_s, with_s):
+            ind_tx  = len(s) - len(s.lstrip())
+            return s[:ind_tx].replace(what_s, with_s) + s[ind_tx:]
+        if     use_tab and clip[0]==' ':
+            # Replace spaces to tab in begining of each clip lines
+            lns_cl  = [replaces_spaces_atstart(cl_ln, sps_tab, '\t')
+                       for cl_ln in lns_cl]
+            pass;              #LOG and log('sp->tb lns_cl={}',(lns_cl))
+        if not use_tab and clip[0]=='\t':
+            # Replace tab to spaces in begining of each clip lines
+            lns_cl  = [replaces_spaces_atstart(cl_ln, '\t', sps_tab)
+                       for cl_ln in lns_cl]
+            pass;              #LOG and log('tb->sp lns_cl={}',(lns_cl))
+        
+        ind_ln  =      len(ln_tx) - len(ln_tx.lstrip())
+        ind_cl  = min([len(cl_ln) - len(cl_ln.lstrip())
+                       for cl_ln in lns_cl])
+        pass;                  #LOG and log('ind_ln, ind_cl={}',(ind_ln, ind_cl))
+        if False:pass
+        elif ind_cl > ind_ln:
+            # Cut clip lines
+            lns_cl  = [cl_ln[  ind_cl - ind_ln:]
+                       for cl_ln in lns_cl]
+            pass;              #LOG and log('cut lns_cl={}',(lns_cl))
+        elif ind_ln > ind_cl:
+            # Add to clip lines
+            apnd    = ln_tx[0]*(ind_ln - ind_cl)
+            lns_cl  = [apnd+cl_ln
+                       for cl_ln in lns_cl]
+            pass;              #LOG and log('add lns_cl={}',(lns_cl))
+        clip    = '\n'.join(lns_cl)
+        clip    = clip+'\n' if clip[-1] not in '\n\r' else clip
+        
+        # Insert
+        pass;                  #LOG and log('ln_tx={}',repr(ln_tx))
+        pass;                  #LOG and log('clip={}',repr(clip))
+        if where=='above':
+            ed.insert(0, r4ins,   clip)
+        else:
+            ed.insert(0, r4ins+1, clip)
+       #def paste_with_indent
 
 #   def find_cb_string(self, updn, bgn_crt_fin='crt'):
 #       ''' Find clipboard value in text.
@@ -778,7 +807,7 @@ class Command:
            
             new_path    = os.path.dirname(old_path) + os.sep + new_stem + ('.'+new_ext if has_ext else '')
             if os.path.isdir(new_path):
-                app.msg_box("It is existed directory\n{}\n\nChoose another name.".format(new_path), app.MB_OK)
+                app.msg_box("Directory already exists\n{}\n\nChoose another name.".format(new_path), app.MB_OK)
                 continue#while
             if os.path.isfile(new_path):
                 if app.ID_NO==app.msg_box("File already exists.\nReplace?", app.MB_YESNO):
