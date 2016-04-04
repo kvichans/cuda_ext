@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.0.5 2016-04-01'
+    '1.0.6 2016-04-04'
 ToDo: (see end of file)
 '''
 
@@ -134,13 +134,19 @@ class Command:
         if len(crts)>1:
             return app.msg_status(ONLY_SINGLE_CRT.format('Command'))
 
+        END_SIGNS = ['begin', '{', ':', 'then']   # }
+
         use_tab = not apx.get_opt('tab_spaces')
         sps_tab = ' '*apx.get_opt('tab_size')
         pass;                  #LOG and log('use_tab,sps_tab={}',(use_tab,sps_tab))
 
         (cCrt, rCrt, cEnd, rEnd) = crts[0]
         r4ins   = min(rCrt, rCrt if -1==rEnd else rEnd)
-        ln_tx   = ed.get_text_line(r4ins)
+        ln_tx   = ed.get_text_line(r4ins).rstrip()
+        if where=='below' and \
+            any(map(lambda sign:ln_tx.lower().endswith(sign), END_SIGNS)):
+            # Extra indent
+            ln_tx = ('\t' if use_tab else sps_tab) + ln_tx
         
         # Fit clip
         lns_cl  = clip.splitlines()
