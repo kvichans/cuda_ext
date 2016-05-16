@@ -1,4 +1,4 @@
-''' Plugin for CudaText editor
+﻿''' Plugin for CudaText editor
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
@@ -60,6 +60,94 @@ class Command:
         self.prevtab1 = None
         self.prevtab2 = None
         
+    def tree_path_to_status(self):
+        path_l, gap = self._get_best_tree_path(ed.get_carets()[0][1])
+        if not path_l:  return
+        ID_TREE = app.app_proc(app.PROC_SIDEPANEL_GET_CONTROL, 'Tree')
+        id_sel  = app.tree_proc(ID_TREE, app.TREE_ITEM_GET_SELECTED)
+        id_need = path_l[-1][0]
+        if id_need != id_sel:
+            app.tree_proc(ID_TREE, app.TREE_ITEM_SELECT, id_need)
+        path    = ' // '.join([cap.rstrip(':')[:40] for (nid,cap) in path_l])
+        if gap==0:  return app.msg_status(path)
+        app.msg_status(f('[{:+}] {}', gap, path))
+       #def tree_path_to_status
+   
+    def set_nearest_tree_node(self):
+        path_l, gap = self._get_best_tree_path(ed.get_carets()[0][1])
+        if not path_l:  return
+        ID_TREE = app.app_proc(app.PROC_SIDEPANEL_GET_CONTROL, 'Tree')
+        app.tree_proc(ID_TREE, app.TREE_ITEM_SELECT, path_l[-1][0])
+       #def set_nearest_tree_node
+   
+    def _get_best_tree_path(self, row):
+        """ Find node-path nearext to row: all nodes cover row or are all above/below nearest.
+            Return
+                [(widest_node_id,cap), (node_id,cap), ..., (smallest_node_id,cap)], gap
+                    list can be empty
+                    gap:  0 if row is covered
+                         >0 if nearest node below
+                         <0 if nearest node above
+        """
+        ID_TREE = app.app_proc(app.PROC_SIDEPANEL_GET_CONTROL, 'Tree')
+        INF     = 0xFFFFFFFF
+        NO_ID   = -1
+        def best_path(id_prnt, prnt_cap=''):
+            rsp_l   = [] 
+            kids    = app.tree_proc(ID_TREE, app.TREE_ITEM_ENUM, id_prnt)
+            pass;              #LOG and log('>>id_prnt, prnt_cap, kids={}',(id_prnt, prnt_cap, len(kids) if kids else 0))
+            if kids is None:
+                pass;          #LOG and log('<<no kids',())
+                return [], INF
+            row_bfr, kid_bfr, cap_bfr = -INF, NO_ID, ''
+            row_aft, kid_aft, cap_aft = +INF, NO_ID, ''
+            for kid, cap in kids:
+                pass;          #LOG and log('kid, cap={}',(kid, cap))
+                cMin, rMin, \
+                cMax, rMax  = app.tree_proc(ID_TREE, app.TREE_ITEM_GET_SYNTAX_RANGE, kid)
+                pass;          #LOG and log('? kid,cap, rMin,rMax,row={}',(kid,cap, rMin,rMax,row))
+                if False:pass
+                elif rMin<=row<=rMax:   # Cover!
+                    sub_l, gap_sub  = best_path(kid, cap)
+                    pass;      #LOG and log('? sub_l, gap_sub={}',(sub_l, gap_sub))
+                    if gap_sub == 0:    # Sub-kid also covers
+                        pass;  #LOG and log('+ sub_l={}',(sub_l))
+                        rsp_l   = [(kid, cap)] + sub_l
+                    else:               # The kid is best
+                        pass;  #LOG and log('0 ',())
+                        rsp_l   = [(kid, cap)]
+                    pass;      #LOG and log('<<! rsp_l={}',(rsp_l))
+                    return rsp_l, 0
+                elif row_bfr                  < rMax            < row:
+                    row_bfr, kid_bfr, cap_bfr = rMax, kid, cap
+                    pass;      #LOG and log('< row_bfr, kid_bfr, cap_bfr={}',(row_bfr, kid_bfr, cap_bfr))
+                elif row_aft                  > rMin            > row:
+                    row_aft, kid_aft, cap_aft = rMin, kid, cap
+                    pass;      #LOG and log('> row_aft, kid_aft, cap_aft={}',(row_aft, kid_aft, cap_aft))
+               #for kid
+            pass;              #LOG and log('? row_bfr, kid_bfr, cap_bfr={}',(row_bfr, kid_bfr, cap_bfr))
+            pass;              #LOG and log('? row_aft, kid_aft, cap_aft={}',(row_aft, kid_aft, cap_aft))
+            pass;              #LOG and log('? abs(row_bfr-row), abs(row_aft-row)={}',(abs(row_bfr-row), abs(row_aft-row)))
+            kid_x, cap_x, gap_x = (kid_bfr, cap_bfr, row_bfr-row) \
+                                if abs(row_bfr-row) <= abs(row_aft-row) else \
+                                  (kid_aft, cap_aft, row_aft-row)
+            pass;              #LOG and log('kid_x, cap_x, gap_x={}',(kid_x, cap_x, gap_x))
+            sub_l, gap_sub  = best_path(kid_x, cap_x)
+            pass;              #LOG and log('? sub_l,gap_sub ?? gap_x={}',(sub_l, gap_sub, gap_x))
+            if abs(gap_sub) <= abs(gap_x):  # Sub-kid better
+                rsp_l  = [(kid_x, cap_x)] + sub_l
+                pass;          #LOG and log('<<sub bt: rsp_l, gap_sub={}',(rsp_l, gap_sub))
+                return rsp_l, gap_sub
+            # The kid is best
+            rsp_l   = [(kid_x, cap_x)]
+            pass;              #LOG and log('<<bst: rsp_l, gap_x={}',(rsp_l, gap_x))
+            return rsp_l, gap_x
+           #def descent
+        lst, gap= best_path(0)
+        pass;                  #LOG and log('lst, gap={}',(lst, gap))
+        return lst, gap
+       #def _get_best_tree_path
+   
     def on_console_nav(self, ed_self, text):
         pass;                  #LOG and log('text={}',text)
         match   = re.match('.*File "([^"]+)", line (\d+)', text)    ##?? variants?
@@ -73,7 +161,21 @@ class Command:
         op_ed   = _file_open(op_file)
         op_ed.focus()
         op_ed.set_caret(0, op_line)
-   #def on_console_nav
+       #def on_console_nav
+   
+    def nav_by_console_err(self):
+        cons_out= app.app_log(app.LOG_CONSOLE_GET_LOG, '')
+        fn      = ed.get_filename()
+        if not fn:      return app.msg_status(_('Only for saved file'))
+        fn_ln_re= f('File "{}", line ', fn).replace('\\','\\\\')+'(\d+)'
+        pass;                  #LOG and log('fn_ln_re={}',fn_ln_re)
+        mtchs   = list(re.finditer(fn_ln_re, cons_out, re.I))
+        if not mtchs:   return app.msg_status(_('No filename in output: '+fn))
+        mtch    = mtchs[-1]
+        row     = int(mtch.group(1))-1
+        pass;                  #LOG and log('row={}',row)
+        ed.set_caret(0, row)
+       #def nav_by_console_err
    
     def add_indented_line_above(self):
         ed.cmd(cmds.cCommand_KeyUp)
@@ -127,6 +229,12 @@ class Command:
 
     def paste_with_indent(self, where='above'):
         ''' Paste above/below with fitting indent of clip to indent of active line
+            Param
+                where   'above' Insert between this and prev line
+                        'below' Insert between this and next line
+                        'lazar' Insert between this and prev line 
+                                    if caret before text else
+                                normal insert 
         '''
         clip    = app.app_proc(app.PROC_GET_CLIP, '')
         pass;                  #LOG and log('clip={}',repr(clip))
@@ -138,13 +246,17 @@ class Command:
 
         END_SIGNS = ['begin', '{', ':', 'then']   # }
 
-        use_tab = not apx.get_opt('tab_spaces')
-        sps_tab = ' '*apx.get_opt('tab_size')
+        use_tab = not ed.get_prop(app.PROP_TAB_SPACES)  # apx.get_opt('tab_spaces')
+        sps_tab = ' '*ed.get_prop(app.PROP_TAB_SIZE)    # apx.get_opt('tab_size')
         pass;                  #LOG and log('use_tab,sps_tab={}',(use_tab,sps_tab))
 
         (cCrt, rCrt, cEnd, rEnd) = crts[0]
-        r4ins   = min(rCrt, rCrt if -1==rEnd else rEnd)
+        if cEnd!=-1:    return app.msg_status(_('Command works only if no selection'))
+        r4ins   = rCrt  # min(rCrt, rCrt if -1==rEnd else rEnd)
         ln_tx   = ed.get_text_line(r4ins).rstrip()
+        if where=='lazar':
+            return
+            
         if where=='below' and \
             any(map(lambda sign:ln_tx.lower().endswith(sign), END_SIGNS)):
             # Extra indent
@@ -366,12 +478,14 @@ class Command:
         find_opt= 'a'
         find_opt= find_opt + ('c' if 'c' in user_opt else '')   # As user: Case
         find_opt= find_opt + ('w' if 'w' in user_opt else '')   # As user: Case
+        ed.lock()
         ed.cmd(cmds.cmd_FinderAction, chr(1).join([]
             +['repall']
             +[seltext]
             +[clip]
             +[find_opt]  # a - wrapped
         ))
+        ed.unlock()
         app.app_proc(app.PROC_SET_FIND_OPTIONS, user_opt)
        #def replace_all_sel_to_cb
     
@@ -391,12 +505,23 @@ class Command:
         pass;                  #LOG and log('pointed={}',pointed)
         if not pointed: return
         op_file     = os.path.join(bs_dir, pointed)
+        op_row      = -1
+        if not os.path.isfile(op_file) and \
+           '(' in op_file:                                      #)
+                # Try to split in 'path(row'                    #)
+                mtch= re.search(r'(.*)\((\d+)', op_file)
+                if mtch:
+                    pointed, op_row = mtch.groups()
+                    op_row          = int(op_row)
+                    op_file         = os.path.join(bs_dir, pointed)
         if not os.path.isfile(op_file):
             return app.msg_status(NO_FILE_FOR_OPEN.format(op_file))
         op_ed       = _file_open(op_file)
         if not op_ed:
             return app.msg_status(NO_FILE_FOR_OPEN.format(op_file))
         op_ed.focus()
+        if op_row!=-1:
+            op_ed.set_caret(0, op_row)
        #def open_selected
     
     def _activate_tab(self, group, tab_ind):
@@ -869,7 +994,7 @@ class Command:
         new_pos = max(1, int(new_pos))
         ed.set_prop(app.PROP_INDEX_TAB, str(new_pos-1))
        #def move_tab
-       
+
     def on_focus(self, ed_self):
         self.prevtab2 = self.prevtab1
         self.prevtab1 = ed_self
@@ -878,9 +1003,26 @@ class Command:
         if self.prevtab2:
             ed1 = self.prevtab2
             ed1.focus()
-            print('Activated prev tab:', ed1.get_prop(app.PROP_TAB_TITLE))
-        #def    
-       
+            app.msg_status(f(_('Activated previous tab: {}'), ed1.get_prop(app.PROP_TAB_TITLE)))
+       #def go_back
+
+    def close_tab_from_other_group(self, what_grp='next'):
+        if app.app_api_version()<'1.0.139': return app.msg_status(NEED_UPDATE)
+        grps    = get_groups_count()
+#       grps    = len({app.Editor(h).get_prop(app.PROP_INDEX_GROUP) for h in app.ed_handles()})
+        if 1==grps: return
+        me_grp  = ed.get_prop(app.PROP_INDEX_GROUP)
+        cl_grp  = (me_grp+1)%grps \
+                    if what_grp=='next' else \
+                  (me_grp-1)%grps
+        if not [h for h in app.ed_handles() if app.Editor(h).get_prop(app.PROP_INDEX_GROUP)==cl_grp]:
+            return app.msg_status(_('No files in group'))
+        cl_ed   = app.ed_group(cl_grp)
+        cl_ed.focus()
+        cl_ed.cmd(cmds.cmd_FileClose)
+        me_ed   = app.ed_group(me_grp)
+        me_ed.focus()
+       #def close_tab_from_other_group
    #class Command
 
 def find_matching_char(ed4find, cStart, rStart, opn2cls={'[':']', '{':'}', '(':')', '<':'>', '«':'»'}):
@@ -978,6 +1120,22 @@ def get_word_or_quoted(text, start, not_word_chars='[](){}', quot_chars="'"+'"')
     
     return (text[bgn:end], bgn-1) if bgn!=-1 and end!=-1 else ('', -1)
    #def get_word_or_quoted
+
+def get_groups_count():
+    gr_mode = app.app_proc(app.PROC_GET_GROUPING, '')
+    if gr_mode==app.GROUPS_ONE      :return 1
+    if gr_mode==app.GROUPS_2VERT    :return 2
+    if gr_mode==app.GROUPS_2HORZ    :return 2
+    if gr_mode==app.GROUPS_3VERT    :return 3
+    if gr_mode==app.GROUPS_3HORZ    :return 3
+    if gr_mode==app.GROUPS_3PLUS    :return 3
+    if gr_mode==app.GROUPS_1P2VERT  :return 3
+    if gr_mode==app.GROUPS_1P2HORZ  :return 3
+    if gr_mode==app.GROUPS_4VERT    :return 4
+    if gr_mode==app.GROUPS_4HORZ    :return 4
+    if gr_mode==app.GROUPS_4GRID    :return 4
+    if gr_mode==app.GROUPS_6GRID    :return 6
+    return 1
 
 '''
 ToDo

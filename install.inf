@@ -9,6 +9,24 @@ homepage=https://github.com/kvichans/cuda_ext
 section=events
 events=on_console_nav,on_focus
 
+[item191]
+section=commands
+caption=CudaExt: Navigate by error in console
+method=nav_by_console_err
+menu=0
+
+[item192]
+section=commands
+caption=CudaExt: Show current Tree path in Status
+method=tree_path_to_status
+menu=0
+
+[item193]
+section=commands
+caption=CudaExt: Set nearest Tree node
+method=set_nearest_tree_node
+menu=0
+
 [item2]
 section=commands
 caption=CudaExt: Add indented line above
@@ -37,6 +55,12 @@ menu=0
 section=commands
 caption=CudaExt: Paste with indent below
 method=paste_with_indent_below
+menu=0
+
+[item106]
+section=commands
+caption=CudaExt: Lazarus Paste
+method=paste_as_lazarus
 menu=0
 
 [item5]
@@ -269,4 +293,16 @@ menu=0
 section=commands
 caption=CudaExt: Move tab to position...
 method=move_tab
+menu=0
+
+[item84]
+section=commands
+caption=CudaExt: Close tab from next group
+method=close_tab_from_next_group
+menu=0
+
+[item85]
+section=commands
+caption=CudaExt: Close tab from previous group
+method=close_tab_from_prev_group
 menu=0
