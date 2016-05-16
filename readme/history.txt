@@ -1,3 +1,13 @@
+1.0.8 (2016-05-16)
+added: go_back for activate prev tab
+added: close tab from next/pev group
+added: show current tree path in status
+added: set nearest tree node
+
+1.0.7 (2016-04-01)
+added: nav_by_console_err navigate to last error in current file
+changed: open_selected recognize path(row)
+
 1.0.5 (2016-04-01)
 added: paste with indent
 
@@ -14,7 +24,7 @@ added: Scroll cur line to screen center
 added: Align in lines by separator
 
 1.0.1 (2016-01-22)
-change: rename cmds with "CudaExt: ..."
+changed: rename cmds with "CudaExt: ..."
 
 0.9.5 (2016-01-22)
 added: Edit stream comment chars for lexer
