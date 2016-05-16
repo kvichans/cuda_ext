@@ -57,8 +57,8 @@ def _file_open(op_file):
 class Command:
     def __init__(self):
         self.data4_align_in_lines_by_sep  = ''
-        self.prevtab1 = None
-        self.prevtab2 = None
+        self.cur_tab_id = None
+        self.pre_tab_id = None
         
     def tree_path_to_status(self):
         path_l, gap = self._get_best_tree_path(ed.get_carets()[0][1])
@@ -996,14 +996,20 @@ class Command:
        #def move_tab
 
     def on_focus(self, ed_self):
-        self.prevtab2 = self.prevtab1
-        self.prevtab1 = ed_self
+        self.pre_tab_id = self.cur_tab_id
+        self.cur_tab_id = ed_self.get_prop(app.PROP_TAB_ID)
+        pass;                  #LOG and log('pre_tab_id,(cur_tab_id,cap)={}',(self.pre_tab_id,(self.cur_tab_id,ed.get_prop(app.PROP_TAB_TITLE))))
        
     def go_back(self):
-        if self.prevtab2:
-            ed1 = self.prevtab2
-            ed1.focus()
-            app.msg_status(f(_('Activated previous tab: {}'), ed1.get_prop(app.PROP_TAB_TITLE)))
+        pass;                  #LOG and log('pre_tab_id,cur_tab_id={}',(self.pre_tab_id,self.cur_tab_id))
+        if not self.pre_tab_id \
+        or     self.pre_tab_id==self.cur_tab_id:
+            return
+        pre_ed  = apx.get_tab_by_id(self.pre_tab_id)
+        pass;                  #LOG and log('pre_ed={}',(pre_ed))
+        if not pre_ed:              return
+        pre_ed.focus()
+#       app.msg_status(f(_('Activated previous tab: {}'), ed.get_prop(app.PROP_TAB_TITLE)))
        #def go_back
 
     def close_tab_from_other_group(self, what_grp='next'):
