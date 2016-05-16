@@ -7,7 +7,7 @@ homepage=https://github.com/kvichans/cuda_ext
 
 [item1]
 section=events
-events=on_console_nav
+events=on_console_nav,on_focus
 
 [item2]
 section=commands
@@ -180,6 +180,12 @@ menu=0
 section=commands
 caption=CudaExt: Activate previous tab (global loop)
 method=to_prev_tab
+menu=0
+
+[item32]
+section=commands
+caption=CudaExt: Activate previously active tab (go back)
+method=go_back
 menu=0
 
 [item40]
