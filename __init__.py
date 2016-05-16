@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '0.9.2 2016-01-10'
+    '0.9.3 2016-05-16'
 '''
 
 from .cd_ext import Command as CommandRLS
@@ -59,4 +59,6 @@ class Command:
     def open_file_near_right(self):             return RLS._open_file_near('right')
     def open_file_near_left(self):              return RLS._open_file_near('left')
     def move_tab(self):                         return RLS.move_tab()
+    def go_back(self):                          return RLS.go_back()
+    def on_focus(self, ed_self):                return RLS.on_focus(ed_self)
    #class Command
