@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.0.8 2016-05-16'
+    '1.0.6 2016-04-04'
 ToDo: (see end of file)
 '''
 
@@ -871,15 +871,20 @@ class Command:
        #def move_tab
        
     def on_focus(self, ed_self):
+        #dont remember ed_self, it is broken if tab closed
+        #remembr prop_tab_id
         self.prevtab2 = self.prevtab1
-        self.prevtab1 = ed_self
+        self.prevtab1 = ed_self.get_prop(app.PROP_TAB_ID)
        
     def go_back(self):
-        if self.prevtab2:
-            ed1 = self.prevtab2
-            ed1.focus()
-            print('Activated prev tab:', ed1.get_prop(app.PROP_TAB_TITLE))
-        #def    
+        need_id = self.prevtab2
+        for h in app.ed_handles():
+            ed1 = app.Editor(h)
+            if ed1.get_prop(app.PROP_TAB_ID)==need_id:
+                ed1.focus()
+                print('Go-back:', ed1.get_prop(app.PROP_TAB_TITLE))
+                return
+        print('Cannot go-back, tab closed?')
        
    #class Command
 
