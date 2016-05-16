@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.0.6 2016-04-04'
+    '1.0.8 2016-05-16'
 ToDo: (see end of file)
 '''
 
@@ -57,6 +57,8 @@ def _file_open(op_file):
 class Command:
     def __init__(self):
         self.data4_align_in_lines_by_sep  = ''
+        self.prevtab1 = None
+        self.prevtab2 = None
         
     def on_console_nav(self, ed_self, text):
         pass;                  #LOG and log('text={}',text)
@@ -867,6 +869,18 @@ class Command:
         new_pos = max(1, int(new_pos))
         ed.set_prop(app.PROP_INDEX_TAB, str(new_pos-1))
        #def move_tab
+       
+    def on_focus(self, ed_self):
+        self.prevtab2 = self.prevtab1
+        self.prevtab1 = ed_self
+       
+    def go_back(self):
+        if self.prevtab2:
+            ed1 = self.prevtab2
+            ed1.focus()
+            print('Activated prev tab:', ed1.get_prop(app.PROP_TAB_TITLE))
+        #def    
+       
    #class Command
 
 def find_matching_char(ed4find, cStart, rStart, opn2cls={'[':']', '{':'}', '(':')', '<':'>', '«':'»'}):
