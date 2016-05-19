@@ -4,16 +4,19 @@ Authors:
 Version:
     '1.0.2 2016-03-22'
 Content
+    log                 Logger with timing
     get_translation     i18n
     dlg_wrapper         Wrapper for dlg_custom: pack/unpack values, h-align controls
 ToDo: (see end of file)
 '''
 
-import  sys, os, gettext
+import  sys, os, gettext, logging, inspect
+from    time        import perf_counter
 import  cudatext        as app
 import  cudax_lib       as apx
-from    cudax_lib   import log
+#from   cudax_lib   import log
 
+c13,c10,c9  = chr(13),chr(10),chr(9)
 REDUCTS = {'lb'     :'label'
         ,  'ln-lb'  :'linklabel'
         ,  'ed'     :'edit'
@@ -29,9 +32,158 @@ REDUCTS = {'lb'     :'label'
         ,  'cb-ro'  :'combo_ro'
         ,  'lbx'    :'listbox'
         ,  'ch-lbx' :'checklistbox'
-        ,  'lvw'     :'listview'
+        ,  'lvw'    :'listview'
         ,  'ch-lvw' :'checklistview'
         }
+
+def f(s, *args, **kwargs):return s.format(*args, **kwargs)
+
+def log(msg='', *args, **kwargs):
+    if args or kwargs:
+        msg = msg.format(*args, **kwargs)
+    if Tr.tr is None:
+        Tr.tr=Tr()
+    return Tr.tr.log(msg)
+    
+class Tr :
+    tr=None
+    """ Трассировщик.
+        Основной (единственный) метод: log(строка) - выводит указанную строку в лог.
+        Управляется через команды в строках для вывода.
+        Команды:
+            >>  Увеличить сдвиг при выводе будущих строк (пока жив возвращенный объект) 
+            (:) Начать замер нового вложенного периода, закончить когда умрет возвращенный объект 
+            (== Начать замер нового вложенного периода 
+            ==> Вывести длительность последнего периода 
+            ==) Вывести длительность последнего периода и закончить его замер
+            =}} Отменить все замеры
+        Вызов log с командой >> (увеличить сдвиг) возвращает объект, 
+            который при уничтожении уменьшит сдвиг 
+        """
+    sec_digs        = 2                     # Точность отображения секунд, кол-во дробных знаков
+    se_fmt          = ''
+    mise_fmt        = ''
+    homise_fmt      = ''
+    def __init__(self, log_to_file=None) :
+        # Поля объекта
+        self.gap    = ''                # Отступ
+        self.tm     = perf_counter()    # Отметка времени о запуске
+        self.stms   = []                # Отметки времени о начале замера спец.периода
+
+        if log_to_file:
+            logging.basicConfig( filename=log_to_file
+                                ,filemode='w'
+                                ,level=logging.DEBUG
+                                ,format='%(message)s'
+                                ,datefmt='%H:%M:%S'
+                                ,style='%')
+        else: # to stdout
+            logging.basicConfig( stream=sys.stdout
+                                ,level=logging.DEBUG
+                                ,format='%(message)s'
+                                ,datefmt='%H:%M:%S'
+                                ,style='%')
+        # Tr()
+    def __del__(self):
+        logging.shutdown()
+
+    class TrLiver :
+        cnt = 0
+        """ Автоматически сокращает gap при уничножении 
+            Показывает время своей жизни"""
+        def __init__(self, tr, ops) :
+            # Поля объекта
+            self.tr = tr
+            self.ops= ops
+            self.tm = 0
+            self.nm = Tr.TrLiver.cnt
+            if '(:)' in self.ops :
+                # Начать замер нового интервала
+                self.tm = perf_counter()
+        def log(self, msg='') :
+            if '(:)' in self.ops :
+                msg = '{}(:)=[{}]{}'.format( self.nm, Tr.format_tm( perf_counter() - self.tm ), msg ) 
+                logging.debug( self.tr.format_msg(msg, ops='') )
+        def __del__(self) :
+            #pass;                  logging.debug('in del')
+            if '(:)' in self.ops :
+                msg = '{}(:)=[{}]'.format( self.nm, Tr.format_tm( perf_counter() - self.tm ) ) 
+                logging.debug( self.tr.format_msg(msg, ops='') )
+            if '>>' in self.ops :
+                self.tr.gap = self.tr.gap[:-1]
+                
+    def log(self, msg='') :
+        if '(:)' in msg :
+            Tr.TrLiver.cnt += 1
+            msg     = msg.replace( '(:)', '{}(:)'.format(Tr.TrLiver.cnt) )  
+        logging.debug( self.format_msg(msg) )
+        if '>>' in msg :
+            self.gap = self.gap + c9
+            # Создаем объект, который при разрушении сократит gap
+        if '>>' in msg or '(:)' in msg:
+            return Tr.TrLiver(self,('>>' if '>>' in msg else '')+('(:)' if '(:)' in msg else ''))
+            # return Tr.TrLiver(self,iif('>>' in msg,'>>','')+iif('(:)' in msg,'(:)',''))
+        else :
+            return self 
+        # Tr.log
+            
+#   def format_msg(self, msg, dpth=2, ops='+fun:ln +wait==') :
+    def format_msg(self, msg, dpth=3, ops='+fun:ln +wait==') :
+        if '(==' in msg :
+            # Начать замер нового интервала
+            self.stms   = self.stms + [perf_counter()]
+            msg = msg.replace( '(==', '(==[' + Tr.format_tm(0) + ']' )
+
+        if '+fun:ln' in ops :
+            frCaller= inspect.stack()[dpth] # 0-format_msg, 1-Tr.log|Tr.TrLiver, 2-log, 3-need func
+            try:
+                cls = frCaller[0].f_locals['self'].__class__.__name__ + '.'
+            except:
+                cls = ''
+            fun     = (cls + frCaller[3]).replace('.__init__','()')
+            ln      = frCaller[2]
+            msg     = '[{}]{}{}:{} '.format( Tr.format_tm( perf_counter() - self.tm ), self.gap, fun, ln ) + msg
+        else : 
+            msg     = '[{}]{}'.format( Tr.format_tm( perf_counter() - self.tm ), self.gap ) + msg
+
+        if '+wait==' in ops :
+            if ( '==)' in msg or '==>' in msg ) and len(self.stms)>0 :
+                # Закончить/продолжить замер последнего интервала и вывести его длительность
+                sign    = '==)' if '==)' in msg else '==>'
+                # sign    = icase( '==)' in msg, '==)', '==>' )
+                stm = '[{}]'.format( Tr.format_tm( perf_counter() - self.stms[-1] ) )
+                msg = msg.replace( sign, sign+stm )
+                if '==)' in msg :
+                    del self.stms[-1] 
+
+            if '=}}' in msg :
+                # Отменить все замеры
+                self.stms   = []
+                
+        return msg.replace('¬',c9).replace('¶',c10)
+        # Tr.format
+
+    @staticmethod
+    def format_tm(secs) :
+        """ Конвертация количества секунд в 12h34'56.78" """
+        if 0==len(Tr.se_fmt) :
+            Tr.se_fmt       = '{:'+str(3+Tr.sec_digs)+'.'+str(Tr.sec_digs)+'f}"'
+            Tr.mise_fmt     = "{:2d}'"+Tr.se_fmt
+            Tr.homise_fmt   = "{:2d}h"+Tr.mise_fmt
+        h = int( secs / 3600 )
+        secs = secs % 3600
+        m = int( secs / 60 )
+        s = secs % 60
+        return Tr.se_fmt.format(s) \
+                if 0==h+m else \
+               Tr.mise_fmt.format(m,s) \
+                if 0==h else \
+               Tr.homise_fmt.format(h,m,s)
+        # return icase( 0==h+m,   Tr.se_fmt.format(s)
+        #             , 0==h,     Tr.mise_fmt.format(m,s)
+        #             ,           Tr.homise_fmt.format(h,m,s) )
+        # Tr.format_tm
+    # Tr
 
 def get_translation(plug_file):
     ''' Part of i18n.
@@ -64,7 +216,6 @@ def get_translation(plug_file):
         _   =  lambda x: x
     return _
 
-def f(s, *args, **kwargs):return s.format(*args, **kwargs)
 def top_plus_for_os(what_control, base_control='edit'):
     ''' Addition for what_top to align text with base.
         Params
@@ -117,6 +268,7 @@ def dlg_wrapper(title, w, h, cnts, in_vals={}, focus_cid=None):
                                 hint        (opt)(str) Tooltip
                                 en          (opt)('0'|'1'|True|False) Enabled-state
                                 props       (opt)(str) See wiki
+                                act         (opt)('0'|'1'|True|False) Will close dlg when changed
                                 items            (str|list) String as in wiki. List structure by types:
                                                             [v1,v2,]     For combo, combo_ro, listbox, checkgroup, radiogroup, checklistbox
                                                             (head, body) For listview, checklistview 
@@ -126,9 +278,10 @@ def dlg_wrapper(title, w, h, cnts, in_vals={}, focus_cid=None):
                                 {'cid':val}
             focus           (opt) Control cid for  start focus
         Return
-            btn_cid         Clicked control cid
+            btn_cid         Clicked/changed control cid
             {'cid':val}     Dict of new values for the same (as in_vals) controls
                                 Format of values is same too.
+            [cid]           List of controls with changed values
         Short names for types
             lb      label
             ln-lb   linklabel
@@ -236,12 +389,16 @@ def dlg_wrapper(title, w, h, cnts, in_vals={}, focus_cid=None):
                 # For checklistbox, checklistview: index+";"+checks 
                 in_val = ';'.join( (in_val[0], ','.join( in_val[1]) ) )
             lst+= ['val='+str(in_val)]
+
+        if 'act' in cnt:    # must be last in lst
+            val     = cnt['act']
+            lst    += ['act='+('1' if val in [True, '1'] else '0')]
         pass;                      #LOG and log('lst={}',lst)
         ctrls_l+= [chr(1).join(lst)]
     pass;                  #LOG and log('ok ctrls_l={}',pformat(ctrls_l, width=120))
 
     ans     = app.dlg_custom(title, w, h, '\n'.join(ctrls_l), cid2i.get(focus_cid, -1))
-    if ans is None: return None, None   # btn_cid, {cid:v}
+    if ans is None: return None, None, None   # btn_cid, {cid:v}, [cid]
 
     btn_i,  \
     vals_ls = ans[0], ans[1].splitlines()
@@ -273,14 +430,42 @@ def dlg_wrapper(title, w, h, cnts, in_vals={}, focus_cid=None):
            #in_val = ';'.join(in_val[0], ','.join(in_val[1]))
         elif isinstance(in_val, bool): 
             an_val = an_val=='1'
+        elif tp=='listview':
+            an_val = -1 if an_val=='' else int(an_val)
         else: 
             an_val = type(in_val)(an_val)
         an_vals[cid]    = an_val
-    return  btn_cid, an_vals
+    return  btn_cid, an_vals, [cid for cid in in_vals if in_vals[cid]!=an_vals[cid]]
    #def dlg_wrapper
 
+def get_hotkeys_desc(cmd_id, ext_id=None, keys_js=None, def_ans=''):
+    """ Read one or two hotkeys for command 
+            cmd_id [+ext_id]
+        from 
+            settings\keys.json
+        Return 
+            def_ans                     If no  hotkeys for the command
+            'Ctrl+Q'            
+            'Ctrl+Q * Ctrl+W'           If one hotkey  for the command
+            'Ctrl+Q/Ctrl+T'            
+            'Ctrl+Q * Ctrl+W/Ctrl+T'    If two hotkeys for the command
+    """
+    if keys_js is None:
+        keys_json   = app.app_path(app.APP_DIR_SETTINGS)+os.sep+'keys.json'
+        keys_js     = apx._json_loads(open(keys_json).read()) if os.path.exists(keys_json) else {}
+
+    cmd_id  = f('{},{}', cmd_id, ext_id) if ext_id else cmd_id
+    if cmd_id not in keys_js:
+        return def_ans
+    cmd_keys= keys_js[cmd_id]
+    desc    = '/'.join([' * '.join(cmd_keys.get('s1', []))
+                       ,' * '.join(cmd_keys.get('s2', []))
+                       ]).strip('/')
+    return desc
+   #def get_hotkeys_desc
+
 if __name__ == '__main__' :     # Tests
-    def ask_number(ask, def_val):
+    def test_ask_number(ask, def_val):
         cnts=[dict(        tp='lb',tid='v',l=3 ,w=70,cap=ask)
              ,dict(cid='v',tp='ed',t=3    ,l=73,w=70)
              ,dict(cid='!',tp='bt',t=45   ,l=3 ,w=70,cap='OK',props='1')
