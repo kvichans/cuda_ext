@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.2.0 2016-05-23'
+    '1.2.1 2016-05-23'
 ToDo: (see end of file)
 '''
 
@@ -199,6 +199,27 @@ class Tabs_cmds:
        #def move_tab
 
     @staticmethod
+    def _activate_tab_other_group(what_tab='next', what_grp='next'):
+        grps    = apx.get_groups_count()
+        if 1==grps:  return
+        me_grp  = ed.get_prop(app.PROP_INDEX_GROUP)
+        op_grp  = (me_grp+1)%grps \
+                    if what_grp=='next' else \
+                  (me_grp-1)%grps
+        op_hs   = [h for h in app.ed_handles() 
+                    if app.Editor(h).get_prop(app.PROP_INDEX_GROUP)==op_grp]
+        if len(op_hs)<2:  return
+        op_ed   = app.ed_group(op_grp)
+        op_ind  = op_ed.get_prop(app.PROP_INDEX_TAB)
+        op_ind  = (op_ind+1)%len(op_hs) \
+                    if what_tab=='next' else \
+                  (op_ind-1)%len(op_hs)
+        app.Editor(op_hs[op_ind]).focus()
+        me_ed   = app.ed_group(me_grp)
+        me_ed.focus()
+       #def _activate_tab_other_group
+
+    @staticmethod
     def close_tab_from_other_group(what_grp='next'):
         if app.app_api_version()<'1.0.139': return app.msg_status(NEED_UPDATE)
         grps    = apx.get_groups_count()
@@ -392,8 +413,10 @@ class SCBs:
         """ Expand current selection to the nearest usefull state:
                 caret -> word -> phrase in brakets/quotes -> phrase with brakets/quotes -> ...
             Example. | caret, <...> selection
+                fun('smt and oth', par)
                 fun('smt an|d oth', par)
                 fun('smt <and> oth', par)
+                fun('smt< and >oth', par)
                 fun('<smt and oth>', par)
                 fun(<'smt and oth'>, par)
                 fun(<'smt and oth', par>)
@@ -1209,6 +1232,8 @@ class Command:
     def move_tab(self):                         return Tabs_cmds.move_tab()
     def close_tab_from_other_group(self
                         , what_grp='next'):     return Tabs_cmds.close_tab_from_other_group(what_grp)
+    def _activate_tab_other_group(self
+        , what_tab='next', what_grp='next'):    return Tabs_cmds._activate_tab_other_group(what_tab, what_grp)
     def go_back_tab(self):
         if  self.pre_tab_id \
         and self.pre_tab_id!=self.cur_tab_id:

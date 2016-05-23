@@ -87,6 +87,10 @@ class Command:
     def move_tab(self):                         return RLS.move_tab()
     def close_tab_from_next_group(self):        return RLS.close_tab_from_other_group('next')
     def close_tab_from_prev_group(self):        return RLS.close_tab_from_other_group('prev')
+    def view_next_tab_from_next_group(self):    return RLS._activate_tab_other_group('next', 'next')
+    def view_next_tab_from_prev_group(self):    return RLS._activate_tab_other_group('next', 'prev')
+    def view_prev_tab_from_next_group(self):    return RLS._activate_tab_other_group('prev', 'next')
+    def view_prev_tab_from_prev_group(self):    return RLS._activate_tab_other_group('prev', 'prev')
     def go_back(self):                          return RLS.go_back_tab()
     
    #class Command

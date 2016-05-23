@@ -119,7 +119,7 @@ method=copy_term
 menu=0
 [item45]
 section=commands
-caption=CudaExt: Replace word or [expression] or 'expression' to clip
+caption=CudaExt: Replace word or [expression] or 'expression' with clip
 method=replace_term
 menu=0
 
@@ -332,7 +332,6 @@ section=commands
 caption=CudaExt: Close tab from next group
 method=close_tab_from_next_group
 menu=0
-
 [item145]
 section=commands
 caption=CudaExt: Close tab from previous group
@@ -340,6 +339,27 @@ method=close_tab_from_prev_group
 menu=0
 
 [item146]
+section=commands
+caption=CudaExt: View next tab from next group
+method=view_next_tab_from_next_group
+menu=0
+[item147]
+section=commands
+caption=CudaExt: View next tab from previous group
+method=view_next_tab_from_prev_group
+menu=0
+[item148]
+section=commands
+caption=CudaExt: View previous tab from next group
+method=view_prev_tab_from_next_group
+menu=0
+[item149]
+section=commands
+caption=CudaExt: View previous tab from previous group
+method=view_prev_tab_from_prev_group
+menu=0
+
+[item150]
 section=commands
 caption=CudaExt: Activate previously active tab (go back)
 method=go_back

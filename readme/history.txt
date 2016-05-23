@@ -1,6 +1,7 @@
 1.2.0 (2016-05-23)
 added: copy or replace word/'smth'/[smth] near/around caret without selection
 added: expand selection caret->word->'smth'->('smth')->f(smth)->...
+added: switch viewed tab in unactive group
 
 1.1.0 (2016-05-19)
 inner rework
