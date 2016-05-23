@@ -1,3 +1,10 @@
+1.2.0 (2016-05-23)
+added: copy or replace word/'smth'/[smth] near/around caret without selection
+added: expand selection caret->word->'smth'->('smth')->f(smth)->...
+
+1.1.0 (2016-05-19)
+inner rework
+
 1.0.8 (2016-05-16)
 added: go_back for activate prev tab
 added: close tab from next/pev group

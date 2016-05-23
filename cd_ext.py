@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.1.0 2016-05-19'
+    '1.2.0 2016-05-23'
 ToDo: (see end of file)
 '''
 
@@ -216,6 +216,333 @@ class Tabs_cmds:
         me_ed.focus()
        #def close_tab_from_other_group
    #class Tabs_cmds
+
+#############################################################
+class SCBs:
+    @staticmethod
+    def copy_term():
+        """ Find and copy to CB word or 'smth'/"smth"/[smth] near/around caret.
+            Parse only (in parse order)
+                ·a|c·      abc|·   ·|abc        "word"-chars are \w             · is [^\w_]
+                'abc'|·    ·|"abc"              any quotes from "" ''           · is [^\w_]
+                [abc]|·    ·|(abc)              any brackets from [](){}<>      · is [^\w_'"]
+        """
+        term,(bgn,end) = SCBs._parseTerm(ed)
+        pass;                  #LOG and log('term,(bgn,end)={}',(term,(bgn,end)))
+        pass;                  #LOG and log('test={}',(ed.get_text_line(ed.get_carets()[0][1])[bgn:end]))
+        if term:
+            app.app_proc(app.PROC_SET_CLIP, term)
+            app.msg_status(f(_('Copy {}'), repr(term[:50])))
+       #def copy_term
+
+    @staticmethod
+    def replace_term():
+        """ Find a word or 'smth'/"smth"/[smth] near/around caret 
+                and replace with CB-clip.
+            Parse only (in parse order)
+                ·a|c·      abc|·   ·|abc        "word"-chars are \w             · is [^\w_]
+                'abc'|·    ·|"abc"              any quotes from "" ''           · is [^\w_]
+                [abc]|·    ·|(abc)              any brackets from [](){}<>      · is [^\w_'"]
+        """
+        clip    = app.app_proc(app.PROC_GET_CLIP, '')
+        if not clip:    return app.msg_status(_('No clip'))
+        term,(bgn,end) = SCBs._parseTerm(ed)
+        pass;                  #LOG and log('term,(bgn,end)={}',(term,(bgn,end)))
+        pass;                  #LOG and log('test={}',(ed.get_text_line(ed.get_carets()[0][1])[bgn:end]))
+        if term:
+            row = ed.get_carets()[0][1]
+            line= ed.get_text_line(row)
+            line= line[:bgn] + clip + line[end:]
+            ed.set_text_line(row, line)
+            app.msg_status(f(_('Replace {} with clip'), repr(term[:50])))
+       #def replace_term
+
+    lexer   = None
+    wrdchs  = ''
+    wrdcs_re= None
+    quotes  = ''
+    brckts  = ''
+    opn2cls = {}
+    cls2opn = {}
+    allspec = ''
+    @staticmethod
+    def _prep_static_data():
+        lexer           = ed.get_prop(app.PROP_LEXER_FILE)
+        if SCBs.lexer==lexer and SCBs.quotes: return
+        SCBs.wrdchs     = apx.get_opt('word_chars', '') + '_'
+        SCBs.wrdcs_re   = re.compile(r'^[\w'+re.escape(SCBs.wrdchs)+']+')
+        SCBs.quotes     = apx.get_opt('cudaext_quotes', '"'+"'")
+        SCBs.brckts     = apx.get_opt('cudaext_brackets', '[](){}<>')
+        SCBs.opn2cls    = {SCBs.brckts[i  ]:SCBs.brckts[i+1] for i in range(0,len(SCBs.brckts),2)}
+        SCBs.cls2opn    = {SCBs.brckts[i+1]:SCBs.brckts[i  ] for i in range(0,len(SCBs.brckts),2)}
+        SCBs.allspec    = SCBs.wrdchs + SCBs.quotes + SCBs.brckts
+        SCBs.notspec_re = re.compile(r'^[\W'+re.escape(SCBs.allspec)+']+')
+       #def _prep_static_data
+
+    @staticmethod
+    def _parseTerm(ted=ed, ops={}):         #NOTE: _parseTerm
+        """ Find _term_ around caret *into* current line.
+            Parse only (in parse order)
+                ·a|c·      abc|·   ·|abc        "word"-chars are \w             · is [^\w_]
+                'abc'|·    ·|"abc"              any quotes from "" ''           · is [^\w_]
+                [abc]|·    ·|(abc)              any brackets from [](){}<>      · is [^\w_'"]
+            Params from def/user/lex
+                word_chars          (no)        Append chars to \w
+                cudaext_quotes      '"          Using quotes 
+                cudaext_brackets    [](){}<>    Using brackets
+            Params
+                ted     (ed)
+                ops     dict({})    
+                    only_word:False             Detect only term as "word"
+            Return      
+                term, col_brn, col_end          term = line[col_bgn:col_end]
+        """
+        NONE    = None, (None, None)
+        crts    = ted.get_carets()
+        if len(crts)>1: 
+            app.msg_status(_("Command doesn't work with multi-carets"))
+            return NONE
+        (cCrt, rCrt
+        ,cEnd, rEnd)= crts[0]
+        if cEnd!=-1:
+            app.msg_status(_('Command works when no selection'))
+            return NONE
+        SCBs._prep_static_data()
+        word_b  = ops.get('only_word', False)
+        
+        line    = ted.get_text_line(rCrt)
+        c_crt   = cCrt
+
+        c_aft   = line[c_crt]   if c_crt<len(line) else ' '
+        c_bfr   = line[c_crt-1] if c_crt>0         else ' '
+        pass;                  #LOG and log('c_crt,(c_bfr,c_aft),line={}',(c_crt,(c_bfr,c_aft),line))
+        if      word_b \
+        and not (c_bfr.isalnum() or c_bfr in SCBs.wrdchs) \
+        and not (c_aft.isalnum() or c_aft in SCBs.wrdchs) :
+            pass;              #LOG and log('for word unk bfr+aft',())
+            return NONE
+        if not word_b \
+        and not (c_bfr.isalnum() or c_bfr in SCBs.quotes or c_bfr in SCBs.brckts) \
+        and not (c_aft.isalnum() or c_aft in SCBs.quotes or c_aft in SCBs.brckts) :
+            pass;              #LOG and log('for expr unk bfr+aft',())
+            return NONE
+        
+        # Detect word
+        if      (c_bfr.isalnum() or c_bfr in SCBs.wrdchs) \
+        or      (c_aft.isalnum() or c_aft in SCBs.wrdchs) :
+            pass;              #LOG and log('?? for word',())
+            tx_bfr  = line[:c_crt]
+            tx_aft  = line[ c_crt:]
+            pass;              #LOG and log('tx_bfr,tx_aft={}',(tx_bfr,tx_aft))
+            gp_aft  = 0
+            gp_bfr  = 0
+            if (c_bfr.isalnum() or c_bfr in SCBs.wrdchs):   # abc|
+                tx_bfr_r= ''.join(reversed(tx_bfr))
+                gp_bfr  = len(SCBs.wrdcs_re.search(tx_bfr_r).group())
+            if (c_aft.isalnum() or c_aft in SCBs.wrdchs):   # |abc
+                gp_aft  = len(SCBs.wrdcs_re.search(tx_aft  ).group())
+            pass;              #LOG and log('gp_bfr,gp_aft={}',(gp_bfr,gp_aft))
+            return line[c_crt-gp_bfr:c_crt+gp_aft], (c_crt-gp_bfr, c_crt+gp_aft)
+        assert not word_b
+
+        find_prms = None
+        rfind_prms= None
+        gap_crt     = 0
+        if False:pass
+        # Detect qouted
+        elif c_bfr in SCBs.quotes and line.count(c_bfr, c_crt)%2==0:    #   'abc'|
+            rfind_prms  = c_bfr, 0, c_crt-2
+            gap_crt     = 0
+        elif c_bfr in SCBs.quotes and line.count(c_bfr, c_crt)%2==1:    #   '|abc'
+            find_prms   = c_bfr, c_crt
+            gap_crt     = -1
+        elif c_aft in SCBs.quotes and line.count(c_aft, c_crt)%2==0:    #   |'abc'
+            find_prms   = c_aft, c_crt+1
+            gap_crt     = 0
+        elif c_aft in SCBs.quotes and line.count(c_aft, c_crt)%2==1:    #   'abc|'
+            rfind_prms  = c_aft, 0, c_crt-1
+            gap_crt     = 1
+        # Detect brackets
+        elif c_bfr in SCBs.cls2opn:                                     #   [...]|
+            rfind_prms  = SCBs.cls2opn[c_bfr], 0, c_crt-2
+            gap_crt     = 0
+        elif c_bfr in SCBs.opn2cls:                                     #   [|..]
+            find_prms   = SCBs.opn2cls[c_bfr], c_crt
+            gap_crt     = -1
+        elif c_aft in SCBs.opn2cls:                                     #   |[...]
+            find_prms   = SCBs.opn2cls[c_aft], c_crt+1
+            gap_crt     = 0
+        elif c_aft in SCBs.cls2opn:                                     #   [..|]
+            rfind_prms  = SCBs.cls2opn[c_aft], 0, c_crt-1
+            gap_crt     = 1
+        pass;                  #LOG and log('(rfind_prms,find_prms),gap_crt={}',((rfind_prms,find_prms),gap_crt))
+        if rfind_prms:
+            trm_bgn = line.rfind(*rfind_prms)
+            pass;              #LOG and log('trm_bgn={}',(trm_bgn))
+            return line[trm_bgn:c_crt+gap_crt          ], (trm_bgn      , c_crt+gap_crt)  if -1!=trm_bgn else NONE
+        if find_prms:
+            trm_end = line.find(*find_prms)
+            pass;              #LOG and log('trm_end={}',(trm_end))
+            return line[        c_crt+gap_crt:trm_end+1], (c_crt+gap_crt, trm_end+1    )  if -1!=trm_end else NONE
+        return NONE
+        #def _parseTerm
+
+    @staticmethod
+    def expand_sel(copy=False):
+        """ Expand current selection to the nearest usefull state:
+                caret -> word -> phrase in brakets/quotes -> phrase with brakets/quotes -> ...
+            Example. | caret, <...> selection
+                fun('smt an|d oth', par)
+                fun('smt <and> oth', par)
+                fun('<smt and oth>', par)
+                fun(<'smt and oth'>, par)
+                fun(<'smt and oth', par>)
+                fun<('smt and oth', par)>
+                <fun('smt and oth', par)>
+            Params
+                copy    Copy new (only changed) selected text to clipboard
+            Return  
+                        Selection is changed
+        """
+        pass;                  #LOG and log('copy={}',(copy))
+        crts    = ed.get_carets()
+        if len(crts)>1: 
+            app.msg_status(_("Command doesn't work with multi-carets"))
+            return False
+        SCBs._prep_static_data()
+        def get_char_before(col, row, dfval):
+            """ Get first not EOL char """
+            line    = ed.get_text_line(row)
+            if col>0:           return line[col-1], col      -1, row
+            return dfval, 0, row
+#           while row>0:
+#               row -= 1
+#               line= ed.get_text_line(row)
+#               if line:        return line[   -1], len(line)-1, row
+            return dfval, -1, -1
+        def get_char_after(col, row, dfval):
+            """ Get first not EOL char """
+            line    = ed.get_text_line(row)
+            if col<len(line)-1: return line[col+1], col+1, row
+            return dfval, len(line), row
+#           while row<ed.get_line_count()-1:
+#               row += 1
+#               line= ed.get_text_line(row)
+#               if line:        return line[    0], 0,     row
+            return dfval, -1, -1
+        
+        (cCrt, rCrt
+        ,cEnd, rEnd)    = crts[0]
+        if -1==rEnd:
+            cEnd, rEnd  = cCrt, rCrt
+        def set_sel(cSelBgn, rSelBgn, cSelEnd, rSelEnd):
+            if (rCrt, cCrt) >= (rEnd, cEnd):
+                ed.set_caret(cSelEnd, rSelEnd, cSelBgn, rSelBgn)
+            else:
+                ed.set_caret(cSelBgn, rSelBgn, cSelEnd, rSelEnd)
+            if copy:
+                sSel    = ed.get_text_sel()
+                app.app_proc(app.PROC_SET_CLIP, sSel)
+                return True
+        ((rSelB, cSelB)
+        ,(rSelE, cSelE))= apx.minmax((rCrt, cCrt), (rEnd, cEnd))
+        cSelE          -= 1                 ##??
+        sSel            = ed.get_text_sel()
+        pass;                  #LOG and log('(rSelB, cSelB),(rSelE, cSelE),sSel={}',((rSelB, cSelB),(rSelE, cSelE),sSel[:50]))
+        sBfr,cBfr,rBfr  = get_char_before(cSelB, rSelB, ' ')
+        sAft,cAft,rAft  = get_char_after( cSelE, rSelE, ' ')
+        pass;                  #LOG and log('(sBfr,rBfr,cBfr),(sAft,rAft,cAft)={}',((sBfr,rBfr,cBfr),(sAft,rAft,cAft)))
+        
+        # Try to expand from '|smth|' to |'smth'| or from (|smth|) to |(smth|)
+        pass;                  #LOG and log('sBfr==sAft and sBfr in SCBs.quotes={}',(sBfr==sAft and sBfr in SCBs.quotes))
+        pass;                  #LOG and log('sBfr==SCBs.cls2opn.get(sAft)={}',(sBfr==SCBs.cls2opn.get(sAft)))
+        if  sBfr and sAft and \
+        (   sBfr==sAft and sBfr in SCBs.quotes
+        or  sBfr==SCBs.cls2opn.get(sAft) ):
+            pass;              #LOG and log('|smth| --> |"smth"| or from (|smth|) to |(smth)|',())
+            return      set_sel(cBfr, rBfr, cAft+1, rAft)
+            
+
+        # Try to expand from (|smth| to (|smth...|) or |smth|) to (|...smth|)
+        if  sBfr in SCBs.opn2cls:
+            c_opn,c_cls,\
+            cAft,rAft   = fnd_mtch_char(ed, sBfr, SCBs.opn2cls[sBfr], ed.get_text_line(rBfr), cBfr+1, rBfr, to_end=True)
+            pass;              #LOG and log('c_opn, c_cls, cAft, rAft={}',(c_opn, c_cls, cAft, rAft))
+            if -1!=rAft:
+                pass;          #LOG and log('(|smth| --> (|smth...|)',())   #)
+                return  set_sel(cSelB, rSelB, cAft, rAft)
+        if  sAft in SCBs.cls2opn:
+            c_opn,c_cls,\
+            cBfr,rBfr   = fnd_mtch_char(ed, sAft, SCBs.cls2opn[sAft], ed.get_text_line(rAft), cAft-1, rAft, to_end=False)
+            pass;              #LOG and log('c_opn, c_cls, cBfr,rBfr={}',(c_opn, c_cls, cBfr,rBfr))
+            if -1!=rBfr:
+                pass;          #LOG and log('|smth|) --> (|...smth|)',())   #(
+                return  set_sel(cBfr+1, rBfr, cSelE+1, rSelE)
+        
+        # Try to expand from |smth|( to |smth(...)| or )|smth| to |(...)smth|
+        if  sBfr in SCBs.cls2opn:
+            c_opn,c_cls,\
+            cBfr,rBfr   = fnd_mtch_char(ed, sBfr, SCBs.cls2opn[sBfr], ed.get_text_line(rBfr), cBfr-1, rBfr, to_end=False)
+            pass;              #LOG and log('c_opn, c_cls, cBfr,rBfr={}',(c_opn, c_cls, cBfr,rBfr))
+            if -1!=rBfr:
+                pass;          #LOG and log(')|smth| --> |(...)smth|',())   #)
+                return  set_sel(cBfr, rBfr, cSelE+1, rSelE)
+        if  sAft in SCBs.opn2cls:
+            c_opn,c_cls,\
+            cAft,rAft   = fnd_mtch_char(ed, sAft, SCBs.opn2cls[sAft], ed.get_text_line(rAft), cAft+1, rAft, to_end=True)
+            pass;              #LOG and log('c_opn, c_cls, cAft, rAft={}',(c_opn, c_cls, cAft, rAft))
+            if -1!=rBfr:
+                pass;          #LOG and log('|smth|( --> |smth(...)|',())   #(
+                return  set_sel(cSelB, rSelB, cAft+1, rAft)
+        
+        # Try to expand from |smth| to |ABCsmthXYX|
+        nBfrGap = 0
+        nAftGap = 0
+        if  sBfr in SCBs.wrdchs or sBfr.isalnum() \
+        or  sAft in SCBs.wrdchs or sAft.isalnum():
+            if  sBfr in SCBs.wrdchs or sBfr.isalnum():
+                sBfrLn  = ed.get_text_line(rBfr)
+                sBfrTx  = sBfrLn[:cBfr]
+                sBfrTxR = ''.join(reversed(sBfrTx))
+                oBfrMch = SCBs.wrdcs_re.search(sBfrTxR)
+                nBfrGap = len(oBfrMch.group()) if oBfrMch else 0
+                pass;          #LOG and log('nBfrGap={}',(nBfrGap))
+            else:
+                nBfrGap = -1
+            if  sAft in SCBs.wrdchs or sAft.isalnum():
+                sAftLn  = ed.get_text_line(rAft)
+                sAftTx  = sAftLn[cAft:]
+                oAftMch = SCBs.wrdcs_re.search(sAftTx)
+                nAftGap = len(oAftMch.group()) if oAftMch else 0
+                pass;          #LOG and log('nAftGap={}',(nAftGap))
+            pass;              #LOG and log('|smth| to |ABCsmthXYX|',())
+            return      set_sel(cBfr-nBfrGap, rBfr, cAft+nAftGap, rAft)
+        
+        # Try to expand from |smth| to |·smth·|
+        nBfrGap = 0
+        nAftGap = 0
+        if      sBfr not in SCBs.allspec and not sBfr.isalnum() \
+        or      sAft not in SCBs.allspec and not sAft.isalnum() :   #NOTE: do
+            if  sBfr not in SCBs.allspec and not sBfr.isalnum():
+                sBfrLn  = ed.get_text_line(rBfr)
+                sBfrTx  = sBfrLn[:cBfr]
+                sBfrTxR = ''.join(reversed(sBfrTx))
+                oBfrMch = SCBs.notspec_re.search(sBfrTxR)
+                nBfrGap = len(oBfrMch.group()) if oBfrMch else 0
+                pass;          #LOG and log('nBfrGap={}',(nBfrGap))
+            else:
+                nBfrGap = -1
+            if  sAft not in SCBs.allspec and not sAft.isalnum():
+                sAftLn  = ed.get_text_line(rAft)
+                sAftTx  = sAftLn[cAft:]
+                oAftMch = SCBs.notspec_re.search(sAftTx)
+                nAftGap = len(oAftMch.group()) if oAftMch else 0
+                pass;          #LOG and log('nAftGap={}',(nAftGap))
+            pass;              #LOG and log('|smth| to |·smth·|',())
+            return      set_sel(cBfr-nBfrGap, rBfr, cAft+nAftGap, rAft)
+        return False
+       #def expand_sel
+#  #class SCBs
 
 #############################################################
 class Jumps_cmds:
@@ -870,6 +1197,11 @@ class Command:
     def find_cb_string_next(self):              return Find_repl_cmds.find_cb_by_cmd('dn')
     def find_cb_string_prev(self):              return Find_repl_cmds.find_cb_by_cmd('up')
     def replace_all_sel_to_cb(self):            return Find_repl_cmds.replace_all_sel_to_cb()
+
+    def copy_term(self):                        return SCBs.copy_term()
+    def replace_term(self):                     return SCBs.replace_term()
+    def expand_sel(self):                       return SCBs.expand_sel(copy=False)
+    def expand_sel_copy(self):                  return SCBs.expand_sel(copy=True)
     
     def _activate_tab(self, group, tab_ind):    return Tabs_cmds._activate_tab(     group, tab_ind)
     def _activate_last_tab(self, group):        return Tabs_cmds._activate_last_tab(group)
@@ -888,6 +1220,53 @@ class Command:
     def scroll_to_center(self):             return Jumps_cmds.scroll_to_center()
    #class Command
 
+
+def fnd_mtch_char(ed4find, c_opn, c_cls, line, col, row, to_end):
+    """ Find paired char c_opn from (col, row) in dir to_end and 
+            skip inside pair (c_opn, c_cls)
+    """
+    assert line     ==ed4find.get_text_line(row)
+#   assert line[col]==c_opn
+    pass;                      #LOG and log('c_opn, c_cls, line[col-1:col+2], col, row, to_end={}',(c_opn, c_cls, line[col-1:col+2], col, row, to_end))
+    cnt = 1
+    while True:
+        for pos in (range(col, len(line)) if to_end else
+                    range(col, -1, -1)):
+            c = line[pos]
+            if False:
+                pass
+            elif c == c_opn:
+                cnt = cnt + 1
+            elif c == c_cls:
+                cnt = cnt - 1
+            else:
+                continue  # for pos
+            pass;              #LOG and log('line, pos, c, cnt={}', (line, pos, c, cnt))
+            if 0 == cnt:
+                # Found!
+                col = pos
+                break#for pos
+           #for pos
+        if 0 == cnt:
+            break#while
+        if to_end:
+            row = row + 1
+            if row == ed4find.get_line_count():
+                pass;          #LOG and log('not found')
+                break#while
+            line = ed4find.get_text_line(row)
+            col = 0
+        else:
+            if row == 0:
+                pass;          #LOG and log('not found')
+                break#while
+            row = row - 1
+            line = ed4find.get_text_line(row)
+            col = len(line) - 1
+       #while
+    return (c_opn, c_cls, col, row) if cnt == 0 else (c_opn, c_cls, -1, -1)
+   #def fnd_mtch_char
+#NOTE: mcth
 def find_matching_char(ed4find, cStart, rStart, opn2cls={'[':']', '{':'}', '(':')', '<':'>', '«':'»'}):
     ''' Find matching (pair) char for char from position (cStart,rStart) (or prev) 
     '''
@@ -910,41 +1289,11 @@ def find_matching_char(ed4find, cStart, rStart, opn2cls={'[':']', '{':'}', '(':'
     line    = crt_line
     row     = rStart
     pass;                      #LOG and log('c_opn,c_cls,to_end,col={}', (c_opn,c_cls,to_end,col))
-    cnt     = 1
-    while True:
-        for pos in (range(col, len(line)) if to_end else 
-                    range(col, -1, -1)):
-            c   = line[pos]
-            if False:pass
-            elif c==c_opn:
-                cnt     = cnt+1
-            elif c==c_cls:
-                cnt     = cnt-1
-            else:
-                continue # for pos
-            pass;              #LOG and log('line, pos, c, cnt={}', (line, pos, c, cnt))
-            if 0==cnt:
-                # Found!
-                col     = pos
-                break #for pos 
-        if 0==cnt:
-            break #while
-        if to_end:
-            row     = row+1
-            if row==ed4find.get_line_count():
-                pass;          #LOG and log('not found')
-                break #while
-            line    = ed4find.get_text_line(row)
-            col     = 0
-        else:
-            if row==0:
-                pass;          #LOG and log('not found')
-                break #while
-            row     = row-1
-            line    = ed4find.get_text_line(row)
-            col     = len(line)-1
-       #while
-    return (c_opn, c_cls, col, row) if cnt==0 else (c_opn, c_cls, -1, -1)
+    c_opn,  \
+    c_cls,  \
+    col,row = fnd_mtch_char(ed4find, c_opn, c_cls, line, col, row, to_end)
+    return c_opn, c_cls, col, row
+#   return (c_opn, c_cls, col, row) if cnt==0 else (c_opn, c_cls, -1, -1)
    #def find_matching_char
 
 def get_word_or_quoted(text, start, not_word_chars='[](){}', quot_chars="'"+'"'):      # '"

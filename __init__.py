@@ -35,6 +35,11 @@ class Command:
     def find_cb_string_next(self):              return RLS.find_cb_string_next()
     def find_cb_string_prev(self):              return RLS.find_cb_string_prev()
     def replace_all_sel_to_cb(self):            return RLS.replace_all_sel_to_cb()
+
+    def copy_term(self):                        return RLS.copy_term()
+    def replace_term(self):                     return RLS.replace_term()
+    def expand_sel(self):                       return RLS.expand_sel()
+    def expand_sel_copy(self):                  return RLS.expand_sel_copy()
     
     # Jumps_cmds
     def scroll_to_center(self):                 return RLS.scroll_to_center()

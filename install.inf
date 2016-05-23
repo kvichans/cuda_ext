@@ -100,7 +100,6 @@ section=commands
 caption=CudaExt: Find clipboard string: next
 method=find_cb_string_next
 menu=0
-
 [item42]
 section=commands
 caption=CudaExt: Find clipboard string: previous
@@ -111,6 +110,28 @@ menu=0
 section=commands
 caption=CudaExt: Replace all fragment as selected with clipboard value
 method=replace_all_sel_to_cb
+menu=0
+
+[item44]
+section=commands
+caption=CudaExt: Copy word or [expression] or 'expression' without selection
+method=copy_term
+menu=0
+[item45]
+section=commands
+caption=CudaExt: Replace word or [expression] or 'expression' to clip
+method=replace_term
+menu=0
+
+[item46]
+section=commands
+caption=CudaExt: Expand selection to word or "expression" or (expression)
+method=expand_sel
+menu=0
+[item47]
+section=commands
+caption=CudaExt: Expand and Copy selection to word or "expression" or (expression)
+method=expand_sel_copy
 menu=0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
