@@ -2,11 +2,12 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.2.1 2016-05-23'
+    '1.2.2 2016-05-26'
 ToDo: (see end of file)
 '''
 
 import  re, os, sys, json
+from    collections     import deque
 import  cudatext            as app
 from    cudatext        import ed
 import  cudatext_cmd        as cmds
@@ -298,6 +299,8 @@ class SCBs:
         SCBs.cls2opn    = {SCBs.brckts[i+1]:SCBs.brckts[i  ] for i in range(0,len(SCBs.brckts),2)}
         SCBs.allspec    = SCBs.wrdchs + SCBs.quotes + SCBs.brckts
         SCBs.notspec_re = re.compile(r'^[\W'+re.escape(SCBs.allspec)+']+')
+        SCBs.signs      = apx.get_opt('cudaext_signs', r'!@#$%^&*-=+;:\|,./?`~')
+        SCBs.signs_re   = re.compile(r'^['+re.escape(SCBs.signs)+']+')
        #def _prep_static_data
 
     @staticmethod
@@ -519,6 +522,7 @@ class SCBs:
                 return  set_sel(cSelB, rSelB, cAft+1, rAft)
         
         # Try to expand from |smth| to |ABCsmthXYX|
+        sBfrTxR = ''
         nBfrGap = 0
         nAftGap = 0
         if  sBfr in SCBs.wrdchs or sBfr.isalnum() \
@@ -526,7 +530,7 @@ class SCBs:
             if  sBfr in SCBs.wrdchs or sBfr.isalnum():
                 sBfrLn  = ed.get_text_line(rBfr)
                 sBfrTx  = sBfrLn[:cBfr]
-                sBfrTxR = ''.join(reversed(sBfrTx))
+                sBfrTxR = ''.join(reversed(sBfrTx)) if not sBfrTxR else sBfrTxR
                 oBfrMch = SCBs.wrdcs_re.search(sBfrTxR)
                 nBfrGap = len(oBfrMch.group()) if oBfrMch else 0
                 pass;          #LOG and log('nBfrGap={}',(nBfrGap))
@@ -541,21 +545,45 @@ class SCBs:
             pass;              #LOG and log('|smth| to |ABCsmthXYX|',())
             return      set_sel(cBfr-nBfrGap, rBfr, cAft+nAftGap, rAft)
         
-        # Try to expand from |smth| to |·smth·|
+        # Try to expand from |smth| to |.smth,|
         nBfrGap = 0
         nAftGap = 0
-        if      sBfr not in SCBs.allspec and not sBfr.isalnum() \
-        or      sAft not in SCBs.allspec and not sAft.isalnum() :   #NOTE: do
-            if  sBfr not in SCBs.allspec and not sBfr.isalnum():
+        if      sBfr in SCBs.signs\
+        or      sAft in SCBs.signs :   #NOTE: do
+            if  sBfr in SCBs.signs:
                 sBfrLn  = ed.get_text_line(rBfr)
                 sBfrTx  = sBfrLn[:cBfr]
-                sBfrTxR = ''.join(reversed(sBfrTx))
+                sBfrTxR = ''.join(reversed(sBfrTx)) if not sBfrTxR else sBfrTxR
+                oBfrMch = SCBs.signs_re.search(sBfrTxR)
+                nBfrGap = len(oBfrMch.group()) if oBfrMch else 0
+                pass;          #LOG and log('nBfrGap={}',(nBfrGap))
+            else:
+                nBfrGap = -1
+            if  sAft in SCBs.signs:
+                sAftLn  = ed.get_text_line(rAft)
+                sAftTx  = sAftLn[cAft:]
+                oAftMch = SCBs.signs_re.search(sAftTx)
+                nAftGap = len(oAftMch.group()) if oAftMch else 0
+                pass;          #LOG and log('nAftGap={}',(nAftGap))
+            pass;              #LOG and log('|smth| to |.smth,|',())
+            return      set_sel(cBfr-nBfrGap, rBfr, cAft+nAftGap, rAft)
+
+        # Try to expand from |smth| to |·smth·|
+        assert not sBfr.isalnum() and not sAft.isalnum()
+        nBfrGap = 0
+        nAftGap = 0
+        if      sBfr not in SCBs.allspec \
+        or      sAft not in SCBs.allspec :
+            if  sBfr not in SCBs.allspec:
+                sBfrLn  = ed.get_text_line(rBfr)
+                sBfrTx  = sBfrLn[:cBfr]
+                sBfrTxR = ''.join(reversed(sBfrTx)) if not sBfrTxR else sBfrTxR
                 oBfrMch = SCBs.notspec_re.search(sBfrTxR)
                 nBfrGap = len(oBfrMch.group()) if oBfrMch else 0
                 pass;          #LOG and log('nBfrGap={}',(nBfrGap))
             else:
                 nBfrGap = -1
-            if  sAft not in SCBs.allspec and not sAft.isalnum():
+            if  sAft not in SCBs.allspec:
                 sAftLn  = ed.get_text_line(rAft)
                 sAftTx  = sAftLn[cAft:]
                 oAftMch = SCBs.notspec_re.search(sAftTx)
@@ -887,7 +915,6 @@ class Insert_cmds:
                 b
                 c  = 1
         '''
-#       global data4_align_in_lines_by_sep
         crts    = ed.get_carets()
         if len(crts)>1:
             return app.msg_status(ONLY_SINGLE_CRT.format('Command'))
@@ -899,7 +926,7 @@ class Insert_cmds:
         spr     = '' if spr is None else spr.strip()
         if not spr:
             return # Esc
-        data4_align_in_lines_by_sep    = spr
+        Insert_cmds.data4_align_in_lines_by_sep    = spr
         ((rTx1, cTx1)
         ,(rTx2, cTx2))  = apx.minmax((rCrt, cCrt), (rEnd, cEnd))
         ls_txt  = ed.get_text_substr(0,rTx1, 0,rTx2+(0 if 0==cEnd else 1))
@@ -922,15 +949,16 @@ class Insert_cmds:
     
 class Command:
     def __init__(self):
-#       self.data4_align_in_lines_by_sep  = ''
-        self.cur_tab_id = None
-        self.pre_tab_id = None
+#       self.cur_tab_id = None
+#       self.pre_tab_id = None
         
-    def on_focus(self, ed_self):
-        self.pre_tab_id = self.cur_tab_id
-        self.cur_tab_id = ed_self.get_prop(app.PROP_TAB_ID)
-        pass;                  #LOG and log('pre_tab_id,(cur_tab_id,cap)={}',(self.pre_tab_id,(self.cur_tab_id,ed.get_prop(app.PROP_TAB_TITLE))))
-       
+        # Data for go_back_tab with "visit history"
+        self.lock_on_fcs  = False
+        self.tid_hist   = deque(()
+                        , apx.get_opt('tab_histoty_size', 10))  # append to left, scan from left, loose from right
+        self.tid_hist_i = 0
+        self.CASM_state = ''                                    # String has "c"/"a"/"s"/"m" if Ctrl/Alt/Shift/Meta-Win pressed
+        
     def _move_splitter(self, what, factor):
         ''' Move one of splitters
             Params:
@@ -1234,12 +1262,57 @@ class Command:
                         , what_grp='next'):     return Tabs_cmds.close_tab_from_other_group(what_grp)
     def _activate_tab_other_group(self
         , what_tab='next', what_grp='next'):    return Tabs_cmds._activate_tab_other_group(what_tab, what_grp)
+
     def go_back_tab(self):
-        if  self.pre_tab_id \
-        and self.pre_tab_id!=self.cur_tab_id:
-            pre_ed  = apx.get_tab_by_id(self.pre_tab_id)
-            if pre_ed:  pre_ed.focus()
+        if app.app_api_version()<'1.0.143': return app.msg_status(NEED_UPDATE)
+        CASM_state      = app.app_proc(app.PROC_GET_KEYSTATE, '')
+        self.lock_on_fcs= bool(CASM_state)
+        pass;                  #LOG and log('ok self.CASM_state={} KEYSTATE={}',self.CASM_state, CASM_state)
+        pass;                  #LOG and log('CASM="{}", self.CASM="{}", lock={}',CASM_state, self.CASM_state, self.lock_on_fcs)
+        self.CASM_state = CASM_state
+        #NOTE: go_back_tab
+        if (1+self.tid_hist_i)>=len(self.tid_hist): return app.msg_status(_('No more tabs in History'))
+        self.tid_hist_i+= 1
+        assert self.tid_hist_i<len(self.tid_hist)
+        tid     = list(self.tid_hist)[self.tid_hist_i]
+        self.tid_hist.remove(tid)
+        self.tid_hist.appendleft(tid)
+        pass;                  #LOG and log('bk jump! h_i={}, h={}, tid="{}"',self.tid_hist_i, list(self.tid_hist), tid)
+        back_ed = apx.get_tab_by_id(tid)
+        if back_ed:  back_ed.focus()
+
+#       if  self.pre_tab_id \
+#       and self.pre_tab_id!=self.cur_tab_id:
+#           pre_ed  = apx.get_tab_by_id(self.pre_tab_id)
+#           if pre_ed:  pre_ed.focus()
        #def go_back_tab
+
+    def on_focus(self, ed_self):
+        if self.lock_on_fcs:
+            pass;              #LOG and log('locked',())
+            return
+        # Add/Rise to/in history
+        tid          = ed_self.get_prop(app.PROP_TAB_ID)
+        if tid in self.tid_hist:
+            self.tid_hist.remove(tid)
+        self.tid_hist.appendleft(tid)
+        self.tid_hist_i = 0
+        pass;                  #LOG and log('H updd! h_i={}, h={}, tid="{}"',self.tid_hist_i, list(self.tid_hist), tid)
+
+#       self.pre_tab_id = self.cur_tab_id
+#       self.cur_tab_id = tid
+        #NOTE: on_focus
+       #def on_focus
+       
+    def on_key_up(self, ed_self, key, state):
+        if app.app_api_version()<'1.0.143': return app.msg_status(NEED_UPDATE)
+        CASM_state      = app.app_proc(app.PROC_GET_KEYSTATE, '')
+        pass;                  #LOG and log('CASM="{}", self.CASM="{}"',CASM_state, self.CASM_state)
+        if CASM_state!=self.CASM_state or not CASM_state:
+            pass;              #LOG and log('unlock')
+            self.lock_on_fcs= False
+            self.CASM_state = ''
+            self.tid_hist_i = 0
 
     def jump_to_matching_bracket(self):     return Jumps_cmds.jump_to_matching_bracket()
     def scroll_to_center(self):             return Jumps_cmds.scroll_to_center()

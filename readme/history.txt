@@ -1,3 +1,6 @@
+1.2.2 (2016-05-26)
+changed: go_back_tab uses "visit history"
+
 1.2.0 (2016-05-23)
 added: copy or replace word/'smth'/[smth] near/around caret without selection
 added: expand selection caret->word->'smth'->('smth')->f(smth)->...

@@ -12,6 +12,7 @@ class Command:
     def on_focus(self, ed_self):                return RLS.on_focus(ed_self)
 
     # Nav_cmds
+    def on_key_up(self, ed_self, key, state):   return RLS.on_key_up(ed_self, key, state)
     def on_console_nav(self, ed_self, text):    return RLS.on_console_nav(ed_self, text)
     def nav_by_console_err(self):               return RLS.nav_by_console_err()
     def open_file_near_right(self):             return RLS._open_file_near('right')
