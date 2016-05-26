@@ -1267,9 +1267,13 @@ class Command:
             if btn=='open' and last>=0 and os.path.isfile(files[last]):
                 app.file_open(files[last])
                 break#while
+            
+            # Modify
+            store_b = False
             if False:pass
-            elif btn=='addc' and ed.get_filename():
+            elif btn=='addc' and ed.get_filename() and ed.get_filename() not in files:
                 files  += [ed.get_filename()]
+                store_b = True
             elif btn=='brow':
                 fl      = app.dlg_file(True, '', '', '')
                 if fl and os.path.basename(fl).upper()=='SynFav.ini'.upper():
@@ -1278,27 +1282,28 @@ class Command:
                     for syn_ln in syn_lns:
                         if os.path.isfile(syn_ln) and syn_ln not in files:
                             files  += [syn_ln]
-                    stores['fv_files'] = files
-                    open(store_json, 'w').write(json.dumps(stores, indent=4))
-                    continue#while
-                if fl and fl not in files:
+                            store_b = True
+                elif fl and fl not in files:
                     files  += [fl]
+                    store_b = True
             elif btn=='delt' and last>=0:
                 del files[last]
                 last    = max(0, len(files)-1)
+                store_b = True
             elif btn in ('fvup', 'fvdn'):
                 newp    = last + (-1 if btn=='fvup' else +1)
                 if 0<=newp<len(files):
                     files[last], files[newp] = files[newp], files[last]
                     last    = newp
+                    store_b = True
+            
+            # Store
+            if store_b:
+                stores['fv_files'] = files
+                stores['fv_fold' ] = fold 
+                stores['fv_last' ] = last 
+                open(store_json, 'w').write(json.dumps(stores, indent=4))
            #while
-        if files != stores.get('fv_files', [])  \
-        or fold  != stores.get('fv_fold', True) \
-        or last  != stores.get('fv_last', 0):
-            stores['fv_files'] = files
-            stores['fv_fold' ] = fold 
-            stores['fv_last' ] = last 
-            open(store_json, 'w').write(json.dumps(stores, indent=4))
        #def dlg_favorites
     
     def on_console_nav(self, ed_self, text):    return Nav_cmds.on_console_nav(ed_self, text)
