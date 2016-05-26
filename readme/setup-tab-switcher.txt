@@ -7,9 +7,9 @@ How to setup another tab-switcher
   Hotkey must contain modifier key: Shift, Ctrl, Alt, Win/Meta.
   F3 - bad, Ctrl+Tab - good, Ctrl+Shift+Alt+Win+Q - good.
 2) Jump to prev-tab by single press of the hotkey.
-3) Hold modifier key[s] and press the hotkey 2 times, to jump to prev-prev-tab (2 steps back).
-4) While you hold modifier key[s], cmd jumps more and more back to history (2,3,4... steps back).
-5) When you release modifier key[s], next jumping starts from history head.
+3) Hold modifier key(s) and press the hotkey 2 times, to jump to prev-prev-tab (2 steps back).
+4) While you hold modifier key(s), cmd jumps more and more back to history (2,3,4... steps back).
+5) When you release modifier key(s), next jumping starts from history head.
 
 Note. 
-Hotkey without modifier key[s] is legal too. But it will always jump to prev-tab.
+Hotkey without modifier key(s) is legal too. But it will always jump to prev-tab.
