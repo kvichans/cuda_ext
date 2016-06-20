@@ -42,6 +42,15 @@ class Command:
     def expand_sel(self):                       return RLS.expand_sel()
     def expand_sel_copy(self):                  return RLS.expand_sel_copy()
     
+#   def mark_all_from(self):                    return RLS.mark_all_from()
+#   def count_all_from(self):                   return RLS.count_all_from()
+#   def find_first_from(self):                  return RLS.find_first_from()
+#   def find_next_from(self):                   return RLS.find_next_from()
+#   def find_prev_from(self):                   return RLS.find_prev_from()
+#   def repl_next_from(self):                   return RLS.repl_next_from()
+#   def repl_stay_from(self):                   return RLS.repl_stay_from()
+#   def repl_all_from(self):                    return RLS.repl_all_from()
+    
     # Jumps_cmds
     def scroll_to_center(self):                 return RLS.scroll_to_center()
     def jump_to_matching_bracket(self):         return RLS.jump_to_matching_bracket()
@@ -61,7 +70,7 @@ class Command:
     # Misc_cmds
     def edit_strcomment_chars(self):            return RLS.edit_strcomment_chars()
     def rename_file(self):                      return RLS.rename_file()
-    def dlg_favorites(self):                    return RLS.dlg_favorites()
+#   def dlg_favorites(self):                    return RLS.dlg_favorites()
 
     # Tabs_cmds
     def to_tab_g1_t1(self):                     return RLS._activate_tab(0, 0)

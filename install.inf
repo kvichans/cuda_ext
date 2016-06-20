@@ -134,15 +134,56 @@ caption=CudaExt: Expand and Copy selection to word or "expression" or (expressio
 method=expand_sel_copy
 menu=0
 
+;[item48]
+;section=commands
+;caption=CudaExt: Mark all (w/o dialog Find)
+;method=mark_all_from
+;menu=0
+;[item49]
+;section=commands
+;caption=CudaExt: Count all (w/o dialog Find)
+;method=count_all_from
+;menu=0
+;[item50]
+;section=commands
+;caption=CudaExt: Find first (w/o dialog Find)
+;method=find_first_from
+;menu=0
+;[item51]
+;section=commands
+;caption=CudaExt: Find next (w/o dialog Find)
+;method=find_next_from
+;menu=0
+;[item52]
+;section=commands
+;caption=CudaExt: Find prev (w/o dialog Find)
+;method=find_prev_from
+;menu=0
+;[item53]
+;section=commands
+;caption=CudaExt: Replace and find (w/o dialog Replace)
+;method=repl_next_from
+;menu=0
+;[item54]
+;section=commands
+;caption=CudaExt: Replace and stay (w/o dialog Replace)
+;method=repl_stay_from
+;menu=0
+;[item55]
+;section=commands
+;caption=CudaExt: Replace all (w/o dialog Replace)
+;method=repl_all_from
+;menu=0
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Jumps_cmds
-[item51]
+[item61]
 section=commands
 caption=CudaExt: Scroll current line to screen center
 method=scroll_to_center
 menu=0
 
-[item52]
+[item62]
 section=commands
 caption=CudaExt: Jump to matching bracket
 method=jump_to_matching_bracket
@@ -150,42 +191,42 @@ menu=0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Move_sep_cmds
-[item61]
+[item161]
 section=commands
 caption=CudaExt: Move splitter to expand tree panel
 method=more_tree
 menu=0
-[item62]
+[item162]
 section=commands
 caption=CudaExt: Move splitter to narrow tree panel
 method=less_tree
 menu=0
-[item63]
+[item163]
 section=commands
 caption=CudaExt: Move splitter to expand bottom panel
 method=more_bottom
 menu=0
-[item64]
+[item164]
 section=commands
 caption=CudaExt: Move splitter to narrow bottom panel
 method=less_bottom
 menu=0
-[item65]
+[item165]
 section=commands
 caption=CudaExt: Move splitter to expand top-left group
 method=more_main_grp
 menu=0
-[item66]
+[item166]
 section=commands
 caption=CudaExt: Move splitter to narrow top-left group
 method=less_main_grp
 menu=0
-[item67]
+[item167]
 section=commands
 caption=CudaExt: Move splitter to expand active group
 method=more_curr_grp
 menu=0
-[item68]
+[item168]
 section=commands
 caption=CudaExt: Move splitter to narrow active group
 method=less_curr_grp
@@ -205,10 +246,10 @@ caption=CudaExt: Rename file...
 method=rename_file
 menu=0
 
-[item73]
-section=commands
-caption=CudaExt: Favorites...
-method=dlg_favorites
+;[item73]
+;section=commands
+;caption=CudaExt: Favorites...
+;method=dlg_favorites
 ;menu=0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -335,33 +376,33 @@ menu=0
 
 [item144]
 section=commands
-caption=CudaExt: Close tab from next group
+caption=CudaExt: Close active tab in next group
 method=close_tab_from_next_group
 menu=0
 [item145]
 section=commands
-caption=CudaExt: Close tab from previous group
+caption=CudaExt: Close active tab in previous group
 method=close_tab_from_prev_group
 menu=0
 
 [item146]
 section=commands
-caption=CudaExt: View next tab from next group
+caption=CudaExt: Switch tab to next in next group
 method=view_next_tab_from_next_group
 menu=0
 [item147]
 section=commands
-caption=CudaExt: View next tab from previous group
+caption=CudaExt: Switch tab to next in previous group
 method=view_next_tab_from_prev_group
 menu=0
 [item148]
 section=commands
-caption=CudaExt: View previous tab from next group
+caption=CudaExt: Switch tab to previous in next group
 method=view_prev_tab_from_next_group
 menu=0
 [item149]
 section=commands
-caption=CudaExt: View previous tab from previous group
+caption=CudaExt: Switch tab to previous in previous group
 method=view_prev_tab_from_prev_group
 menu=0
 

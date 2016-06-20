@@ -42,6 +42,7 @@ pass;                          #pfrm15=lambda d:pformat(d,width=15)
 pass;                           LOG = (-2==-2)  # Do or dont logging.
 pass;                           ##!! waits correction
 
+c1      = chr(1)
 GAP     = 5
 
 def _file_open(op_file):
@@ -523,6 +524,20 @@ class SCBs:
                 pass;          #LOG and log('|smth|( --> |smth(...)|',())   #(
                 return  set_sel(cSelB, rSelB, cAft+1, rAft)
         
+        # Try to expand from "|smth| smth" to "|smth smth|"
+        if  sBfr in SCBs.quotes:
+            line    = ed.get_text_line(rSelB)
+            cNewE   = line.find(sBfr, cSelE+1)
+            if -1!=cNewE:
+                pass;          #LOG and log('"|smth| smth" --> "|smth smth|"',())
+                return  set_sel(cSelB, rSelB, cNewE, rSelB)
+        if  sAft in SCBs.quotes:
+            line    = ed.get_text_line(rSelE)
+            cNewB   = line.rfind(sAft, 0, cSelB)
+            if -1!=cNewB:
+                pass;          #LOG and log('"smth |smth|" --> "|smth smth|"',())
+                return  set_sel(cNewB+1, rSelB, cSelB, rSelB)
+        
         # Try to expand from |smth| to |ABCsmthXYX|
         sBfrTxR = ''
         nBfrGap = 0
@@ -750,7 +765,7 @@ class Find_repl_cmds:
         find_opt= find_opt + ('c' if 'c' in user_opt else '')   # As user: Case
         find_opt= find_opt + ('w' if 'w' in user_opt else '')   # As user: Word
         find_opt= find_opt + ('a' if 'a' in user_opt else '')   # As user: Wrap
-        ed.cmd(cmds.cmd_FinderAction, chr(1).join([]
+        ed.cmd(cmds.cmd_FinderAction, c1.join([]
             +['findprev' if updn=='up' else 'findnext']
             +[clip]
             +['']
@@ -773,7 +788,7 @@ class Find_repl_cmds:
         find_opt= find_opt + ('c' if 'c' in user_opt else '')   # As user: Case
         find_opt= find_opt + ('w' if 'w' in user_opt else '')   # As user: Word
         ed.lock()
-        ed.cmd(cmds.cmd_FinderAction, chr(1).join([]
+        ed.cmd(cmds.cmd_FinderAction, c1.join([]
             +['repall']
             +[seltext]
             +[clip]
@@ -782,6 +797,53 @@ class Find_repl_cmds:
         ed.unlock()
         app.app_proc(app.PROC_SET_FIND_OPTIONS, user_opt)
        #def replace_all_sel_to_cb
+
+    @staticmethod
+    def find_dlg_adapter(act):
+#       try:
+#           foo=1/0
+#       except Exception as ex:
+#           return
+#       pass;                   app.msg_status('No release yet (waiting API update)')
+#       pass;                   return
+        if app.app_api_version()<'1.0.144': return app.msg_status(NEED_UPDATE)
+        find_ss = app.app_proc(app.PROC_GET_FIND_STRINGS, '')
+        if not find_ss:                     return app.msg_status(_('Use Find/Replace dialog before'))
+        user_wht= find_ss[0] if find_ss else ''
+        user_rep= find_ss[1] if find_ss else ''
+        user_opt= app.app_proc(app.PROC_GET_FIND_OPTIONS, '')
+        # c - Case, r - RegEx,  w - Word,  f - From-caret,  a - Wrap
+        cmd_id  = apx.icase(False,''
+                ,   act=='mark'      , 'findmark'
+                ,   act=='count'     , 'findcnt'
+                ,   act=='find-first', 'findfirst'
+                ,   act=='find-next' , 'findnext'
+                ,   act=='find-prev' , 'findprev'
+                ,   act=='repl-next' , 'rep'
+                ,   act=='repl-stay' , 'repstop'
+                ,   act=='repl-all'  , 'repall'
+                )
+        cmd_opt = apx.icase(False,''
+                ,   act=='find-first' and 'f' in user_opt,  user_opt.replace('f', '')
+                ,   user_opt
+                )
+        pass;                  #LOG and log('cmd_id,user_opt,cmd_opt,user_wht,user_rep={}',(cmd_id,user_opt,cmd_opt,user_wht,user_rep))
+#       cmd_par = c1.join([]
+#                           +[cmd_id]
+#                           +[user_wht]
+#                           +[user_rep]
+#                           +[cmd_opt]  # a - wrapped
+#                           )
+#       pass;                   LOG and log('cmd_par={}',repr(cmd_par))
+#       ed.cmd(cmds.cmd_FinderAction, cmd_par)
+        ed.cmd(cmds.cmd_FinderAction, c1.join([]
+            +[cmd_id]
+            +[user_wht]
+            +[user_rep]
+            +[cmd_opt]  # a - wrapped
+        ))
+        app.app_proc(app.PROC_SET_FIND_OPTIONS, user_opt)
+       #def find_dlg_adapter
    #class Find_repl_cmds
 
 #############################################################
@@ -1233,79 +1295,79 @@ class Command:
         ed.set_caret(*crt)
        #def rename_file
     
-    def dlg_favorites(self):
-        pass;                  #LOG and log('=',())
-        store_json= app.app_path(app.APP_DIR_SETTINGS)+os.sep+'cuda_ext.json'
-        stores  = json.loads(open(store_json).read(), object_pairs_hook=OrdDict) \
-                    if os.path.exists(store_json) else OrdDict()
-        files   = stores.get('fv_files', [])
-        fold    = stores.get('fv_fold', True)
-        last    = stores.get('fv_last', 0)
-        brow_h  = 'Select file to append.\rTip: Select "SynFav.ini" for import Favorites from SynWrite.'
-        while True:
-            itms= [f('{} ({})', os.path.basename(fv), os.path.dirname(fv)) for fv in files] \
-                    if fold else \
-                  [f('{}'     , os.path.basename(fv)                     ) for fv in files]
-            itms= itms if itms else [' ']
-            btn,vals,chds   = dlg_wrapper(_('Favorites'), GAP+500+GAP,GAP+300+GAP,     #NOTE: dlg-favorites
-                 [dict(           tp='lb'   ,t=GAP          ,l=GAP          ,w=400      ,cap=_('&Files:')               ) # &f
-                 ,dict(cid='fvrs',tp='lbx'  ,t=GAP+20,h=250 ,l=GAP          ,w=400-GAP  ,items=itms                     ) # 
-                 ,dict(cid='open',tp='bt'   ,t=GAP+20       ,l=GAP+400      ,w=100      ,cap=_('&Open')     ,props='1'  ) #     default
-                 ,dict(cid='addc',tp='bt'   ,t=GAP+75       ,l=GAP+400      ,w=100      ,cap=_('&Add opened')           ) # &a
-                 ,dict(cid='brow',tp='bt'   ,t=GAP+100      ,l=GAP+400      ,w=100      ,cap=_('Add&...')   ,hint=brow_h) # &.
-                 ,dict(cid='delt',tp='bt'   ,t=GAP+135      ,l=GAP+400      ,w=100      ,cap=_('&Delete')               ) # &d
-                 ,dict(cid='fvup',tp='bt'   ,t=GAP+210      ,l=GAP+400      ,w=100      ,cap=_('Move &up')              ) # &u
-                 ,dict(cid='fvdn',tp='bt'   ,t=GAP+235      ,l=GAP+400      ,w=100      ,cap=_('Move do&wn')            ) # &w
-                 ,dict(cid='fold',tp='ch'   ,tid='-'        ,l=GAP          ,w=100      ,cap=_('Show &paths')   ,act='1') # &p
-                 ,dict(cid='-'   ,tp='bt'   ,t=GAP+300-28   ,l=GAP+500-100  ,w=100      ,cap=_('Close')                 )
-                 ],    dict(fvrs=last
-                           ,fold=fold), focus_cid='fvrs')
-            if btn is None or btn=='-': return None
-            
-            fold    = vals['fold']
-            last    = vals['fvrs']
-            if btn=='open' and last>=0 and os.path.isfile(files[last]):
-                app.file_open(files[last])
-                break#while
-            
-            # Modify
-            store_b = False
-            if False:pass
-            elif btn=='addc' and ed.get_filename() and ed.get_filename() not in files:
-                files  += [ed.get_filename()]
-                store_b = True
-            elif btn=='brow':
-                fl      = app.dlg_file(True, '', '', '')
-                if fl and os.path.basename(fl).upper()=='SynFav.ini'.upper():
-                    # Import from Syn
-                    syn_lns = open(fl, encoding='utf-16').read().splitlines()
-                    for syn_ln in syn_lns:
-                        if os.path.isfile(syn_ln) and syn_ln not in files:
-                            files  += [syn_ln]
-                            store_b = True
-                elif fl and fl not in files:
-                    files  += [fl]
-                    store_b = True
-            elif btn=='delt' and last>=0:
-                del files[last]
-                last    = max(0, len(files)-1)
-                store_b = True
-            elif btn in ('fvup', 'fvdn'):
-                newp    = last + (-1 if btn=='fvup' else +1)
-                if 0<=newp<len(files):
-                    files[last], files[newp] = files[newp], files[last]
-                    last    = newp
-                    store_b = True
-            
-            # Store
-            if store_b:
-                stores['fv_files'] = files
-                stores['fv_fold' ] = fold 
-                stores['fv_last' ] = last 
-                open(store_json, 'w').write(json.dumps(stores, indent=4))
-           #while
-       #def dlg_favorites
-    
+#   def dlg_favorites(self):
+#       pass;                  #LOG and log('=',())
+#       store_json= app.app_path(app.APP_DIR_SETTINGS)+os.sep+'cuda_ext.json'
+#       stores  = json.loads(open(store_json).read(), object_pairs_hook=OrdDict) \
+#                   if os.path.exists(store_json) else OrdDict()
+#       files   = stores.get('fv_files', [])
+#       fold    = stores.get('fv_fold', True)
+#       last    = stores.get('fv_last', 0)
+#       brow_h  = 'Select file to append.\rTip: Select "SynFav.ini" for import Favorites from SynWrite.'
+#       while True:
+#           itms= [f('{} ({})', os.path.basename(fv), os.path.dirname(fv)) for fv in files] \
+#                   if fold else \
+#                 [f('{}'     , os.path.basename(fv)                     ) for fv in files]
+#           itms= itms if itms else [' ']
+#           btn,vals,chds   = dlg_wrapper(_('Favorites'), GAP+500+GAP,GAP+300+GAP,     #NOTE: dlg-favorites
+#                [dict(           tp='lb'   ,t=GAP          ,l=GAP          ,w=400      ,cap=_('&Files:')               ) # &f
+#                ,dict(cid='fvrs',tp='lbx'  ,t=GAP+20,h=250 ,l=GAP          ,w=400-GAP  ,items=itms                     ) # 
+#                ,dict(cid='open',tp='bt'   ,t=GAP+20       ,l=GAP+400      ,w=100      ,cap=_('&Open')     ,props='1'  ) #     default
+#                ,dict(cid='addc',tp='bt'   ,t=GAP+75       ,l=GAP+400      ,w=100      ,cap=_('&Add opened')           ) # &a
+#                ,dict(cid='brow',tp='bt'   ,t=GAP+100      ,l=GAP+400      ,w=100      ,cap=_('Add&...')   ,hint=brow_h) # &.
+#                ,dict(cid='delt',tp='bt'   ,t=GAP+135      ,l=GAP+400      ,w=100      ,cap=_('&Delete')               ) # &d
+#                ,dict(cid='fvup',tp='bt'   ,t=GAP+210      ,l=GAP+400      ,w=100      ,cap=_('Move &up')              ) # &u
+#                ,dict(cid='fvdn',tp='bt'   ,t=GAP+235      ,l=GAP+400      ,w=100      ,cap=_('Move do&wn')            ) # &w
+#                ,dict(cid='fold',tp='ch'   ,tid='-'        ,l=GAP          ,w=100      ,cap=_('Show &paths')   ,act='1') # &p
+#                ,dict(cid='-'   ,tp='bt'   ,t=GAP+300-28   ,l=GAP+500-100  ,w=100      ,cap=_('Close')                 )
+#                ],    dict(fvrs=last
+#                          ,fold=fold), focus_cid='fvrs')
+#           if btn is None or btn=='-': return None
+#           
+#           fold    = vals['fold']
+#           last    = vals['fvrs']
+#           if btn=='open' and last>=0 and os.path.isfile(files[last]):
+#               app.file_open(files[last])
+#               break#while
+#           
+#           # Modify
+#           store_b = False
+#           if False:pass
+#           elif btn=='addc' and ed.get_filename() and ed.get_filename() not in files:
+#               files  += [ed.get_filename()]
+#               store_b = True
+#           elif btn=='brow':
+#               fl      = app.dlg_file(True, '', '', '')
+#               if fl and os.path.basename(fl).upper()=='SynFav.ini'.upper():
+#                   # Import from Syn
+#                   syn_lns = open(fl, encoding='utf-16').read().splitlines()
+#                   for syn_ln in syn_lns:
+#                       if os.path.isfile(syn_ln) and syn_ln not in files:
+#                           files  += [syn_ln]
+#                           store_b = True
+#               elif fl and fl not in files:
+#                   files  += [fl]
+#                   store_b = True
+#           elif btn=='delt' and last>=0:
+#               del files[last]
+#               last    = max(0, len(files)-1)
+#               store_b = True
+#           elif btn in ('fvup', 'fvdn'):
+#               newp    = last + (-1 if btn=='fvup' else +1)
+#               if 0<=newp<len(files):
+#                   files[last], files[newp] = files[newp], files[last]
+#                   last    = newp
+#                   store_b = True
+#           
+#           # Store
+#           if store_b:
+#               stores['fv_files'] = files
+#               stores['fv_fold' ] = fold 
+#               stores['fv_last' ] = last 
+#               open(store_json, 'w').write(json.dumps(stores, indent=4))
+#          #while
+#      #def dlg_favorites
+#   
     def on_console_nav(self, ed_self, text):    return Nav_cmds.on_console_nav(ed_self, text)
     def _open_file_near(self, where='right'):   return Nav_cmds._open_file_near(where)
     def open_selected(self):                    return Nav_cmds.open_selected()
@@ -1323,6 +1385,15 @@ class Command:
     def find_cb_string_next(self):              return Find_repl_cmds.find_cb_by_cmd('dn')
     def find_cb_string_prev(self):              return Find_repl_cmds.find_cb_by_cmd('up')
     def replace_all_sel_to_cb(self):            return Find_repl_cmds.replace_all_sel_to_cb()
+
+    def mark_all_from(self):                    return Find_repl_cmds.find_dlg_adapter('mark')
+    def count_all_from(self):                   return Find_repl_cmds.find_dlg_adapter('count')
+    def find_first_from(self):                  return Find_repl_cmds.find_dlg_adapter('find-first')
+    def find_next_from(self):                   return Find_repl_cmds.find_dlg_adapter('find-next')
+    def find_prev_from(self):                   return Find_repl_cmds.find_dlg_adapter('find-prev')
+    def repl_next_from(self):                   return Find_repl_cmds.find_dlg_adapter('repl-next')
+    def repl_stay_from(self):                   return Find_repl_cmds.find_dlg_adapter('repl-stay')
+    def repl_all_from(self):                    return Find_repl_cmds.find_dlg_adapter('repl-all')
 
     def copy_term(self):                        return SCBs.copy_term()
     def replace_term(self):                     return SCBs.replace_term()
@@ -1514,7 +1585,7 @@ ToDo
 [?][kv-kv][20nov15] Paste from clipboard, to 1st column for m-carets
 [+][kv-kv][20nov15] Find string from clipboard - next/prev: find_cb_string_next
 [+][kv-kv][20nov15] Jump to matching bracket: jump_to_matching_bracket
-[-][kv-kv][20nov15] CopyTerm, ReplaceTerm
+[+][kv-kv][20nov15] CopyTerm, ReplaceTerm
 [-][kv-kv][20nov15] Comment/uncomment before cur term (or fix col?)
 [+][kv-kv][24nov15] Wrap for "Find string from clipboard"
 [+][kv-kv][25nov15] Replace all as selected to cb-string: replace_all_sel_to_cb
