@@ -246,12 +246,6 @@ caption=CudaExt: Rename file...
 method=rename_file
 menu=0
 
-;[item73]
-;section=commands
-;caption=CudaExt: Favorites...
-;method=dlg_favorites
-;menu=0
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Tabs_cmds
 [item111]
