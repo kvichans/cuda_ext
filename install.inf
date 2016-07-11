@@ -83,7 +83,7 @@ menu=0
 
 [item36]
 section=commands
-caption=CudaExt: Lazarus Paste
+caption=CudaExt: Paste like Lazarus IDE
 method=paste_as_lazarus
 menu=0
 
