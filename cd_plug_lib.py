@@ -14,8 +14,11 @@ import  sys, os, gettext, logging, inspect
 from    time        import perf_counter
 import  cudatext        as app
 import  cudax_lib       as apx
-#from   cudax_lib   import log
 
+pass;                           # Logging
+pass;                           from pprint import pformat
+
+GAP         = 5
 c13,c10,c9  = chr(13),chr(10),chr(9)
 REDUCTS = {'lb'     :'label'
         ,  'ln-lb'  :'linklabel'
@@ -34,6 +37,7 @@ REDUCTS = {'lb'     :'label'
         ,  'ch-lbx' :'checklistbox'
         ,  'lvw'    :'listview'
         ,  'ch-lvw' :'checklistview'
+        ,  'tabs'   :'tabs'
         }
 
 def f(s, *args, **kwargs):return s.format(*args, **kwargs)
@@ -216,41 +220,115 @@ def get_translation(plug_file):
         _   =  lambda x: x
     return _
 
-def top_plus_for_os(what_control, base_control='edit'):
-    ''' Addition for what_top to align text with base.
-        Params
-            what_control    'check'/'label'/'edit'/'button'/'combo'/'combo_ro'
-            base_control    'check'/'label'/'edit'/'button'/'combo'/'combo_ro'
-    '''
-    if what_control==base_control:
+def get_desktop_environment():
+    #From http://stackoverflow.com/questions/2035657/what-is-my-current-desktop-environment
+    # and http://ubuntuforums.org/showthread.php?t=652320
+    # and http://ubuntuforums.org/showthread.php?t=652320
+    # and http://ubuntuforums.org/showthread.php?t=1139057
+    if sys.platform in ["win32", "cygwin"]:
+        return "win"
+    elif sys.platform == "darwin":
+        return "mac"
+    else: #Most likely either a POSIX system or something not much common
+        desktop_session = os.environ.get("DESKTOP_SESSION")
+        if desktop_session is not None: #easier to match if we doesn't have  to deal with caracter cases
+            desktop_session = desktop_session.lower()
+            if desktop_session in ["gnome","unity", "cinnamon", "mate", "xfce4", "lxde", "fluxbox", 
+                                   "blackbox", "openbox", "icewm", "jwm", "afterstep","trinity", "kde"]:
+                return desktop_session
+            ## Special cases ##
+            # Canonical sets $DESKTOP_SESSION to Lubuntu rather than LXDE if using LXDE.
+            # There is no guarantee that they will not do the same with the other desktop environments.
+            elif "xfce" in desktop_session or desktop_session.startswith("xubuntu"):
+                return "xfce4"
+            elif desktop_session.startswith("ubuntu"):
+                return "unity"       
+            elif desktop_session.startswith("lubuntu"):
+                return "lxde" 
+            elif desktop_session.startswith("kubuntu"): 
+                return "kde" 
+            elif desktop_session.startswith("razor"): # e.g. razorkwin
+                return "razor-qt"
+            elif desktop_session.startswith("wmaker"): # e.g. wmaker-common
+                return "windowmaker"
+        if os.environ.get('KDE_FULL_SESSION') == 'true':
+            return "kde"
+        elif os.environ.get('GNOME_DESKTOP_SESSION_ID'):
+            if not "deprecated" in os.environ.get('GNOME_DESKTOP_SESSION_ID'):
+                return "gnome2"
+        #From http://ubuntuforums.org/showthread.php?t=652320
+        elif is_running("xfce-mcs-manage"):
+            return "xfce4"
+        elif is_running("ksmserver"):
+            return "kde"
+    return "unknown"
+def is_running(process):
+    #From http://www.bloggerpolis.com/2011/05/how-to-check-if-a-process-is-running-using-python/
+    # and http://richarddingwall.name/2009/06/18/windows-equivalents-of-ps-and-kill-commands/
+    try: #Linux/Unix
+        s = subprocess.Popen(["ps", "axw"],stdout=subprocess.PIPE)
+    except: #Windows
+        s = subprocess.Popen(["tasklist", "/v"],stdout=subprocess.PIPE)
+    for x in s.stdout:
+        if re.search(process, x):
+            return True
+    return False
+
+ENV2FITS= {'win':
+            {'check'      :-2
+            ,'edit'       :-3
+            ,'button'     :-4
+            ,'combo_ro'   :-4
+            ,'combo'      :-3
+            ,'checkbutton':-4
+            ,'linklabel'  : 0
+            ,'spinedit'   :-3
+            }
+          ,'unity':
+            {'check'      :-3
+            ,'edit'       :-5
+            ,'button'     :-4
+            ,'combo_ro'   :-5
+            ,'combo'      :-6
+            ,'checkbutton':-3
+            ,'linklabel'  : 0
+            ,'spinedit'   :-5
+            }
+          ,'mac':
+            {'check'      :-1
+            ,'edit'       :-3
+            ,'button'     :-3
+            ,'combo_ro'   :-2
+            ,'combo'      :-3
+            ,'checkbutton':-2
+            ,'linklabel'  : 0
+            ,'spinedit'   : 0   ##??
+            }
+          }
+fit_top_by_env__cash    = {}
+def fit_top_by_env__clear():
+    global fit_top_by_env__cash
+    fit_top_by_env__cash    = {}
+def fit_top_by_env(what_tp, base_tp='label'):
+    """ Get "fitting" to add to top of first control to vertical align inside text with text into second control.
+        The fittings rely to platform: win, unix(kde,gnome,...), mac
+    """
+    if what_tp==base_tp:
         return 0
-    env = sys.platform
-    if base_control=='edit': 
-        if env=='win32':
-            return apx.icase(what_control=='check',    1
-                            ,what_control=='label',    3
-                            ,what_control=='button',  -1
-                            ,what_control=='combo_ro',-1
-                            ,what_control=='combo',    0
-                            ,True,                     0)
-        if env=='linux':
-            return apx.icase(what_control=='check',    1
-                            ,what_control=='label',    5
-                            ,what_control=='button',   1
-                            ,what_control=='combo_ro', 0
-                            ,what_control=='combo',   -1
-                            ,True,                     0)
-        if env=='darwin':
-            return apx.icase(what_control=='check',    2
-                            ,what_control=='label',    3
-                            ,what_control=='button',   0
-                            ,what_control=='combo_ro', 1
-                            ,what_control=='combo',    0
-                            ,True,                     0)
-        return 0
-       #if base_control=='edit'
-    return top_plus_for_os(what_control, 'edit') - top_plus_for_os(base_control, 'edit')
-   #def top_plus_for_os
+    if (what_tp, base_tp) in fit_top_by_env__cash:
+        pass;                  #log('cashed what_tp, base_tp={}',(what_tp, base_tp))
+        return fit_top_by_env__cash[(what_tp, base_tp)]
+    env     = get_desktop_environment()
+    pass;                      #env = 'mac'
+    fit4lb  = ENV2FITS.get(env, ENV2FITS.get('win'))
+    fit     = 0
+    if base_tp=='label':
+        fit = apx.get_opt('dlg_wrapper_fit_va_for_'+what_tp, fit4lb.get(what_tp, 0))
+    else:
+        fit = fit_top_by_env(what_tp) - fit_top_by_env(base_tp)
+    pass;                      #log('what_tp, base_tp, fit={}',(what_tp, base_tp, fit))
+    return fit_top_by_env__cash.setdefault((what_tp, base_tp), fit)
+   #def fit_top_by_env
 
 def dlg_wrapper(title, w, h, cnts, in_vals={}, focus_cid=None):
     """ Wrapper for dlg_custom. 
@@ -313,7 +391,7 @@ def dlg_wrapper(title, w, h, cnts, in_vals={}, focus_cid=None):
                     if not re.match(r'\d+$', vals['v']): continue
                     return vals['v']
     """
-    pass;                  #LOG and log('in_vals={}',pformat(in_vals, width=120))
+    pass;                      #log('in_vals={}',pformat(in_vals, width=120))
     cid2i       = {cnt['cid']:i for i,cnt in enumerate(cnts) if 'cid' in cnt}
     if True:
         # Checks
@@ -327,6 +405,18 @@ def dlg_wrapper(title, w, h, cnts, in_vals={}, focus_cid=None):
     for cnt in cnts:
         tp      = cnt['tp']
         tp      = REDUCTS.get(tp, tp)
+        if tp=='--':
+            # Horz-line
+            t   = cnt.get('t')
+            l   = cnt.get('l', 0)                   # def: from DlgLeft
+            r   = cnt.get('r', l+cnt.get('w', w))   # def: to   DlgRight
+            lst = ['type=label']
+            lst+= ['cap='+'—'*1000]
+            lst+= ['en=0']
+            lst+= ['pos={l},{t},{r},0'.format(l=l,t=t,r=r)]
+            ctrls_l+= [chr(1).join(lst)]
+            continue#for cnt
+            
         lst     = ['type='+tp]
         # Simple props
         for k in ['cap', 'hint', 'props']:
@@ -344,7 +434,8 @@ def dlg_wrapper(title, w, h, cnts, in_vals={}, focus_cid=None):
             # cid for horz-align text
             bs_cnt  = cnts[cid2i[cnt['tid']]]
             bs_tp   = bs_cnt['tp']
-            t       = bs_cnt['t'] + top_plus_for_os(tp, REDUCTS.get(bs_tp, bs_tp))
+            t       = bs_cnt['t'] + fit_top_by_env(tp, REDUCTS.get(bs_tp, bs_tp))
+#           t       = bs_cnt['t'] + top_plus_for_os(tp, REDUCTS.get(bs_tp, bs_tp))
         r       = cnt.get('r', l+cnt.get('w', 0)) 
         b       = cnt.get('b', t+cnt.get('h', 0)) 
         lst    += ['pos={l},{t},{r},{b}'.format(l=l,t=t,r=r,b=b)]
@@ -387,22 +478,23 @@ def dlg_wrapper(title, w, h, cnts, in_vals={}, focus_cid=None):
                 in_val = ','.join(in_val)
             elif tp in ['checklistbox', 'checklistview'] and isinstance(in_val, tuple):
                 # For checklistbox, checklistview: index+";"+checks 
-                in_val = ';'.join( (in_val[0], ','.join( in_val[1]) ) )
+                in_val = ';'.join( (str(in_val[0]), ','.join( in_val[1]) ) )
             lst+= ['val='+str(in_val)]
 
         if 'act' in cnt:    # must be last in lst
             val     = cnt['act']
             lst    += ['act='+('1' if val in [True, '1'] else '0')]
-        pass;                      #LOG and log('lst={}',lst)
+        pass;                  #log('lst={}',lst)
         ctrls_l+= [chr(1).join(lst)]
-    pass;                  #LOG and log('ok ctrls_l={}',pformat(ctrls_l, width=120))
+       #for cnt
+    pass;                      #log('ok ctrls_l={}',pformat(ctrls_l, width=120))
 
     ans     = app.dlg_custom(title, w, h, '\n'.join(ctrls_l), cid2i.get(focus_cid, -1))
     if ans is None: return None, None, None   # btn_cid, {cid:v}, [cid]
 
     btn_i,  \
     vals_ls = ans[0], ans[1].splitlines()
-    btn_cid = cnts[btn_i]['cid']
+    aid     = cnts[btn_i]['cid']
     # Parse output values
     an_vals = {cid:vals_ls[cid2i[cid]] for cid in in_vals}
     for cid in an_vals:
@@ -435,7 +527,8 @@ def dlg_wrapper(title, w, h, cnts, in_vals={}, focus_cid=None):
         else: 
             an_val = type(in_val)(an_val)
         an_vals[cid]    = an_val
-    return  btn_cid, an_vals, [cid for cid in in_vals if in_vals[cid]!=an_vals[cid]]
+       #for cid
+    return  aid, an_vals, [cid for cid in in_vals if in_vals[cid]!=an_vals[cid]]
    #def dlg_wrapper
 
 def get_hotkeys_desc(cmd_id, ext_id=None, keys_js=None, def_ans=''):
