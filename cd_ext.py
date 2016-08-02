@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.2.3 2016-05-26'
+    '1.2.4 2016-08-02'
 ToDo: (see end of file)
 '''
 
@@ -1294,6 +1294,16 @@ class Command:
         ed.set_prop(app.PROP_INDEX_TAB, str(tab_pos))
         ed.set_caret(*crt)
        #def rename_file
+
+    def new_file_save_as_near_cur(self):
+        cur_fn  = ed.get_filename()
+        if not cur_fn:  return app.msg_status(_('Warning: the command needs a named tab.'))
+        cur_dir = os.path.dirname(cur_fn)
+        new_fn  = app.dlg_file(False, '', cur_dir, '')
+        if not new_fn:  return
+        app.file_open('')
+        ed.save(new_fn)
+       #def new_file_save_as_near_cur
     
     def on_console_nav(self, ed_self, text):    return Nav_cmds.on_console_nav(ed_self, text)
     def _open_file_near(self, where='right'):   return Nav_cmds._open_file_near(where)

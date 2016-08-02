@@ -70,6 +70,7 @@ class Command:
     # Misc_cmds
     def edit_strcomment_chars(self):            return RLS.edit_strcomment_chars()
     def rename_file(self):                      return RLS.rename_file()
+    def new_file_save_as_near_cur(self):        return RLS.new_file_save_as_near_cur()
 
     # Tabs_cmds
     def to_tab_g1_t1(self):                     return RLS._activate_tab(0, 0)

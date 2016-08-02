@@ -2,7 +2,6 @@ Plugin for CudaText.
 Adds commands to Commands dialog (not to Plugins menu, too much of them):
 
 [Misc]
-  Favorites...
   Rename file...
   Edit stream comment chars for lexer
 

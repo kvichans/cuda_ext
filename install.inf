@@ -246,6 +246,12 @@ caption=CudaExt: Rename file...
 method=rename_file
 menu=0
 
+[item73]
+section=commands
+caption=CudaExt: New file and SaveAs in current folder...
+method=new_file_save_as_near_cur
+menu=0
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Tabs_cmds
 [item111]
