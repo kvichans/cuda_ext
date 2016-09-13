@@ -68,7 +68,7 @@ class Command:
     def less_curr_grp(self):                    return RLS._move_splitter('curr', 0.95)
 
     # Misc_cmds
-    def edit_strcomment_chars(self):            return RLS.edit_strcomment_chars()
+#   def edit_strcomment_chars(self):            return RLS.edit_strcomment_chars()
     def rename_file(self):                      return RLS.rename_file()
     def new_file_save_as_near_cur(self):        return RLS.new_file_save_as_near_cur()
 

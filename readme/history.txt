@@ -1,3 +1,6 @@
+1.2.5 (2016-09-13)
+removed: edit_strcomment_chars is moved to plugin cuda_comments
+
 1.2.4 (2016-08-02)
 added: cmd new_file_save_as_near_cur
 removed: dlg Favorites is moved to own plug

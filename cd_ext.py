@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.2.4 2016-08-02'
+    '1.2.5 2016-09-13'
 ToDo: (see end of file)
 '''
 
@@ -33,7 +33,7 @@ NO_LEXER            = _("No lexer")
 #UPDATE_FILE         = _("File '{}' is updated")
 USE_NOT_EMPTY       = _("Set not empty values")
 ONLY_FOR_ML_SEL     = _("{} works with multiline selection")
-NO_SPR_IN_LINES     = _("No seperator '{}' in selected lines")
+NO_SPR_IN_LINES     = _("No separator '{}' in selected lines")
 DONT_NEED_CHANGE    = _("Text change not needed")
 
 pass;                           # Logging
@@ -1177,69 +1177,69 @@ class Command:
         app.app_proc(app.PROC_SET_SPLIT, '{};{}'.format(id_splt, pos_new))
        #def _move_splitter
 
-    def edit_strcomment_chars(self):
-        lex     = ed.get_prop(app.PROP_LEXER_CARET)
-        if not lex: return app.msg_status(NO_LEXER)
-        def_lexs_json   = os.path.join(apx.get_def_setting_dir()         , 'default_lexers.json')
-        usr_lexs_json   = os.path.join(app.app_path(app.APP_DIR_SETTINGS), 'user_lexers.json')
-        def_lexs        = apx._json_loads(open(def_lexs_json).read())
-        usr_lexs        = apx._json_loads(open(usr_lexs_json).read()) if os.path.exists(usr_lexs_json) else {"Comments":{}, "CommentsForLines":{}}
-        pass;                  #LOG and log('usr_lexs={}',usr_lexs)
-        only_ln         = False
-        pair_df         = ['','']
-        pair            = ['','']
-        if False:pass
-        elif lex in   def_lexs["Comments"]:
-            pair_df = def_lexs["Comments"].get(lex)
-        elif lex in   def_lexs["CommentsForLines"]:
-            pair_df = def_lexs["CommentsForLines"].get(lex)
-            only_ln = True
-        if False:pass
-        elif lex in   usr_lexs["Comments"]:
-            pair    = usr_lexs["Comments"].get(lex)
-        elif lex in   usr_lexs["CommentsForLines"]:
-            pair    = usr_lexs["CommentsForLines"].get(lex)
-            only_ln = True
-        elif lex in   def_lexs["Comments"]:
-            pair    = def_lexs["Comments"].get(lex)
-        elif lex in   def_lexs["CommentsForLines"]:
-            pair    = def_lexs["CommentsForLines"].get(lex)
-            only_ln = True
-        vals        = dict(stcs=pair[   0]
-                          ,stdf=pair_df[0]
-                          ,encs=pair[   1]
-                          ,endf=pair_df[1]
-                          ,full=only_ln   )
-        while True:
-            btn,vals,chds   = dlg_wrapper(f(_('Stream comment chars for lexer "{}"'), lex), GAP*3+100+165*2, GAP+105+GAP,     #NOTE: dlg-str-cmnt
-                 [dict(           tp='lb'   ,t=GAP          ,l=GAP+100+GAP+165  ,w=165  ,cap=_('Default values')    ) #
-                 ,dict(           tp='lb'   ,tid='stcs'     ,l=GAP              ,w=100  ,cap=_('&Start chars')      ) # &s
-                 ,dict(cid='stcs',tp='ed'   ,t=GAP+20       ,l=GAP+100          ,w=165                              ) # 
-                 ,dict(cid='stdf',tp='ed'   ,tid='stcs'     ,l=GAP+100+GAP+165  ,w=165  ,props='1,0,1'              ) #     ro,mono,border
-                 ,dict(           tp='lb'   ,tid='encs'     ,l=GAP              ,w=100  ,cap=_('&Finish chars')     ) # &f
-                 ,dict(cid='encs',tp='ed'   ,t=GAP+50       ,l=GAP+100          ,w=165                              ) # 
-                 ,dict(cid='endf',tp='ed'   ,tid='encs'     ,l=GAP+100+GAP+165  ,w=165  ,props='1,0,1'              ) #     ro,mono,border
-                 ,dict(cid='full',tp='ch'   ,t=GAP+80       ,l=GAP+100          ,w=165  ,cap=_('Only f&ull lines')  ) # &u
-                 ,dict(cid='!'   ,tp='bt'   ,tid='full'     ,l=GAP+GAP+430-165  ,w=80   ,cap=_('OK'),props='1'    ) #     default
-                 ,dict(cid='-'   ,tp='bt'   ,tid='full'     ,l=GAP+GAP+430-80   ,w=80   ,cap=_('Cancel')            )
-                 ], vals, focus_cid='stcs')
-            pass;              #LOG and log('vals={}',(vals))
-            if btn is None or btn=='-': return None
-            pair        = [vals['stcs'], vals['encs']]
-            only_ln     = vals['full']
-            # Checking
-            if not pair[0] or not pair[1]:
-                app.msg_box(USE_NOT_EMPTY, app.MB_OK)
-                continue #while
-            break #while 
-           #while
-           
-        #Saving
-        usr_lexs["Comments"         if only_ln else "CommentsForLines"].pop(lex, None)
-        usr_lexs["CommentsForLines" if only_ln else "Comments"        ][lex] = pair
-        open(usr_lexs_json, 'w').write(json.dumps(usr_lexs, indent=2))
-        app.msg_status(f(_('File "{}" is updated'), usr_lexs_json))
-       #def edit_strcomment_chars
+#   def edit_strcomment_chars(self):
+#       lex     = ed.get_prop(app.PROP_LEXER_CARET)
+#       if not lex: return app.msg_status(NO_LEXER)
+#       def_lexs_json   = os.path.join(apx.get_def_setting_dir()         , 'default_lexers.json')
+#       usr_lexs_json   = os.path.join(app.app_path(app.APP_DIR_SETTINGS), 'user_lexers.json')
+#       def_lexs        = apx._json_loads(open(def_lexs_json).read())
+#       usr_lexs        = apx._json_loads(open(usr_lexs_json).read()) if os.path.exists(usr_lexs_json) else {"Comments":{}, "CommentsForLines":{}}
+#       pass;                  #LOG and log('usr_lexs={}',usr_lexs)
+#       only_ln         = False
+#       pair_df         = ['','']
+#       pair            = ['','']
+#       if False:pass
+#       elif lex in   def_lexs["Comments"]:
+#           pair_df = def_lexs["Comments"].get(lex)
+#       elif lex in   def_lexs["CommentsForLines"]:
+#           pair_df = def_lexs["CommentsForLines"].get(lex)
+#           only_ln = True
+#       if False:pass
+#       elif lex in   usr_lexs["Comments"]:
+#           pair    = usr_lexs["Comments"].get(lex)
+#       elif lex in   usr_lexs["CommentsForLines"]:
+#           pair    = usr_lexs["CommentsForLines"].get(lex)
+#           only_ln = True
+#       elif lex in   def_lexs["Comments"]:
+#           pair    = def_lexs["Comments"].get(lex)
+#       elif lex in   def_lexs["CommentsForLines"]:
+#           pair    = def_lexs["CommentsForLines"].get(lex)
+#           only_ln = True
+#       vals        = dict(stcs=pair[   0]
+#                         ,stdf=pair_df[0]
+#                         ,encs=pair[   1]
+#                         ,endf=pair_df[1]
+#                         ,full=only_ln   )
+#       while True:
+#           btn,vals,chds   = dlg_wrapper(f(_('Stream comment chars for lexer "{}"'), lex), GAP*3+100+165*2, GAP+105+GAP,     #NOTE: dlg-str-cmnt
+#                [dict(           tp='lb'   ,t=GAP          ,l=GAP+100+GAP+165  ,w=165  ,cap=_('Default values')    ) #
+#                ,dict(           tp='lb'   ,tid='stcs'     ,l=GAP              ,w=100  ,cap=_('&Start chars')      ) # &s
+#                ,dict(cid='stcs',tp='ed'   ,t=GAP+20       ,l=GAP+100          ,w=165                              ) # 
+#                ,dict(cid='stdf',tp='ed'   ,tid='stcs'     ,l=GAP+100+GAP+165  ,w=165  ,props='1,0,1'              ) #     ro,mono,border
+#                ,dict(           tp='lb'   ,tid='encs'     ,l=GAP              ,w=100  ,cap=_('&Finish chars')     ) # &f
+#                ,dict(cid='encs',tp='ed'   ,t=GAP+50       ,l=GAP+100          ,w=165                              ) # 
+#                ,dict(cid='endf',tp='ed'   ,tid='encs'     ,l=GAP+100+GAP+165  ,w=165  ,props='1,0,1'              ) #     ro,mono,border
+#                ,dict(cid='full',tp='ch'   ,t=GAP+80       ,l=GAP+100          ,w=165  ,cap=_('Only f&ull lines')  ) # &u
+#                ,dict(cid='!'   ,tp='bt'   ,tid='full'     ,l=GAP+GAP+430-165  ,w=80   ,cap=_('OK'),props='1'    ) #     default
+#                ,dict(cid='-'   ,tp='bt'   ,tid='full'     ,l=GAP+GAP+430-80   ,w=80   ,cap=_('Cancel')            )
+#                ], vals, focus_cid='stcs')
+#           pass;              #LOG and log('vals={}',(vals))
+#           if btn is None or btn=='-': return None
+#           pair        = [vals['stcs'], vals['encs']]
+#           only_ln     = vals['full']
+#           # Checking
+#           if not pair[0] or not pair[1]:
+#               app.msg_box(USE_NOT_EMPTY, app.MB_OK)
+#               continue #while
+#           break #while 
+#          #while
+#          
+#       #Saving
+#       usr_lexs["Comments"         if only_ln else "CommentsForLines"].pop(lex, None)
+#       usr_lexs["CommentsForLines" if only_ln else "Comments"        ][lex] = pair
+#       open(usr_lexs_json, 'w').write(json.dumps(usr_lexs, indent=2))
+#       app.msg_status(f(_('File "{}" is updated'), usr_lexs_json))
+#      #def edit_strcomment_chars
     
     def rename_file(self):
         old_path= ed.get_filename()
