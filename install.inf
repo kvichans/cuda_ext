@@ -234,12 +234,6 @@ menu=0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Misc_cmds
-;[item71]
-;section=commands
-;caption=CudaExt: Edit stream comment chars for lexer
-;method=edit_strcomment_chars
-;menu=0
-
 [item72]
 section=commands
 caption=CudaExt: Rename file...
