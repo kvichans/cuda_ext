@@ -50,6 +50,8 @@ class Command:
 #   def repl_next_from(self):                   return RLS.repl_next_from()
 #   def repl_stay_from(self):                   return RLS.repl_stay_from()
 #   def repl_all_from(self):                    return RLS.repl_all_from()
+
+    def rewrap_sel_by_margin(self):             return RLS.rewrap_sel_by_margin()
     
     # Jumps_cmds
     def scroll_to_center(self):                 return RLS.scroll_to_center()

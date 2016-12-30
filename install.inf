@@ -175,6 +175,12 @@ menu=0
 ;method=repl_all_from
 ;menu=0
 
+[item56]
+section=commands
+caption=CudaExt: ReWrap selected text by margin
+method=rewrap_sel_by_margin
+menu=0
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Jumps_cmds
 [item61]

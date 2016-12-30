@@ -1,3 +1,6 @@
+1.2.6 (2016-12-30)
+added: rewrap by margin
+
 1.2.5 (2016-09-13)
 removed: edit_strcomment_chars is moved to plugin cuda_comments
 

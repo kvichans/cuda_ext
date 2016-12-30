@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.2.5 2016-09-13'
+    '1.2.6 2016-12-30'
 ToDo: (see end of file)
 '''
 
@@ -39,7 +39,7 @@ DONT_NEED_CHANGE    = _("Text change not needed")
 pass;                           # Logging
 pass;                          #from pprint import pformat
 pass;                          #pfrm15=lambda d:pformat(d,width=15)
-pass;                           LOG = (-2==-2)  # Do or dont logging.
+pass;                           LOG = (-2== 2)  # Do or dont logging.
 pass;                           ##!! waits correction
 
 c1      = chr(1)
@@ -95,56 +95,56 @@ class Tree_cmds:
         def best_path(id_prnt, prnt_cap=''):
             rsp_l   = [] 
             kids    = app.tree_proc(ID_TREE, app.TREE_ITEM_ENUM, id_prnt)
-            pass;                  #LOG and log('>>id_prnt, prnt_cap, kids={}',(id_prnt, prnt_cap, len(kids) if kids else 0))
+            pass;              #LOG and log('>>id_prnt, prnt_cap, kids={}',(id_prnt, prnt_cap, len(kids) if kids else 0))
             if kids is None:
-                pass;              #LOG and log('<<no kids',())
+                pass;          #LOG and log('<<no kids',())
                 return [], INF
             row_bfr, kid_bfr, cap_bfr = -INF, NO_ID, ''
             row_aft, kid_aft, cap_aft = +INF, NO_ID, ''
             for kid, cap in kids:
-                pass;              #LOG and log('kid, cap={}',(kid, cap))
+                pass;           LOG and log('kid, cap={}',(kid, cap))
                 cMin, rMin, \
                 cMax, rMax  = app.tree_proc(ID_TREE, app.TREE_ITEM_GET_SYNTAX_RANGE, kid)
-                pass;              #LOG and log('? kid,cap, rMin,rMax,row={}',(kid,cap, rMin,rMax,row))
+                pass;          #LOG and log('? kid,cap, rMin,rMax,row={}',(kid,cap, rMin,rMax,row))
                 if False:pass
                 elif rMin<=row<=rMax:   # Cover!
                     sub_l, gap_sub  = best_path(kid, cap)
-                    pass;          #LOG and log('? sub_l, gap_sub={}',(sub_l, gap_sub))
+                    pass;      #LOG and log('? sub_l, gap_sub={}',(sub_l, gap_sub))
                     if gap_sub == 0:    # Sub-kid also covers
-                        pass;      #LOG and log('+ sub_l={}',(sub_l))
+                        pass;  #LOG and log('+ sub_l={}',(sub_l))
                         rsp_l   = [(kid, cap)] + sub_l
                     else:               # The kid is best
-                        pass;      #LOG and log('0 ',())
+                        pass;  #LOG and log('0 ',())
                         rsp_l   = [(kid, cap)]
-                    pass;          #LOG and log('<<! rsp_l={}',(rsp_l))
+                    pass;       LOG and log('<<! rsp_l={}',(rsp_l))
                     return rsp_l, 0
                 elif row_bfr                  < rMax            < row:
                     row_bfr, kid_bfr, cap_bfr = rMax, kid, cap
-                    pass;          #LOG and log('< row_bfr, kid_bfr, cap_bfr={}',(row_bfr, kid_bfr, cap_bfr))
+                    pass;      #LOG and log('< row_bfr, kid_bfr, cap_bfr={}',(row_bfr, kid_bfr, cap_bfr))
                 elif row_aft                  > rMin            > row:
                     row_aft, kid_aft, cap_aft = rMin, kid, cap
-                    pass;          #LOG and log('> row_aft, kid_aft, cap_aft={}',(row_aft, kid_aft, cap_aft))
+                    pass;      #LOG and log('> row_aft, kid_aft, cap_aft={}',(row_aft, kid_aft, cap_aft))
                #for kid
-            pass;                  #LOG and log('? row_bfr, kid_bfr, cap_bfr={}',(row_bfr, kid_bfr, cap_bfr))
-            pass;                  #LOG and log('? row_aft, kid_aft, cap_aft={}',(row_aft, kid_aft, cap_aft))
-            pass;                  #LOG and log('? abs(row_bfr-row), abs(row_aft-row)={}',(abs(row_bfr-row), abs(row_aft-row)))
+            pass;              #LOG and log('? row_bfr, kid_bfr, cap_bfr={}',(row_bfr, kid_bfr, cap_bfr))
+            pass;              #LOG and log('? row_aft, kid_aft, cap_aft={}',(row_aft, kid_aft, cap_aft))
+            pass;              #LOG and log('? abs(row_bfr-row), abs(row_aft-row)={}',(abs(row_bfr-row), abs(row_aft-row)))
             kid_x, cap_x, gap_x = (kid_bfr, cap_bfr, row_bfr-row) \
                                 if abs(row_bfr-row) <= abs(row_aft-row) else \
                                   (kid_aft, cap_aft, row_aft-row)
-            pass;                  #LOG and log('kid_x, cap_x, gap_x={}',(kid_x, cap_x, gap_x))
+            pass;              #LOG and log('kid_x, cap_x, gap_x={}',(kid_x, cap_x, gap_x))
             sub_l, gap_sub  = best_path(kid_x, cap_x)
-            pass;                  #LOG and log('? sub_l,gap_sub ?? gap_x={}',(sub_l, gap_sub, gap_x))
+            pass;              #LOG and log('? sub_l,gap_sub ?? gap_x={}',(sub_l, gap_sub, gap_x))
             if abs(gap_sub) <= abs(gap_x):  # Sub-kid better
                 rsp_l  = [(kid_x, cap_x)] + sub_l
-                pass;              #LOG and log('<<sub bt: rsp_l, gap_sub={}',(rsp_l, gap_sub))
+                pass;           LOG and log('<<sub bt: rsp_l, gap_sub={}',(rsp_l, gap_sub))
                 return rsp_l, gap_sub
             # The kid is best
             rsp_l   = [(kid_x, cap_x)]
-            pass;                  #LOG and log('<<bst: rsp_l, gap_x={}',(rsp_l, gap_x))
+            pass;               LOG and log('<<bst: rsp_l, gap_x={}',(rsp_l, gap_x))
             return rsp_l, gap_x
-           #def descent
+           #def best_path
         lst, gap= best_path(0)
-        pass;                      #LOG and log('lst, gap={}',(lst, gap))
+        pass;                   LOG and log('lst, gap={}',(lst, gap))
         return lst, gap
        #def _get_best_tree_path
    #class Tree_cmds
@@ -844,6 +844,71 @@ class Find_repl_cmds:
         ))
         app.app_proc(app.PROC_SET_FIND_OPTIONS, user_opt)
        #def find_dlg_adapter
+       
+    def rewrap_sel_by_margin():
+        margin  = apx.get_opt('margin', 0)
+        tab_sz  = apx.get_opt('tab_size', 8)
+        lex     = ed.get_prop(app.PROP_LEXER_FILE, '')
+        cmt_sgn = app.lexer_proc(app.LEXER_GET_COMMENT, lex) \
+                    if lex else ''
+        crts    = ed.get_carets()
+        if len(crts)>1:
+            return app.msg_status(ONLY_SINGLE_CRT.format('Command'))
+        cCrt, rCrt, \
+        cEnd, rEnd  = crts[0]
+        cEnd, rEnd  = (cCrt, rCrt) if -1==rCrt else (cEnd, rEnd)
+        (rTx1,cTx1),\
+        (rTx2,cTx2) = apx.minmax((rCrt, cCrt), (rEnd, cEnd))
+        rTx2        = rTx2-1 if cTx2==0 else rTx2
+        pass;                  #LOG and log('rTx1, rTx2={}',(rTx1, rTx2))
+        lines   = [ed.get_text_line(nln) for nln in range(rTx1, rTx2+1)]
+        pass;                  #LOG and log('lines={}',(lines))
+        # Extract prefix by comment-sign
+        cm_prfx = ''
+        if lines[0].lstrip().startswith(cmt_sgn):
+            # First line commented - need for all
+            cm_prfx = lines[0][:lines[0].index(cmt_sgn)+len(cmt_sgn)]
+            if not all(map(lambda l:l.startswith(cm_prfx), lines)):
+                return app.msg_status('Re-wrap needs same positions of comments')
+        pass;                  #LOG and log('1 cm_prfx={}',repr(cm_prfx))
+        # Can prefix is wider?
+        for ext in range(1,100):
+            if False:pass
+            elif all(map(lambda l:l.startswith(cm_prfx+' '),  lines)):
+                cm_prfx += ' '
+            elif all(map(lambda l:l.startswith(cm_prfx+'\t'), lines)):
+                cm_prfx += '\t'
+            else:
+                break#for ext
+           #for ext
+        pass;                  #LOG and log('2 cm_prfx={}',repr(cm_prfx))
+        if len(cm_prfx)+10>margin:
+            return app.msg_status('No text to re-wrap')
+        # Join
+        text    = ' '.join(line[len(cm_prfx):] for line in lines)
+        pass;                  #LOG and log('mid text={}',('\n'+text))
+        # Split by margin
+        margin -= (len(cm_prfx) + (tab_sz-1)*cm_prfx.count('\t'))
+        pass;                  #LOG and log('margin,tab_sz={}',(margin,tab_sz))
+        words   = [(m.start(), m.end(), m.group()) 
+                    for m in re.finditer(r'\b\S+\b', text)]
+        pass;                  #LOG and log('words={}',(words))
+        lines   = []
+        last_pos= 0
+        for word in words:
+            pass;              #LOG and log('last_pos, word[1]-last_pos, word={}',(last_pos, word[1]-last_pos, word))
+            if word[1] - last_pos > margin:
+                lines  += [text[last_pos:word[0]]]
+                last_pos= word[0]
+        lines  += [text[last_pos:]]
+        # Re-join
+        text    = '\n'.join(cm_prfx+line for line in lines)
+        pass;                  #LOG and log('fin text={}',('\n'+text))
+        # Modify ed
+        ed.delete(0,rTx1, 0,rTx2+1)
+        ed.insert(0,rTx1, text+'\n')
+        ed.set_caret(0,rTx1+len(lines), 0, rTx1)
+       #def rewrap_sel_by_margin
    #class Find_repl_cmds
 
 #############################################################
@@ -1267,6 +1332,8 @@ class Command:
     def repl_next_from(self):                   return Find_repl_cmds.find_dlg_adapter('repl-next')
     def repl_stay_from(self):                   return Find_repl_cmds.find_dlg_adapter('repl-stay')
     def repl_all_from(self):                    return Find_repl_cmds.find_dlg_adapter('repl-all')
+
+    def rewrap_sel_by_margin(self):             return Find_repl_cmds.rewrap_sel_by_margin()
 
     def copy_term(self):                        return SCBs.copy_term()
     def replace_term(self):                     return SCBs.replace_term()
