@@ -851,18 +851,34 @@ class Find_repl_cmds:
         lex     = ed.get_prop(app.PROP_LEXER_FILE, '')
         cmt_sgn = app.lexer_proc(app.LEXER_GET_COMMENT, lex) \
                     if lex else ''
+        aid,vals,chds   = dlg_wrapper(_('Re-wrap selected text'), 5+165+5,5+120+5,     #NOTE: dlg-rewrap
+             [dict(           tp='lb'   ,tid='marg' ,l=5        ,w=120  ,cap=_('&Margin:')      ) # &m
+             ,dict(cid='marg',tp='ed'   ,t=5        ,l=5+120    ,w=45                           ) # 
+             ,dict(           tp='lb'   ,tid='csgn' ,l=5        ,w=120  ,cap=_('&Comment sign:')) # &c
+             ,dict(cid='csgn',tp='ed'   ,t=5+30     ,l=5+120    ,w=45                           )
+             ,dict(cid='svbl',tp='ch'   ,t=5+60     ,l=5        ,w=165  ,cap=_('&Save intend')  ) # &s
+             ,dict(cid='!'   ,tp='bt'   ,t=5+120-28 ,l=5        ,w=80   ,cap=_('OK'),  props='1') #     default
+             ,dict(cid='-'   ,tp='bt'   ,t=5+120-28 ,l=5+80+5   ,w=80   ,cap=_('Cancel')        )
+             ],    dict(marg=str(margin)
+                       ,csgn=cmt_sgn
+                       ,svbl=True), focus_cid='marg')
+        if aid is None or aid=='-': return None
+        if not vals['marg'].isdigit(): return app.msg_status('Not digit margin')
+        margin  = int(vals['marg'])
+        cmt_sgn =     vals['csgn']
+        save_bl =     vals['svbl']
         crts    = ed.get_carets()
         if len(crts)>1:
             return app.msg_status(ONLY_SINGLE_CRT.format('Command'))
         cCrt, rCrt, \
         cEnd, rEnd  = crts[0]
-        cEnd, rEnd  = (cCrt, rCrt) if -1==rCrt else (cEnd, rEnd)
+        cEnd, rEnd  = (cCrt, rCrt) if -1==rEnd else (cEnd, rEnd)
         (rTx1,cTx1),\
         (rTx2,cTx2) = apx.minmax((rCrt, cCrt), (rEnd, cEnd))
-        rTx2        = rTx2-1 if cTx2==0 else rTx2
-        pass;                  #LOG and log('rTx1, rTx2={}',(rTx1, rTx2))
+        rTx2        = rTx2-1 if cTx2==0 and rTx1!=rTx2 else rTx2
+        pass;                   LOG and log('rTx1, rTx2={}',(rTx1, rTx2))
         lines   = [ed.get_text_line(nln) for nln in range(rTx1, rTx2+1)]
-        pass;                  #LOG and log('lines={}',(lines))
+        pass;                   LOG and log('lines={}',(lines))
         # Extract prefix by comment-sign
         cm_prfx = ''
         if lines[0].lstrip().startswith(cmt_sgn):
@@ -872,24 +888,28 @@ class Find_repl_cmds:
                 return app.msg_status('Re-wrap needs same positions of comments')
         pass;                  #LOG and log('1 cm_prfx={}',repr(cm_prfx))
         # Can prefix is wider?
-        for ext in range(1,100):
-            if False:pass
-            elif all(map(lambda l:l.startswith(cm_prfx+' '),  lines)):
-                cm_prfx += ' '
-            elif all(map(lambda l:l.startswith(cm_prfx+'\t'), lines)):
-                cm_prfx += '\t'
-            else:
-                break#for ext
-           #for ext
-        pass;                  #LOG and log('2 cm_prfx={}',repr(cm_prfx))
+        if save_bl:
+            for ext in range(1,100):
+                if False:pass
+                elif all(map(lambda l:l.startswith(cm_prfx+' '),  lines)):
+                    cm_prfx += ' '
+                elif all(map(lambda l:l.startswith(cm_prfx+'\t'), lines)):
+                    cm_prfx += '\t'
+                else:
+                    break#for ext
+               #for ext
+        pass;                   LOG and log('2 cm_prfx={}',repr(cm_prfx))
         if len(cm_prfx)+10>margin:
             return app.msg_status('No text to re-wrap')
         # Join
-        text    = ' '.join(line[len(cm_prfx):] for line in lines)
-        pass;                  #LOG and log('mid text={}',('\n'+text))
+        lines   = [line[len(cm_prfx):] for line in lines]
+        if not save_bl:
+            lines   = [line.lstrip() for line in lines]
+        text    = ' '.join(lines)
+        pass;                   LOG and log('mid text={}',('\n'+text))
         # Split by margin
         margin -= (len(cm_prfx) + (tab_sz-1)*cm_prfx.count('\t'))
-        pass;                  #LOG and log('margin,tab_sz={}',(margin,tab_sz))
+        pass;                   LOG and log('margin,tab_sz={}',(margin,tab_sz))
         words   = [(m.start(), m.end(), m.group()) 
                     for m in re.finditer(r'\b\S+\b', text)]
         pass;                  #LOG and log('words={}',(words))
@@ -897,13 +917,16 @@ class Find_repl_cmds:
         last_pos= 0
         for word in words:
             pass;              #LOG and log('last_pos, word[1]-last_pos, word={}',(last_pos, word[1]-last_pos, word))
-            if word[1] - last_pos > margin:
-                lines  += [text[last_pos:word[0]]]
+            if word[1] - last_pos >= margin:
+                line    = text[last_pos:word[0]]
+                if line[-1] == ' ':
+                    line    = line[:-1]
+                lines  += [line]
                 last_pos= word[0]
         lines  += [text[last_pos:]]
         # Re-join
         text    = '\n'.join(cm_prfx+line for line in lines)
-        pass;                  #LOG and log('fin text={}',('\n'+text))
+        pass;                   LOG and log('fin text={}',('\n'+text))
         # Modify ed
         ed.delete(0,rTx1, 0,rTx2+1)
         ed.insert(0,rTx1, text+'\n')
