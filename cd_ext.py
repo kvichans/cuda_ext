@@ -856,7 +856,7 @@ class Find_repl_cmds:
              ,dict(cid='marg',tp='ed'   ,t=5        ,l=5+120    ,w=45                           ) # 
              ,dict(           tp='lb'   ,tid='csgn' ,l=5        ,w=120  ,cap=_('&Comment sign:')) # &c
              ,dict(cid='csgn',tp='ed'   ,t=5+30     ,l=5+120    ,w=45                           )
-             ,dict(cid='svbl',tp='ch'   ,t=5+60     ,l=5        ,w=165  ,cap=_('&Save intend')  ) # &s
+             ,dict(cid='svbl',tp='ch'   ,t=5+60     ,l=5        ,w=165  ,cap=_('&Keep intend')  ) # &s
              ,dict(cid='!'   ,tp='bt'   ,t=5+120-28 ,l=5        ,w=80   ,cap=_('OK'),  props='1') #     default
              ,dict(cid='-'   ,tp='bt'   ,t=5+120-28 ,l=5+80+5   ,w=80   ,cap=_('Cancel')        )
              ],    dict(marg=str(margin)
