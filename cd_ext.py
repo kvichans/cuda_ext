@@ -851,7 +851,7 @@ class Find_repl_cmds:
         lex     = ed.get_prop(app.PROP_LEXER_FILE, '')
         cmt_sgn = app.lexer_proc(app.LEXER_GET_COMMENT, lex) \
                     if lex else ''
-        aid,vals,chds   = dlg_wrapper(_('Re-wrap selected text'), 5+165+5,5+120+5,     #NOTE: dlg-rewrap
+        aid,vals,chds   = dlg_wrapper(_('Re-wrap lines'), 5+165+5,5+120+5,     #NOTE: dlg-rewrap
              [dict(           tp='lb'   ,tid='marg' ,l=5        ,w=120  ,cap=_('&Margin:')      ) # &m
              ,dict(cid='marg',tp='ed'   ,t=5        ,l=5+120    ,w=45                           ) # 
              ,dict(           tp='lb'   ,tid='csgn' ,l=5        ,w=120  ,cap=_('&Comment sign:')) # &c

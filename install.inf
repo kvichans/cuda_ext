@@ -177,7 +177,7 @@ menu=0
 
 [item56]
 section=commands
-caption=CudaExt: Re-wrap selected text by margin
+caption=CudaExt: Re-wrap lines by margin
 method=rewrap_sel_by_margin
 menu=0
 
