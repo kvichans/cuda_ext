@@ -1460,7 +1460,7 @@ class Command:
         for dirpath, dirnames, filenames in os.walk(src_dir):
             files  += [dirpath+os.sep+fn for fn in filenames if fnmatch(fn, mask)]
         if app.ID_OK!=app.msg_box(
-            f(_('Open {} files?{}'), len(files), chr(13)+'   '+(chr(13)+'   ').join(files))
+            f(_('Open {} files?{}'), len(files), '\n   '+'\n   '.join(files))
             , app.MB_OKCANCEL ):   return
         for fn in files:
             app.file_open(fn)
