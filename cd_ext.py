@@ -2,12 +2,14 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.2.6 2016-12-30'
+    '1.2.8 2017-05-22'
 ToDo: (see end of file)
 '''
 
 import  re, os, sys, json, collections
 from    collections     import deque
+from    fnmatch         import fnmatch
+
 import  cudatext            as app
 from    cudatext        import ed
 import  cudatext_cmd        as cmds
@@ -17,7 +19,8 @@ from    .cd_plug_lib    import *
 
 OrdDict = collections.OrderedDict
 
-FROM_API_VERSION= '1.0.119'
+FROM_API_VERSION    = '1.0.119'
+MIN_API_VER_4_REPL  = '1.0.169'
 
 # I18N
 _       = get_translation(__file__)
@@ -39,7 +42,7 @@ DONT_NEED_CHANGE    = _("Text change not needed")
 pass;                           # Logging
 pass;                          #from pprint import pformat
 pass;                          #pfrm15=lambda d:pformat(d,width=15)
-pass;                           LOG = (-2== 2)  # Do or dont logging.
+pass;                           LOG = (-2==-2)  # Do or dont logging.
 pass;                           ##!! waits correction
 
 c1      = chr(1)
@@ -215,9 +218,11 @@ class Tabs_cmds:
         if len(op_hs)<2:  return
         op_ed   = app.ed_group(op_grp)
         op_ind  = op_ed.get_prop(app.PROP_INDEX_TAB)
-        op_ind  = (op_ind+1)%len(op_hs) \
-                    if what_tab=='next' else \
-                  (op_ind-1)%len(op_hs)
+        op_ind  = (op_ind+1)%len(op_hs)     if what_tab=='next' else \
+                  (op_ind-1)%len(op_hs)     if what_tab=='prev' else \
+                  0                         if what_tab=='frst' else \
+                  len(op_hs)-1              if what_tab=='last' else \
+                  op_ind
         app.Editor(op_hs[op_ind]).focus()
         me_ed   = app.ed_group(me_grp)
         me_ed.focus()
@@ -622,10 +627,10 @@ class Jumps_cmds:
         pass;                      #LOG and log('')
         crts    = ed.get_carets()
         if len(crts)>1:
-            return app.msg_status(ONLY_SINGLE_CRT.format('Command'))
+            return app.msg_status(ONLY_SINGLE_CRT.format(_('Command')))
         (cCrt, rCrt, cEnd, rEnd)    = crts[0]
         if cEnd!=-1:
-            return app.msg_status(ONLY_FOR_NO_SEL.format('Command'))
+            return app.msg_status(ONLY_FOR_NO_SEL.format(_('Command')))
 
         (c_opn, c_cls
         ,col, row)  = find_matching_char(ed, cCrt, rCrt)
@@ -778,7 +783,7 @@ class Find_repl_cmds:
     def replace_all_sel_to_cb():
         if app.app_api_version()<FROM_API_VERSION:  return app.msg_status(NEED_UPDATE)
         crts    = ed.get_carets()
-        if len(crts)>1: return app.msg_status(ONLY_SINGLE_CRT.format('Command'))
+        if len(crts)>1: return app.msg_status(ONLY_SINGLE_CRT.format(_('Command')))
         seltext = ed.get_text_sel()
         if not seltext: return
         clip    = app.app_proc(app.PROC_GET_CLIP, '')
@@ -845,7 +850,149 @@ class Find_repl_cmds:
         app.app_proc(app.PROC_SET_FIND_OPTIONS, user_opt)
        #def find_dlg_adapter
        
+    data4_align_in_lines_by_sep = ''
+    @staticmethod
+    def align_in_lines_by_sep():
+        ''' Add spaces for aline text in some lines
+            Example. Start lines
+                a= 0
+                b
+                c  = 1
+            Aligned lines
+                a  = 0
+                b
+                c  = 1
+        '''
+        crts    = ed.get_carets()
+        if len(crts)>1:
+            return app.msg_status(ONLY_SINGLE_CRT.format(_('Command')))
+        (cCrt, rCrt
+        ,cEnd, rEnd)    = crts[0]
+        if rEnd==-1 or rEnd==rCrt:
+            return app.msg_status(ONLY_FOR_ML_SEL.format(_('Command')))
+        spr     = app.dlg_input('Enter separator string', Find_repl_cmds.data4_align_in_lines_by_sep)
+        spr     = '' if spr is None else spr.strip()
+        if not spr:
+            return # Esc
+        Find_repl_cmds.data4_align_in_lines_by_sep    = spr
+        ((rTx1, cTx1)
+        ,(rTx2, cTx2))  = apx.minmax((rCrt, cCrt), (rEnd, cEnd))
+        ls_txt  = ed.get_text_substr(0,rTx1, 0,rTx2+(0 if 0==cEnd else 1))
+        if spr not in ls_txt: 
+            return app.msg_status(NO_SPR_IN_LINES.format(spr))
+        lines   = ls_txt.splitlines()
+        ln_poss = [(ln, ln.find(spr)) for ln in lines]
+        max_pos =    max([p for (l,p) in ln_poss])
+        if max_pos== min([p if p>=0 else max_pos for (l,p) in ln_poss]):
+            return app.msg_status(DONT_NEED_CHANGE)
+        nlines  = [ln       if pos==-1 or max_pos==pos else 
+                   ln[:pos]+' '*(max_pos-pos)+ln[pos:]
+                   for (ln,pos) in ln_poss
+                  ]
+        ed.delete(0,rTx1, 0,rTx2+(0 if 0==cEnd else 1))
+        ed.insert(0,rTx1, '\n'.join(nlines)+'\n')
+        ed.set_caret(0,rTx1+len(nlines), 0, rTx1)
+       #def align_in_lines_by_sep
+
+    @staticmethod
+    def reindent():
+        if app.app_api_version()<MIN_API_VER_4_REPL: return app.msg_status(_('Need update application'))
+        crts    = ed.get_carets()
+        if len(crts)>1:
+            return app.msg_status(ONLY_SINGLE_CRT.format(_('Command')))
+        (cCrt, rCrt
+        ,cEnd, rEnd)    = crts[0]
+        cEnd, rEnd      = (cCrt, rCrt) if rEnd==-1 else (cEnd, rEnd)
+        (rSelB, cSelB), \
+        (rSelE, cSelE)  = apx.minmax((rCrt, cCrt), (rEnd, cEnd))
+        rSelE           = rSelE - (1 if 0==cSelE else 0)
+
+        first_s     = ed.get_text_line(rSelB)
+        ed_tab_sp   = apx.get_opt('tab_spaces', False)
+        ed_tab_sz   = apx.get_opt('tab_size'  , 8)
+        old_s       = 't' if first_s.startswith('\t')   else '?b'
+        new_s       = f('{}b', ed_tab_sz) if ed_tab_sp  else 't'
+        fill_h      = _('Enter "2b" or "··", "t" for TAB')
+        btn,vals,_t = dlg_wrapper(f(_('Reindent selected lines ({})'), rSelE-rSelB+1), 245,120,     #NOTE: dlg-reindent
+             [dict(           tp='lb'   ,t=5        ,l=5        ,w=235  ,cap='>'+fill_h                             ) #   
+             ,dict(           tp='lb'   ,tid='olds' ,l=5        ,w=150  ,cap='>'+_('&Old indent step:')             ) # &o
+             ,dict(cid='olds',tp='ed'   ,t=30       ,l=5+150+5  ,w= 80                                              ) # 
+             ,dict(           tp='lb'   ,tid='news' ,l=5        ,w=150  ,cap='>'+_('&New indent step:')             ) # &n
+             ,dict(cid='news',tp='ed'   ,t=60       ,l=5+150+5  ,w= 80                                              )
+             ,dict(cid='!'   ,tp='bt'   ,t=90       ,l=245-170-5,w= 80  ,cap=_('OK')                    ,def_bt='1' ) #   
+             ,dict(cid='-'   ,tp='bt'   ,t=90       ,l=245-80-5 ,w= 80  ,cap=_('Cancel')                            )
+             ],    dict(olds=old_s
+                       ,news=new_s), focus_cid='olds')
+        if btn is None or btn=='-': return None
+        
+        def parse_step(step):
+            if step in ('t', '\t'):         return '\t'
+            if not step.replace(' ', ''):   return step
+            if step[0].isdigit() and \
+               step[1]=='b':                return ' '*int(step[0])
+            return ''
+        old_s   = parse_step(vals['olds'])
+        new_s   = parse_step(vals['news'])
+        pass;                   LOG and log('old_s, new_s={}',(old_s, new_s))
+        if not old_s or not new_s or old_s==new_s:
+            return app.msg_status(_('Skip to reindent'))
+        
+        lines   = [ed.get_text_line(row) for row in range(rSelB, rSelE+1)]
+        def reind_line(line, ost_l, nst):
+            pass;              #LOG and log('line={}',repr(line))
+            if not line.startswith(ost_l[0]):    return line
+            for n in range(1, 1000):
+                if n == len(ost_l):
+                    ost_l.append(ost_l[0]*n)
+                if not line.startswith(ost_l[n]):
+                    break
+            pass;              #LOG and log('n={}',(n))
+            pass;              #LOG and log('new={}',repr(nst*n + line[len(ost_l[n])-1:]))
+            return nst*n + line[len(ost_l[n])-1:]
+        ost_l   = [old_s*n for n in range(1,20)]
+        lines   = [reind_line(l, ost_l, new_s) for l in lines]
+        pass;                  #LOG and log('lines={}',(lines))
+        Find_repl_cmds._replace_lines(ed, rSelB, rSelE, '\n'.join(lines))
+        ed.set_caret(0,rSelE+1, 0,rSelB)
+       #def reindent
+    
+#   @staticmethod
+#   def split_lines_to_width():
+#       width   = apx.get_opt('last_width_for_split_lines', apx.get_opt('margin', 0))
+#       width   = app.dlg_input(_('Width for split lines'), str(width))
+#       if not width or not width.isdigit() or not (0<int(width)<1000):
+#           app.msg_status(_('Skip to split lines'))
+#       apx.set_opt('last_width_for_split_lines', width)
+#      #def split_lines_to_width
+    
+    @staticmethod
+    def join_lines():
+        if app.app_api_version()<MIN_API_VER_4_REPL: return app.msg_status(_('Need update application'))
+        crts    = ed.get_carets()
+        if len(crts)>1:
+            return app.msg_status(ONLY_SINGLE_CRT.format(_('Command')))
+        (cCrt, rCrt
+        ,cEnd, rEnd)    = crts[0]
+        (rSelB, cSelB), \
+        (rSelE, cSelE)  = apx.minmax((rCrt, cCrt), (rEnd, cEnd))
+        rSelE           = rSelE - (1 if 0==cSelE else 0)
+        if rEnd==-1 or rEnd==rCrt or rSelB==rSelE:
+            return app.msg_status(ONLY_FOR_ML_SEL.format(_('Command')))
+        first_ln= ed.get_text_line(rSelB)
+        last_ln = ed.get_text_line(rSelE)
+        lines   = [first_ln.rstrip()] \
+                + [ed.get_text_line(row).strip() for row in range(rSelB+1, rSelE)] \
+                + [last_ln.lstrip()]
+        joined  = ' '.join(l for l in lines if l)
+#       ed.delete(0,rSelB, len(last_ln),rSelE)
+#       ed.insert(0,rSelB, joined+'\n')
+##       ed.insert(0,rMin, joined+'\n')
+        Find_repl_cmds._replace_lines(ed, rSelB, rSelE, joined)
+        ed.set_caret(0,rSelB+1, 0,rSelB)
+       #def join_lines
+    
     def rewrap_sel_by_margin():
+        if app.app_api_version()<MIN_API_VER_4_REPL: return app.msg_status(_('Need update application'))
         margin  = apx.get_opt('margin', 0)
         tab_sz  = apx.get_opt('tab_size', 8)
         lex     = ed.get_prop(app.PROP_LEXER_FILE, '')
@@ -869,7 +1016,7 @@ class Find_repl_cmds:
         save_bl =     vals['svbl']
         crts    = ed.get_carets()
         if len(crts)>1:
-            return app.msg_status(ONLY_SINGLE_CRT.format('Command'))
+            return app.msg_status(ONLY_SINGLE_CRT.format(_('Command')))
         cCrt, rCrt, \
         cEnd, rEnd  = crts[0]
         cEnd, rEnd  = (cCrt, rCrt) if -1==rEnd else (cEnd, rEnd)
@@ -928,10 +1075,29 @@ class Find_repl_cmds:
         text    = '\n'.join(cm_prfx+line for line in lines)
         pass;                   LOG and log('fin text={}',('\n'+text))
         # Modify ed
-        ed.delete(0,rTx1, 0,rTx2+1)
-        ed.insert(0,rTx1, text+'\n')
-        ed.set_caret(0,rTx1+len(lines), 0, rTx1)
+        Find_repl_cmds._replace_lines(ed, rTx1, rTx2, text)
+#       ed.delete(0,rTx1, 0,rTx2+1)
+#       ed.insert(0,rTx1, text+'\n')
+        ed.set_caret(0,rTx1+len(lines), 0,rTx1)
        #def rewrap_sel_by_margin
+
+    @staticmethod
+    def _replace_lines(_ed, r_bgn, r_end, newlines):
+        """ Replace full lines in [r_bgn, r_end] to newlines """
+        if app.app_api_version()<MIN_API_VER_4_REPL: return app.msg_status(_('Need update application'))
+        lines_n     = _ed.get_line_count()
+        pass;                   LOG and log('lines_n, r_bgn, r_end, newlines={}',(lines_n, r_bgn, r_end, newlines))
+        if r_end < lines_n-1:
+            # Replace middle lines
+            pass;               LOG and log('middle',())
+            _ed.delete(0,r_bgn, 0,1+r_end)
+            _ed.insert(0,r_bgn, newlines+'\n')
+        else:
+            # Replace final lines
+            pass;               LOG and log('final',())
+            _ed.delete(0,r_bgn, 0,lines_n)
+            _ed.insert(0,r_bgn, newlines)
+       #def _replace_lines
    #class Find_repl_cmds
 
 #############################################################
@@ -962,7 +1128,7 @@ class Insert_cmds:
         rnews   = clip.count('\n')
         crts    = ed.get_carets()
         if len(crts)>1:
-            return app.msg_status(ONLY_SINGLE_CRT.format('Command'))
+            return app.msg_status(ONLY_SINGLE_CRT.format(_('Command')))
         (cCrt, rCrt, cEnd, rEnd)    = crts[0]
         r4ins   = min(rCrt, rCrt if -1==rEnd else rEnd)
         ed.insert(0, r4ins, clip)
@@ -990,7 +1156,7 @@ class Insert_cmds:
         if not clip.strip():return app.msg_status(_('No text in clip'))
         crts    = ed.get_carets()
         if len(crts)>1:
-            return app.msg_status(ONLY_SINGLE_CRT.format('Command'))
+            return app.msg_status(ONLY_SINGLE_CRT.format(_('Command')))
 
         END_SIGNS = ['begin', '{', ':', 'then']   # }
 
@@ -1053,50 +1219,6 @@ class Insert_cmds:
         else:
             ed.insert(0, r4ins+1, clip)
        #def paste_with_indent
-    
-    data4_align_in_lines_by_sep = ''
-    @staticmethod
-    def align_in_lines_by_sep():
-        ''' Add spaces for aline text in some lines
-            Example. Start lines
-                a= 0
-                b
-                c  = 1
-            Aligned lines
-                a  = 0
-                b
-                c  = 1
-        '''
-        crts    = ed.get_carets()
-        if len(crts)>1:
-            return app.msg_status(ONLY_SINGLE_CRT.format('Command'))
-        (cCrt, rCrt
-        ,cEnd, rEnd)    = crts[0]
-        if rEnd==-1 or rEnd==rCrt:
-            return app.msg_status(ONLY_FOR_ML_SEL.format('Command'))
-        spr     = app.dlg_input('Enter separator string', Insert_cmds.data4_align_in_lines_by_sep)
-        spr     = '' if spr is None else spr.strip()
-        if not spr:
-            return # Esc
-        Insert_cmds.data4_align_in_lines_by_sep    = spr
-        ((rTx1, cTx1)
-        ,(rTx2, cTx2))  = apx.minmax((rCrt, cCrt), (rEnd, cEnd))
-        ls_txt  = ed.get_text_substr(0,rTx1, 0,rTx2+(0 if 0==cEnd else 1))
-        if spr not in ls_txt: 
-            return app.msg_status(NO_SPR_IN_LINES.format(spr))
-        lines   = ls_txt.splitlines()
-        ln_poss = [(ln, ln.find(spr)) for ln in lines]
-        max_pos =    max([p for (l,p) in ln_poss])
-        if max_pos== min([p if p>=0 else max_pos for (l,p) in ln_poss]):
-            return app.msg_status(DONT_NEED_CHANGE)
-        nlines  = [ln       if pos==-1 or max_pos==pos else 
-                   ln[:pos]+' '*(max_pos-pos)+ln[pos:]
-                   for (ln,pos) in ln_poss
-                  ]
-        ed.delete(0,rTx1, 0,rTx2+(0 if 0==cEnd else 1))
-        ed.insert(0,rTx1, '\n'.join(nlines)+'\n')
-        ed.set_caret(0,rTx1+len(nlines), 0, rTx1)
-       #def align_in_lines_by_sep
    #class Insert_cmds
     
 class Command:
@@ -1328,6 +1450,28 @@ class Command:
         app.file_open('')
         ed.save(new_fn)
        #def new_file_save_as_near_cur
+
+    def open_all_with_subdir(self):
+        src_dir = app.dlg_dir(os.path.dirname(ed.get_filename()))
+        if not src_dir: return
+        mask    = app.dlg_input(_('Mask for filename. "*" - all files'), '*')
+        if not mask: return
+        files   = []
+        for dirpath, dirnames, filenames in os.walk(src_dir):
+            files  += [dirpath+os.sep+fn for fn in filenames if fnmatch(fn, mask)]
+        if app.ID_OK!=app.msg_box(f(_('Open {} files?{}'), len(files), chr(13)+'   '+(chr(13)+'   ').join(files)), app.MB_OKCANCEL ):   return
+        for fn in files:
+            app.file_open(fi)
+    
+    def remove_unprinted(self):
+        body    = ed.get_text_all()
+        in_size = len(body)
+        for ichar in range(32):
+            if not ichar in [9,10,13]:
+                body    = body.replace(chr(ichar), '')
+        ed.set_text_all(body)   if in_size != len(body) else None
+        app.msg_status(f(_('Removed characters: {}'), in_size-len(body)))
+       #def remove_unprinted
     
     def on_console_nav(self, ed_self, text):    return Nav_cmds.on_console_nav(ed_self, text)
     def _open_file_near(self, where='right'):   return Nav_cmds._open_file_near(where)
@@ -1341,11 +1485,15 @@ class Command:
     def add_indented_line_below(self):          return Insert_cmds.add_indented_line_below()
     def paste_to_1st_col(self):                 return Insert_cmds.paste_to_1st_col()
     def paste_with_indent(self, where='above'): return Insert_cmds.paste_with_indent(where)
-    def align_in_lines_by_sep(self):            return Insert_cmds.align_in_lines_by_sep()
     
     def find_cb_string_next(self):              return Find_repl_cmds.find_cb_by_cmd('dn')
     def find_cb_string_prev(self):              return Find_repl_cmds.find_cb_by_cmd('up')
     def replace_all_sel_to_cb(self):            return Find_repl_cmds.replace_all_sel_to_cb()
+    def align_in_lines_by_sep(self):            return Find_repl_cmds.align_in_lines_by_sep()
+    def reindent(self):                         return Find_repl_cmds.reindent()
+    def join_lines(self):                       return Find_repl_cmds.join_lines()
+#   def split_lines_to_width(self):             return Find_repl_cmds.split_lines_to_width()
+    def rewrap_sel_by_margin(self):             return Find_repl_cmds.rewrap_sel_by_margin()
 
     def mark_all_from(self):                    return Find_repl_cmds.find_dlg_adapter('mark')
     def count_all_from(self):                   return Find_repl_cmds.find_dlg_adapter('count')
@@ -1355,8 +1503,6 @@ class Command:
     def repl_next_from(self):                   return Find_repl_cmds.find_dlg_adapter('repl-next')
     def repl_stay_from(self):                   return Find_repl_cmds.find_dlg_adapter('repl-stay')
     def repl_all_from(self):                    return Find_repl_cmds.find_dlg_adapter('repl-all')
-
-    def rewrap_sel_by_margin(self):             return Find_repl_cmds.rewrap_sel_by_margin()
 
     def copy_term(self):                        return SCBs.copy_term()
     def replace_term(self):                     return SCBs.replace_term()

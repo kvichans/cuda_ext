@@ -30,7 +30,6 @@ class Command:
     def paste_with_indent_above(self):          return RLS.paste_with_indent('above')
     def paste_with_indent_below(self):          return RLS.paste_with_indent('below')
     def paste_as_lazarus(self):                 return RLS.paste_with_indent('lazar')
-    def align_in_lines_by_sep(self):            return RLS.align_in_lines_by_sep()
     
     # Find_repl_cmds
     def find_cb_string_next(self):              return RLS.find_cb_string_next()
@@ -51,6 +50,10 @@ class Command:
 #   def repl_stay_from(self):                   return RLS.repl_stay_from()
 #   def repl_all_from(self):                    return RLS.repl_all_from()
 
+    def align_in_lines_by_sep(self):            return RLS.align_in_lines_by_sep()
+    def reindent(self):                         return RLS.reindent()
+    def join_lines(self):                       return RLS.join_lines()
+#   def split_lines_to_width(self):             return RLS.split_lines_to_width()
     def rewrap_sel_by_margin(self):             return RLS.rewrap_sel_by_margin()
     
     # Jumps_cmds
@@ -73,6 +76,8 @@ class Command:
 #   def edit_strcomment_chars(self):            return RLS.edit_strcomment_chars()
     def rename_file(self):                      return RLS.rename_file()
     def new_file_save_as_near_cur(self):        return RLS.new_file_save_as_near_cur()
+    def open_all_with_subdir(self):             return RLS.open_all_with_subdir()
+    def remove_unprinted(self):                 return RLS.remove_unprinted()
 
     # Tabs_cmds
     def to_tab_g1_t1(self):                     return RLS._activate_tab(0, 0)
@@ -100,10 +105,16 @@ class Command:
     def move_tab(self):                         return RLS.move_tab()
     def close_tab_from_next_group(self):        return RLS.close_tab_from_other_group('next')
     def close_tab_from_prev_group(self):        return RLS.close_tab_from_other_group('prev')
+
     def view_next_tab_from_next_group(self):    return RLS._activate_tab_other_group('next', 'next')
     def view_next_tab_from_prev_group(self):    return RLS._activate_tab_other_group('next', 'prev')
     def view_prev_tab_from_next_group(self):    return RLS._activate_tab_other_group('prev', 'next')
     def view_prev_tab_from_prev_group(self):    return RLS._activate_tab_other_group('prev', 'prev')
+
+    def view_first_tab_from_next_group(self):   return RLS._activate_tab_other_group('frst', 'next')
+    def view_first_tab_from_prev_group(self):   return RLS._activate_tab_other_group('frst', 'prev')
+    def view_last_tab_from_next_group(self):    return RLS._activate_tab_other_group('last', 'next')
+    def view_last_tab_from_prev_group(self):    return RLS._activate_tab_other_group('last', 'prev')
     def go_back(self):                          return RLS.go_back_tab()
     
    #class Command

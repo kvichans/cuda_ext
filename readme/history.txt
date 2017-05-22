@@ -1,3 +1,10 @@
+1.2.8 (2017-05-22)
+added: open all files in dir and subdirs
+added: remove unprinted chars in ed
+
+1.2.7 (2017-03-30)
+added: switch tab to first/last in other group
+
 1.2.6 (2016-12-30)
 added: rewrap by margin
 

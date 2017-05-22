@@ -87,12 +87,6 @@ caption=CudaExt: Paste like Lazarus IDE
 method=paste_as_lazarus
 menu=0
 
-[item37]
-section=commands
-caption=CudaExt: Align in lines by separator
-method=align_in_lines_by_sep
-menu=0
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Find_repl_cmds
 [item41]
@@ -175,9 +169,33 @@ menu=0
 ;method=repl_all_from
 ;menu=0
 
+[item52]
+section=commands
+caption=CudaExt: Align in lines by separator
+method=align_in_lines_by_sep
+menu=0
+
+[item53]
+section=commands
+caption=CudaExt: Reindent selected lines
+method=reindent
+menu=0
+
+[item54]
+section=commands
+caption=CudaExt: Join selected lines
+method=join_lines
+menu=0
+
+;[item55]
+;section=commands
+;caption=CudaExt: Split selected lines
+;method=split_lines_to_width
+;menu=0
+
 [item56]
 section=commands
-caption=CudaExt: Re-wrap lines by margin
+caption=CudaExt: Re-wrap/split lines by margin
 method=rewrap_sel_by_margin
 menu=0
 
@@ -250,6 +268,18 @@ menu=0
 section=commands
 caption=CudaExt: New file and SaveAs in current folder...
 method=new_file_save_as_near_cur
+menu=0
+
+[item74]
+section=commands
+caption=CudaExt: Open all files from asked dir and subdirs...
+method=open_all_with_subdir
+menu=0
+
+[item75]
+section=commands
+caption=CudaExt: Remove all ASCII chars 0..31 (exlude 9,10,13)
+method=remove_unprinted
 menu=0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -407,6 +437,27 @@ method=view_prev_tab_from_prev_group
 menu=0
 
 [item150]
+section=commands
+caption=CudaExt: Switch tab to first in next group
+method=view_first_tab_from_next_group
+menu=0
+[item151]
+section=commands
+caption=CudaExt: Switch tab to first in previous group
+method=view_first_tab_from_prev_group
+menu=0
+[item152]
+section=commands
+caption=CudaExt: Switch tab to last in next group
+method=view_last_tab_from_next_group
+menu=0
+[item153]
+section=commands
+caption=CudaExt: Switch tab to last in previous group
+method=view_last_tab_from_prev_group
+menu=0
+
+[item159]
 section=commands
 caption=CudaExt: Activate previously active tab (go back)
 method=go_back
