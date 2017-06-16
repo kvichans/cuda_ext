@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.2.8 2017-05-22'
+    '1.2.9 2017-06-16'
 ToDo: (see end of file)
 '''
 
@@ -21,6 +21,7 @@ OrdDict = collections.OrderedDict
 
 FROM_API_VERSION    = '1.0.119'
 MIN_API_VER_4_REPL  = '1.0.169'
+FROM_API_VERSION    = '1.0.182'     # PROC_SPLITTER_GET/SET, LOG_CONSOLE_GET_MEMO_LINES
 
 # I18N
 _       = get_translation(__file__)
@@ -706,7 +707,9 @@ class Nav_cmds:
     
     @staticmethod
     def nav_by_console_err():
-        cons_out= app.app_log(app.LOG_CONSOLE_GET_LOG, '')
+        if app.app_api_version()<FROM_API_VERSION:  return app.msg_status(NEED_UPDATE)
+        cons_out= '\n'.join(app.app_log(app.LOG_CONSOLE_GET_MEMO_LINES, ''))
+#       cons_out= app.app_log(app.LOG_CONSOLE_GET_LOG, '')
         fn      = ed.get_filename()
         if not fn:      return app.msg_status(_('Only for saved file'))
         fn_ln_re= f('File "{}", line ', fn).replace('\\','\\\\')+'(\d+)'
@@ -991,6 +994,34 @@ class Find_repl_cmds:
         ed.set_caret(0,rSelB+1, 0,rSelB)
        #def join_lines
     
+    @staticmethod
+    def del_more_spaces():
+        if app.app_api_version()<MIN_API_VER_4_REPL: return app.msg_status(_('Need update application'))
+        crts    = ed.get_carets()
+        if len(crts)>1:
+            return app.msg_status(ONLY_SINGLE_CRT.format(_('Command')))
+        (cCrt, rCrt
+        ,cEnd, rEnd)    = crts[0]
+        sel     = ed.get_text_sel()
+        if not sel:
+            body    = ed.get_text_all()
+            new_body= re.sub('  +', ' ', body)
+            if body==new_body:
+                return app.msg_status(_('No duplicate spaces'))
+            ed.set_text_all(new_body)
+            ed.set_caret(cCrt, rCrt)
+            return app.msg_status(f(_('Deleted spaces: {}'), len(body)-len(new_body)))
+        new_sel = re.sub('  +', ' ', sel)
+        if sel==new_sel:
+            return app.msg_status(_('No duplicate spaces'))
+        (rSelB, cSelB), \
+        (rSelE, cSelE)  = apx.minmax((rCrt, cCrt), (rEnd, cEnd))
+        cCrt, rCrt      = ed.replace(cSelB, rSelB, cSelE, rSelE, new_sel)
+        ed.set_caret(cCrt, rCrt, cSelB, rSelB)
+        return app.msg_status(f(_('Deleted spaces: {}'), len(sel)-len(new_sel)))
+       #def del_more_spaces
+    
+    @staticmethod
     def rewrap_sel_by_margin():
         if app.app_api_version()<MIN_API_VER_4_REPL: return app.msg_status(_('Need update application'))
         margin  = apx.get_opt('margin', 0)
@@ -1251,6 +1282,7 @@ class Command:
                 factor  Multiplier for relation pos of splitter.
                             NewPos  = int(factor * OldPos)
         '''
+        if app.app_api_version()<FROM_API_VERSION:  return app.msg_status(NEED_UPDATE)
         pass;                  #LOG and log('what, factor={}',(what, factor))
         id_splt     = ''
         pos_old     = 0
@@ -1375,8 +1407,16 @@ class Command:
         if id_splt[0]=='-':
             id_splt = id_splt[1:]
             factor  = 2 - factor
+        id_splt = {'L': app.SPLITTER_SIDE
+                  ,'B': app.SPLITTER_BOTTOM
+                  ,'G1':app.SPLITTER_G1
+                  ,'G2':app.SPLITTER_G2
+                  ,'G3':app.SPLITTER_G3
+                  }[id_splt]
 
-        (vh, shown, pos_old, prn_size)  = app.app_proc(app.PROC_GET_SPLIT, id_splt)
+        (vh, shown, pos_old, prn_size)  = app.app_proc(app.PROC_SPLITTER_GET, id_splt)
+        pass;                  #LOG and log('vh, shown, pos_old, prn_size={}',(vh, shown, pos_old, prn_size))
+#       (vh, shown, pos_old, prn_size)  = app.app_proc(app.PROC_GET_SPLIT, id_splt)
         pass;                  #LOG and log('id_splt, vh, shown, pos_old, prn_size={}',(id_splt, vh, shown, pos_old, prn_size))
         if not shown:           return
         pos_new     = int(factor * pos_old) 
@@ -1384,7 +1424,9 @@ class Command:
         pos_new     = max(100, min(prn_size-100, pos_new))
         pass;                  #LOG and log('pos_new={}',(pos_new))
         if pos_new==pos_old:    return
-        app.app_proc(app.PROC_SET_SPLIT, '{};{}'.format(id_splt, pos_new))
+        pass;                  #LOG and log('id_splt, pos_new={}',(id_splt, pos_new))
+        app.app_proc(app.PROC_SPLITTER_SET, (id_splt, pos_new))
+#       app.app_proc(app.PROC_SET_SPLIT, '{};{}'.format(id_splt, pos_new))
        #def _move_splitter
 
     def rename_file(self):
@@ -1493,9 +1535,9 @@ class Command:
     def replace_all_sel_to_cb(self):            return Find_repl_cmds.replace_all_sel_to_cb()
     def align_in_lines_by_sep(self):            return Find_repl_cmds.align_in_lines_by_sep()
     def reindent(self):                         return Find_repl_cmds.reindent()
-    def join_lines(self):                       return Find_repl_cmds.join_lines()
-#   def split_lines_to_width(self):             return Find_repl_cmds.split_lines_to_width()
     def rewrap_sel_by_margin(self):             return Find_repl_cmds.rewrap_sel_by_margin()
+    def join_lines(self):                       return Find_repl_cmds.join_lines()
+    def del_more_spaces(self):                  return Find_repl_cmds.del_more_spaces()
 
     def mark_all_from(self):                    return Find_repl_cmds.find_dlg_adapter('mark')
     def count_all_from(self):                   return Find_repl_cmds.find_dlg_adapter('count')

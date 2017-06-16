@@ -187,16 +187,16 @@ caption=CudaExt: Join selected lines
 method=join_lines
 menu=0
 
-;[item55]
-;section=commands
-;caption=CudaExt: Split selected lines
-;method=split_lines_to_width
-;menu=0
-
-[item56]
+[item55]
 section=commands
 caption=CudaExt: Re-wrap/split lines by margin
 method=rewrap_sel_by_margin
+menu=0
+
+[item56]
+section=commands
+caption=CudaExt: Delete duplicate spaces
+method=del_more_spaces
 menu=0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -278,7 +278,7 @@ menu=0
 
 [item75]
 section=commands
-caption=CudaExt: Remove all ASCII chars 0..31 (exlude 9,10,13)
+caption=CudaExt: Remove all ASCII chars 0..31 (excluding 9,10,13)
 method=remove_unprinted
 menu=0
 
