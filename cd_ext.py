@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.2.9 2017-06-16'
+    '1.3.01 2017-06-28'
 ToDo: (see end of file)
 '''
 
@@ -621,6 +621,27 @@ class SCBs:
 #############################################################
 class Jumps_cmds:
     @staticmethod
+    def scroll_to_center():
+       #wraped      = apx.get_opt('wrap_mode', False, apx.CONFIG_LEV_FILE)
+       #last_on_top = apx.get_opt('show_last_line_on_top', False)
+        txt_lines   = ed.get_line_count()
+        old_top_line= ed.get_prop(app.PROP_LINE_TOP) if app.app_api_version()>='1.0.126' else ed.get_top()
+        scr_lines   = ed.get_prop(app.PROP_VISIBLE_LINES)
+        crt_line    = ed.get_carets()[0][1]
+        
+        new_top_line= crt_line - int(scr_lines/2)
+        new_top_line= max(new_top_line, 0)
+        new_top_line= min(new_top_line, txt_lines-1)
+        pass;                      #LOG and log('cur, old, new, scr={}',(crt_line, old_top_line, new_top_line, scr_lines))
+        
+        if new_top_line!=old_top_line:
+            if app.app_api_version()>='1.0.126':
+                ed.set_prop(app.PROP_LINE_TOP, str(new_top_line))
+            else: # old
+                ed.set_top(new_top_line)
+       #def scroll_to_center
+
+    @staticmethod
     def jump_to_matching_bracket():
         ''' Jump single (only!) caret to matching bracket.
             Pairs: [] {} () <> «»
@@ -644,25 +665,49 @@ class Jumps_cmds:
        #def jump_to_matching_bracket
 
     @staticmethod
-    def scroll_to_center():
-       #wraped      = apx.get_opt('wrap_mode', False, apx.CONFIG_LEV_FILE)
-       #last_on_top = apx.get_opt('show_last_line_on_top', False)
-        txt_lines   = ed.get_line_count()
-        old_top_line= ed.get_prop(app.PROP_LINE_TOP) if app.app_api_version()>='1.0.126' else ed.get_top()
-        scr_lines   = ed.get_prop(app.PROP_VISIBLE_LINES)
-        crt_line    = ed.get_carets()[0][1]
+    def jump_to_status_line(status, nx_pr, bgn_end):
+        pass;                  #LOG and log('status, nx_pr, bgn_end={}',(status, nx_pr, bgn_end))
+        trg_sts = [app.LINESTATE_CHANGED] if status=='mod' else \
+                  [app.LINESTATE_SAVED]   if status=='svd' else \
+                  [app.LINESTATE_CHANGED
+                  ,app.LINESTATE_SAVED
+                  ,app.LINESTATE_ADDED]   if status=='wrk' else \
+                  [app.LINESTATE_NORMAL]
+        step    = (-1 if nx_pr=='prev' else 1)
+        fini_r  = ( 0 if nx_pr=='prev' else ed.get_line_count()-1)
+        init_r  = ed.get_carets()[0][1]                             # Start from upper caret (not selection)
+        init_st = ed.get_prop(app.PROP_LINE_STATE, init_r)          # Start status
+        pass;                  #LOG and log('step,init_r,fini_r,trg_sts={}',(step,init_r,fini_r,trg_sts))
         
-        new_top_line= crt_line - int(scr_lines/2)
-        new_top_line= max(new_top_line, 0)
-        new_top_line= min(new_top_line, txt_lines-1)
-        pass;                      #LOG and log('cur, old, new, scr={}',(crt_line, old_top_line, new_top_line, scr_lines))
+        trgt_r  = -1
+        state   = 'to-free' if init_st in trg_sts else 'to-trgt'
+        test_r  = init_r
+        while True:
+            test_r += step
+            if test_r==fini_r: break#while
+            test_st = ed.get_prop(app.PROP_LINE_STATE, test_r)
+            pass;              #LOG and log('state,test_r,test_st={}',(state,test_r,test_st))
+            if False:pass
+            elif state == 'to-free' and test_st     in trg_sts:     #   in init wrk fragment
+                pass
+            elif state == 'to-free' and test_st not in trg_sts:     # exit init wrk fragment
+                state   = 'to-trgt'
+            elif state == 'to-trgt' and test_st not in trg_sts:     #   in free space
+                state   = 'to-trgt'
+            elif state == 'to-trgt' and test_st     in trg_sts:     # found
+                trgt_r  = test_r
+                if nx_pr=='next' and bgn_end=='bgn' or \
+                   nx_pr=='prev' and bgn_end=='end': break#while    # true side of fragment
+                state   = 'to-side'
+            elif state == 'to-side' and test_st     in trg_sts:     #   in trgt fragment
+                trgt_r  = test_r
+            elif state == 'to-side' and test_st not in trg_sts:     # exit trgt fragment
+                break#while
         
-        if new_top_line!=old_top_line:
-            if app.app_api_version()>='1.0.126':
-                ed.set_prop(app.PROP_LINE_TOP, str(new_top_line))
-            else: # old
-                ed.set_top(new_top_line)
-       #def scroll_to_center
+        if -1==trgt_r:  return app.msg_status(_("Not found lines by status"))
+        ed.set_caret(0, trgt_r)
+       #def jump_to_status_line
+
    #class Jumps_cmds
 
 #############################################################
@@ -1613,8 +1658,9 @@ class Command:
             self.CASM_state = ''
             self.tid_hist_i = 0
 
-    def jump_to_matching_bracket(self):     return Jumps_cmds.jump_to_matching_bracket()
-    def scroll_to_center(self):             return Jumps_cmds.scroll_to_center()
+    def scroll_to_center(self):                             return Jumps_cmds.scroll_to_center()
+    def jump_to_matching_bracket(self):                     return Jumps_cmds.jump_to_matching_bracket()
+    def jump_to_status_line(self, status, nx_pr, bgn_end):  return Jumps_cmds.jump_to_status_line(status, nx_pr, bgn_end)
    #class Command
 
 

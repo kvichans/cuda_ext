@@ -59,6 +59,12 @@ class Command:
     # Jumps_cmds
     def scroll_to_center(self):                 return RLS.scroll_to_center()
     def jump_to_matching_bracket(self):         return RLS.jump_to_matching_bracket()
+    def jump_to_next_mod_lines(self):           return RLS.jump_to_status_line('mod', 'next', 'bgn')
+    def jump_to_prev_mod_lines(self):           return RLS.jump_to_status_line('mod', 'prev', 'bgn')
+    def jump_to_next_sav_lines(self):           return RLS.jump_to_status_line('svd', 'next', 'bgn')
+    def jump_to_prev_sav_lines(self):           return RLS.jump_to_status_line('svd', 'prev', 'bgn')
+    def jump_to_next_wrk_lines(self):           return RLS.jump_to_status_line('wrk', 'next', 'bgn')
+    def jump_to_prev_wrk_lines(self):           return RLS.jump_to_status_line('wrk', 'prev', 'bgn')
     
     # Move_sep_cmds
     def more_in_tab(self):                      return RLS._move_splitter('into', 1.05)

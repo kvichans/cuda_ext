@@ -213,6 +213,42 @@ caption=CudaExt: Jump to matching bracket
 method=jump_to_matching_bracket
 menu=0
 
+[item63]
+section=commands
+caption=CudaExt: Jump to next changed lines
+method=jump_to_next_mod_lines
+menu=0
+
+[item64]
+section=commands
+caption=CudaExt: Jump to previous changed lines
+method=jump_to_prev_mod_lines
+menu=0
+
+[item65]
+section=commands
+caption=CudaExt: Jump to next saved lines
+method=jump_to_next_sav_lines
+menu=0
+
+[item66]
+section=commands
+caption=CudaExt: Jump to previous saved lines
+method=jump_to_prev_sav_lines
+menu=0
+
+[item67]
+section=commands
+caption=CudaExt: Jump to next worked lines
+method=jump_to_next_wrk_lines
+menu=0
+
+[item68]
+section=commands
+caption=CudaExt: Jump to previous worked lines
+method=jump_to_prev_wrk_lines
+menu=0
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Move_sep_cmds
 [item161]
