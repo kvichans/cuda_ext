@@ -239,13 +239,13 @@ menu=0
 
 [item67]
 section=commands
-caption=CudaExt: Jump to next worked lines
+caption=CudaExt: Jump to next working lines
 method=jump_to_next_wrk_lines
 menu=0
 
 [item68]
 section=commands
-caption=CudaExt: Jump to previous worked lines
+caption=CudaExt: Jump to previous working lines
 method=jump_to_prev_wrk_lines
 menu=0
 

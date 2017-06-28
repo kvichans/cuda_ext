@@ -1,5 +1,5 @@
 1.3.01 (2017-06-28)
-added: jump to next/prev changed/saved/worked lines
+added: jump to next/prev changed/saved/working lines (with color status in gutter)
 
 1.2.9 (2017-06-16)
 added: delete dup spaces
