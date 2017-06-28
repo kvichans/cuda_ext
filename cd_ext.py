@@ -667,12 +667,13 @@ class Jumps_cmds:
     @staticmethod
     def jump_to_status_line(status, nx_pr, bgn_end):
         pass;                  #LOG and log('status, nx_pr, bgn_end={}',(status, nx_pr, bgn_end))
-        trg_sts = [app.LINESTATE_CHANGED] if status=='mod' else \
-                  [app.LINESTATE_SAVED]   if status=='svd' else \
+        trg_sts = [app.LINESTATE_SAVED  ]   if status=='svd' else \
+                  [app.LINESTATE_CHANGED
+                  ,app.LINESTATE_ADDED  ]   if status=='mod' else \
                   [app.LINESTATE_CHANGED
                   ,app.LINESTATE_SAVED
-                  ,app.LINESTATE_ADDED]   if status=='wrk' else \
-                  [app.LINESTATE_NORMAL]
+                  ,app.LINESTATE_ADDED  ]   if status=='wrk' else \
+                  [app.LINESTATE_NORMAL ]
         step    = (-1 if nx_pr=='prev' else 1)
         fini_r  = ( 0 if nx_pr=='prev' else ed.get_line_count()-1)
         init_r  = ed.get_carets()[0][1]                             # Start from upper caret (not selection)
