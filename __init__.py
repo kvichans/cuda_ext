@@ -65,6 +65,7 @@ class Command:
     def jump_to_prev_sav_lines(self):           return RLS.jump_to_status_line('svd', 'prev', 'bgn')
     def jump_to_next_wrk_lines(self):           return RLS.jump_to_status_line('wrk', 'next', 'bgn')
     def jump_to_prev_wrk_lines(self):           return RLS.jump_to_status_line('wrk', 'prev', 'bgn')
+    def jump_to_line_by_cb(self):               return RLS.jump_to_line_by_cb()
     
     # Move_sep_cmds
     def more_in_tab(self):                      return RLS._move_splitter('into', 1.05)

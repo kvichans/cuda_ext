@@ -249,6 +249,12 @@ caption=CudaExt: Jump to previous working lines
 method=jump_to_prev_wrk_lines
 menu=0
 
+[item69]
+section=commands
+caption=CudaExt: Jump to line with number in clipboard
+method=jump_to_line_by_cb
+menu=0
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Move_sep_cmds
 [item161]

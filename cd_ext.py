@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.3.01 2017-06-28'
+    '1.3.03 2017-07-12'
 ToDo: (see end of file)
 '''
 
@@ -20,8 +20,9 @@ from    .cd_plug_lib    import *
 OrdDict = collections.OrderedDict
 
 FROM_API_VERSION    = '1.0.119'
-MIN_API_VER_4_REPL  = '1.0.169'
 FROM_API_VERSION    = '1.0.182'     # PROC_SPLITTER_GET/SET, LOG_CONSOLE_GET_MEMO_LINES
+MIN_API_VER_4_REPL  = '1.0.169'
+MIN_API_VER_4_REPL  = '1.0.187'     # LEXER_GET_PROP
 
 # I18N
 _       = get_translation(__file__)
@@ -708,6 +709,17 @@ class Jumps_cmds:
         if -1==trgt_r:  return app.msg_status(_("Not found lines by status"))
         ed.set_caret(0, trgt_r)
        #def jump_to_status_line
+       
+    @staticmethod
+    def jump_to_line_by_cb():
+        clip    = app.app_proc(app.PROC_GET_CLIP, '')
+        row = -1
+        try:    row = int(clip)-1
+        except: return  app.msg_status(_("No line number in clipboard"))
+        if not (0 <= row < ed.get_line_count()):
+            return      app.msg_status(f(_("No line #{}"), row)) 
+        ed.set_caret(0, row)
+       #def jump_to_line_by_cb
 
    #class Jumps_cmds
 
@@ -1073,8 +1085,8 @@ class Find_repl_cmds:
         margin  = apx.get_opt('margin', 0)
         tab_sz  = apx.get_opt('tab_size', 8)
         lex     = ed.get_prop(app.PROP_LEXER_FILE, '')
-        cmt_sgn = app.lexer_proc(app.LEXER_GET_COMMENT, lex) \
-                    if lex else ''
+#       cmt_sgn = app.lexer_proc(app.LEXER_GET_COMMENT, lex)            if lex else ''
+        cmt_sgn = app.lexer_proc(app.LEXER_GET_PROP, lex)['c_line']     if lex else ''
         aid,vals,chds   = dlg_wrapper(_('Re-wrap lines'), 5+165+5,5+120+5,     #NOTE: dlg-rewrap
              [dict(           tp='lb'   ,tid='marg' ,l=5        ,w=120  ,cap=_('&Margin:')      ) # &m
              ,dict(cid='marg',tp='ed'   ,t=5        ,l=5+120    ,w=45                           ) # 
@@ -1662,6 +1674,7 @@ class Command:
     def scroll_to_center(self):                             return Jumps_cmds.scroll_to_center()
     def jump_to_matching_bracket(self):                     return Jumps_cmds.jump_to_matching_bracket()
     def jump_to_status_line(self, status, nx_pr, bgn_end):  return Jumps_cmds.jump_to_status_line(status, nx_pr, bgn_end)
+    def jump_to_line_by_cb(self):                           return Jumps_cmds.jump_to_line_by_cb()
    #class Command
 
 
