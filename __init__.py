@@ -123,5 +123,17 @@ class Command:
     def view_last_tab_from_next_group(self):    return RLS._activate_tab_other_group('last', 'next')
     def view_last_tab_from_prev_group(self):    return RLS._activate_tab_other_group('last', 'prev')
     def go_back(self):                          return RLS.go_back_tab()
+
+    # Paragraph_cmds
+    def go_prgph_bgn(self):                      return RLS.go_prgph('bgn')
+    def go_prgph_end(self):                      return RLS.go_prgph('end')
+    def go_prgph_nxt(self):                      return RLS.go_prgph('nxt')
+    def go_prgph_prv(self):                      return RLS.go_prgph('prv')
+    
+    def align_prgph_cfg(self):                   return RLS.align_prgph('?')
+    def align_prgph_l(self):                     return RLS.align_prgph('l')
+    def align_prgph_r(self):                     return RLS.align_prgph('r')
+    def align_prgph_c(self):                     return RLS.align_prgph('c')
+    def align_prgph_f(self):                     return RLS.align_prgph('f')
     
    #class Command

@@ -1,8 +1,8 @@
-﻿''' Plugin for CudaText editor
+''' Plugin for CudaText editor
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.3.03 2017-07-12'
+    '1.3.10 2017-07-18'
 ToDo: (see end of file)
 '''
 
@@ -15,7 +15,12 @@ from    cudatext        import ed
 import  cudatext_cmd        as cmds
 import  cudax_lib           as apx
 from    cudax_lib       import log
-from    .cd_plug_lib    import *
+try:
+    from    .cd_plug_lib    import *
+    # I18N
+    _   = get_translation(__file__)
+except: 
+    _   = lambda p:p
 
 OrdDict = collections.OrderedDict
 
@@ -23,9 +28,6 @@ FROM_API_VERSION    = '1.0.119'
 FROM_API_VERSION    = '1.0.182'     # PROC_SPLITTER_GET/SET, LOG_CONSOLE_GET_MEMO_LINES
 MIN_API_VER_4_REPL  = '1.0.169'
 MIN_API_VER_4_REPL  = '1.0.187'     # LEXER_GET_PROP
-
-# I18N
-_       = get_translation(__file__)
 
 ONLY_SINGLE_CRT     = _("{} doesn't work with multi-carets")
 ONLY_FOR_NO_SEL     = _("{} works when no selection")
@@ -722,6 +724,261 @@ class Jumps_cmds:
        #def jump_to_line_by_cb
 
    #class Jumps_cmds
+
+class Prgph_cmds:
+
+    @staticmethod
+    def go_prgph(what):
+        """ Param 
+                what    'bgn' - go to begin of current prph
+                        'end' - go to end   of current prph
+                        'nxt' - go to begin of next    prph
+                        'prv' - go to begin of prev    prph
+        """
+        pass;                  #LOG and log('what={}',(what))
+        crts    = ed.get_carets()
+        if len(crts)>1:
+            return app.msg_status(ONLY_SINGLE_CRT.format(_('Command')))
+        (cCrt, rCrt, cEnd, rEnd)    = crts[0]
+        cu_row  = rCrt
+        
+        cu_line = ed.get_text_line(cu_row)
+        if ''==cu_line.strip() and what in ('bgn', 'end'):  return 
+        
+        cu_skip = False
+        if what=='end' and cu_row+1<ed.get_line_count():
+            # Skip cu-prph if caret "at end" and cmd "go end"
+            cu_skip = ''==ed.get_text_line(cu_row+1).strip() and \
+                      cCrt==len(cu_line)
+        if what=='bgn' and cu_row-1>=0:
+            # Skip cu-prph if caret "at bgn" and cmd "go bgn"
+            cu_skip = ''==ed.get_text_line(cu_row-1).strip() and \
+                      cCrt<=len(cu_line)-len(cu_line.lstrip())
+        
+        if what in ('nxt', 'prv') or cu_skip:
+            # Search row in other prph
+            step    = 1 if what in ('nxt','end') else -1
+            stop    =-1 if what in ('prv','bgn') else ed.get_line_count()
+            aim     = 'skip-prph'
+            for test_row in range(cu_row+step, stop, step):
+                test_line   = ed.get_text_line(test_row)
+                empty       = ''==test_line.strip()
+                if False:pass
+                elif aim=='skip-prph' and not empty:
+                    pass
+                elif aim=='skip-prph' and     empty:
+                    aim = 'skip-free'
+                elif aim=='skip-free' and     empty:
+                    pass
+                elif aim=='skip-free' and not empty:
+                    aim = 'found'
+                    break#for
+               #for test_row
+            if aim!='found':    return 
+            what    = 'bgn' if what in ('nxt', 'prv') else what
+            cu_row  = test_row
+            
+        # Search need row in curr prph
+        nd_row  = cu_row
+        step    =-1 if what=='bgn' else 1
+        stop    =-1 if what=='bgn' else ed.get_line_count()
+        pass;                  #LOG and log('cu_row,step,stop={}',(cu_row,step,stop))
+        for test_row in range(cu_row+step, stop, step):
+            if ''==ed.get_text_line(test_row).strip():
+                break#for
+            nd_row  = test_row
+           #for test_row
+           
+        # Set caret
+        nd_text = ed.get_text_line(nd_row)
+        nd_col  = len(nd_text) - len(nd_text.lstrip()) \
+                    if what=='bgn' else \
+                  len(nd_text)
+        ed.set_caret(nd_col, nd_row)
+       #def go_prgph
+
+    @staticmethod
+    def align_prgph(how):
+        """ Align words in selected paragraphs
+            Param 
+                how     'l' - left
+                        'r' - right
+                        'c' - center
+                        'f' - full
+                        '?' - edit params
+        """
+        pass;                  #LOG and log('how={}',(how))
+        df_mrg  = apx.get_opt('margin', 80)
+        if how=='?':
+            df_m    = str(df_mrg)
+            ans     = app.dlg_input_ex(3, _('Options to align paragraphs (default values)')
+                , _('Right margin ('+df_m+')')  , str(apx.get_opt('margin_right'    , df_mrg))
+                , _('Block indent (0)')         , str(apx.get_opt('margin_left'     , 0))
+                , _('First line indent (0)')    , str(apx.get_opt('margin_left_1'   , 0))
+                )
+            if ans:
+                apx.set_opt('margin_right'  , int(ans[0]) if ans[0].isdigit() else df_mrg)
+                apx.set_opt('margin_left'   , int(ans[1]) if ans[1].isdigit() else 0)
+                apx.set_opt('margin_left_1' , int(ans[2]) if ans[2].isdigit() else 0)
+            return 
+            
+        crts    = ed.get_carets()
+        if len(crts)>1:
+            return app.msg_status(ONLY_SINGLE_CRT.format(_('Command')))
+
+        max_col = apx.get_opt('margin_right'    , df_mrg)
+        indent  = apx.get_opt('margin_left'     , 0)
+        indent1 = apx.get_opt('margin_left_1'   , 0)
+        (cCrt, rCrt, cEnd, rEnd)    = crts[0]
+        min_row,\
+        max_row = apx.minmax(rCrt, rEnd) if -1!=rEnd else (rCrt, rCrt)
+
+        prphs   = Prgph_cmds._detect_prphs(min_row, max_row)
+        pass;                  #LOG and log('prphs={}',(prphs))
+        pass;                  #return
+        
+        for (prph_bgn_r, prphs_end_r) in reversed(prphs):
+            prph_text   = ' '.join([ed.get_text_line(r) 
+                                    for r in range(prph_bgn_r, prphs_end_r+1)])     # join
+            pass;              #LOG and log('prph_text={}',(prph_text))
+            prph_text   = re.sub(r'(\s)\s+', r'\1', prph_text)                      # reduce
+            pass;              #LOG and log('prph_text={}',(prph_text))
+            prph_lines  = Prgph_cmds._form_prph(prph_text, how, max_col, indent, indent1)   # split and align
+            pass;              #LOG and log('prph_lines={}',('\n'+'\n'.join(prph_lines)))
+            ed.replace_lines(prph_bgn_r, prphs_end_r, prph_lines)
+       #def align_prgph
+       
+    def _form_prph(text, how, max_col, indent=0, indent1=0):
+        words   = [m.group() for m in re.finditer(r'\b\S+\b', text)]
+        if not words:
+            return [text]
+        
+        width1  = max_col - indent1
+        width   = max_col - indent
+        pass;                  #LOG and log('width1,width={}',(width1,width))
+        line_ws = []
+        line_ns = []
+        # Draft split
+        line_n  = 0
+        line    = []
+        for word in words:
+            if not line:
+                # First word in line has any length
+                line_n  = len(word)
+                line    = [   word]
+                continue
+            if  line_n +    len(word) < (width if line_ws else width1):
+                line_n += 1+len(word)
+                line   += [' ', word]
+            else:
+                line_ws+= [line]
+                line_ns+= [line_n]
+                line_n  = len(word)
+                line    = [   word]
+           #for word
+        if line:
+            # tail
+            line_ws+= [line]
+            line_ns+= [line_n]
+        pass;                  #LOG and log('line_ws={}',(line_ws))
+        pass;                  #LOG and log('line_ns={}',(line_ns))
+        
+        widths  = [width1]      + [width]     *(len(line_ws)-1)
+        shifts  = [' '*indent1] + [' '*indent]*(len(line_ws)-1)
+            
+        # Format lines
+        if how=='l':
+            return [sh+''.join(ws)
+                    for    ws,sh in         zip(line_ws,shifts)]
+        if how=='r':
+            return [sh
+                   +' '*(wd-ns) 
+                   +''.join(ws)
+                    for ns,ws,sh,wd in zip(line_ns,line_ws,shifts,widths)]
+        if how=='c':
+            return [sh
+                   +' '*       int((wd-ns)/2)
+                   +''.join(ws)
+                   +' '*(wd-ns-int((wd-ns)/2))
+                    for ns,ws,sh,wd in zip(line_ns,line_ws,shifts,widths)]
+        # Full
+        def frm_full(ws, spaces):                           # Spaces needs to append 
+            if not spaces:      return ws
+            insides = int((len(ws) - 1 )/2)                 # Count of inside space-items: ['w',' ','w',' ','w']
+            if not insides:     return ws + [' '*spaces]
+            pass;              #LOG and log('ws={}',(ws))
+            quant   = max(int(spaces / insides), 1)         # Size  of first  appending q-block
+            quants  = min(int(spaces / quant), insides) \
+                        if quant else 0                     # Count of first  appending q-block
+            extra   =     spaces - quant*quants             # Count of second appending 1-block
+            pass;              #LOG and log('(spaces,insides),(quant,quants),extra={}',((spaces,insides),(quant,quants),extra))
+            if quants:
+                quant_s = ' '*quant
+                gap     = max(1, int(insides/quants))
+                pass;          #LOG and log('gap={}',(gap))
+                for q_i in range(quants):
+                    ins = q_i * gap
+                    ws[1+2*ins] += quant_s
+            if extra:
+                gap     = max(1, int(insides/extra))
+                pass;          #LOG and log('gap={}',(gap))
+                for q_i in range(extra):
+                    ins = q_i * gap
+                    ws[-2-2*ins] += ' '
+            pass;              #LOG and log('ws={}',(ws))
+            return ws
+           #def frm_full
+        
+        return     [sh+''.join(frm_full(ws, wd-ns))
+                    for ns,ws,sh,wd in zip(line_ns[:-1],line_ws[:-1],shifts[:-1],widths[:-1])] \
+                 + [shifts[-1]+''.join(line_ws[-1])]        # Last line has with left format
+       #def _form_prph
+    
+    def _detect_prphs(min_row, max_row):
+        pass;                  #LOG and log('min_row, max_row={}',(min_row, max_row))
+        pass;                  #return [(min_row, max_row)]
+        if min_row>max_row:
+            return []
+        # Expand/reduce to whole prphs
+        def find_row(start, what):
+            rsp     = start
+            step    = 1 if what=='bot-prph' else -1
+            stop    =-1 if what=='top-prph' else ed.get_line_count()
+            pass;              #LOG and log('start, stop, step={}',(start, stop, step))
+            for row in range(start, stop, step):
+                if ''==ed.get_text_line(row).strip():
+                    return rsp
+                rsp = row
+            return rsp
+           #def find_row
+           
+        min_row = find_row(min_row, 'top-prph') #if ''!=ed.get_text_line(min_row).strip() else min_row
+        max_row = find_row(max_row, 'bot-prph') #if ''!=ed.get_text_line(max_row).strip() else max_row
+        pass;                  #LOG and log('min_row, max_row={}',(min_row, max_row))
+        prphs   = []
+        top,bot = None,None
+        inside  = False
+        for row in range(min_row, max_row+1):
+            empty   = ''==ed.get_text_line(row).strip()
+            if False:pass
+            elif not inside and     empty:
+                pass
+            elif not inside and not empty:
+                top     = row
+                bot     = row
+                inside  = True
+            elif     inside and not empty:
+                bot     = row
+            elif     inside and     empty:
+                prphs  += [(top, bot)]
+                inside  = False
+           #for row
+        if inside:
+            prphs      += [(top, bot)]
+        return prphs
+       #def _detect_prphs
+        
+   #class Prgph_cmds
 
 #############################################################
 class Nav_cmds:
@@ -1675,6 +1932,9 @@ class Command:
     def jump_to_matching_bracket(self):                     return Jumps_cmds.jump_to_matching_bracket()
     def jump_to_status_line(self, status, nx_pr, bgn_end):  return Jumps_cmds.jump_to_status_line(status, nx_pr, bgn_end)
     def jump_to_line_by_cb(self):                           return Jumps_cmds.jump_to_line_by_cb()
+    
+    def go_prgph(self, what):                               return Prgph_cmds.go_prgph(what)
+    def align_prgph(self, how):                             return Prgph_cmds.align_prgph(how)
    #class Command
 
 
@@ -1789,6 +2049,15 @@ def get_word_or_quoted(text, start, not_word_chars='[](){}', quot_chars="'"+'"')
     
     return (text[bgn:end], bgn-1) if bgn!=-1 and end!=-1 else ('', -1)
    #def get_word_or_quoted
+
+#######################################
+if __name__ == '__main__' :     # Tests
+    pass;                      #log('test')
+#   Prgph_cmds.go_prgph('bgn')
+#   Prgph_cmds.go_prgph('end')
+#   Prgph_cmds.go_prgph('nxt')
+#   Prgph_cmds.go_prgph('prv')
+    Prgph_cmds.align_prgph('l')
 
 '''
 ToDo

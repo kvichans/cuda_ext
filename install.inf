@@ -39,13 +39,13 @@ menu=0
 ; Tree_cmds
 [item21]
 section=commands
-caption=CudaExt: Show current Tree path in Status
+caption=CudaExt: Show current Code Tree path in statusbar
 method=tree_path_to_status
 menu=0
 
 [item22]
 section=commands
-caption=CudaExt: Set nearest Tree node
+caption=CudaExt: Set active node of Code Tree, nearest to caret
 method=set_nearest_tree_node
 menu=0
 
@@ -102,7 +102,7 @@ menu=0
 
 [item43]
 section=commands
-caption=CudaExt: Replace all fragment as selected with clipboard value
+caption=CudaExt: Replace all occurrences of selected string, with clipboard string
 method=replace_all_sel_to_cb
 menu=0
 
@@ -314,7 +314,7 @@ menu=0
 
 [item74]
 section=commands
-caption=CudaExt: Open all files from asked dir and subdirs...
+caption=CudaExt: Open all files from folder with sub-folders...
 method=open_all_with_subdir
 menu=0
 
@@ -503,5 +503,62 @@ menu=0
 section=commands
 caption=CudaExt: Activate previously active tab (go back)
 method=go_back
+menu=0
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Paragraph_cmds
+[item211]
+section=commands
+caption=CudaExt: Go to Beginning of Paragraph 
+method=go_prgph_bgn
+menu=0
+
+[item212]
+section=commands
+caption=CudaExt: Go to End of Paragraph 
+method=go_prgph_end
+menu=0
+
+[item213]
+section=commands
+caption=CudaExt: Go to Next Paragraph 
+method=go_prgph_nxt
+menu=0
+
+[item214]
+section=commands
+caption=CudaExt: Go to Previous Paragraph 
+method=go_prgph_prv
+menu=0
+
+[item220]
+section=commands
+caption=CudaExt: Align paragraph(s): Configure...
+method=align_prgph_cfg
+menu=0
+
+[item221]
+section=commands
+caption=CudaExt: Align paragraph(s): Left justify 
+method=align_prgph_l
+menu=0
+
+[item222]
+section=commands
+caption=CudaExt: Align paragraph(s): Right justify 
+method=align_prgph_r
+menu=0
+
+[item223]
+section=commands
+caption=CudaExt: Align paragraph(s): Center justify 
+method=align_prgph_c
+menu=0
+
+[item224]
+section=commands
+caption=CudaExt: Align paragraph(s): Fully justify 
+method=align_prgph_f
 menu=0
 
