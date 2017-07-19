@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.3.10 2017-07-18'
+    '1.3.12 2017-07-19'
 ToDo: (see end of file)
 '''
 
@@ -811,7 +811,7 @@ class Prgph_cmds:
         df_mrg  = apx.get_opt('margin', 80)
         if how=='?':
             df_m    = str(df_mrg)
-            ans     = app.dlg_input_ex(3, _('Options to align paragraphs (default values)')
+            ans     = app.dlg_input_ex(3, _('Align paragraphs - options (default values)')
                 , _('Right margin ('+df_m+')')  , str(apx.get_opt('margin_right'    , df_mrg))
                 , _('Block indent (0)')         , str(apx.get_opt('margin_left'     , 0))
                 , _('First line indent (0)')    , str(apx.get_opt('margin_left_1'   , 0))
@@ -821,6 +821,11 @@ class Prgph_cmds:
                 apx.set_opt('margin_left'   , int(ans[1]) if ans[1].isdigit() else 0)
                 apx.set_opt('margin_left_1' , int(ans[2]) if ans[2].isdigit() else 0)
             return 
+        
+        if 0==apx.get_opt('margin_right', 0):
+            Prgph_cmds.align_prgph('?')
+            if 0==apx.get_opt('margin_right', 0):
+                return 
             
         crts    = ed.get_carets()
         if len(crts)>1:
@@ -849,7 +854,8 @@ class Prgph_cmds:
        #def align_prgph
        
     def _form_prph(text, how, max_col, indent=0, indent1=0):
-        words   = [m.group() for m in re.finditer(r'\b\S+\b', text)]
+        words   = [m.group() for m in re.finditer(r'\S+', text)]
+#       words   = [m.group() for m in re.finditer(r'\b\S+\b', text)]
         if not words:
             return [text]
         
