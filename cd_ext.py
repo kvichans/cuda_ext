@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.3.12 2017-07-19'
+    '1.3.13 2017-08-11'
 ToDo: (see end of file)
 '''
 
@@ -812,14 +812,14 @@ class Prgph_cmds:
         if how=='?':
             df_m    = str(df_mrg)
             ans     = app.dlg_input_ex(3, _('Align paragraphs - options (default values)')
-                , _('Right margin ('+df_m+')')  , str(apx.get_opt('margin_right'    , df_mrg))
-                , _('Block indent (0)')         , str(apx.get_opt('margin_left'     , 0))
-                , _('First line indent (0)')    , str(apx.get_opt('margin_left_1'   , 0))
+                , _('Paragraph right margin ('+df_m+')'), str(apx.get_opt('margin_right'    , df_mrg))
+                , _('Indent of first line (0)')         , str(apx.get_opt('margin_left_1'   , 0))
+                , _('Indent of other lines (0)')        , str(apx.get_opt('margin_left'     , 0))
                 )
             if ans:
                 apx.set_opt('margin_right'  , int(ans[0]) if ans[0].isdigit() else df_mrg)
-                apx.set_opt('margin_left'   , int(ans[1]) if ans[1].isdigit() else 0)
-                apx.set_opt('margin_left_1' , int(ans[2]) if ans[2].isdigit() else 0)
+                apx.set_opt('margin_left_1' , int(ans[1]) if ans[2].isdigit() else 0)
+                apx.set_opt('margin_left'   , int(ans[2]) if ans[1].isdigit() else 0)
             return 
         
         if 0==apx.get_opt('margin_right', 0):

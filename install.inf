@@ -259,12 +259,12 @@ menu=0
 ; Move_sep_cmds
 [item161]
 section=commands
-caption=CudaExt: Move splitter to expand tree panel
+caption=CudaExt: Move splitter to expand side panel
 method=more_tree
 menu=0
 [item162]
 section=commands
-caption=CudaExt: Move splitter to narrow tree panel
+caption=CudaExt: Move splitter to narrow side panel
 method=less_tree
 menu=0
 [item163]
