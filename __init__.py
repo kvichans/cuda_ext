@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '0.9.3 2016-05-16'
+    '1.3.14 2017-08-11'
 '''
 
 from .cd_ext import Command as CommandRLS
@@ -57,7 +57,11 @@ class Command:
     def del_more_spaces(self):                  return RLS.del_more_spaces()
     
     # Jumps_cmds
-    def scroll_to_center(self):                 return RLS.scroll_to_center()
+    def scroll_to_center(self):                 return RLS.scroll_to('cen')
+    def scroll_to_top(self):                    return RLS.scroll_to('top')
+    def scroll_to_bottom(self):                 return RLS.scroll_to('bot')
+    def scroll_to_left(self):                   return RLS.scroll_to('lf')
+    def scroll_to_right(self):                  return RLS.scroll_to('rt')
     def jump_to_matching_bracket(self):         return RLS.jump_to_matching_bracket()
     def jump_to_next_mod_lines(self):           return RLS.jump_to_status_line('mod', 'next', 'bgn')
     def jump_to_prev_mod_lines(self):           return RLS.jump_to_status_line('mod', 'prev', 'bgn')

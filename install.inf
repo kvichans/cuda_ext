@@ -201,10 +201,34 @@ menu=0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Jumps_cmds
-[item61]
+[item81]
 section=commands
 caption=CudaExt: Scroll current line to screen center
 method=scroll_to_center
+menu=0
+
+[item82]
+section=commands
+caption=CudaExt: Scroll current line to screen top
+method=scroll_to_top
+menu=0
+
+[item83]
+section=commands
+caption=CudaExt: Scroll current line to screen bottom
+method=scroll_to_bottom
+menu=0
+
+[item84]
+section=commands
+caption=CudaExt: Scroll screen to left
+method=scroll_to_left
+menu=0
+
+[item85]
+section=commands
+caption=CudaExt: Scroll screen to right
+method=scroll_to_right
 menu=0
 
 [item62]

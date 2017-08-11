@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.3.13 2017-08-11'
+    '1.3.14 2017-08-11'
 ToDo: (see end of file)
 '''
 
@@ -624,25 +624,46 @@ class SCBs:
 #############################################################
 class Jumps_cmds:
     @staticmethod
-    def scroll_to_center():
+    def scroll_to(place):
        #wraped      = apx.get_opt('wrap_mode', False, apx.CONFIG_LEV_FILE)
        #last_on_top = apx.get_opt('show_last_line_on_top', False)
-        txt_lines   = ed.get_line_count()
-        old_top_line= ed.get_prop(app.PROP_LINE_TOP) if app.app_api_version()>='1.0.126' else ed.get_top()
-        scr_lines   = ed.get_prop(app.PROP_VISIBLE_LINES)
-        crt_line    = ed.get_carets()[0][1]
+        if place in ('cen', 'top', 'bot'):
+            txt_lines   = ed.get_line_count()
+            old_top_line= ed.get_prop(app.PROP_LINE_TOP) if app.app_api_version()>='1.0.126' else ed.get_top()
+            scr_lines   = ed.get_prop(app.PROP_VISIBLE_LINES)
+            crt_line    = ed.get_carets()[0][1]
+            vert_indent = 2
+#           vert_indent = abs(apx.get_opt('find_indent_vert', 0))
         
-        new_top_line= crt_line - int(scr_lines/2)
-        new_top_line= max(new_top_line, 0)
-        new_top_line= min(new_top_line, txt_lines-1)
-        pass;                      #LOG and log('cur, old, new, scr={}',(crt_line, old_top_line, new_top_line, scr_lines))
+            new_top_line= old_top_line
+            if False:pass
+            elif place=='cen':
+                new_top_line= crt_line - int(scr_lines/2)
+            elif place=='top':
+                new_top_line= crt_line              - vert_indent+1
+            elif place=='bot':
+                new_top_line= crt_line - scr_lines  + vert_indent
+            new_top_line= max(new_top_line, 0)
+            new_top_line= min(new_top_line, txt_lines-1)
+            pass;              #LOG and log('cur, old, new, scr, ind={}',(crt_line, old_top_line, new_top_line, scr_lines, vert_indent))
         
-        if new_top_line!=old_top_line:
-            if app.app_api_version()>='1.0.126':
-                ed.set_prop(app.PROP_LINE_TOP, str(new_top_line))
-            else: # old
-                ed.set_top(new_top_line)
-       #def scroll_to_center
+            if new_top_line!=old_top_line:
+                if app.app_api_version()>='1.0.126':
+                    ed.set_prop(app.PROP_LINE_TOP, str(new_top_line))
+                else: # old
+                    ed.set_top(new_top_line)
+
+        if place in ('lf', 'rt') and 0==apx.get_opt('wrap_mode', 0):    # 0: off 
+#           scr_cols    = ed.get_prop(app.PROP_VISIBLE_COLUMNS)
+            shift       = apx.get_opt('cuda_ext_horz_scroll_size', 30)
+            old_lf_col  = ed.get_prop(app.PROP_COLUMN_LEFT)
+            
+            new_lf_col  = old_lf_col + (-shift if place=='lf' else shift)
+            new_lf_col  = max(new_lf_col, 0)
+            pass;              #LOG and log('old,new={}',(old_lf_col,new_lf_col))
+            if new_lf_col!=old_lf_col:
+                ed.set_prop(app.PROP_COLUMN_LEFT, str(new_lf_col))
+       #def scroll_to
 
     @staticmethod
     def jump_to_matching_bracket():
@@ -1934,7 +1955,7 @@ class Command:
             self.CASM_state = ''
             self.tid_hist_i = 0
 
-    def scroll_to_center(self):                             return Jumps_cmds.scroll_to_center()
+    def scroll_to(self, place):                             return Jumps_cmds.scroll_to(place)
     def jump_to_matching_bracket(self):                     return Jumps_cmds.jump_to_matching_bracket()
     def jump_to_status_line(self, status, nx_pr, bgn_end):  return Jumps_cmds.jump_to_status_line(status, nx_pr, bgn_end)
     def jump_to_line_by_cb(self):                           return Jumps_cmds.jump_to_line_by_cb()
