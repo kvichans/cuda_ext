@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.3.14 2017-08-11'
+    '1.3.15 2017-08-14'
 ToDo: (see end of file)
 '''
 
@@ -632,7 +632,7 @@ class Jumps_cmds:
             old_top_line= ed.get_prop(app.PROP_LINE_TOP) if app.app_api_version()>='1.0.126' else ed.get_top()
             scr_lines   = ed.get_prop(app.PROP_VISIBLE_LINES)
             crt_line    = ed.get_carets()[0][1]
-            vert_indent = 2
+            vert_indent = apx.get_opt('cuda_ext_vert_indent', 1)
 #           vert_indent = abs(apx.get_opt('find_indent_vert', 0))
         
             new_top_line= old_top_line
@@ -839,8 +839,8 @@ class Prgph_cmds:
                 )
             if ans:
                 apx.set_opt('margin_right'  , int(ans[0]) if ans[0].isdigit() else df_mrg)
-                apx.set_opt('margin_left_1' , int(ans[1]) if ans[2].isdigit() else 0)
-                apx.set_opt('margin_left'   , int(ans[2]) if ans[1].isdigit() else 0)
+                apx.set_opt('margin_left_1' , int(ans[1]) if ans[1].isdigit() else 0)
+                apx.set_opt('margin_left'   , int(ans[2]) if ans[2].isdigit() else 0)
             return 
         
         if 0==apx.get_opt('margin_right', 0):
@@ -1592,6 +1592,25 @@ class Insert_cmds:
         else:
             ed.insert(0, r4ins+1, clip)
        #def paste_with_indent
+
+    @staticmethod
+    def fill_by_str():
+        crts    = ed.get_carets()
+        if all(-1==cEnd for cCrt, rCrt, cEnd, rEnd in crts):    return
+        str2fill    = app.dlg_input('Enter string to fill selection', '')
+        if not str2fill:    return
+        for cCrt, rCrt, cEnd, rEnd in crts:
+            if -1  ==cEnd:    continue
+            if rCrt!=rEnd:    continue
+            ((rSelB, cSelB)
+            ,(rSelE, cSelE))= apx.minmax((rCrt, cCrt), (rEnd, cEnd))
+            trg_len = cSelE - cSelB
+            trg_str = str2fill * (1  + int(trg_len/len(str2fill)))
+            trg_str = trg_str[:trg_len]
+            ed.replace(cSelB, rSelB, cSelE, rSelE, trg_str)
+           #for
+        pass;                   LOG and log('ok',())
+       #def fill_by_str
    #class Insert_cmds
     
 class Command:
@@ -1871,6 +1890,7 @@ class Command:
     def add_indented_line_below(self):          return Insert_cmds.add_indented_line_below()
     def paste_to_1st_col(self):                 return Insert_cmds.paste_to_1st_col()
     def paste_with_indent(self, where='above'): return Insert_cmds.paste_with_indent(where)
+    def fill_by_str(self):                      return Insert_cmds.fill_by_str()
     
     def find_cb_string_next(self):              return Find_repl_cmds.find_cb_by_cmd('dn')
     def find_cb_string_prev(self):              return Find_repl_cmds.find_cb_by_cmd('up')

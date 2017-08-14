@@ -87,6 +87,12 @@ caption=CudaExt: Paste like Lazarus IDE
 method=paste_as_lazarus
 menu=0
 
+[item37]
+section=commands
+caption=CudaExt: Fill selection by string
+method=fill_by_str
+menu=0
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Find_repl_cmds
 [item41]
