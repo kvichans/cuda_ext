@@ -632,7 +632,7 @@ class Jumps_cmds:
             old_top_line= ed.get_prop(app.PROP_LINE_TOP) if app.app_api_version()>='1.0.126' else ed.get_top()
             scr_lines   = ed.get_prop(app.PROP_VISIBLE_LINES)
             crt_line    = ed.get_carets()[0][1]
-            vert_indent = apx.get_opt('cuda_ext_vert_indent', 1)
+            vert_indent = apx.get_opt('cuda_ext_vert_indent', 0)
 #           vert_indent = abs(apx.get_opt('find_indent_vert', 0))
         
             new_top_line= old_top_line
@@ -640,9 +640,9 @@ class Jumps_cmds:
             elif place=='cen':
                 new_top_line= crt_line - int(scr_lines/2)
             elif place=='top':
-                new_top_line= crt_line              - vert_indent+1
+                new_top_line= crt_line              - vert_indent
             elif place=='bot':
-                new_top_line= crt_line - scr_lines  + vert_indent
+                new_top_line= crt_line - scr_lines  + vert_indent+1
             new_top_line= max(new_top_line, 0)
             new_top_line= min(new_top_line, txt_lines-1)
             pass;              #LOG and log('cur, old, new, scr, ind={}',(crt_line, old_top_line, new_top_line, scr_lines, vert_indent))
