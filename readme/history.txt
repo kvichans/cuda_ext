@@ -1,5 +1,5 @@
 1.3.16 (2017-08-16)
-added: move caret atfer command "Scroll screen to left/right" if option cuda_ext_horz_scroll_move_caret and caret_after_end
+added: move caret after commands "Scroll screen to left/right" if options are set: cuda_ext_horz_scroll_move_caret and caret_after_end
 
 1.3.15 (2017-08-14)
 added: command "Fill selection by string"
@@ -12,12 +12,12 @@ added: commands "Scroll screen to left/right"
 
 1.3.12 (2017-07-19)
 fixed: don't skip punctuation in "Align paragraph"
-added: ask options on first call "Align paragraph***"
+added: ask options on first call of "Align paragraph***"
 
 1.3.10 (2017-07-18)
 added: commands "Go to Beginning/End of Paragraph", "Go to Next/Prev Paragraph"
 added: commands "Align paragraph***"
-fixed: rename commands
+fixed: renamed commands
 
 1.3.03 (2017-07-12)
 fixed: don't use deprecated API
