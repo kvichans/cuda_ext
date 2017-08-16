@@ -1,28 +1,30 @@
 Plugin for CudaText.
-Adds commands to Commands dialog (not to Plugins menu, too much of them):
+Adds lot of commands to the Commands dialog (not to Plugins menu, too much of them):
 
 [Misc]
   Rename file...
-  Edit stream comment chars for lexer
 
 [Jump]
   Jump to matching bracket
-  Scroll current line to screen center
+  Scroll current line to screen center/ top/ bottom
 
 [Insertion]
   Add indented line above
   Add indented line below
+  Align in lines by separator
+  
+[Paste]
   Paste to first column
   Paste with indent above
   Paste with indent below
-  Align in lines by separator
+  Paste like Lazarus IDE
 
 [Find/Replace/Select]
   Find clipboard string: next
-  Find clipboard string: prev
-  Replace all fragment as selected with clipboard value
+  Find clipboard string: previous
+  Replace all occurences of selected string with clipboard value
   Copy word or [expression] or 'expression' without selection
-  Replace word or [expression] or 'expression' with clip
+  Replace word or [expression] or 'expression' with clipboard value
   Expand selection to word or "expression" or (expression)
   Expand and Copy selection to word or "expression" or (expression)
 
@@ -56,12 +58,9 @@ Adds commands to Commands dialog (not to Plugins menu, too much of them):
   Activate next tab (global loop)
   Activate prev tab (global loop)
   Move tab to position...
-  Close tab from next group
-  Close tab from previous group
-  View next tab from next group
-  View next tab from previous group
-  View previous tab from next group
-  View previous tab from previous group
+  Close active tab in next group
+  Close active tab in previous group
+  Switch tab to next/previous/first/last in next/previous group (5 commands)
 
 [Splitters]
   Move splitter to expand tree panel
@@ -74,7 +73,7 @@ Adds commands to Commands dialog (not to Plugins menu, too much of them):
   Move splitter to narrow active group
 
 [Tree]
-  Show current Tree path in Status
-  Set nearest Tree node
+  Show current Code Tree path in statusbar
+  Set active node of Code Tree, nearest to caret
 
 Author: Andrey Kvichanskiy (kvichans, at forum/github)
