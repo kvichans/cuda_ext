@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.3.15 2017-08-14'
+    '1.3.16 2017-08-16'
 ToDo: (see end of file)
 '''
 
@@ -654,15 +654,31 @@ class Jumps_cmds:
                     ed.set_top(new_top_line)
 
         if place in ('lf', 'rt') and 0==apx.get_opt('wrap_mode', 0):    # 0: off 
-#           scr_cols    = ed.get_prop(app.PROP_VISIBLE_COLUMNS)
+            free_crt    = apx.get_opt('caret_after_end', False)
+            move_crt    = apx.get_opt('cuda_ext_horz_scroll_move_caret', False)
             shift       = apx.get_opt('cuda_ext_horz_scroll_size', 30)
             old_lf_col  = ed.get_prop(app.PROP_COLUMN_LEFT)
             
             new_lf_col  = old_lf_col + (-shift if place=='lf' else shift)
             new_lf_col  = max(new_lf_col, 0)
-            pass;              #LOG and log('old,new={}',(old_lf_col,new_lf_col))
-            if new_lf_col!=old_lf_col:
-                ed.set_prop(app.PROP_COLUMN_LEFT, str(new_lf_col))
+            pass;              #LOG and log('cols,old_l,new_l={}',(old_lf_col,new_lf_col))
+            if new_lf_col==old_lf_col:                          return # Good state
+            ed.set_prop(app.PROP_COLUMN_LEFT, str(new_lf_col))
+            
+            if not (free_crt and move_crt):                     return # No need opts
+            # Move caret if it isnot shown
+            crts        = ed.get_carets()
+            if len(crts)>1:                                     return # M-carets
+            if crts[0][2]!=-1:                                  return # With sel
+            old_crt_pos,y   = crts[0][0], crts[0][1]
+            old_crt_col,y   = ed.convert(app.CONVERT_CHAR_TO_COL, old_crt_pos, y)
+            scr_cols        = ed.get_prop(app.PROP_VISIBLE_COLUMNS)
+            if new_lf_col<=old_crt_col<(new_lf_col+scr_cols):   return # Visible
+            new_crt_col     = new_lf_col + (old_crt_col-old_lf_col)
+            new_crt_col     = min(max(new_crt_col, 0), new_lf_col + scr_cols)
+            new_crt_pos,y   = ed.convert(app.CONVERT_COL_TO_CHAR, new_crt_col, y)
+            pass;              #LOG and log('old_p,old_c,new_c,new_p={}',(old_crt_pos,old_crt_col,new_crt_col,new_crt_pos))
+            ed.set_caret(new_crt_pos,y)
        #def scroll_to
 
     @staticmethod

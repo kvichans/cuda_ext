@@ -1,13 +1,17 @@
+1.3.16 (2017-08-16)
+added: move caret atfer command "Scroll screen to left/right" if option cuda_ext_horz_scroll_move_caret and caret_after_end
+
 1.3.15 (2017-08-14)
-added: "CudaExt: Fill selection by string"
-added: opts for "Scroll ...": cuda_ext_vert_indent, cuda_ext_horz_scroll_size
+added: command "Fill selection by string"
+added: option for horiz "Scroll ..." commands in user.json: cuda_ext_horz_scroll_size
+added: option for vert "Scroll ..." commands in user.json: cuda_ext_vert_indent
 
 1.3.14 (2017-08-11)
-added: "Scroll current line to screen top/bottom"
-added: "Scroll screen to left/right"
+added: commands "Scroll current line to screen top/bottom"
+added: commands "Scroll screen to left/right"
 
 1.3.12 (2017-07-19)
-fixed: dont skip punctuation when align paragraphs
+fixed: don't skip punctuation in "Align paragraph"
 added: ask options on first call "Align paragraph***"
 
 1.3.10 (2017-07-18)
