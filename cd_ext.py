@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.3.16 2017-08-16'
+    '1.3.17 2017-08-23'
 ToDo: (see end of file)
 '''
 
@@ -1294,7 +1294,7 @@ class Find_repl_cmds:
             return ''
         old_s   = parse_step(vals['olds'])
         new_s   = parse_step(vals['news'])
-        pass;                   LOG and log('old_s, new_s={}',(old_s, new_s))
+        pass;                  #LOG and log('old_s, new_s={}',(old_s, new_s))
         if not old_s or not new_s or old_s==new_s:
             return app.msg_status(_('Skip to reindent'))
         
@@ -1307,12 +1307,14 @@ class Find_repl_cmds:
                     ost_l.append(ost_l[0]*n)
                 if not line.startswith(ost_l[n]):
                     break
-            pass;              #LOG and log('n={}',(n))
-            pass;              #LOG and log('new={}',repr(nst*n + line[len(ost_l[n])-1:]))
-            return nst*n + line[len(ost_l[n])-1:]
+            pass;              #LOG and log('n,len(ost_l[n-1])={}',(n,len(ost_l[n-1])))
+            new_line    = nst*n + line[len(ost_l[n-1]):]
+            pass;              #LOG and log('new={}',repr(new_line))
+            return new_line
         ost_l   = [old_s*n for n in range(1,20)]
         lines   = [reind_line(l, ost_l, new_s) for l in lines]
-        pass;                  #LOG and log('lines={}',(lines))
+        pass;                   LOG and log('rSelB, rSelE, lines={}',(rSelB, rSelE, lines))
+#       ed.replace_lines(rSelB, rSelE, lines)
         Find_repl_cmds._replace_lines(ed, rSelB, rSelE, '\n'.join(lines))
         ed.set_caret(0,rSelE+1, 0,rSelB)
        #def reindent

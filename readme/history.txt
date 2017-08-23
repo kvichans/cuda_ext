@@ -1,3 +1,6 @@
+1.3.17 (2017-08-23)
+fixed: command "Reindent selected lines"
+
 1.3.16 (2017-08-16)
 added: move caret after commands "Scroll screen to left/right" if options are set: cuda_ext_horz_scroll_move_caret and caret_after_end
 
