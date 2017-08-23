@@ -20,7 +20,7 @@ Adds lot of commands to the Commands dialog (not to Plugins menu, too much of th
 [Editing]
   Add indented line above/below (2 commands)
   Align in lines by separator...
-  Reindent selected lines
+  Reindent selected lines... (it asks for old indent, for new indent, and changes indents of selected lines)
   Join selected lines
   Re-wrap/split lines by margin
   Fill selection by string...
