@@ -177,13 +177,13 @@ menu=0
 
 [item52]
 section=commands
-caption=CudaExt: Align in lines by separator
+caption=CudaExt: Align in lines by separator...
 method=align_in_lines_by_sep
 menu=0
 
 [item53]
 section=commands
-caption=CudaExt: Reindent selected lines
+caption=CudaExt: Reindent selected lines...
 method=reindent
 menu=0
 
