@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.3.17 2017-08-23'
+    '1.3.18 2017-09-12'
 ToDo: (see end of file)
 '''
 
@@ -783,20 +783,20 @@ class Jumps_cmds:
         tail    = line[cCrt:] \
                     if drct=='r' else \
                   ''.join(reversed(line[:cCrt]))
-        pass;                   LOG and log('tail={}',(tail))
+        pass;                  #LOG and log('tail={}',(tail))
         tail    = re.search(r'\w+', tail).group()
-        pass;                   LOG and log('tail={}',(tail))
+        pass;                  #LOG and log('tail={}',(tail))
         
-        # Scan to nearest aCamelCase or "_" in snake_case
+        # Scan to nearest aCamelCase or "_" in snake_case test___test___dd
         gap     = 0
         for pos, ch in enumerate(tail):
-            if ch=='_':
+            if ch=='_' and (pos+1)<len(tail) and tail[pos+1]!='_':
                 gap = pos+1
                 break
-            if pos>0 and ch==ch.upper():
+            if pos>0 and ch==ch.upper() and ch!='_':
                 gap = pos + (1 if drct=='l' else 0)
                 break
-        pass;                   LOG and log('gap={}',(gap))
+        pass;                  #LOG and log('gap={}',(gap))
         if gap==0:    return ed.cmd(core_cmds[drct, sel])
         gap     = gap if drct=='r' else -gap
         
