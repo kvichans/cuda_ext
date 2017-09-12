@@ -285,6 +285,30 @@ caption=CudaExt: Jump to line with number in clipboard
 method=jump_to_line_by_cb
 menu=0
 
+[item71]
+section=commands
+caption=CudaExt: Left jump into CamelCase/snake_case
+method=jump_left_ccsc
+menu=0
+
+[item72]
+section=commands
+caption=CudaExt: Right jump into CamelCase/snake_case
+method=jump_right_ccsc
+menu=0
+
+[item73]
+section=commands
+caption=CudaExt: Left jump into CamelCase/snake_case + select
+method=jump_sel_left_ccsc
+menu=0
+
+[item74]
+section=commands
+caption=CudaExt: Right jump into CamelCase/snake_case + select
+method=jump_sel_right_ccsc
+menu=0
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Move_sep_cmds
 [item161]
@@ -330,25 +354,25 @@ menu=0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Misc_cmds
-[item72]
+[item92]
 section=commands
 caption=CudaExt: Rename file...
 method=rename_file
 menu=0
 
-[item73]
+[item93]
 section=commands
 caption=CudaExt: New file and SaveAs in current folder...
 method=new_file_save_as_near_cur
 menu=0
 
-[item74]
+[item94]
 section=commands
 caption=CudaExt: Open all files from folder with sub-folders...
 method=open_all_with_subdir
 menu=0
 
-[item75]
+[item95]
 section=commands
 caption=CudaExt: Remove all ASCII chars 0..31 (excluding 9,10,13)
 method=remove_unprinted

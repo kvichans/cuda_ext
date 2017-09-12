@@ -759,7 +759,55 @@ class Jumps_cmds:
             return      app.msg_status(f(_("No line #{}"), row)) 
         ed.set_caret(0, row)
        #def jump_to_line_by_cb
-
+       
+    @staticmethod
+    def jump_ccsc(drct='l', sel=False):
+        crts    = ed.get_carets()
+        if len(crts)>1:
+            return app.msg_status(ONLY_SINGLE_CRT.format(_('Command')))
+        core_cmds   = { ('r', False): cmds.cCommand_GotoWordNext
+                      , ('l', False): cmds.cCommand_GotoWordPrev
+                      , ('r', True ): cmds.cCommand_GotoWordNext_Sel
+                      , ('l', True ): cmds.cCommand_GotoWordPrev_Sel
+                      }
+        (cCrt, rCrt, cEnd, rEnd)    = crts[0]
+        line        = ed.get_text_line(rCrt)
+        use_core    = ( drct=='l' and cCrt==0
+                    or  drct=='l' and not re.search(r'\w', line[cCrt-1])
+                    or  drct=='r' and cCrt>=len(line)
+                    or  drct=='r' and not re.search(r'\w', line[cCrt])
+                      )
+        if use_core:    return ed.cmd(core_cmds[drct, sel])
+        
+        # Extract tail of word
+        tail    = line[cCrt:] \
+                    if drct=='r' else \
+                  ''.join(reversed(line[:cCrt]))
+        pass;                   LOG and log('tail={}',(tail))
+        tail    = re.search(r'\w+', tail).group()
+        pass;                   LOG and log('tail={}',(tail))
+        
+        # Scan to nearest aCamelCase or "_" in snake_case
+        gap     = 0
+        for pos, ch in enumerate(tail):
+            if ch=='_':
+                gap = pos+1
+                break
+            if pos>0 and ch==ch.upper():
+                gap = pos + (1 if drct=='l' else 0)
+                break
+        pass;                   LOG and log('gap={}',(gap))
+        if gap==0:    return ed.cmd(core_cmds[drct, sel])
+        gap     = gap if drct=='r' else -gap
+        
+        # Jump
+        if not sel:
+            ed.set_caret(cCrt + gap, rCrt)
+        else:
+            cEnd, rEnd  = (cCrt, rCrt) if cEnd==-1 else (cEnd, rEnd)
+            ed.set_caret(cCrt + gap, rCrt, cEnd, rEnd)
+       #def jump_ccsc
+ 
    #class Jumps_cmds
 
 class Prgph_cmds:
@@ -1314,8 +1362,8 @@ class Find_repl_cmds:
         ost_l   = [old_s*n for n in range(1,20)]
         lines   = [reind_line(l, ost_l, new_s) for l in lines]
         pass;                   LOG and log('rSelB, rSelE, lines={}',(rSelB, rSelE, lines))
-#       ed.replace_lines(rSelB, rSelE, lines)
-        Find_repl_cmds._replace_lines(ed, rSelB, rSelE, '\n'.join(lines))
+        ed.replace_lines(rSelB, rSelE, lines)
+#       Find_repl_cmds._replace_lines(ed, rSelB, rSelE, '\n'.join(lines))
         ed.set_caret(0,rSelE+1, 0,rSelB)
        #def reindent
     
@@ -1997,6 +2045,7 @@ class Command:
     def jump_to_matching_bracket(self):                     return Jumps_cmds.jump_to_matching_bracket()
     def jump_to_status_line(self, status, nx_pr, bgn_end):  return Jumps_cmds.jump_to_status_line(status, nx_pr, bgn_end)
     def jump_to_line_by_cb(self):                           return Jumps_cmds.jump_to_line_by_cb()
+    def jump_ccsc(self, drct, sel):                         return Jumps_cmds.jump_ccsc(drct, sel)
     
     def go_prgph(self, what):                               return Prgph_cmds.go_prgph(what)
     def align_prgph(self, how):                             return Prgph_cmds.align_prgph(how)

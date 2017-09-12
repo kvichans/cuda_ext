@@ -71,6 +71,10 @@ class Command:
     def jump_to_next_wrk_lines(self):           return RLS.jump_to_status_line('wrk', 'next', 'bgn')
     def jump_to_prev_wrk_lines(self):           return RLS.jump_to_status_line('wrk', 'prev', 'bgn')
     def jump_to_line_by_cb(self):               return RLS.jump_to_line_by_cb()
+    def jump_left_ccsc(self):                   return RLS.jump_ccsc('l', False)
+    def jump_right_ccsc(self):                  return RLS.jump_ccsc('r', False)
+    def jump_sel_left_ccsc(self):               return RLS.jump_ccsc('l', True)
+    def jump_sel_right_ccsc(self):              return RLS.jump_ccsc('r', True)
     
     # Move_sep_cmds
     def more_in_tab(self):                      return RLS._move_splitter('into', 1.05)
