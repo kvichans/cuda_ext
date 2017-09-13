@@ -787,14 +787,20 @@ class Jumps_cmds:
         tail    = re.search(r'\w+', tail).group()
         pass;                  #LOG and log('tail={}',(tail))
         
-        # Scan to nearest aCamelCase or "_" in snake_case test___test___dd
+        # Scan to nearest aCamelCase or "_" in snake_case_case test___test___dd ddTest____DD__DDddd_test
         gap     = 0
         for pos, ch in enumerate(tail):
-            if ch=='_' and (pos+1)<len(tail) and tail[pos+1]!='_':
+            if pos>0 and ch!='_' and ch==ch.upper():
+                # Skip first and stop at next Camel
+                gap = pos + (1 if drct=='l' else 0)     # For backward stop after C, for forward - before
+                break
+            if drct=='r' and ch=='_' and (pos+1)<len(tail) and tail[pos+1]!='_':
+                # For forward stop after _
                 gap = pos+1
                 break
-            if pos>0 and ch==ch.upper() and ch!='_':
-                gap = pos + (1 if drct=='l' else 0)
+            if drct=='l' and ch!='_' and (pos+1)<len(tail) and tail[pos+1]=='_':
+                # For backward stop before _
+                gap = pos+1
                 break
         pass;                  #LOG and log('gap={}',(gap))
         if gap==0:    return ed.cmd(core_cmds[drct, sel])
