@@ -287,25 +287,25 @@ menu=0
 
 [item71]
 section=commands
-caption=CudaExt: Left jump into CamelCase/snake_case
+caption=CudaExt: Jump left into CamelCase/snake_case
 method=jump_left_ccsc
 menu=0
 
 [item72]
 section=commands
-caption=CudaExt: Right jump into CamelCase/snake_case
+caption=CudaExt: Jump right into CamelCase/snake_case
 method=jump_right_ccsc
 menu=0
 
 [item73]
 section=commands
-caption=CudaExt: Left jump into CamelCase/snake_case + select
+caption=CudaExt: Jump left into CamelCase/snake_case + select
 method=jump_sel_left_ccsc
 menu=0
 
 [item74]
 section=commands
-caption=CudaExt: Right jump into CamelCase/snake_case + select
+caption=CudaExt: Jump right into CamelCase/snake_case + select
 method=jump_sel_right_ccsc
 menu=0
 
