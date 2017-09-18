@@ -31,6 +31,7 @@ class Command:
     def paste_with_indent_below(self):          return RLS.paste_with_indent('below')
     def paste_as_lazarus(self):                 return RLS.paste_with_indent('lazar')
     def fill_by_str(self):                      return RLS.fill_by_str()
+    def insert_char_by_hex(self):               return RLS.insert_char_by_hex()
     
     # Find_repl_cmds
     def find_cb_string_next(self):              return RLS.find_cb_string_next()

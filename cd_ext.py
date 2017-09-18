@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.3.18 2017-09-12'
+    '1.3.19 2017-09-18'
 ToDo: (see end of file)
 '''
 
@@ -1683,6 +1683,33 @@ class Insert_cmds:
            #for
         pass;                   LOG and log('ok',())
        #def fill_by_str
+
+    @staticmethod
+    def insert_char_by_hex():
+        hexcode = app.dlg_input('Unicode hex code:     0xhhhh  or  hhhh  or  hh', '')
+        if not hexcode:
+            return
+        if not (len(hexcode) in (2, 4, 6) and
+                re.search(r'(0x)?[\dabcdef]+', hexcode)
+               ):
+            app.msg_status('Not valid hex code: ' + hexcode)
+            return
+
+        hexcode = hexcode.upper()
+        hexcode = hexcode[2:]   if hexcode.startswith('0X') else hexcode
+        hexcode = '00'+hexcode  if len(hexcode)==2          else hexcode
+
+        try:
+            text = chr(int(hexcode, 16))
+        except:
+            app.msg_status('Not valid hex code: ' + hexcode)
+            return
+
+        #this supports multi-carets on insert
+        ed.cmd(cmds.cCommand_TextInsert, text)
+        app.msg_status('Char inserted: U+' + hexcode)
+       #def insert_char_by_hex
+    
    #class Insert_cmds
     
 class Command:
@@ -1963,6 +1990,7 @@ class Command:
     def paste_to_1st_col(self):                 return Insert_cmds.paste_to_1st_col()
     def paste_with_indent(self, where='above'): return Insert_cmds.paste_with_indent(where)
     def fill_by_str(self):                      return Insert_cmds.fill_by_str()
+    def insert_char_by_hex(self):               return Insert_cmds.insert_char_by_hex()
     
     def find_cb_string_next(self):              return Find_repl_cmds.find_cb_by_cmd('dn')
     def find_cb_string_prev(self):              return Find_repl_cmds.find_cb_by_cmd('up')

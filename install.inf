@@ -93,6 +93,12 @@ caption=CudaExt: Fill selection by string
 method=fill_by_str
 menu=0
 
+[item38]
+section=commands
+caption=CudaExt: Insert unicode char
+method=insert_char_by_hex
+menu=0
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Find_repl_cmds
 [item41]
