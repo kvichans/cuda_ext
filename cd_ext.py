@@ -1970,8 +1970,8 @@ class Command:
         if app.ID_OK!=app.msg_box(
             f(_('Open {} file(s) from {} folder(s)?{}'), len(files), len(dirs), '\n   '+'\n   '.join(
                 files 
-                    if len(files) < 15*2+2 else
-                files[:15] + ['...'] + files[-15:]
+                    if len(files) < 5*2+2 else
+                files[:5] + ['...'] + files[-5:]
             ))
             , app.MB_OKCANCEL ):   return
         for fn in files:
