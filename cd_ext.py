@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.3.19 2017-09-18'
+    '1.3.20 2017-09-26'
 ToDo: (see end of file)
 '''
 
@@ -1959,10 +1959,20 @@ class Command:
         mask    = app.dlg_input(_('Mask for filename. "*" - all files'), '*')
         if not mask: return
         files   = []
+        dirs    = set()
         for dirpath, dirnames, filenames in os.walk(src_dir):
-            files  += [dirpath+os.sep+fn for fn in filenames if fnmatch(fn, mask)]
+            dir_fs  = [dirpath+os.sep+fn for fn in filenames if fnmatch(fn, mask)]
+            if dir_fs:
+                files  += dir_fs
+                dirs.add(dirpath)
+
+        pass;                  #LOG and log('dirs={}',(dirs))
         if app.ID_OK!=app.msg_box(
-            f(_('Open {} files?{}'), len(files), '\n   '+'\n   '.join(files))
+            f(_('Open {} file(s) from {} folder(s)?{}'), len(files), len(dirs), '\n   '+'\n   '.join(
+                files 
+                    if len(files) < 15*2+2 else
+                files[:15] + ['...'] + files[-15:]
+            ))
             , app.MB_OKCANCEL ):   return
         for fn in files:
             app.file_open(fn)
