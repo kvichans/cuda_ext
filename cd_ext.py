@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.3.21 2017-12-01'
+    '1.3.22 2017-12-01'
 ToDo: (see end of file)
 '''
 
@@ -1956,12 +1956,17 @@ class Command:
     def open_all_with_subdir(self):
         src_dir = app.dlg_dir(os.path.dirname(ed.get_filename()))
         if not src_dir: return
-        mask    = app.dlg_input(_('Mask for filename. "*" - all files'), '*')
-        if not mask: return
+        masks   = app.dlg_input(_('Mask(s) for filename ("*" - all files; "*.txt *.bat" - two masks)'), '*')
+        if not masks: return
+        masks   = re.sub(r'\s\s+', ' ', masks)
+        masks   = masks.split(' ')
         files   = []
         dirs    = set()
         for dirpath, dirnames, filenames in os.walk(src_dir):
-            dir_fs  = [dirpath+os.sep+fn for fn in filenames if fnmatch(fn, mask)]
+            dir_fs  = [dirpath+os.sep+fn for fn in filenames 
+                        if any(map(lambda mask:fnmatch(fn, mask), masks))]
+#           dir_fs  = [dirpath+os.sep+fn for fn in filenames 
+#                       if fnmatch(fn, mask)]
             if dir_fs:
                 files  += dir_fs
                 dirs.add(dirpath)
@@ -1984,7 +1989,7 @@ class Command:
         if not cf_path:             return app.msg_status(_('No file to open. '))
         if ed.get_prop(app.PROP_MODIFIED) and \
             app.msg_box(  _('Text is modified!'
-                          '\Command will use file content from disk.'
+                          '\nCommand will use file content from disk.'
                         '\n\nContinue?')
                            ,app.MB_YESNO+app.MB_ICONQUESTION
                            )!=app.ID_YES:   return 
