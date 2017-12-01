@@ -94,6 +94,7 @@ class Command:
     def rename_file(self):                      return RLS.rename_file()
     def new_file_save_as_near_cur(self):        return RLS.new_file_save_as_near_cur()
     def open_all_with_subdir(self):             return RLS.open_all_with_subdir()
+    def open_with_defapp(self):                 return RLS.open_with_defapp()
     def remove_unprinted(self):                 return RLS.remove_unprinted()
 
     # Tabs_cmds

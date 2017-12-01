@@ -380,6 +380,12 @@ menu=0
 
 [item95]
 section=commands
+caption=CudaExt: Open current file in default application
+method=open_with_defapp
+menu=0
+
+[item96]
+section=commands
 caption=CudaExt: Remove all ASCII chars 0..31 (excluding 9,10,13)
 method=remove_unprinted
 menu=0

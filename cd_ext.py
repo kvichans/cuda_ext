@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.3.20 2017-09-26'
+    '1.3.21 2017-12-01'
 ToDo: (see end of file)
 '''
 
@@ -1976,6 +1976,24 @@ class Command:
             , app.MB_OKCANCEL ):   return
         for fn in files:
             app.file_open(fn)
+       #def open_all_with_subdir
+    
+    def open_with_defapp(self):
+        if not os.name=='nt':       return app.msg_status(_('Command is for Windows only.'))
+        cf_path     = ed.get_filename()
+        if not cf_path:             return app.msg_status(_('No file to open. '))
+        if ed.get_prop(app.PROP_MODIFIED) and \
+            app.msg_box(  _('Text is modified!'
+                          '\Command will use file content from disk.'
+                        '\n\nContinue?')
+                           ,app.MB_YESNO+app.MB_ICONQUESTION
+                           )!=app.ID_YES:   return 
+        try:
+            os.startfile(cf_path)
+        except Exception as ex:
+            pass;               log(traceback.format_exc()) 
+            return app.msg_status(_('Error: '+ex))
+       #def open_with_defapp
     
     def remove_unprinted(self):
         body    = ed.get_text_all()
