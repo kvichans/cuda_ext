@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.3.22 2017-12-01'
+    '1.3.23 2018-01-12'
 ToDo: (see end of file)
 '''
 
@@ -46,7 +46,7 @@ DONT_NEED_CHANGE    = _("Text change not needed")
 pass;                           # Logging
 pass;                          #from pprint import pformat
 pass;                          #pfrm15=lambda d:pformat(d,width=15)
-pass;                           LOG = (-2==-2)  # Do or dont logging.
+pass;                           LOG = (-2== 2)  # Do or dont logging.
 pass;                           ##!! waits correction
 
 c1      = chr(1)
@@ -160,11 +160,13 @@ class Tree_cmds:
 class Tabs_cmds:
     @staticmethod
     def _activate_tab(group, tab_ind):
-        pass;                      #LOG and log('')
+        pass;                   LOG and log('group, tab_ind={}',(group, tab_ind))
         for h in app.ed_handles():
             edH = app.Editor(h)
+            pass;               LOG and log('h.g h.t={}',(edH.get_prop(app.PROP_INDEX_GROUP),edH.get_prop(app.PROP_INDEX_TAB)))
             if ( group  ==edH.get_prop(app.PROP_INDEX_GROUP)
             and  tab_ind==edH.get_prop(app.PROP_INDEX_TAB)):
+                pass;           LOG and log('found',())
                 edH.focus() 
                 return True
         return False
@@ -1325,32 +1327,52 @@ class Find_repl_cmds:
         first_s     = ed.get_text_line(rSelB)
         ed_tab_sp   = apx.get_opt('tab_spaces', False)
         ed_tab_sz   = apx.get_opt('tab_size'  , 8)
-        old_s       = 't' if first_s.startswith('\t')   else '?b'
-        new_s       = f('{}b', ed_tab_sz) if ed_tab_sp  else 't'
-        fill_h      = _('Enter "2b" or "··", "t" for TAB')
-        btn,vals,_t = dlg_wrapper(f(_('Reindent selected lines ({})'), rSelE-rSelB+1), 245,120,     #NOTE: dlg-reindent
-             [dict(           tp='lb'   ,t=5        ,l=5        ,w=235  ,cap='>'+fill_h                             ) #   
-             ,dict(           tp='lb'   ,tid='olds' ,l=5        ,w=150  ,cap='>'+_('&Old indent step:')             ) # &o
-             ,dict(cid='olds',tp='ed'   ,t=30       ,l=5+150+5  ,w= 80                                              ) # 
-             ,dict(           tp='lb'   ,tid='news' ,l=5        ,w=150  ,cap='>'+_('&New indent step:')             ) # &n
-             ,dict(cid='news',tp='ed'   ,t=60       ,l=5+150+5  ,w= 80                                              )
-             ,dict(cid='!'   ,tp='bt'   ,t=90       ,l=245-170-5,w= 80  ,cap=_('OK')                    ,def_bt='1' ) #   
-             ,dict(cid='-'   ,tp='bt'   ,t=90       ,l=245-80-5 ,w= 80  ,cap=_('Cancel')                            )
-             ],    dict(olds=old_s
-                       ,news=new_s), focus_cid='olds')
-        if btn is None or btn=='-': return None
-        
+        ed_blanks   = '.'*ed_tab_sz
+        old_s       = 't' if first_s.startswith('\t')   else ed_blanks
+        new_s       = 't' if old_s!='t' else ed_blanks
+        fill_h      = _('To point two/four/eight blanks enter'
+                        '\r    these blanks'
+                        '\ror'
+                        '\r    "2b"/"4b"/"8b"'
+                        '\ror'
+                        '\r    ".."/"...."/"........" (dots).'
+                        '\rTo point TAB enter "t".'
+                      )
         def parse_step(step):
-            if step in ('t', '\t'):         return '\t'
+            if step in 't\t':               return '\t'
             if not step.replace(' ', ''):   return step
             if step[0].isdigit() and \
                step[1]=='b':                return ' '*int(step[0])
             return ''
-        old_s   = parse_step(vals['olds'])
-        new_s   = parse_step(vals['news'])
-        pass;                  #LOG and log('old_s, new_s={}',(old_s, new_s))
-        if not old_s or not new_s or old_s==new_s:
-            return app.msg_status(_('Skip to reindent'))
+        vals        = dict(olds=old_s
+                          ,news=new_s)
+        fid         = 'olds'
+        while True:
+            btn,vals,_t = dlg_wrapper(f(_('Reindent selected lines ({})'), rSelE-rSelB+1), 245,120,     #NOTE: dlg-reindent
+                 [dict(           tp='lb'   ,tid='olds' ,l=5        ,w=150  ,cap='>'+_('&Old indent step:') ,hint=fill_h) # &o
+                 ,dict(cid='olds',tp='ed'   ,t=10       ,l=5+150+5  ,w= 80                                              ) # 
+                 ,dict(           tp='lb'   ,tid='news' ,l=5        ,w=150  ,cap='>'+_('&New indent step:') ,hint=fill_h) # &n
+                 ,dict(cid='news',tp='ed'   ,t=50       ,l=5+150+5  ,w= 80                                              )
+#                ,dict(cid='?'   ,tp='bt'   ,t=90       ,l=5        ,w= 30  ,cap='&?'                                   ) #   
+                 ,dict(cid='!'   ,tp='bt'   ,t=90       ,l=245-170-5,w= 80  ,cap=_('OK')                    ,def_bt='1' ) #   
+                 ,dict(cid='-'   ,tp='bt'   ,t=90       ,l=245-80-5 ,w= 80  ,cap=_('Cancel')                            )
+                 ],    vals, focus_cid=fid)
+            if btn is None or btn=='-': return None
+            if ''==vals['olds'] or vals['olds'][0] not in ' .t2345678':
+                app.msg_box(_('Fill "Old step".\n\n'+fill_h.replace('\r', '\n')), app.MB_OK)
+                fid = 'olds'
+                continue
+            if ''==vals['news'] or vals['news'][0] not in ' .t2345678':
+                app.msg_box(_('Fill "New step".\n\n'+fill_h.replace('\r', '\n')), app.MB_OK)
+                fid = 'news'
+                continue
+            old_s   = parse_step(vals['olds'].replace('.', ' '))
+            new_s   = parse_step(vals['news'].replace('.', ' '))
+            pass;                  #LOG and log('old_s, new_s={}',(old_s, new_s))
+            if not old_s or not new_s or old_s==new_s:
+                return app.msg_status(_('Reindent skipped'))
+            break
+           #while
         
         lines   = [ed.get_text_line(row) for row in range(rSelB, rSelE+1)]
         def reind_line(line, ost_l, nst):
