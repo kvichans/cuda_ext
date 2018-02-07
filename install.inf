@@ -7,7 +7,8 @@ homepage=https://github.com/kvichans/cuda_ext
 
 [item1]
 section=events
-events=on_key_up,on_console_nav,on_focus
+events=on_console_nav
+;events=on_console_nav,on_key_up,on_focus
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Nav_cmds

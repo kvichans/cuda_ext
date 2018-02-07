@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.3.23 2018-01-12'
+    '1.4.01 2018-02-07'
 ToDo: (see end of file)
 '''
 
@@ -1210,6 +1210,7 @@ class Find_repl_cmds:
         find_opt= find_opt + ('c' if 'c' in user_opt else '')   # As user: Case
         find_opt= find_opt + ('w' if 'w' in user_opt else '')   # As user: Word
         ed.lock()
+        pass;                  #log('seltext,clip,find_opt={}',(seltext,clip,find_opt))
         ed.cmd(cmds.cmd_FinderAction, c1.join([]
             +['repall']
             +[seltext]
@@ -1330,13 +1331,13 @@ class Find_repl_cmds:
         ed_blanks   = '.'*ed_tab_sz
         old_s       = 't' if first_s.startswith('\t')   else ed_blanks
         new_s       = 't' if old_s!='t' else ed_blanks
-        fill_h      = _('To point two/four/eight blanks enter'
+        fill_h      = _('To specify two/four/eight blanks enter'
                         '\r    these blanks'
                         '\ror'
                         '\r    "2b"/"4b"/"8b"'
                         '\ror'
                         '\r    ".."/"...."/"........" (dots).'
-                        '\rTo point TAB enter "t".'
+                        '\rTo specify TAB enter "t".'
                       )
         def parse_step(step):
             if step in 't\t':               return '\t'
@@ -1741,8 +1742,9 @@ class Command:
         
         # Data for go_back_tab with "visit history"
         self.lock_on_fcs  = False
-        self.tid_hist   = deque(()
-                        , apx.get_opt('tab_histoty_size', 10))  # append to left, scan from left, loose from right
+        self.tid_hist   = None
+#       self.tid_hist   = deque(()
+#                       , apx.get_opt('tab_histoty_size', 10))  # append to left, scan from left, loose from right
         self.tid_hist_i = 0
         self.CASM_state = ''                                    # String has "c"/"a"/"s"/"m" if Ctrl/Alt/Shift/Meta-Win pressed
         
@@ -2081,6 +2083,18 @@ class Command:
 
     def go_back_tab(self):
         if app.app_api_version()<'1.0.143': return app.msg_status(NEED_UPDATE)
+        if not self.tid_hist:
+            # First call
+            self.tid_hist   = deque(()
+                            , apx.get_opt('tab_histoty_size', 10))  # append to left, scan from left, loose from right
+            app.app_proc(app.PROC_SET_EVENTS
+                        ,    'cuda_ext'                             #module_name
+                        +';'+'on_console_nav,on_key_up,on_focus'    #event_list
+                        +';'+''                                     #lexer_list
+#                       +';'+',,'                                   #lexer_list
+                        +';'+''                                     #keycode_list
+                        )
+            return app.msg_status(_('Ready to "Activate previously active tab (go back)"'))
         CASM_state      = app.app_proc(app.PROC_GET_KEYSTATE, '')
         self.lock_on_fcs= bool(CASM_state)
         pass;                  #LOG and log('ok self.CASM_state={} KEYSTATE={}',self.CASM_state, CASM_state)
