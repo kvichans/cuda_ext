@@ -2083,7 +2083,7 @@ class Command:
 
     def go_back_tab(self):
         if app.app_api_version()<'1.0.143': return app.msg_status(NEED_UPDATE)
-        if not self.tid_hist:
+        if self.tid_hist is None:
             # First call
             self.tid_hist   = deque(()
                             , apx.get_opt('tab_histoty_size', 10))  # append to left, scan from left, loose from right
@@ -2121,6 +2121,8 @@ class Command:
         if self.lock_on_fcs:
             pass;              #LOG and log('locked',())
             return
+        if self.tid_hist is None:
+            return
         # Add/Rise to/in history
         tid          = ed_self.get_prop(app.PROP_TAB_ID)
         if tid in self.tid_hist:
@@ -2136,6 +2138,8 @@ class Command:
        
     def on_key_up(self, ed_self, key, state):
         if app.app_api_version()<'1.0.143': return app.msg_status(NEED_UPDATE)
+        if self.tid_hist is None:
+            return
         CASM_state      = app.app_proc(app.PROC_GET_KEYSTATE, '')
         pass;                  #LOG and log('CASM="{}", self.CASM="{}"',CASM_state, self.CASM_state)
         if CASM_state!=self.CASM_state or not CASM_state:
