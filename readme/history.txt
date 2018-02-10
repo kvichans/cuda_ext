@@ -1,14 +1,14 @@
 1.4.01 (2018-02-07)
-fixed: Events on_key_up,on_focus use on first call "go back"
+fixed: don't autostart plugin, events are used after first call of "Go back" command
 
 1.3.23 (2018-01-12)
 fixed: Reindent
 
 1.3.22 (2017-12-01)
-fixed: many masks in "Open all files..."
+fixed: allow many file masks in "Open all files..." command
 
 1.3.21 (2017-12-01)
-added: command "Open in def app"
+added: command "Open current file in default application"
 
 1.3.20 (2017-09-26)
 fixed: command "Open all files from folder with sub-folders"
