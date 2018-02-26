@@ -55,8 +55,11 @@ class Command:
     def align_in_lines_by_sep(self):            return RLS.align_in_lines_by_sep()
     def reindent(self):                         return RLS.reindent()
     def join_lines(self):                       return RLS.join_lines()
-    def rewrap_sel_by_margin(self):             return RLS.rewrap_sel_by_margin()
     def del_more_spaces(self):                  return RLS.del_more_spaces()
+    def rewrap_sel_by_margin(self):             return RLS.rewrap_sel_by_margin()
+    def align_sel_to_center_by_margin(self):    return RLS.align_sel_by_margin('c')
+    def align_sel_to_right_by_margin(self):     return RLS.align_sel_by_margin('r')
+    def indent_sel_as_1st(self):                return RLS.indent_sel_as_1st()
     
     # Jumps_cmds
     def scroll_to_center(self):                 return RLS.scroll_to('cen')

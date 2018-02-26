@@ -1,5 +1,7 @@
 1.4.02 (2018-02-26)
 added: show all bookmarks in tab/tabs
+added: indent lines like the first selected
+added: align lines to center/right by margin
 
 1.4.01 (2018-02-07)
 fixed: don't autostart plugin, events are used after first call of "Go back" command

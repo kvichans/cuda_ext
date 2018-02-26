@@ -202,14 +202,32 @@ menu=0
 
 [item55]
 section=commands
-caption=CudaExt: Re-wrap/split lines by margin
-method=rewrap_sel_by_margin
+caption=CudaExt: Delete duplicate spaces
+method=del_more_spaces
 menu=0
 
 [item56]
 section=commands
-caption=CudaExt: Delete duplicate spaces
-method=del_more_spaces
+caption=CudaExt: Re-wrap/split lines by margin
+method=rewrap_sel_by_margin
+menu=0
+
+[item57]
+section=commands
+caption=CudaExt: Align lines to center by margin
+method=align_sel_to_center_by_margin
+menu=0
+
+[item58]
+section=commands
+caption=CudaExt: Align lines to right by margin
+method=align_sel_to_right_by_margin
+menu=0
+
+[item59]
+section=commands
+caption=CudaExt: Indent lines like the first selected
+method=indent_sel_as_1st
 menu=0
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

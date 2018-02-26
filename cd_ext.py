@@ -870,7 +870,7 @@ class Jumps_cmds:
             tab_id  = ted.get_prop(app.PROP_TAB_ID)
             tab_info= tab_cap \
                         if what=='a' else \
-                      (f('(tab={}-{}) ', 1+tab_grp, 1+tab_num) if tnmd else '') + tab_cap
+                      (f('(g{},t{}) ', 1+tab_grp, 1+tab_num) if tnmd else '') + tab_cap
             tab_id  = ted.get_prop(app.PROP_TAB_ID)
             tab_sps = ' '*ed.get_prop(app.PROP_TAB_SIZE)
             tbms   += [ (line_num                                           # line number
@@ -897,7 +897,7 @@ class Jumps_cmds:
                     ]), near) \
                                 if what=='a' else \
                   app.dlg_menu(app.MENU_LIST_ALT, '\n'.join([
-                        f('{}:{}{}\t{}'
+                        f('{}: {} {}\t{}'
                          , tab_info
                          , f('[{}] ', bm_kind-1) if bm_kind!=1 else ''
                          , 1+line_n
@@ -1493,6 +1493,62 @@ class Find_repl_cmds:
         ed.set_caret(0,rSelE+1, 0,rSelB)
        #def reindent
     
+    @staticmethod
+    def indent_sel_as_1st():
+        crts    = ed.get_carets()
+        if len(crts)>1:
+            return app.msg_status(ONLY_SINGLE_CRT.format(_('Command')))
+        (cCrt, rCrt
+        ,cEnd, rEnd)    = crts[0]
+        if rEnd==-1:
+            return app.msg_status(_('Need selected lines'))
+        (rSelB, cSelB), \
+        (rSelE, cSelE)  = apx.minmax((rCrt, cCrt), (rEnd, cEnd))
+        rSelE           = rSelE - (1 if 0==cSelE else 0)
+        if rSelB==rSelE:
+            return app.msg_status(_('Need more then one selected lines'))
+
+        first_s     = ed.get_text_line(rSelB)
+        prfx_1st    = re.match(r'\s*', first_s).group(0) if first_s[0] in ' \t' else ''
+        lines       = [ed.get_text_line(row)    for row  in range(rSelB+1, rSelE+1)]
+        lines       = [prfx_1st+line.lstrip()   for line in lines]
+        ed.replace_lines(rSelB+1, rSelE, lines)
+       #def indent_sel_as_1st
+    
+    @staticmethod
+    def align_sel_by_margin(how):
+        pass;                   log('ok',())
+        if not apx.get_opt('tab_spaces', False):
+            return app.msg_status(_('Fail to use Tab to align'))
+        mrgn    = apx.get_opt('margin', 0)
+        pass;                   log('mrgn={}',(mrgn))
+        def align_line(line):
+            strpd   = line.strip()
+            lstr    = len(strpd)
+            if lstr >= mrgn:
+                pass;           log('lstr >= mrgn',())
+                return  strpd                               # only strip
+            if how=='r':
+                return  ' '*(mrgn-lstr) + strpd             # r-align
+            return      ' '*           int((mrgn-lstr)/2) \
+                       +strpd                             \
+                       +' '*(mrgn-lstr-int((mrgn-lstr)/2))  # c-align
+           #def align_line
+        crts    = ed.get_carets()
+        for crt in crts:
+            (cCrt, rCrt
+            ,cEnd, rEnd)    = crts[0]
+            if rEnd==-1:
+                cEnd, rEnd  = cCrt, rCrt
+            (rSelB, cSelB), \
+            (rSelE, cSelE)  = apx.minmax((rCrt, cCrt), (rEnd, cEnd))
+            rSelE           = rSelE - (1 if 0==cSelE else 0)
+            lines           = [align_line(ed.get_text_line(row))
+                                for row in range(rSelB, rSelE+1)]
+            ed.replace_lines(rSelB, rSelE, lines)
+           #for crt
+       #def align_sel_by_margin
+
 #   @staticmethod
 #   def split_lines_to_width():
 #       width   = apx.get_opt('last_width_for_split_lines', apx.get_opt('margin', 0))
@@ -2151,7 +2207,9 @@ class Command:
     def replace_all_sel_to_cb(self):            return Find_repl_cmds.replace_all_sel_to_cb()
     def align_in_lines_by_sep(self):            return Find_repl_cmds.align_in_lines_by_sep()
     def reindent(self):                         return Find_repl_cmds.reindent()
+    def indent_sel_as_1st(self):                return Find_repl_cmds.indent_sel_as_1st()
     def rewrap_sel_by_margin(self):             return Find_repl_cmds.rewrap_sel_by_margin()
+    def align_sel_by_margin(self,how):          return Find_repl_cmds.align_sel_by_margin(how)
     def join_lines(self):                       return Find_repl_cmds.join_lines()
     def del_more_spaces(self):                  return Find_repl_cmds.del_more_spaces()
 
