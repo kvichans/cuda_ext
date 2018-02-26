@@ -858,6 +858,7 @@ class Jumps_cmds:
     @staticmethod
     def dlg_bms_in_tabs(what='a'):
         pass;                  #return log('ok',())
+        tnmd    = apx.get_opt('ui_tab_numbers', False)
         tbms    = []
         for h_tab in app.ed_handles(): 
             ted     = app.Editor(h_tab)
@@ -867,7 +868,9 @@ class Jumps_cmds:
             tab_num = ted.get_prop(app.PROP_INDEX_TAB)
             tab_cap = ted.get_prop(app.PROP_TAB_TITLE)
             tab_id  = ted.get_prop(app.PROP_TAB_ID)
-            tab_info= tab_cap if what=='a' else f('(tab={}-{}) {}', 1+tab_grp, 1+tab_num, tab_cap)
+            tab_info= tab_cap \
+                        if what=='a' else \
+                      (f('(tab={}-{}) ', 1+tab_grp, 1+tab_num) if tnmd else '') + tab_cap
             tab_id  = ted.get_prop(app.PROP_TAB_ID)
             tab_sps = ' '*ed.get_prop(app.PROP_TAB_SIZE)
             tbms   += [ (line_num                                           # line number
