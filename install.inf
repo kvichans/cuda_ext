@@ -316,6 +316,24 @@ caption=CudaExt: Jump right into CamelCase/snake_case + select
 method=jump_sel_right_ccsc
 menu=0
 
+[item75]
+section=commands
+caption=CudaExt: Bookmark list for current tab
+method=dlg_bms_in_tab
+menu=0
+
+[item76]
+section=commands
+caption=CudaExt: Bookmark list for all tabs
+method=dlg_bms_in_tabs
+menu=0
+
+[item77]
+section=commands
+caption=CudaExt: Numbered bookmark list for all tabs
+method=dlg_nbms_in_tabs
+menu=0
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Move_sep_cmds
 [item161]

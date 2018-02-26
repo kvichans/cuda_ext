@@ -76,6 +76,9 @@ class Command:
     def jump_right_ccsc(self):                  return RLS.jump_ccsc('r', False)
     def jump_sel_left_ccsc(self):               return RLS.jump_ccsc('l', True)
     def jump_sel_right_ccsc(self):              return RLS.jump_ccsc('r', True)
+    def dlg_bms_in_tab(self):                   return RLS.dlg_bms_in_tab()
+    def dlg_bms_in_tabs(self):                  return RLS.dlg_bms_in_tabs('a')
+    def dlg_nbms_in_tabs(self):                 return RLS.dlg_bms_in_tabs('n')
     
     # Move_sep_cmds
     def more_in_tab(self):                      return RLS._move_splitter('into', 1.05)

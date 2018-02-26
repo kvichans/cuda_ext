@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.4.01 2018-02-07'
+    '1.4.02 2018-02-26'
 ToDo: (see end of file)
 '''
 
@@ -68,21 +68,28 @@ class Tree_cmds:
     def tree_path_to_status():
         path_l, gap = Tree_cmds._get_best_tree_path(ed.get_carets()[0][1])
         if not path_l:  return
-        ID_TREE = app.app_proc(app.PROC_SIDEPANEL_GET_CONTROL, 'Tree')
+#       ID_TREE = app.app_proc(app.PROC_SIDEPANEL_GET_CONTROL, 'Tree')
+        ID_TREE = app.app_proc(app.PROC_SIDEPANEL_GET_CONTROL, 'Code tree')
+        if not ID_TREE: return
         id_sel  = app.tree_proc(ID_TREE, app.TREE_ITEM_GET_SELECTED)
         id_need = path_l[-1][0]
         if id_need != id_sel:
             app.tree_proc(ID_TREE, app.TREE_ITEM_SELECT, id_need)
-        path    = ' // '.join([cap.rstrip(':')[:40] for (nid,cap) in path_l])
+        path    = '['+ '] / ['.join([cap.rstrip(':')[:40] for (nid,cap) in path_l]) + ']'
+#       path    = ' // '.join([cap.rstrip(':')[:40] for (nid,cap) in path_l])
+#       if gap==0:  return app.msg_status_alt(path, 10)
         if gap==0:  return app.msg_status(path)
-        app.msg_status(f('[{:+}] {}', gap, path))
+#       app.msg_status_alt(f('[{:+}] {}', gap, path), 10)
+        app.msg_status(f('[{:+}] {}', -gap, path))
        #def tree_path_to_status
    
     @staticmethod
     def set_nearest_tree_node():
         path_l, gap = Tree_cmds._get_best_tree_path(ed.get_carets()[0][1])
         if not path_l:  return
-        ID_TREE = app.app_proc(app.PROC_SIDEPANEL_GET_CONTROL, 'Tree')
+#       ID_TREE = app.app_proc(app.PROC_SIDEPANEL_GET_CONTROL, 'Tree')
+        ID_TREE = app.app_proc(app.PROC_SIDEPANEL_GET_CONTROL, 'Code tree')
+        if not ID_TREE: return
         app.tree_proc(ID_TREE, app.TREE_ITEM_SELECT, path_l[-1][0])
        #def set_nearest_tree_node
    
@@ -96,7 +103,10 @@ class Tree_cmds:
                          >0 if nearest node below
                          <0 if nearest node above
         """
-        ID_TREE = app.app_proc(app.PROC_SIDEPANEL_GET_CONTROL, 'Tree')
+        ed.cmd(cmds.cmd_TreeUpdate)
+#       ID_TREE = app.app_proc(app.PROC_SIDEPANEL_GET_CONTROL, 'Tree')
+        ID_TREE = app.app_proc(app.PROC_SIDEPANEL_GET_CONTROL, 'Code tree')
+        if not ID_TREE: return [], INF
         INF     = 0xFFFFFFFF
         NO_ID   = -1
         def best_path(id_prnt, prnt_cap=''):
@@ -111,7 +121,9 @@ class Tree_cmds:
             for kid, cap in kids:
                 pass;           LOG and log('kid, cap={}',(kid, cap))
                 cMin, rMin, \
-                cMax, rMax  = app.tree_proc(ID_TREE, app.TREE_ITEM_GET_SYNTAX_RANGE, kid)
+                cMax, rMax  = app.tree_proc(ID_TREE, app.TREE_ITEM_GET_SYNTAX_RANGE , kid) \
+                                if app.app_api_version() < '1.0.266' else \
+                              app.tree_proc(ID_TREE, app.TREE_ITEM_GET_RANGE        , kid)
                 pass;          #LOG and log('? kid,cap, rMin,rMax,row={}',(kid,cap, rMin,rMax,row))
                 if False:pass
                 elif rMin<=row<=rMax:   # Cover!
@@ -816,6 +828,88 @@ class Jumps_cmds:
             ed.set_caret(cCrt + gap, rCrt, cEnd, rEnd)
        #def jump_ccsc
  
+    @staticmethod
+    def dlg_bms_in_tab():
+        bm_lns  = ed.bookmark(app.BOOKMARK_GET_LIST, 0)
+        if not bm_lns:  return app.msg_status(_('No bookmarks'))
+        tab_sps = ' '*ed.get_prop(app.PROP_TAB_SIZE)
+        bms     = [ (line_num                                           # line number
+                    ,ed.get_text_line(line_num).replace('\t', tab_sps)  # line string
+                    ,ed.bookmark(app.BOOKMARK_GET, line_num)            # kind of bm
+                    )   for line_num in bm_lns]
+        pass;                  #LOG and log('bms=¶{}',pf(bms))
+        rCrt    = ed.get_carets()[0][1]
+        near    = min([(abs(line_n-rCrt), ind) 
+                        for ind, (line_n, line_s, bm_kind) in enumerate(bms)])[1]
+        ans = app.dlg_menu(app.MENU_LIST, '\n'.join([
+                f('{}\t{}{}'
+                 , line_s
+                 , f('[{}] ', bm_kind-1) if bm_kind!=1 else ''
+                 , 1+line_n
+                 ) for line_n, line_s, bm_kind in bms
+                ]), near)
+        if ans is None: return
+        line_n, line_s, bm_kind    = bms[ans]
+        ed.set_caret(0, line_n)
+        if not (ed.get_prop(app.PROP_LINE_TOP) <= line_n <= ed.get_prop(app.PROP_LINE_BOTTOM)):
+            ed.set_prop(app.PROP_LINE_TOP, str(max(0, line_n - max(5, apx.get_opt('find_indent_vert')))))
+       #def dlg_bms_in_tab
+
+    @staticmethod
+    def dlg_bms_in_tabs(what='a'):
+        pass;                  #return log('ok',())
+        tbms    = []
+        for h_tab in app.ed_handles(): 
+            ted     = app.Editor(h_tab)
+            bm_lns  = ted.bookmark(app.BOOKMARK_GET_LIST, 0)
+            if not bm_lns:  continue
+            tab_grp = ted.get_prop(app.PROP_INDEX_GROUP)
+            tab_num = ted.get_prop(app.PROP_INDEX_TAB)
+            tab_cap = ted.get_prop(app.PROP_TAB_TITLE)
+            tab_id  = ted.get_prop(app.PROP_TAB_ID)
+            tab_info= tab_cap if what=='a' else f('(tab={}-{}) {}', 1+tab_grp, 1+tab_num, tab_cap)
+            tab_id  = ted.get_prop(app.PROP_TAB_ID)
+            tab_sps = ' '*ed.get_prop(app.PROP_TAB_SIZE)
+            tbms   += [ (line_num                                           # line number
+                        ,ted.get_text_line(line_num).replace('\t', tab_sps) # line string
+                        ,ted.bookmark(app.BOOKMARK_GET, line_num)           # kind of bm
+                        ,tab_info                                           # src tab '(group:num) title'
+                        ,tab_id                                             # src tab ID
+                        )   for line_num in bm_lns
+                            if what=='a' or 1<ted.bookmark(app.BOOKMARK_GET, line_num)<10
+                      ]
+           #for h_tab
+        if not tbms:    return app.msg_status(_('No numbered bookmarks in tabs') if what=='n' else _('No bookmarks in tabs'))
+        tid     = ed.get_prop(app.PROP_TAB_ID)
+        rCrt    = ed.get_carets()[0][1]
+        near    = min([(abs(line_n-rCrt) if tid==tab_id else 0xFFFFFF, ind) 
+                    for ind, (line_n, line_s, bm_kind, tab_info, tab_id) in enumerate(tbms)])[1]
+        ans     = app.dlg_menu(app.MENU_LIST, '\n'.join([
+                        f('{}\t{}:{}{}'
+                         , line_s
+                         , tab_info
+                         , f('[{}]', bm_kind-1) if bm_kind!=1 else ''
+                         , 1+line_n
+                         ) for line_n, line_s, bm_kind, tab_info, tab_id in tbms
+                    ]), near) \
+                                if what=='a' else \
+                  app.dlg_menu(app.MENU_LIST_ALT, '\n'.join([
+                        f('{}:{}{}\t{}'
+                         , tab_info
+                         , f('[{}] ', bm_kind-1) if bm_kind!=1 else ''
+                         , 1+line_n
+                         , line_s
+                         ) for line_n, line_s, bm_kind, tab_info, tab_id in tbms
+                    ]), near)
+        if ans is None: return
+        line_n, line_s, bm_kind, tab_info, tab_id    = tbms[ans]
+        ted     = apx.get_tab_by_id(tab_id)
+        ted.focus()
+        ed.set_caret(0, line_n)
+        if not (ed.get_prop(app.PROP_LINE_TOP) <= line_n <= ed.get_prop(app.PROP_LINE_BOTTOM)):
+            ed.set_prop(app.PROP_LINE_TOP, str(max(0, line_n - max(5, apx.get_opt('find_indent_vert')))))
+       #def dlg_bms_in_tabs
+
    #class Jumps_cmds
 
 class Prgph_cmds:
@@ -2153,6 +2247,8 @@ class Command:
     def jump_to_status_line(self, status, nx_pr, bgn_end):  return Jumps_cmds.jump_to_status_line(status, nx_pr, bgn_end)
     def jump_to_line_by_cb(self):                           return Jumps_cmds.jump_to_line_by_cb()
     def jump_ccsc(self, drct, sel):                         return Jumps_cmds.jump_ccsc(drct, sel)
+    def dlg_bms_in_tab(self):                               return Jumps_cmds.dlg_bms_in_tab()
+    def dlg_bms_in_tabs(self, what='a'):                    return Jumps_cmds.dlg_bms_in_tabs(what)
     
     def go_prgph(self, what):                               return Prgph_cmds.go_prgph(what)
     def align_prgph(self, how):                             return Prgph_cmds.align_prgph(how)
@@ -2278,7 +2374,7 @@ if __name__ == '__main__' :     # Tests
 #   Prgph_cmds.go_prgph('end')
 #   Prgph_cmds.go_prgph('nxt')
 #   Prgph_cmds.go_prgph('prv')
-    Prgph_cmds.align_prgph('l')
+#   Prgph_cmds.align_prgph('l')
 
 '''
 ToDo
