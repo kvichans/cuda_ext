@@ -2,11 +2,11 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.4.02 2018-02-26'
+    '1.4.03 2018-02-27'
 ToDo: (see end of file)
 '''
 
-import  re, os, sys, json, collections
+import  re, os, sys, json, collections, time
 from    collections     import deque
 from    fnmatch         import fnmatch
 
@@ -2129,6 +2129,33 @@ class Command:
         app.file_open('')
         ed.save(new_fn)
        #def new_file_save_as_near_cur
+
+    def open_recent(self):
+        hist_fs_f   = app.app_path(app.APP_DIR_SETTINGS)+os.sep+'history files.json'
+#       hist_f      = app.app_path(app.APP_DIR_SETTINGS)+os.sep+'history.json'
+        if not os.path.exists(hist_fs_f):   return app.msg_status(_('No files in history'))
+        hist_full_js= json.loads(open(hist_fs_f, encoding='utf8').read())
+        hist_fs     = [f.replace('|', os.sep) for f in hist_full_js]
+        hist_fts    = [(f, os.path.getmtime(f)) 
+                        for f in hist_fs if os.path.exists(f)]
+        sort_as     = 't'
+        while True:
+            hist_fts    = sorted(hist_fts
+                                , key=lambda ft:ft[1] if sort_as=='t' else ft[0].upper()
+                                , reverse=(sort_as=='t'))
+            ans         = app.dlg_menu(app.MENU_LIST, '\n'.join([
+                            f + '\t' + time.strftime("%Y/%b/%d %H:%M", time.gmtime(t))
+                            for f,t in hist_fts
+                          ]
+                          +['<Sort by path>' if sort_as=='t' else '<Sort by time>']))
+            if ans is None: return
+            if ans==len(hist_fts):
+                sort_as     = 'p' if sort_as=='t' else 't'
+                continue #while
+            return app.file_open(hist_fts[ans][0])
+#           break#while
+           #while
+       #def open_recent
 
     def open_all_with_subdir(self):
         src_dir = app.dlg_dir(os.path.dirname(ed.get_filename()))

@@ -99,6 +99,7 @@ class Command:
 #   def edit_strcomment_chars(self):            return RLS.edit_strcomment_chars()
     def rename_file(self):                      return RLS.rename_file()
     def new_file_save_as_near_cur(self):        return RLS.new_file_save_as_near_cur()
+    def open_recent(self):                      return RLS.open_recent()
     def open_all_with_subdir(self):             return RLS.open_all_with_subdir()
     def open_with_defapp(self):                 return RLS.open_with_defapp()
     def remove_unprinted(self):                 return RLS.remove_unprinted()
