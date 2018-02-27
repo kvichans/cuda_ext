@@ -411,7 +411,7 @@ menu=0
 
 [item94]
 section=commands
-caption=CudaExt: Open a recent file...
+caption=CudaExt: Open recent file...
 method=open_recent
 menu=0
 

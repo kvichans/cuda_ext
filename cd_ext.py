@@ -2131,12 +2131,13 @@ class Command:
        #def new_file_save_as_near_cur
 
     def open_recent(self):
+        home_s      = os.path.expanduser('~')
         hist_fs_f   = app.app_path(app.APP_DIR_SETTINGS)+os.sep+'history files.json'
 #       hist_f      = app.app_path(app.APP_DIR_SETTINGS)+os.sep+'history.json'
         if not os.path.exists(hist_fs_f):   return app.msg_status(_('No files in history'))
         hist_full_js= json.loads(open(hist_fs_f, encoding='utf8').read())
         hist_fs     = [f.replace('|', os.sep) for f in hist_full_js]
-        hist_fts    = [(f, os.path.getmtime(f)) 
+        hist_fts    = [(f.replace(home_s, '~'), os.path.getmtime(f)) 
                         for f in hist_fs if os.path.exists(f)]
         sort_as     = 't'
         while True:
@@ -2152,7 +2153,7 @@ class Command:
             if ans==len(hist_fts):
                 sort_as     = 'p' if sort_as=='t' else 't'
                 continue #while
-            return app.file_open(hist_fts[ans][0])
+            return app.file_open(hist_fts[ans][0].replace('~', home_s))
 #           break#while
            #while
        #def open_recent
