@@ -1,5 +1,8 @@
+1.5.01 (2018-02-28)
+added: commands in menu Plugins
+
 1.4.03 (2018-02-27)
-added: command "Open a recent file"
+added: command "Open recent file"
 
 1.4.02 (2018-02-26)
 added: command "Bookmark list for current tab"

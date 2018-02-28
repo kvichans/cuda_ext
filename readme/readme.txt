@@ -1,5 +1,5 @@
 Plugin for CudaText.
-Adds lot of commands to the Commands dialog (not to Plugins menu, too much of them):
+Adds lot of commands to the Commands dialog:
 
 [Files]
   Open file by selected name
