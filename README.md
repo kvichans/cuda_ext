@@ -1,7 +1,7 @@
 # cuda_ext
 Additional commands for CudaText in Commands dialog and Plugins menu
 
-Menu items
+Menu `Plugins/Cuda-Ext` items
 
 - Find/Replace
 	- Find clipbrd: next
