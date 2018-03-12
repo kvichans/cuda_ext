@@ -66,6 +66,7 @@ def _file_open(op_file):
 class Tree_cmds:
     @staticmethod
     def tree_path_to_status():
+        pass;                  #log('?',())
         path_l, gap = Tree_cmds._get_best_tree_path(ed.get_carets()[0][1])
         if not path_l:  return
 #       ID_TREE = app.app_proc(app.PROC_SIDEPANEL_GET_CONTROL, 'Tree')
@@ -76,11 +77,15 @@ class Tree_cmds:
         if id_need != id_sel:
             app.tree_proc(ID_TREE, app.TREE_ITEM_SELECT, id_need)
         path    = '['+ '] / ['.join([cap.rstrip(':')[:40] for (nid,cap) in path_l]) + ']'
-#       path    = ' // '.join([cap.rstrip(':')[:40] for (nid,cap) in path_l])
+#       path    =       ' // '.join([cap.rstrip(':')[:40] for (nid,cap) in path_l])
+        return app.msg_status_alt(
+            path if gap==0 else f('[{:+}] {}', -gap, path)
+        , 10)
+        
 #       if gap==0:  return app.msg_status_alt(path, 10)
-        if gap==0:  return app.msg_status(path)
-#       app.msg_status_alt(f('[{:+}] {}', gap, path), 10)
-        app.msg_status(f('[{:+}] {}', -gap, path))
+#       if gap==0:  return app.msg_status(    path)
+#       app.msg_status_alt( f('[{:+}] {}', -gap, path), 10)
+#       app.msg_status(     f('[{:+}] {}', -gap, path))
        #def tree_path_to_status
    
     @staticmethod

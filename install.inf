@@ -1,6 +1,6 @@
 [info]
 title=CudaExt
-desc=Additional commands for CudaText in Commands dialog (not visible in Plugins menu)
+desc=Additional commands for CudaText in Commands dialog and Plugins menu
 type=cudatext-plugin
 subdir=cuda_ext
 homepage=https://github.com/kvichans/cuda_ext
@@ -11,571 +11,636 @@ events=on_console_nav
 ;events=on_console_nav,on_key_up,on_focus
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Nav_cmds
+; Find_repl_cmds
 [item11]
+section=commands
+caption=Cuda&-Ext\&Find/Replace\Find clipbrd: &next
+method=find_cb_string_next
+[item12]
+section=commands
+caption=Cuda&-Ext\&Find/Replace\Find clipbrd: &previous
+method=find_cb_string_prev
+
+[item13]
+section=commands
+caption=Cuda&-Ext\&Find/Replace\Replace &all occurrences of selected string with clipbrd
+method=replace_all_sel_to_cb
+
+[item14]
+section=commands
+caption=Cuda&-Ext\&Find/Replace\-
+method=_
+
+[item15]
+section=commands
+caption=Cuda&-Ext\&Find/Replace\&Copy word or [string] or 'string' (no selection)
+method=copy_term
+
+[item16]
+section=commands
+caption=Cuda&-Ext\&Find/Replace\&Replace word or [string] or 'string' with clipbrd (no selection)
+method=replace_term
+
+[item17]
+section=commands
+caption=Cuda&-Ext\&Find/Replace\E&xpand selection to word or "string" or (string)
+method=expand_sel
+
+[item18]
+section=commands
+caption=Cuda&-Ext\&Find/Replace\Expand and Cop&y selection to word or "string" or (string)
+method=expand_sel_copy
+
+[item19]
+section=commands
+caption=Cuda&-Ext\&Find/Replace\-
+method=_
+
+[item20]
+section=commands
+caption=Cuda&-Ext\&Find/Replace\Remove all ASCII chars 0..31 (excluding 9,10,13)
+method=remove_unprinted
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Insert_cmds
+[item41]
+section=commands
+caption=Cuda&-Ext\&Insert\Add indented line abo&ve
+method=add_indented_line_above
+
+[item42]
+section=commands
+caption=Cuda&-Ext\&Insert\Add indented line &below
+method=add_indented_line_below
+
+[item43]
+section=commands
+caption=Cuda&-Ext\&Insert\-
+method=_
+
+[item44]
+section=commands
+caption=Cuda&-Ext\&Insert\Paste to &first column
+method=paste_to_1st_col
+
+[item45]
+section=commands
+caption=Cuda&-Ext\&Insert\Paste with indent ab&ove
+method=paste_with_indent_above
+
+[item46]
+section=commands
+caption=Cuda&-Ext\&Insert\Paste with indent belo&w
+method=paste_with_indent_below
+
+[item47]
+section=commands
+caption=Cuda&-Ext\&Insert\Paste like La&zarus IDE
+method=paste_as_lazarus
+
+[item48]
+section=commands
+caption=Cuda&-Ext\&Insert\-
+method=_
+
+[item49]
+section=commands
+caption=Cuda&-Ext\&Insert\F&ill selection by string...
+method=fill_by_str
+
+[item50]
+section=commands
+caption=Cuda&-Ext\&Insert\Insert &unicode char...
+method=insert_char_by_hex
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Jumps_cmds
+[item71]
+section=commands
+caption=Cuda&-Ext\&Jump\To matching bracket
+method=jump_to_matching_bracket
+
+[item72]
+section=commands
+caption=Cuda&-Ext\&Jump\-
+method=_
+
+[item73]
+section=commands
+caption=Cuda&-Ext\&Jump\To next changed lines
+method=jump_to_next_mod_lines
+
+[item74]
+section=commands
+caption=Cuda&-Ext\&Jump\To previous changed lines
+method=jump_to_prev_mod_lines
+
+[item75]
+section=commands
+caption=Cuda&-Ext\&Jump\To next saved lines
+method=jump_to_next_sav_lines
+
+[item76]
+section=commands
+caption=Cuda&-Ext\&Jump\To previous saved lines
+method=jump_to_prev_sav_lines
+
+[item77]
+section=commands
+caption=Cuda&-Ext\&Jump\To next working lines
+method=jump_to_next_wrk_lines
+
+[item78]
+section=commands
+caption=Cuda&-Ext\&Jump\To previous working lines
+method=jump_to_prev_wrk_lines
+
+[item79]
+section=commands
+caption=Cuda&-Ext\&Jump\-
+method=_
+
+[item80]
+section=commands
+caption=Cuda&-Ext\&Jump\To line with number in clipbrd
+method=jump_to_line_by_cb
+
+[item81]
+section=commands
+caption=Cuda&-Ext\&Jump\-
+method=_
+
+[item82]
+section=commands
+caption=Cuda&-Ext\&Jump\Left into CamelCase/snake_case
+method=jump_left_ccsc
+
+[item83]
+section=commands
+caption=Cuda&-Ext\&Jump\Right into CamelCase/snake_case
+method=jump_right_ccsc
+
+[item84]
+section=commands
+caption=Cuda&-Ext\&Jump\Left into CamelCase/snake_case and select
+method=jump_sel_left_ccsc
+
+[item85]
+section=commands
+caption=Cuda&-Ext\&Jump\Right into CamelCase/snake_case and select
+method=jump_sel_right_ccsc
+
+[item86]
+section=commands
+caption=Cuda&-Ext\&Jump\-
+method=_
+
+[item87]
+section=commands
+caption=Cuda&-Ext\&Jump\Bookmark list for current tab...
+method=dlg_bms_in_tab
+
+[item88]
+section=commands
+caption=Cuda&-Ext\&Jump\Bookmark list for all tabs...
+method=dlg_bms_in_tabs
+
+[item89]
+section=commands
+caption=Cuda&-Ext\&Jump\Numbered bookmark list for all tabs...
+method=dlg_nbms_in_tabs
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Scroll_cmds
+[item111]
+section=commands
+caption=Cuda&-Ext\Scr&oll\Current line to screen &center
+method=scroll_to_center
+
+[item112]
+section=commands
+caption=Cuda&-Ext\Scr&oll\Current line to screen &top
+method=scroll_to_top
+
+[item113]
+section=commands
+caption=Cuda&-Ext\Scr&oll\Current line to screen &bottom
+method=scroll_to_bottom
+
+[item114]
+section=commands
+caption=Cuda&-Ext\Scr&oll\-
+method=_
+
+[item115]
+section=commands
+caption=Cuda&-Ext\Scr&oll\Screen to &left
+method=scroll_to_left
+
+[item116]
+section=commands
+caption=Cuda&-Ext\Scr&oll\Screen to &right
+method=scroll_to_right
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Nav_cmds
+[item141]
 section=commands
 caption=Cuda&-Ext\&Navigate\Open file by &selected name
 method=open_selected
 
-[item12]
+[item142]
 section=commands
 caption=Cuda&-Ext\&Navigate\-
 method=_
 
-[item13]
+[item143]
 section=commands
 caption=Cuda&-Ext\&Navigate\Open file(s) in nearest &right tab(s)...
 method=open_file_near_right
 
-[item14]
+[item144]
 section=commands
 caption=Cuda&-Ext\&Navigate\Open file(s) in nearest &left tab(s)...
 method=open_file_near_left
 
-[item15]
+[item145]
 section=commands
 caption=Cuda&-Ext\&Navigate\-
 method=_
 
-[item16]
+[item146]
 section=commands
 caption=Cuda&-Ext\&Navigate\Navigate by &error in console
 method=nav_by_console_err
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Tree_cmds
-[item21]
-section=commands
-caption=Cuda&-Ext\&Tree\Show &current Code Tree path in statusbar
-method=tree_path_to_status
-
-[item22]
-section=commands
-caption=Cuda&-Ext\&Tree\Set &active node of Code Tree, nearest to caret
-method=set_nearest_tree_node
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Insert_cmds
-[item31]
-section=commands
-caption=Cuda&-Ext\&Insert\Add indented line abo&ve
-method=add_indented_line_above
-
-[item32]
-section=commands
-caption=Cuda&-Ext\&Insert\Add indented line &below
-method=add_indented_line_below
-
-[item33]
-section=commands
-caption=Cuda&-Ext\&Insert\Paste to &first column
-method=paste_to_1st_col
-
-[item34]
-section=commands
-caption=Cuda&-Ext\&Insert\Paste with indent ab&ove
-method=paste_with_indent_above
-
-[item35]
-section=commands
-caption=Cuda&-Ext\&Insert\Paste with indent belo&w
-method=paste_with_indent_below
-
-[item36]
-section=commands
-caption=Cuda&-Ext\&Insert\Paste like La&zarus IDE
-method=paste_as_lazarus
-
-[item37]
-section=commands
-caption=Cuda&-Ext\&Insert\F&ill selection by string
-method=fill_by_str
-
-[item38]
-section=commands
-caption=Cuda&-Ext\&Insert\Insert &unicode char
-method=insert_char_by_hex
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Find_repl_cmds
-[item41]
-section=commands
-caption=Cuda&-Ext\&Find/Replace\Find clipboard string: &next
-method=find_cb_string_next
-[item42]
-section=commands
-caption=Cuda&-Ext\&Find/Replace\Find clipboard string: &previous
-method=find_cb_string_prev
-
-[item43]
-section=commands
-caption=Cuda&-Ext\&Find/Replace\Replace &all occurrences of selected string, with clipboard string
-method=replace_all_sel_to_cb
-
-[item44]
-section=commands
-caption=Cuda&-Ext\&Find/Replace\-
-method=_
-
-[item45]
-section=commands
-caption=Cuda&-Ext\&Find/Replace\&Copy word or [expression] or 'expression' without selection
-method=copy_term
-
-[item46]
-section=commands
-caption=Cuda&-Ext\&Find/Replace\&Replace word or [expression] or 'expression' with clip
-method=replace_term
-
-[item47]
-section=commands
-caption=Cuda&-Ext\&Find/Replace\E&xpand selection to word or "expression" or (expression)
-method=expand_sel
-
-[item48]
-section=commands
-caption=Cuda&-Ext\&Find/Replace\Expand and Cop&y selection to word or "expression" or (expression)
-method=expand_sel_copy
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Align_cmds
-[item51]
-section=commands
-caption=Cuda&-Ext\&Align\Align in lines by separator...
-method=align_in_lines_by_sep
-
-[item52]
-section=commands
-caption=Cuda&-Ext\&Align\Reindent selected lines...
-method=reindent
-
-[item53]
-section=commands
-caption=Cuda&-Ext\&Align\Join selected lines
-method=join_lines
-
-[item54]
-section=commands
-caption=Cuda&-Ext\&Align\Delete duplicate spaces
-method=del_more_spaces
-
-[item55]
-section=commands
-caption=Cuda&-Ext\&Align\Re-wrap/split lines by margin
-method=rewrap_sel_by_margin
-
-[item56]
-section=commands
-caption=Cuda&-Ext\&Align\Align lines to center by margin
-method=align_sel_to_center_by_margin
-
-[item57]
-section=commands
-caption=Cuda&-Ext\&Align\Align lines to right by margin
-method=align_sel_to_right_by_margin
-
-[item58]
-section=commands
-caption=Cuda&-Ext\&Align\Indent lines like the first selected
-method=indent_sel_as_1st
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Jumps_cmds
-[item61]
-section=commands
-caption=Cuda&-Ext\&Jump\Jump to matching bracket
-method=jump_to_matching_bracket
-
-[item62]
-section=commands
-caption=Cuda&-Ext\&Jump\-
-method=_
-
-[item63]
-section=commands
-caption=Cuda&-Ext\&Jump\Jump to next changed lines
-method=jump_to_next_mod_lines
-
-[item64]
-section=commands
-caption=Cuda&-Ext\&Jump\Jump to previous changed lines
-method=jump_to_prev_mod_lines
-
-[item65]
-section=commands
-caption=Cuda&-Ext\&Jump\Jump to next saved lines
-method=jump_to_next_sav_lines
-
-[item66]
-section=commands
-caption=Cuda&-Ext\&Jump\Jump to previous saved lines
-method=jump_to_prev_sav_lines
-
-[item67]
-section=commands
-caption=Cuda&-Ext\&Jump\Jump to next working lines
-method=jump_to_next_wrk_lines
-
-[item68]
-section=commands
-caption=Cuda&-Ext\&Jump\Jump to previous working lines
-method=jump_to_prev_wrk_lines
-
-[item69]
-section=commands
-caption=Cuda&-Ext\&Jump\Jump to line with number in clipboard
-method=jump_to_line_by_cb
-
-[item70]
-section=commands
-caption=Cuda&-Ext\&Jump\-
-method=_
-
-[item71]
-section=commands
-caption=Cuda&-Ext\&Jump\Jump left into CamelCase/snake_case
-method=jump_left_ccsc
-
-[item72]
-section=commands
-caption=Cuda&-Ext\&Jump\Jump right into CamelCase/snake_case
-method=jump_right_ccsc
-
-[item73]
-section=commands
-caption=Cuda&-Ext\&Jump\Jump left into CamelCase/snake_case + select
-method=jump_sel_left_ccsc
-
-[item74]
-section=commands
-caption=Cuda&-Ext\&Jump\Jump right into CamelCase/snake_case + select
-method=jump_sel_right_ccsc
-
-[item75]
-section=commands
-caption=Cuda&-Ext\&Jump\-
-method=_
-
-[item76]
-section=commands
-caption=Cuda&-Ext\&Jump\Bookmark list for current tab
-method=dlg_bms_in_tab
-
-[item77]
-section=commands
-caption=Cuda&-Ext\&Jump\Bookmark list for all tabs
-method=dlg_bms_in_tabs
-
-[item78]
-section=commands
-caption=Cuda&-Ext\&Jump\Numbered bookmark list for all tabs
-method=dlg_nbms_in_tabs
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Scroll_cmds
-[item81]
-section=commands
-caption=Cuda&-Ext\Scr&oll\Scroll current line to screen center
-method=scroll_to_center
-
-[item82]
-section=commands
-caption=Cuda&-Ext\Scr&oll\Scroll current line to screen top
-method=scroll_to_top
-
-[item83]
-section=commands
-caption=Cuda&-Ext\Scr&oll\Scroll current line to screen bottom
-method=scroll_to_bottom
-
-[item84]
-section=commands
-caption=Cuda&-Ext\Scr&oll\Scroll screen to left
-method=scroll_to_left
-
-[item85]
-section=commands
-caption=Cuda&-Ext\Scr&oll\Scroll screen to right
-method=scroll_to_right
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Misc_cmds
-[item92]
-section=commands
-caption=Cuda&-Ext\&Misc\Rename file...
-method=rename_file
-
-[item93]
-section=commands
-caption=Cuda&-Ext\&Misc\New file and SaveAs in current folder...
-method=new_file_save_as_near_cur
-
-[item94]
-section=commands
-caption=Cuda&-Ext\&Misc\Open recent file...
-method=open_recent
-
-[item95]
-section=commands
-caption=Cuda&-Ext\&Misc\Open all files from folder with sub-folders...
-method=open_all_with_subdir
-
-[item96]
-section=commands
-caption=Cuda&-Ext\&Misc\Open current file in default application
-method=open_with_defapp
-
-[item97]
-section=commands
-caption=Cuda&-Ext\&Misc\Remove all ASCII chars 0..31 (excluding 9,10,13)
-method=remove_unprinted
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Tabs_cmds
-[item101]
+[item171]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Activate previously active tab (go back)
+caption=Cuda&-Ext\Ta&bs\Activate previously active tab (go &back)
 method=go_back
 
-[item102]
+[item172]
 section=commands
 caption=Cuda&-Ext\Ta&bs\-
 method=_
 
-[item103]
+[item173]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Move tab to position...
+caption=Cuda&-Ext\Ta&bs\Move tab to &position...
 method=move_tab
 
-[item110]
+[item174]
 section=commands
 caption=Cuda&-Ext\Ta&bs\-
 method=_
 
-[item111]
+[item175]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #1 in group #1
 method=to_tab_g1_t1
-[item112]
+[item176]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #2 in group #1
 method=to_tab_g1_t2
-[item113]
+[item177]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #3 in group #1
 method=to_tab_g1_t3
-[item114]
+[item178]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #4 in group #1
 method=to_tab_g1_t4
-[item115]
+[item179]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #5 in group #1
 method=to_tab_g1_t5
-[item116]
+[item180]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #6 in group #1
 method=to_tab_g1_t6
-[item117]
+[item181]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #7 in group #1
 method=to_tab_g1_t7
-[item118]
+[item182]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #8 in group #1
 method=to_tab_g1_t8
-[item119]
+[item183]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #9 in group #1
 method=to_tab_g1_t9
 
-[item121]
+[item184]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #1 in group #2
 method=to_tab_g2_t1
-[item122]
+[item185]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #2 in group #2
 method=to_tab_g2_t2
-[item123]
+[item186]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #3 in group #2
 method=to_tab_g2_t3
-[item124]
+[item187]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #4 in group #2
 method=to_tab_g2_t4
-[item125]
+[item187]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #5 in group #2
 method=to_tab_g2_t5
-[item126]
+[item188]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #6 in group #2
 method=to_tab_g2_t6
-[item127]
+[item189]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #7 in group #2
 method=to_tab_g2_t7
-[item128]
+[item190]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #8 in group #2
 method=to_tab_g2_t8
-[item129]
+[item191]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #9 in group #2
 method=to_tab_g2_t9
 
-[item131]
+[item192]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate last tab in group #1
 method=to_tab_g1_last
-[item132]
+[item193]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate last tab in group #2
 method=to_tab_g2_last
 
-[item141]
+[item194]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate next tab (global loop)
 method=to_next_tab
-[item142]
+[item195]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate previous tab (global loop)
 method=to_prev_tab
 
-[item143]
+[item196]
 section=commands
 caption=Cuda&-Ext\Ta&bs\-
 method=_
 
-[item144]
+[item197]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Other group\Close active tab in next group
+caption=Cuda&-Ext\Ta&bs\&Other group\Close tab in next group
 method=close_tab_from_next_group
-[item145]
+[item198]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Other group\Close active tab in previous group
+caption=Cuda&-Ext\Ta&bs\&Other group\Close tab in previous group
 method=close_tab_from_prev_group
 
-[item146]
+[item199]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Other group\Switch tab to next in next group
+caption=Cuda&-Ext\Ta&bs\&Other group\-
+method=_
+
+[item200]
+section=commands
+caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to next in next group
 method=view_next_tab_from_next_group
-[item147]
+[item201]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Other group\Switch tab to next in previous group
+caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to next in previous group
 method=view_next_tab_from_prev_group
-[item148]
+[item202]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Other group\Switch tab to previous in next group
+caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to previous in next group
 method=view_prev_tab_from_next_group
-[item149]
+[item203]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Other group\Switch tab to previous in previous group
+caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to previous in previous group
 method=view_prev_tab_from_prev_group
 
-[item150]
+[item204]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Other group\Switch tab to first in next group
+caption=Cuda&-Ext\Ta&bs\&Other group\-
+method=_
+
+[item205]
+section=commands
+caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to first in next group
 method=view_first_tab_from_next_group
-[item151]
+[item206]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Other group\Switch tab to first in previous group
+caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to first in previous group
 method=view_first_tab_from_prev_group
-[item152]
+[item207]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Other group\Switch tab to last in next group
+caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to last in next group
 method=view_last_tab_from_next_group
-[item153]
+[item208]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Other group\Switch tab to last in previous group
+caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to last in previous group
 method=view_last_tab_from_prev_group
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Move_sep_cmds
-[item161]
+[item211]
 section=commands
-caption=Cuda&-Ext\&Splitters\Move splitter to expand side panel
+caption=Cuda&-Ext\&Splitters\Expand side panel
 method=more_tree
-[item162]
+[item212]
 section=commands
-caption=Cuda&-Ext\&Splitters\Move splitter to narrow side panel
+caption=Cuda&-Ext\&Splitters\Narrow side panel
 method=less_tree
-[item163]
+
+[item213]
 section=commands
-caption=Cuda&-Ext\&Splitters\Move splitter to expand bottom panel
+caption=Cuda&-Ext\&Splitters\-
+method=-
+[item214]
+section=commands
+caption=Cuda&-Ext\&Splitters\Expand bottom panel
 method=more_bottom
-[item164]
+[item215]
 section=commands
-caption=Cuda&-Ext\&Splitters\Move splitter to narrow bottom panel
+caption=Cuda&-Ext\&Splitters\Narrow bottom panel
 method=less_bottom
-[item165]
+
+[item216]
 section=commands
-caption=Cuda&-Ext\&Splitters\Move splitter to expand top-left group
+caption=Cuda&-Ext\&Splitters\-
+method=-
+[item217]
+section=commands
+caption=Cuda&-Ext\&Splitters\Expand top-left group
 method=more_main_grp
-[item166]
+[item218]
 section=commands
-caption=Cuda&-Ext\&Splitters\Move splitter to narrow top-left group
+caption=Cuda&-Ext\&Splitters\Narrow top-left group
 method=less_main_grp
-[item167]
+
+[item219]
 section=commands
-caption=Cuda&-Ext\&Splitters\Move splitter to expand active group
+caption=Cuda&-Ext\&Splitters\-
+method=-
+[item220]
+section=commands
+caption=Cuda&-Ext\&Splitters\Expand active group
 method=more_curr_grp
-[item168]
+[item221]
 section=commands
-caption=Cuda&-Ext\&Splitters\Move splitter to narrow active group
+caption=Cuda&-Ext\&Splitters\Narrow active group
 method=less_curr_grp
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Paragraph_cmds
-[item211]
+[item241]
 section=commands
-caption=Cuda&-Ext\Para&graph\Go to Beginning of Paragraph 
+caption=Cuda&-Ext\Para&graph\Go to beginning
 method=go_prgph_bgn
 
-[item212]
+[item242]
 section=commands
-caption=Cuda&-Ext\Para&graph\Go to End of Paragraph 
+caption=Cuda&-Ext\Para&graph\Go to end
 method=go_prgph_end
 
-[item213]
+[item243]
 section=commands
-caption=Cuda&-Ext\Para&graph\Go to Next Paragraph 
+caption=Cuda&-Ext\Para&graph\Go to next
 method=go_prgph_nxt
 
-[item214]
+[item244]
 section=commands
-caption=Cuda&-Ext\Para&graph\Go to Previous Paragraph 
+caption=Cuda&-Ext\Para&graph\Go to previous
 method=go_prgph_prv
 
-[item219]
+[item249]
 section=commands
 caption=Cuda&-Ext\Para&graph\-
 method=_
 
-[item220]
+[item250]
 section=commands
-caption=Cuda&-Ext\Para&graph\Align paragraph(s): Configure...
+caption=Cuda&-Ext\Para&graph\Align: Configure...
 method=align_prgph_cfg
 
-[item221]
+[item251]
 section=commands
-caption=Cuda&-Ext\Para&graph\Align paragraph(s): Left justify 
+caption=Cuda&-Ext\Para&graph\Align: Left justify 
 method=align_prgph_l
 
-[item222]
+[item252]
 section=commands
-caption=Cuda&-Ext\Para&graph\Align paragraph(s): Right justify 
+caption=Cuda&-Ext\Para&graph\Align: Right justify 
 method=align_prgph_r
 
-[item223]
+[item253]
 section=commands
-caption=Cuda&-Ext\Para&graph\Align paragraph(s): Center justify 
+caption=Cuda&-Ext\Para&graph\Align: Center justify 
 method=align_prgph_c
 
-[item224]
+[item254]
 section=commands
-caption=Cuda&-Ext\Para&graph\Align paragraph(s): Fully justify 
+caption=Cuda&-Ext\Para&graph\Align: Fully justify 
 method=align_prgph_f
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Tree_cmds
+[item271]
+section=commands
+caption=Cuda&-Ext\Code &Tree\Show &current path in statusbar
+method=tree_path_to_status
+
+[item272]
+section=commands
+caption=Cuda&-Ext\Code &Tree\Set &active node, nearest to caret
+method=set_nearest_tree_node
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Align_cmds
+[item311]
+section=commands
+caption=Cuda&-Ext\&Align\Reindent selected lines...
+method=reindent
+
+[item312]
+section=commands
+caption=Cuda&-Ext\&Align\Indent lines like the first selected
+method=indent_sel_as_1st
+
+[item313]
+section=commands
+caption=Cuda&-Ext\&Align\Align in lines by separator...
+method=align_in_lines_by_sep
+
+[item314]
+section=commands
+caption=Cuda&-Ext\&Align\-
+method=_
+
+[item315]
+section=commands
+caption=Cuda&-Ext\&Align\Join selected lines
+method=join_lines
+
+[item316]
+section=commands
+caption=Cuda&-Ext\&Align\Delete duplicate spaces
+method=del_more_spaces
+
+[item317]
+section=commands
+caption=Cuda&-Ext\&Align\-
+method=_
+
+[item318]
+section=commands
+caption=Cuda&-Ext\&Align\Re-wrap/split lines by margin
+method=rewrap_sel_by_margin
+
+[item319]
+section=commands
+caption=Cuda&-Ext\&Align\Align in lines to center by margin
+method=align_sel_to_center_by_margin
+
+[item320]
+section=commands
+caption=Cuda&-Ext\&Align\Align in lines to right by margin
+method=align_sel_to_right_by_margin
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Misc_cmds
+[item341]
+section=commands
+caption=Cuda&-Ext\F&ile\Open &recent file...
+method=open_recent
+
+[item342]
+section=commands
+caption=Cuda&-Ext\F&ile\-
+method=_
+
+[item343]
+section=commands
+caption=Cuda&-Ext\F&ile\Re&name file...
+method=rename_file
+
+[item344]
+section=commands
+caption=Cuda&-Ext\F&ile\Ne&w file and save in current folder...
+method=new_file_save_as_near_cur
+
+[item345]
+section=commands
+caption=Cuda&-Ext\F&ile\Open &all files from folder with sub-folders...
+method=open_all_with_subdir
+
+[item346]
+section=commands
+caption=Cuda&-Ext\F&ile\Open &current file in default application
+method=open_with_defapp
 
