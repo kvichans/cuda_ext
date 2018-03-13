@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.5.01 2018-02-28'
+    '1.5.02 2018-03-13'
 ToDo: (see end of file)
 '''
 
@@ -1521,6 +1521,59 @@ class Find_repl_cmds:
        #def indent_sel_as_1st
     
     @staticmethod
+    def indent_sel_as_bgn():
+        '''
+        Changes single multi-line selection.
+        Changes all lines in sel except 1st, re-indents lines so make
+        indent like in 1st line.
+        Indent of 1st line detected by pos of selection start.
+        
+        Author: github.com/Alexey-T
+        Draft:  github.com/kvichans/cuda_ext/issues/93#issuecomment-372763018
+        '''
+        if ed.get_sel_mode() != app.SEL_NORMAL:
+            return app.msg_status(_('Required single multi-line selection'))
+
+        carets = ed.get_carets()
+        if len(carets)!=1:
+            return app.msg_status(_('Required single multi-line selection'))
+
+        x1, y1, x2, y2 = carets[0]
+        if y2<0 or y1==y2:
+            return app.msg_status(_('Required single multi-line selection'))
+
+        #sort x,y
+        if y1>y2:
+            x1, y1, x2, y2 = x2, y2, x1, y1
+
+        lines = ed.get_text_sel().splitlines()
+        tabsize = ed.get_prop(app.PROP_TAB_SIZE)
+        indent_char = ' ' if ed.get_prop(app.PROP_TAB_SPACES) else '\t'
+        indent_need = x1
+
+        def _get_indent(s, tabsize):
+            r = 0
+            for i in range(len(s)):
+                if s[i]==' ': r+=1
+                elif s[i]=='\t': r+=tabsize
+                else: return r
+            return r
+
+        for i in range(1, len(lines)):
+            s = lines[i]
+
+            while _get_indent(s, tabsize) > indent_need:
+                s = s[1:]
+            while _get_indent(s, tabsize) < indent_need:
+                s = indent_char+s
+
+            lines[i] = s
+
+        ed.replace(x1, y1, x2, y2, '\n'.join(lines))
+        app.msg_status(_('Aligned selection'))
+       #def indent_sel_as_bgn
+    
+    @staticmethod
     def align_sel_by_margin(how):
         pass;                   log('ok',())
         if not apx.get_opt('tab_spaces', False):
@@ -2241,6 +2294,7 @@ class Command:
     def align_in_lines_by_sep(self):            return Find_repl_cmds.align_in_lines_by_sep()
     def reindent(self):                         return Find_repl_cmds.reindent()
     def indent_sel_as_1st(self):                return Find_repl_cmds.indent_sel_as_1st()
+    def indent_sel_as_bgn(self):                return Find_repl_cmds.indent_sel_as_bgn()
     def rewrap_sel_by_margin(self):             return Find_repl_cmds.rewrap_sel_by_margin()
     def align_sel_by_margin(self,how):          return Find_repl_cmds.align_sel_by_margin(how)
     def join_lines(self):                       return Find_repl_cmds.join_lines()

@@ -60,6 +60,7 @@ class Command:
     def align_sel_to_center_by_margin(self):    return RLS.align_sel_by_margin('c')
     def align_sel_to_right_by_margin(self):     return RLS.align_sel_by_margin('r')
     def indent_sel_as_1st(self):                return RLS.indent_sel_as_1st()
+    def indent_sel_as_bgn(self):                return RLS.indent_sel_as_bgn()
     
     # Jumps_cmds
     def scroll_to_center(self):                 return RLS.scroll_to('cen')

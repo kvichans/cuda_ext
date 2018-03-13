@@ -574,40 +574,45 @@ method=indent_sel_as_1st
 
 [item313]
 section=commands
+caption=Cuda&-Ext\&Align\Align indentation of selection
+method=indent_sel_as_bgn
+
+[item314]
+section=commands
 caption=Cuda&-Ext\&Align\Align in lines by separator...
 method=align_in_lines_by_sep
 
-[item314]
+[item315]
 section=commands
 caption=Cuda&-Ext\&Align\-
 method=_
 
-[item315]
+[item316]
 section=commands
 caption=Cuda&-Ext\&Align\Join selected lines
 method=join_lines
 
-[item316]
+[item317]
 section=commands
 caption=Cuda&-Ext\&Align\Delete duplicate spaces
 method=del_more_spaces
 
-[item317]
+[item318]
 section=commands
 caption=Cuda&-Ext\&Align\-
 method=_
 
-[item318]
+[item319]
 section=commands
 caption=Cuda&-Ext\&Align\Re-wrap/split lines by margin
 method=rewrap_sel_by_margin
 
-[item319]
+[item320]
 section=commands
 caption=Cuda&-Ext\&Align\Align in lines to center by margin
 method=align_sel_to_center_by_margin
 
-[item320]
+[item321]
 section=commands
 caption=Cuda&-Ext\&Align\Align in lines to right by margin
 method=align_sel_to_right_by_margin
