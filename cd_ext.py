@@ -1523,8 +1523,8 @@ class Find_repl_cmds:
     @staticmethod
     def indent_sel_as_bgn():
         '''
-        Changes single multi-line selection.
-        Changes all lines in sel except 1st, re-indents lines so make
+        Aligns multi-line selections.
+        Changes all lines in sel except 1st, re-indents lines to make
         indent like in 1st line.
         Indent of 1st line detected by pos of selection start.
 
@@ -1532,13 +1532,13 @@ class Find_repl_cmds:
         Draft:  github.com/kvichans/cuda_ext/issues/93#issuecomment-372763018
         '''
         if ed.get_sel_mode() != app.SEL_NORMAL:
-            return app.msg_status(_('Required multi-line selection(s)'))
+            return app.msg_status(_('Required normal selection(s)'))
 
         def _get_indent(s, tabsize):
             r = 0
-            for i in range(len(s)):
-                if s[i]==' ': r+=1
-                elif s[i]=='\t': r+=tabsize
+            for ch in s:
+                if ch==' ': r += 1
+                elif ch=='\t': r += tabsize
                 else: return r
             return r
 
@@ -1570,9 +1570,12 @@ class Find_repl_cmds:
             ed.replace(x1, y1, x2, y2, '\n'.join(lines))
             carets_fixed += 1
 
-        app.msg_status(
-            _('Aligned selection for {} of {} caret(s)').format(
-            carets_fixed, len(carets)))
+        if carets_fixed>0:
+            app.msg_status(
+                _('Aligned selection for {} of {} caret(s)').format(
+                carets_fixed, len(carets)))
+        else:
+            app.msg_status(_('Nothing to align'))
        #def indent_sel_as_bgn
     
     @staticmethod
