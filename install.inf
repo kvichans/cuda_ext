@@ -574,7 +574,7 @@ method=indent_sel_as_1st
 
 [item313]
 section=commands
-caption=Cuda&-Ext\&Align\Align indentation of selection
+caption=Cuda&-Ext\&Align\Align indentation of selection(s)
 method=indent_sel_as_bgn
 
 [item314]
