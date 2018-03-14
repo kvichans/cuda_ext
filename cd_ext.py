@@ -1527,29 +1527,12 @@ class Find_repl_cmds:
         Changes all lines in sel except 1st, re-indents lines so make
         indent like in 1st line.
         Indent of 1st line detected by pos of selection start.
-        
+
         Author: github.com/Alexey-T
         Draft:  github.com/kvichans/cuda_ext/issues/93#issuecomment-372763018
         '''
         if ed.get_sel_mode() != app.SEL_NORMAL:
-            return app.msg_status(_('Required single multi-line selection'))
-
-        carets = ed.get_carets()
-        if len(carets)!=1:
-            return app.msg_status(_('Required single multi-line selection'))
-
-        x1, y1, x2, y2 = carets[0]
-        if y2<0 or y1==y2:
-            return app.msg_status(_('Required single multi-line selection'))
-
-        #sort x,y
-        if y1>y2:
-            x1, y1, x2, y2 = x2, y2, x1, y1
-
-        lines = ed.get_text_sel().splitlines()
-        tabsize = ed.get_prop(app.PROP_TAB_SIZE)
-        indent_char = ' ' if ed.get_prop(app.PROP_TAB_SPACES) else '\t'
-        indent_need = x1
+            return app.msg_status(_('Required multi-line selection(s)'))
 
         def _get_indent(s, tabsize):
             r = 0
@@ -1559,18 +1542,37 @@ class Find_repl_cmds:
                 else: return r
             return r
 
-        for i in range(1, len(lines)):
-            s = lines[i]
+        carets = ed.get_carets()
+        carets_fixed = 0
+        for caret in reversed(carets):
+            x1, y1, x2, y2 = caret
+            if y2<0 or y1==y2: continue
 
-            while _get_indent(s, tabsize) > indent_need:
-                s = s[1:]
-            while _get_indent(s, tabsize) < indent_need:
-                s = indent_char+s
+            #sort x,y
+            if y1>y2:
+                x1, y1, x2, y2 = x2, y2, x1, y1
 
-            lines[i] = s
+            lines = ed.get_text_substr(x1, y1, x2, y2).splitlines()
+            tabsize = ed.get_prop(app.PROP_TAB_SIZE)
+            indent_char = ' ' if ed.get_prop(app.PROP_TAB_SPACES) else '\t'
+            indent_need = x1
 
-        ed.replace(x1, y1, x2, y2, '\n'.join(lines))
-        app.msg_status(_('Aligned selection'))
+            for i in range(1, len(lines)):
+                s = lines[i]
+
+                while _get_indent(s, tabsize) > indent_need:
+                    s = s[1:]
+                while _get_indent(s, tabsize) < indent_need:
+                    s = indent_char+s
+
+                lines[i] = s
+
+            ed.replace(x1, y1, x2, y2, '\n'.join(lines))
+            carets_fixed += 1
+
+        app.msg_status(
+            _('Aligned selection for {} of {} caret(s)').format(
+            carets_fixed, len(carets)))
        #def indent_sel_as_bgn
     
     @staticmethod
