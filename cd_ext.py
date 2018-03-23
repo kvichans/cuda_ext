@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.5.02 2018-03-13'
+    '1.5.03 2018-03-23'
 ToDo: (see end of file)
 '''
 
@@ -2202,19 +2202,37 @@ class Command:
         hist_fs     = [f.replace('|', os.sep) for f in hist_full_js]
         hist_fts    = [(f.replace(home_s, '~'), os.path.getmtime(f)) 
                         for f in hist_fs if os.path.exists(f)]
-        sort_as     = 't'
+        sort_as     = apx.get_opt('cuda_ext.open-recent.sort_as', 't')
+        show_as     = apx.get_opt('cuda_ext.open-recent.show_as', 'n')
         while True:
             hist_fts    = sorted(hist_fts
-                                , key=lambda ft:ft[1] if sort_as=='t' else ft[0].upper()
+                                , key=lambda ft:(ft[1]          if sort_as=='t' else 
+                                                 ft[0].upper()  if show_as=='p' else 
+                                                 os.path.basename(ft[0]).upper()
+                                                )
                                 , reverse=(sort_as=='t'))
             ans         = app.dlg_menu(app.MENU_LIST, '\n'.join([
-                            f + '\t' + time.strftime("%Y/%b/%d %H:%M", time.gmtime(t))
-                            for f,t in hist_fts
+                            (fn if show_as=='p' else 
+                             f('{} ({})', os.path.basename(fn), os.path.dirname(fn))) 
+                            + '\t' 
+                            + time.strftime("%Y/%b/%d %H:%M", time.gmtime(tm))
+                            for fn,tm in hist_fts
                           ]
-                          +['<Sort by path>' if sort_as=='t' else '<Sort by time>']))
+                          +['<Show "name (path)">'  if show_as=='p' else 
+                            '<Show "path/name">']
+                          +['<Sort by path>'        if sort_as=='t' and show_as=='p' else 
+                            '<Sort by name>'        if sort_as=='t' and show_as=='n' else 
+                            '<Sort by time>']
+                                                               )
+                                      )
             if ans is None: return
-            if ans==len(hist_fts):
+            if ans==(0+len(hist_fts)):
+                show_as     = 'p' if show_as=='n' else 'n'
+                apx.set_opt('cuda_ext.open-recent.show_as', show_as)
+                continue #while
+            if ans==(1+len(hist_fts)):
                 sort_as     = 'p' if sort_as=='t' else 't'
+                apx.set_opt('cuda_ext.open-recent.sort_as', sort_as)
                 continue #while
             return app.file_open(hist_fts[ans][0].replace('~', home_s))
 #           break#while
