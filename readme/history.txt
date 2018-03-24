@@ -1,11 +1,12 @@
 1.5.03 (2018-03-23)
-added: command "Open recent file" can switch "name.ext (path)" <-> "path/name.ext"
+added: command "Open recent file" gives items <Show "name (path)">, <Show "path/name">
+added: command "Open recent file" gives items <Sort by name>, <Sort by path>, <Sort by time>
 
 1.5.02 (2018-03-13)
 added: command "Align indentation of selection(s)"
 
 1.5.01 (2018-02-28)
-added: commands in menu Plugins
+added: all commands are visible in menu Plugins
 
 1.4.03 (2018-02-27)
 added: command "Open recent file"
