@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.5.03 2018-03-23'
+    '1.5.04 2018-04-18'
 ToDo: (see end of file)
 '''
 
@@ -2265,8 +2265,13 @@ class Command:
                 files[:5] + ['...'] + files[-5:]
             ))
             , app.MB_OKCANCEL ):   return
-        for fn in files:
+            
+        for (i, fn) in enumerate(files):
+            if i%8 == 0:
+                app.app_idle()
+            app.app_proc(app.PROC_PROGRESSBAR, i * 100 // len(files))
             app.file_open(fn)
+        app.app_proc(app.PROC_PROGRESSBAR, -1)
        #def open_all_with_subdir
     
     def open_with_defapp(self):
