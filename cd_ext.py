@@ -1733,6 +1733,31 @@ class Find_repl_cmds:
 #       ed.delete(0,rTx1, 0,rTx2+1)
 #       ed.insert(0,rTx1, text+'\n')
         ed.set_caret(0,rTx1+len(lines), 0,rTx1)
+       #def _rewrap
+
+    @staticmethod
+    def rewrap_cmt_at_caret():
+        if app.app_api_version()<MIN_API_VER_4_REPL: return app.msg_status(_('Need update application'))
+        margin  = apx.get_opt('margin', 0)
+        lex     = ed.get_prop(app.PROP_LEXER_FILE, '')
+        if not lex: return app.msg_status(_('Need lexer active'))
+        cmt_sgn = app.lexer_proc(app.LEXER_GET_PROP, lex)['c_line']     if lex else ''
+        if not cmt_sgn: return app.msg_status(_('Need lexer with line-comment chars'))
+        
+        x, y, x1, y1 = ed.get_carets()[0]
+        line = ed.get_text_line(y)
+        if not line.lstrip().startswith(cmt_sgn):
+            return app.msg_status(_('Current line is not line-comment'))
+        prefix = line[:line.find(cmt_sgn)+len(cmt_sgn)]
+        line1 = y
+        line2 = y
+        while line1>0 and ed.get_text_line(line1-1).startswith(prefix):
+            line1 -= 1
+        while line2<ed.get_line_count()-1 and ed.get_text_line(line2+1).startswith(prefix):
+            line2 += 1
+        
+        Find_repl_cmds._rewrap(margin, cmt_sgn, True, line1, line2)
+       #def rewrap_cmt_at_caret
 
     @staticmethod
     def rewrap_sel_by_margin():
@@ -2331,6 +2356,7 @@ class Command:
     def indent_sel_as_1st(self):                return Find_repl_cmds.indent_sel_as_1st()
     def indent_sel_as_bgn(self):                return Find_repl_cmds.indent_sel_as_bgn()
     def rewrap_sel_by_margin(self):             return Find_repl_cmds.rewrap_sel_by_margin()
+    def rewrap_cmt_at_caret(self):              return Find_repl_cmds.rewrap_cmt_at_caret()
     def align_sel_by_margin(self,how):          return Find_repl_cmds.align_sel_by_margin(how)
     def join_lines(self):                       return Find_repl_cmds.join_lines()
     def del_more_spaces(self):                  return Find_repl_cmds.del_more_spaces()
