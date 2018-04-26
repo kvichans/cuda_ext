@@ -1675,7 +1675,7 @@ class Find_repl_cmds:
        #def del_more_spaces
     
     @staticmethod
-    def _rewrap(margin, cmt_sgn, save_bl, rTx1, rTx2):
+    def _rewrap(margin, cmt_sgn, save_bl, rTx1, rTx2, sel_after):
     
         tab_sz  = apx.get_opt('tab_size', 8)
         lines   = [ed.get_text_line(nln) for nln in range(rTx1, rTx2+1)]
@@ -1732,7 +1732,8 @@ class Find_repl_cmds:
         Find_repl_cmds._replace_lines(ed, rTx1, rTx2, text)
 #       ed.delete(0,rTx1, 0,rTx2+1)
 #       ed.insert(0,rTx1, text+'\n')
-        ed.set_caret(0,rTx1+len(lines), 0,rTx1)
+        if sel_after:
+            ed.set_caret(0,rTx1+len(lines), 0,rTx1)
        #def _rewrap
 
     @staticmethod
@@ -1756,7 +1757,7 @@ class Find_repl_cmds:
         while line2<ed.get_line_count()-1 and ed.get_text_line(line2+1).startswith(prefix):
             line2 += 1
         
-        Find_repl_cmds._rewrap(margin, cmt_sgn, True, line1, line2)
+        Find_repl_cmds._rewrap(margin, cmt_sgn, True, line1, line2, False)
        #def rewrap_cmt_at_caret
 
     @staticmethod
@@ -1794,7 +1795,7 @@ class Find_repl_cmds:
         rTx2        = rTx2-1 if cTx2==0 and rTx1!=rTx2 else rTx2
         pass;                   LOG and log('rTx1, rTx2={}',(rTx1, rTx2))
 
-        Find_repl_cmds._rewrap(margin, cmt_sgn, save_bl, rTx1, rTx2)
+        Find_repl_cmds._rewrap(margin, cmt_sgn, save_bl, rTx1, rTx2, True)
        #def rewrap_sel_by_margin
         
     @staticmethod
