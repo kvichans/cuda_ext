@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.3.14 2017-08-11'
+    '1.3.15 2018-04-26'
 '''
 
 from .cd_ext import Command as CommandRLS
@@ -57,6 +57,7 @@ class Command:
     def join_lines(self):                       return RLS.join_lines()
     def del_more_spaces(self):                  return RLS.del_more_spaces()
     def rewrap_sel_by_margin(self):             return RLS.rewrap_sel_by_margin()
+    def rewrap_cmt_at_caret(self):              return RLS.rewrap_cmt_at_caret()
     def align_sel_to_center_by_margin(self):    return RLS.align_sel_by_margin('c')
     def align_sel_to_right_by_margin(self):     return RLS.align_sel_by_margin('r')
     def indent_sel_as_1st(self):                return RLS.indent_sel_as_1st()

@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.5.04 2018-04-18'
+    '1.5.05 2018-04-26'
 ToDo: (see end of file)
 '''
 
@@ -1675,39 +1675,9 @@ class Find_repl_cmds:
        #def del_more_spaces
     
     @staticmethod
-    def rewrap_sel_by_margin():
-        if app.app_api_version()<MIN_API_VER_4_REPL: return app.msg_status(_('Need update application'))
-        margin  = apx.get_opt('margin', 0)
+    def _rewrap(margin, cmt_sgn, save_bl, rTx1, rTx2):
+    
         tab_sz  = apx.get_opt('tab_size', 8)
-        lex     = ed.get_prop(app.PROP_LEXER_FILE, '')
-#       cmt_sgn = app.lexer_proc(app.LEXER_GET_COMMENT, lex)            if lex else ''
-        cmt_sgn = app.lexer_proc(app.LEXER_GET_PROP, lex)['c_line']     if lex else ''
-        aid,vals,chds   = dlg_wrapper(_('Re-wrap lines'), 5+165+5,5+120+5,     #NOTE: dlg-rewrap
-             [dict(           tp='lb'   ,tid='marg' ,l=5        ,w=120  ,cap=_('&Margin:')      ) # &m
-             ,dict(cid='marg',tp='ed'   ,t=5        ,l=5+120    ,w=45                           ) # 
-             ,dict(           tp='lb'   ,tid='csgn' ,l=5        ,w=120  ,cap=_('&Comment sign:')) # &c
-             ,dict(cid='csgn',tp='ed'   ,t=5+30     ,l=5+120    ,w=45                           )
-             ,dict(cid='svbl',tp='ch'   ,t=5+60     ,l=5        ,w=165  ,cap=_('&Keep indent')  ) # &s
-             ,dict(cid='!'   ,tp='bt'   ,t=5+120-28 ,l=5        ,w=80   ,cap=_('OK'),  props='1') #     default
-             ,dict(cid='-'   ,tp='bt'   ,t=5+120-28 ,l=5+80+5   ,w=80   ,cap=_('Cancel')        )
-             ],    dict(marg=str(margin)
-                       ,csgn=cmt_sgn
-                       ,svbl=True), focus_cid='marg')
-        if aid is None or aid=='-': return None
-        if not vals['marg'].isdigit(): return app.msg_status('Not digit margin')
-        margin  = int(vals['marg'])
-        cmt_sgn =     vals['csgn']
-        save_bl =     vals['svbl']
-        crts    = ed.get_carets()
-        if len(crts)>1:
-            return app.msg_status(ONLY_SINGLE_CRT.format(_('Command')))
-        cCrt, rCrt, \
-        cEnd, rEnd  = crts[0]
-        cEnd, rEnd  = (cCrt, rCrt) if -1==rEnd else (cEnd, rEnd)
-        (rTx1,cTx1),\
-        (rTx2,cTx2) = apx.minmax((rCrt, cCrt), (rEnd, cEnd))
-        rTx2        = rTx2-1 if cTx2==0 and rTx1!=rTx2 else rTx2
-        pass;                   LOG and log('rTx1, rTx2={}',(rTx1, rTx2))
         lines   = [ed.get_text_line(nln) for nln in range(rTx1, rTx2+1)]
         pass;                   LOG and log('lines={}',(lines))
         # Extract prefix by comment-sign
@@ -1763,8 +1733,70 @@ class Find_repl_cmds:
 #       ed.delete(0,rTx1, 0,rTx2+1)
 #       ed.insert(0,rTx1, text+'\n')
         ed.set_caret(0,rTx1+len(lines), 0,rTx1)
-       #def rewrap_sel_by_margin
+       #def _rewrap
 
+    @staticmethod
+    def rewrap_cmt_at_caret():
+        if app.app_api_version()<MIN_API_VER_4_REPL: return app.msg_status(_('Need update application'))
+        margin  = apx.get_opt('margin', 0)
+        lex     = ed.get_prop(app.PROP_LEXER_FILE, '')
+        if not lex: return app.msg_status(_('Need lexer active'))
+        cmt_sgn = app.lexer_proc(app.LEXER_GET_PROP, lex)['c_line']     if lex else ''
+        if not cmt_sgn: return app.msg_status(_('Need lexer with line-comment chars'))
+        
+        x, y, x1, y1 = ed.get_carets()[0]
+        line = ed.get_text_line(y)
+        if not line.lstrip().startswith(cmt_sgn):
+            return app.msg_status(_('Current line is not line-comment'))
+        prefix = line[:line.find(cmt_sgn)+len(cmt_sgn)]
+        line1 = y
+        line2 = y
+        while line1>0 and ed.get_text_line(line1-1).startswith(prefix):
+            line1 -= 1
+        while line2<ed.get_line_count()-1 and ed.get_text_line(line2+1).startswith(prefix):
+            line2 += 1
+        
+        Find_repl_cmds._rewrap(margin, cmt_sgn, True, line1, line2)
+       #def rewrap_cmt_at_caret
+
+    @staticmethod
+    def rewrap_sel_by_margin():
+        if app.app_api_version()<MIN_API_VER_4_REPL: return app.msg_status(_('Need update application'))
+        margin  = apx.get_opt('margin', 0)
+        lex     = ed.get_prop(app.PROP_LEXER_FILE, '')
+#       cmt_sgn = app.lexer_proc(app.LEXER_GET_COMMENT, lex)            if lex else ''
+        cmt_sgn = app.lexer_proc(app.LEXER_GET_PROP, lex)['c_line']     if lex else ''
+        aid,vals,chds   = dlg_wrapper(_('Re-wrap lines'), 5+165+5,5+120+5,     #NOTE: dlg-rewrap
+             [dict(           tp='lb'   ,tid='marg' ,l=5        ,w=120  ,cap=_('&Margin:')      ) # &m
+             ,dict(cid='marg',tp='ed'   ,t=5        ,l=5+120    ,w=45                           ) # 
+             ,dict(           tp='lb'   ,tid='csgn' ,l=5        ,w=120  ,cap=_('&Comment sign:')) # &c
+             ,dict(cid='csgn',tp='ed'   ,t=5+30     ,l=5+120    ,w=45                           )
+             ,dict(cid='svbl',tp='ch'   ,t=5+60     ,l=5        ,w=165  ,cap=_('&Keep indent')  ) # &s
+             ,dict(cid='!'   ,tp='bt'   ,t=5+120-28 ,l=5        ,w=80   ,cap=_('OK'),  props='1') #     default
+             ,dict(cid='-'   ,tp='bt'   ,t=5+120-28 ,l=5+80+5   ,w=80   ,cap=_('Cancel')        )
+             ],    dict(marg=str(margin)
+                       ,csgn=cmt_sgn
+                       ,svbl=True), focus_cid='marg')
+        if aid is None or aid=='-': return None
+        if not vals['marg'].isdigit(): return app.msg_status('Not digit margin')
+        margin  = int(vals['marg'])
+        cmt_sgn =     vals['csgn']
+        save_bl =     vals['svbl']
+        
+        crts    = ed.get_carets()
+        if len(crts)>1:
+            return app.msg_status(ONLY_SINGLE_CRT.format(_('Command')))
+        cCrt, rCrt, \
+        cEnd, rEnd  = crts[0]
+        cEnd, rEnd  = (cCrt, rCrt) if -1==rEnd else (cEnd, rEnd)
+        (rTx1,cTx1),\
+        (rTx2,cTx2) = apx.minmax((rCrt, cCrt), (rEnd, cEnd))
+        rTx2        = rTx2-1 if cTx2==0 and rTx1!=rTx2 else rTx2
+        pass;                   LOG and log('rTx1, rTx2={}',(rTx1, rTx2))
+
+        Find_repl_cmds._rewrap(margin, cmt_sgn, save_bl, rTx1, rTx2)
+       #def rewrap_sel_by_margin
+        
     @staticmethod
     def _replace_lines(_ed, r_bgn, r_end, newlines):
         """ Replace full lines in [r_bgn, r_end] to newlines """
@@ -2324,6 +2356,7 @@ class Command:
     def indent_sel_as_1st(self):                return Find_repl_cmds.indent_sel_as_1st()
     def indent_sel_as_bgn(self):                return Find_repl_cmds.indent_sel_as_bgn()
     def rewrap_sel_by_margin(self):             return Find_repl_cmds.rewrap_sel_by_margin()
+    def rewrap_cmt_at_caret(self):              return Find_repl_cmds.rewrap_cmt_at_caret()
     def align_sel_by_margin(self,how):          return Find_repl_cmds.align_sel_by_margin(how)
     def join_lines(self):                       return Find_repl_cmds.join_lines()
     def del_more_spaces(self):                  return Find_repl_cmds.del_more_spaces()
