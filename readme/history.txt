@@ -1,3 +1,6 @@
+1.5.05 (2018-04-26)
+added: command 'Align / Re-wrap/split comment at caret'
+
 1.5.04 (2018-04-18)
 fixed: app looks hanging on Linux, if command "Open files in dir+subdirs" opens 100+ files
 
