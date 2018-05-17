@@ -22,6 +22,7 @@ class Command:
     # Tree_cmds
     def tree_path_to_status(self):              return RLS.tree_path_to_status()
     def set_nearest_tree_node(self):            return RLS.set_nearest_tree_node()
+    def find_tree_node(self):                   return RLS.find_tree_node()
     
     # Insert_cmds
     def add_indented_line_above(self):          return RLS.add_indented_line_above()

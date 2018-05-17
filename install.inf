@@ -349,99 +349,99 @@ method=to_tab_g2_t3
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #4 in group #2
 method=to_tab_g2_t4
-[item187]
+[item188]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #5 in group #2
 method=to_tab_g2_t5
-[item188]
+[item189]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #6 in group #2
 method=to_tab_g2_t6
-[item189]
+[item190]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #7 in group #2
 method=to_tab_g2_t7
-[item190]
+[item191]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #8 in group #2
 method=to_tab_g2_t8
-[item191]
+[item192]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #9 in group #2
 method=to_tab_g2_t9
 
-[item192]
+[item193]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate last tab in group #1
 method=to_tab_g1_last
-[item193]
+[item194]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate last tab in group #2
 method=to_tab_g2_last
 
-[item194]
+[item195]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate next tab (global loop)
 method=to_next_tab
-[item195]
+[item196]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate previous tab (global loop)
 method=to_prev_tab
 
-[item196]
+[item197]
 section=commands
 caption=Cuda&-Ext\Ta&bs\-
 method=_
 
-[item197]
+[item198]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Close tab in next group
 method=close_tab_from_next_group
-[item198]
+[item199]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Close tab in previous group
 method=close_tab_from_prev_group
 
-[item199]
+[item200]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\-
 method=_
 
-[item200]
+[item201]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to next in next group
 method=view_next_tab_from_next_group
-[item201]
+[item202]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to next in previous group
 method=view_next_tab_from_prev_group
-[item202]
+[item203]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to previous in next group
 method=view_prev_tab_from_next_group
-[item203]
+[item204]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to previous in previous group
 method=view_prev_tab_from_prev_group
 
-[item204]
+[item205]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\-
 method=_
 
-[item205]
+[item206]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to first in next group
 method=view_first_tab_from_next_group
-[item206]
+[item207]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to first in previous group
 method=view_first_tab_from_prev_group
-[item207]
+[item208]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to last in next group
 method=view_last_tab_from_next_group
-[item208]
+[item209]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to last in previous group
 method=view_last_tab_from_prev_group
@@ -560,6 +560,11 @@ section=commands
 caption=Cuda&-Ext\Code &Tree\Set &active node, nearest to caret
 method=set_nearest_tree_node
 
+[item273]
+section=commands
+caption=Cuda&-Ext\Code &Tree\&Find node...
+method=find_tree_node
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Align_cmds
 [item311]
@@ -604,7 +609,7 @@ method=_
 
 [item319]
 section=commands
-caption=Cuda&-Ext\&Align\Re-wrap/split lines by margin
+caption=Cuda&-Ext\&Align\Re-wrap/split lines by margin...
 method=rewrap_sel_by_margin
 
 [item320]
@@ -612,12 +617,12 @@ section=commands
 caption=Cuda&-Ext\&Align\Re-wrap/split comment at caret
 method=rewrap_cmt_at_caret
 
-[item330]
+[item321]
 section=commands
 caption=Cuda&-Ext\&Align\Align in lines to center by margin
 method=align_sel_to_center_by_margin
 
-[item331]
+[item322]
 section=commands
 caption=Cuda&-Ext\&Align\Align in lines to right by margin
 method=align_sel_to_right_by_margin

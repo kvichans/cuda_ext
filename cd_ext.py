@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.5.05 2018-04-26'
+    '1.5.06 2018-05-17'
 ToDo: (see end of file)
 '''
 
@@ -22,6 +22,7 @@ try:
 except: 
     _   = lambda p:p
 
+d       = dict
 OrdDict = collections.OrderedDict
 
 FROM_API_VERSION    = '1.0.119'
@@ -44,8 +45,8 @@ NO_SPR_IN_LINES     = _("No separator '{}' in selected lines")
 DONT_NEED_CHANGE    = _("Text change not needed")
 
 pass;                           # Logging
-pass;                          #from pprint import pformat
-pass;                          #pfrm15=lambda d:pformat(d,width=15)
+pass;                           from pprint import pformat
+pass;                           pfrm100=lambda d:pformat(d,width=100)
 pass;                           LOG = (-2== 2)  # Do or dont logging.
 pass;                           ##!! waits correction
 
@@ -89,10 +90,116 @@ class Tree_cmds:
        #def tree_path_to_status
    
     @staticmethod
+    def find_tree_node():
+        pass;                  #return log('ok')
+        ID_TREE = app.app_proc(app.PROC_SIDEPANEL_GET_CONTROL, 'Code tree')
+        if not ID_TREE: return app.msg_status(_('No CodeTree'))
+        # Scan Tree
+        tree_t  = []        # [{nid:ID, sub:[{nid:ID, sub:{}, cap:'smth'},], cap:'smth'},]
+        tree_p  = []        # [(ID, 'smth'),]
+        tree_sid= app.tree_proc(ID_TREE, app.TREE_ITEM_GET_SELECTED)
+        def scan_tree(id_prnt, tree_nds):
+            nonlocal tree_p
+            kids            = app.tree_proc(ID_TREE, app.TREE_ITEM_ENUM, id_prnt)
+            if kids is None:    return None
+            for nid, cap in kids:
+                tree_p     += [(nid, cap)]
+                sub         = scan_tree(nid, [])
+                tree_nds   += [d(nid=nid, cap=cap, sub=sub) if sub else d(id=nid, cap=cap)]
+#               nd          = dict(id=nid, cap=cap)
+#               if sub:
+#                   nd['sub']   = sub
+#               tree_nds   += [nd]
+            return tree_nds
+           #def scan_tree
+        ID_ROOT = 0
+        scan_tree(ID_ROOT, tree_t)
+        pass;                  #log('tree_t={}',pfrm100(tree_t))
+        pass;                  #log('tree_p={}',pfrm100(tree_p))
+        # Ask
+        id_found    = None
+        def do_attr(aid, ag, data=''):
+#           if aid=='xpth' and ag.cval(aid):    return d(vals=d(reex=False, case=False, word=False), fid='what')
+#           if aid!='xpth' and ag.cval(aid):    return d(vals=d(xpth=False)                        , fid='what')
+            return d(fid='what')
+           #def do_attr
+        def do_menu(aid, ag, data=''):
+            def wnen_menu(ag, tag):
+                if False:pass
+                elif tag=='help':   app.msg_box(_('...help...'), app.MB_OK)
+                return []
+               #def wnen_menu
+            ag.show_menu(aid, 
+                [ d(    tag='help'          ,cap=_('&Help...')  ,cmd=wnen_menu
+                )]
+            )
+            return []
+           #def do_menu
+        def do_find(aid, ag, data=''):
+            nonlocal id_found, tree_p
+            what    = ag.cval('what').strip()
+            pass;               log('what={}',(what))
+            if not what:    return []
+            hows    = ag.cvals(['reex','case','word','wrap'])
+#           hows    = ag.cvals(['reex','case','word','xpth','wrap'])
+            pass;              #log('hows={}',(hows))
+            if hows['wrap'] and tree_sid:
+                nids    = [nid for nid, cap in tree_p]
+                pos     = nids.index(tree_sid)
+                tree_p  = tree_p[pos+1:] + tree_p[:pos+1]
+                pass;          #log('tree_p={}',pfrm100(tree_p))
+
+            if False: #hows['xpth']:
+                # XPath-like search
+                pass
+            else:
+                # Common search
+                pttn_s  = what
+                flags   = 0 if hows['case'] else re.I
+                if not    hows['reex']:
+                    if    hows['word'] and re.match('^\w+$', pttn_s):
+                        pttn_s  = r'\b'+pttn_s+r'\b'
+                    else:
+                        pttn_s  = re.escape(pttn_s)
+                pass;          #log('pttn_s, flags={}',(pttn_s, flags))
+                pttn_r  = re.compile(pttn_s, flags)
+                for nid, cap in tree_p:
+                    if pttn_r.search(cap):
+                        id_found    = nid
+                        break
+            return None if id_found else []
+           #def do_find
+        wh_l    = []
+#       attrs   = 
+        DlgAgent(
+            form    =dict(cap=_('Find tree node'), w=400-40, h=35, h_max=35, resize=True)
+        ,   ctrls   =[0
+    ,('find',d(tp='bt'  ,t=0        ,l=0        ,w=0    ,cap=''     ,sto=False  ,def_bt='1'         ,call=do_find           ))  # Enter
+    ,('reex',d(tp='ch-b',tid='what' ,l=5+38*0   ,w=39   ,cap='.&*'  ,hint=_('Regular expression')   ,call=do_attr           ))  # &*
+    ,('case',d(tp='ch-b',tid='what' ,l=5+38*1   ,w=39   ,cap='&aA'  ,hint=_('Case sensative')       ,call=do_attr           ))  # &a
+    ,('word',d(tp='ch-b',tid='what' ,l=5+38*2   ,w=39   ,cap='"&w"' ,hint=_('Whole words')          ,call=do_attr           ))  # &w
+#   ,('xpth',d(tp='ch-b',tid='what' ,l=5+38*3   ,w=39   ,cap='&/'   ,hint=_('XPath expression')     ,call=do_attr           ))  # &/
+    ,('wrap',d(tp='ch-b',tid='what' ,l=5+38*3   ,w=39   ,cap='&O'   ,hint=_('Wrapped search')       ,call=do_attr           ))  # &/
+    ,('what',d(tp='cb'  ,t  =5      ,l=5+38*4+5 ,w=155  ,items=wh_l                                                 ,a='lR' ))  # 
+    ,('menu',d(tp='bt'  ,tid='what' ,l=325      ,w=30   ,cap='&='                                   ,call=do_menu   ,a='LR' ))  # &=
+                    ][1:]
+        ,   fid     ='what'
+        ,   vals    = d(reex=False,case=False,word=False,wrap=False)
+#       ,   vals    = d(reex=False,case=False,word=False,xpth=False,wrap=False)
+#                              ,options={'gen_repro_to_file':'repro_dlg_pres.py'}
+        ).show()
+        if not id_found:    return 
+        # Select node
+        app.tree_proc(ID_TREE, app.TREE_ITEM_SELECT, id_found)
+        c_min, r_min,   \
+        c_max, r_max    = app.tree_proc(ID_TREE, app.TREE_ITEM_GET_RANGE, id_found)
+        ed.set_caret(c_min, r_min)
+       #def find_tree_node
+   
+    @staticmethod
     def set_nearest_tree_node():
         path_l, gap = Tree_cmds._get_best_tree_path(ed.get_carets()[0][1])
         if not path_l:  return
-#       ID_TREE = app.app_proc(app.PROC_SIDEPANEL_GET_CONTROL, 'Tree')
         ID_TREE = app.app_proc(app.PROC_SIDEPANEL_GET_CONTROL, 'Code tree')
         if not ID_TREE: return
         app.tree_proc(ID_TREE, app.TREE_ITEM_SELECT, path_l[-1][0])
@@ -109,7 +216,6 @@ class Tree_cmds:
                          <0 if nearest node above
         """
         ed.cmd(cmds.cmd_TreeUpdate)
-#       ID_TREE = app.app_proc(app.PROC_SIDEPANEL_GET_CONTROL, 'Tree')
         ID_TREE = app.app_proc(app.PROC_SIDEPANEL_GET_CONTROL, 'Code tree')
         if not ID_TREE: return [], INF
         INF     = 0xFFFFFFFF
@@ -127,7 +233,7 @@ class Tree_cmds:
                 pass;           LOG and log('kid, cap={}',(kid, cap))
                 cMin, rMin, \
                 cMax, rMax  = app.tree_proc(ID_TREE, app.TREE_ITEM_GET_SYNTAX_RANGE , kid) \
-                                if app.app_api_version() < '1.0.266' else \
+                                if app.app_api_version() < '1.0.226' else \
                               app.tree_proc(ID_TREE, app.TREE_ITEM_GET_RANGE        , kid)
                 pass;          #LOG and log('? kid,cap, rMin,rMax,row={}',(kid,cap, rMin,rMax,row))
                 if False:pass
@@ -1451,7 +1557,7 @@ class Find_repl_cmds:
                           ,news=new_s)
         fid         = 'olds'
         while True:
-            btn,vals,_t = dlg_wrapper(f(_('Reindent selected lines ({})'), rSelE-rSelB+1), 245,120,     #NOTE: dlg-reindent
+            btn,vals,_t,_p = dlg_wrapper(f(_('Reindent selected lines ({})'), rSelE-rSelB+1), 245,120,     #NOTE: dlg-reindent
                  [dict(           tp='lb'   ,tid='olds' ,l=5        ,w=150  ,cap='>'+_('&Old indent step:') ,hint=fill_h) # &o
                  ,dict(cid='olds',tp='ed'   ,t=10       ,l=5+150+5  ,w= 80                                              ) # 
                  ,dict(           tp='lb'   ,tid='news' ,l=5        ,w=150  ,cap='>'+_('&New indent step:') ,hint=fill_h) # &n
@@ -1767,7 +1873,7 @@ class Find_repl_cmds:
         lex     = ed.get_prop(app.PROP_LEXER_FILE, '')
 #       cmt_sgn = app.lexer_proc(app.LEXER_GET_COMMENT, lex)            if lex else ''
         cmt_sgn = app.lexer_proc(app.LEXER_GET_PROP, lex)['c_line']     if lex else ''
-        aid,vals,chds   = dlg_wrapper(_('Re-wrap lines'), 5+165+5,5+120+5,     #NOTE: dlg-rewrap
+        aid,vals,_t,chds   = dlg_wrapper(_('Re-wrap lines'), 5+165+5,5+120+5,     #NOTE: dlg-rewrap
              [dict(           tp='lb'   ,tid='marg' ,l=5        ,w=120  ,cap=_('&Margin:')      ) # &m
              ,dict(cid='marg',tp='ed'   ,t=5        ,l=5+120    ,w=45                           ) # 
              ,dict(           tp='lb'   ,tid='csgn' ,l=5        ,w=120  ,cap=_('&Comment sign:')) # &c
@@ -2174,7 +2280,7 @@ class Command:
         new_stem= old_stem
         new_ext = old_ext
         while True:
-            btn,vals,chds   = dlg_wrapper(_('Rename file'), GAP+300+GAP,GAP+80+GAP,     #NOTE: dlg-rename
+            btn,vals,_t,chds   = dlg_wrapper(_('Rename file'), GAP+300+GAP,GAP+80+GAP,     #NOTE: dlg-rename
                  [dict(           tp='lb'   ,t=GAP          ,l=GAP          ,w=200      ,cap=_('Enter new file name:')  ) # &e
                  ,dict(cid='stem',tp='ed'   ,t=GAP+18       ,l=GAP          ,w=200+10                                   ) # 
                  ,dict(           tp='lb'   ,tid='stem'     ,l=GAP+200+12   ,w=8        ,cap='.'                        ) # &.
@@ -2341,6 +2447,7 @@ class Command:
     
     def tree_path_to_status(self):              return Tree_cmds.tree_path_to_status()
     def set_nearest_tree_node(self):            return Tree_cmds.set_nearest_tree_node()
+    def find_tree_node(self):                   return Tree_cmds.find_tree_node()
     
     def add_indented_line_above(self):          return Insert_cmds.add_indented_line_above()
     def add_indented_line_below(self):          return Insert_cmds.add_indented_line_below()
