@@ -1,3 +1,6 @@
+1.5.07 (2018-05-22)
+added: command 'Code Tree / Find node' - allow to jump over found nodes
+
 1.5.06 (2018-05-17)
 added: command 'Code Tree / Find node'
 

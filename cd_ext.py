@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.5.06 2018-05-17'
+    '1.5.07 2018-05-22'
 ToDo: (see end of file)
 '''
 
@@ -24,6 +24,7 @@ except:
 
 d       = dict
 OrdDict = collections.OrderedDict
+first_true  = lambda iterable, default=False, pred=None: next(filter(pred, iterable), default)  # 10.1.2. Itertools Recipes
 
 FROM_API_VERSION    = '1.0.119'
 FROM_API_VERSION    = '1.0.182'     # PROC_SPLITTER_GET/SET, LOG_CONSOLE_GET_MEMO_LINES
@@ -91,109 +92,195 @@ class Tree_cmds:
    
     @staticmethod
     def find_tree_node():
-        pass;                  #return log('ok')
+        HELP_C  = _(
+            'Search starts on Enter.'
+          '\rA found node after current one will be selected.'
+          '\rAll found nodes are remembered and dialog can jump over them:'
+          '\r    by buttons < or >'
+          '\r    by hotkeys Alt+< or Alt+> (Alt+, and Alt+. also work).'
+          '\rHint: Enter also jumps to next node.'
+          '\rIf option "O" (wrapped search) is tuned on:'
+          '\r    - Search continues from the start, when end of the tree is reached,'
+          '\r    - Jumps to previous/next nodes are looped too.'
+          '\rOption ".* (Regular expression) allows to use python\'s syntax.'
+          '\r   See "docs.python.org/3/library/re.html".'
+          '\rIf option "Close on success" (in menu) is tuned on,'
+          '\r    dialog will close after successful search.'
+          '\rOption "Show full tree path" (in menu) allow to see in status'
+          '\r   the found node and all parents.'
+        )
+        opts_s  = apx.get_opt('cuda_ext.tree.find_node')
+        opts    = json.loads(opts_s) if opts_s else d(reex=False,case=False,word=False,wrap=False,hist=[],clos=False)
+        opts.setdefault('fpth', False)
+        # Scan Tree
         ID_TREE = app.app_proc(app.PROC_SIDEPANEL_GET_CONTROL, 'Code tree')
         if not ID_TREE: return app.msg_status(_('No CodeTree'))
-        # Scan Tree
-        tree_t  = []        # [{nid:ID, sub:[{nid:ID, sub:{}, cap:'smth'},], cap:'smth'},]
-        tree_p  = []        # [(ID, 'smth'),]
-        tree_sid= app.tree_proc(ID_TREE, app.TREE_ITEM_GET_SELECTED)
-        def scan_tree(id_prnt, tree_nds):
+        tree_t  = []        # [{nid:ID, sub:[{nid:ID, sub:{}, cap:'smth', path:['rt','smth']},], cap:'rt', path:[]},]
+        tree_p  = []        # [,(ID, 'smth',['rt','smth']),]
+        def scan_tree(id_prnt, tree_nds, path_prnt):
             nonlocal tree_p
             kids            = app.tree_proc(ID_TREE, app.TREE_ITEM_ENUM, id_prnt)
             if kids is None:    return None
             for nid, cap in kids:
-                tree_p     += [(nid, cap)]
-                sub         = scan_tree(nid, [])
-                tree_nds   += [d(nid=nid, cap=cap, sub=sub) if sub else d(id=nid, cap=cap)]
-#               nd          = dict(id=nid, cap=cap)
-#               if sub:
-#                   nd['sub']   = sub
-#               tree_nds   += [nd]
+                path        = path_prnt + [cap]
+                tree_p     += [(nid, cap, path)]
+                sub         = scan_tree(nid, [], path)
+#               tree_nds   += [d(nid=nid, cap=cap, path=path, sub=sub) if sub else d(id=nid, cap=cap, path=path)]
             return tree_nds
            #def scan_tree
-        ID_ROOT = 0
-        scan_tree(ID_ROOT, tree_t)
+        scan_tree(0, tree_t, [])    # 0 is root
         pass;                  #log('tree_t={}',pfrm100(tree_t))
         pass;                  #log('tree_p={}',pfrm100(tree_p))
+        
+        # How to select node
+        def select_node(nid):
+            app.tree_proc(ID_TREE, app.TREE_ITEM_SELECT, nid)
+            c_min, r_min,   \
+            c_max, r_max    = app.tree_proc(ID_TREE, app.TREE_ITEM_GET_RANGE, nid)
+            ed.set_caret(c_min, r_min)
+           #def select_node
+        
         # Ask
-        id_found    = None
+        MAX_HIST= apx.get_opt('ui_max_history_edits', 20)
+        stbr    = None
+        status  = lambda msg:  app.statusbar_proc(stbr, app.STATUSBAR_SET_CELL_TEXT, tag=1, value=msg)
+        def add_to_hist(val, lst):
+            """ Add/Move val to list head. """
+            if val in lst:
+                if 0 == lst.index(val):   return lst
+                lst.remove(val)
+            lst.insert(0, val)
+            if len(lst)>MAX_HIST:
+                del lst[MAX_HIST:]
+            return lst
+           #def add_to_hist
+        def compile_pttn(pttn_s, reex, case, word):
+            pttn_s  =           pttn_s          if reex else \
+                          r'\b'+pttn_s+r'\b'    if word and re.match('^\w+$', pttn_s) else \
+                      re.escape(pttn_s)
+            return re.compile(pttn_s, 0 if case else re.I)
+        
+        prev_wt = None          # Prev what
+        ready_l = []            # [(nid,cap|path,ndn)]
+        ready_p = -1            # pos in ready_l
+        nfnd_st = lambda: status(_('No suitable nodes'))
+        ready_st= lambda: status(f(_('{pos}/{all}:  {cap}'), pos=1+ready_p, all=len(ready_l), cap=ready_l[ready_p][1]))
+        prev_en = lambda: ready_l and (opts['wrap'] or ready_p>0)
+        next_en = lambda: ready_l and (opts['wrap'] or ready_p<(len(ready_l)-1))
+        
         def do_attr(aid, ag, data=''):
-#           if aid=='xpth' and ag.cval(aid):    return d(vals=d(reex=False, case=False, word=False), fid='what')
-#           if aid!='xpth' and ag.cval(aid):    return d(vals=d(xpth=False)                        , fid='what')
+            nonlocal prev_wt
+            prev_wt = ''
             return d(fid='what')
-           #def do_attr
         def do_menu(aid, ag, data=''):
             def wnen_menu(ag, tag):
-                if False:pass
-                elif tag=='help':   app.msg_box(_('...help...'), app.MB_OK)
+                nonlocal opts, prev_wt
+                if   tag in ('fpth','clos'):
+                    prev_wt = ''
+                    opts[tag] = not opts[tag]
+                elif tag=='help':
+                    app.msg_box(HELP_C, app.MB_OK)
                 return []
                #def wnen_menu
             ag.show_menu(aid, 
-                [ d(    tag='help'          ,cap=_('&Help...')  ,cmd=wnen_menu
+                [ d(tag='help'  ,cap=_('&Help...')                              ,cmd=wnen_menu
+                ),d(tag='fpth'  ,cap=_('Show full tree path')   ,ch=opts['fpth'],cmd=wnen_menu
+                ),d(tag='clos'  ,cap=_('Close on success')      ,ch=opts['clos'],cmd=wnen_menu
                 )]
             )
-            return []
+            return d(fid='what')
            #def do_menu
+        def do_next(aid, ag, data=''):
+            nonlocal ready_l, ready_p
+            ready_n = ready_p + (-1 if aid in ('prev','pre_') else 1)
+            ready_n = ready_n % len(ready_l) if opts['wrap'] else max(0, min(len(ready_l)-1, ready_n), 0)
+            pass;              #log('ready_n,ready_p={}',(ready_n,ready_p))
+            if ready_p == ready_n:  return d(fid='what')
+            ready_p = ready_n
+            ready_st()
+            select_node(ready_l[ready_p][0])
+            return d(ctrls=[('prev',d(en=prev_en())),('pre_',d(en=prev_en()))
+                           ,('next',d(en=next_en())),('nex_',d(en=next_en()))]
+                    ,fid='what')
+           #def do_next
         def do_find(aid, ag, data=''):
-            nonlocal id_found, tree_p
-            what    = ag.cval('what').strip()
-            pass;               log('what={}',(what))
-            if not what:    return []
-            hows    = ag.cvals(['reex','case','word','wrap'])
-#           hows    = ag.cvals(['reex','case','word','xpth','wrap'])
-            pass;              #log('hows={}',(hows))
-            if hows['wrap'] and tree_sid:
-                nids    = [nid for nid, cap in tree_p]
+            nonlocal opts, tree_p, prev_wt, ready_l, ready_p
+            # What/how/where will search
+            what        = ag.cval('what')#.strip()
+            if prev_wt==what:
+                return do_next(ag, 'next')
+            prev_wt  = what
+            pass;              #log('what={}',(what))
+            if not what:
+                ready_l, ready_p    = [], -1
+                return d(ctrls=[('prev',d(en=prev_en())),('pre_',d(en=prev_en()))
+                               ,('next',d(en=next_en())),('nex_',d(en=next_en()))]
+                        ,fid='what')
+            opts['hist']= add_to_hist(what, opts['hist'])
+            opts.update(ag.cvals(['reex','case','word','wrap']))
+            pass;              #log('opts={}',(opts))
+            tree_sid    = app.tree_proc(ID_TREE, app.TREE_ITEM_GET_SELECTED)    # cur
+            nodes       = tree_p                                                # To find from top
+            if tree_sid and opts['clos']:                                       # To find from cur
+                # Trick: [..,i,sid]+[j,..]   switch to   [j,..] or [j,..]+[..,i]  to search first after cur
+                nids    = [nid for nid, cap, path in tree_p]
                 pos     = nids.index(tree_sid)
-                tree_p  = tree_p[pos+1:] + tree_p[:pos+1]
-                pass;          #log('tree_p={}',pfrm100(tree_p))
-
-            if False: #hows['xpth']:
-                # XPath-like search
-                pass
-            else:
-                # Common search
-                pttn_s  = what
-                flags   = 0 if hows['case'] else re.I
-                if not    hows['reex']:
-                    if    hows['word'] and re.match('^\w+$', pttn_s):
-                        pttn_s  = r'\b'+pttn_s+r'\b'
-                    else:
-                        pttn_s  = re.escape(pttn_s)
-                pass;          #log('pttn_s, flags={}',(pttn_s, flags))
-                pttn_r  = re.compile(pttn_s, flags)
-                for nid, cap in tree_p:
-                    if pttn_r.search(cap):
-                        id_found    = nid
-                        break
-            return None if id_found else []
+                nodes   = tree_p[pos+1:] + (tree_p[:pos] if opts['wrap'] else [])
+#               pass;          #log('nodes={}',pfrm100(nodes))
+            # Search
+            ready_l = []
+            tree_ndn= -1
+            pttn_r  = compile_pttn(what, opts['reex'], opts['case'], opts['word'])
+            for ndn, (nid, cap, path) in enumerate(nodes):
+                if not pttn_r.search(cap):  continue
+                if opts['clos']:
+                    select_node(nid)
+                    return None         # Close dlg
+                ready_l+= [(nid, ' / '.join(path) if opts['fpth'] else cap, ndn)]
+                tree_ndn= ndn if ndn==tree_sid else tree_ndn
+            pass;              #log('ready_l={}',(ready_l))
+            ready_p = -1    if not ready_l  else \
+                      0     if not tree_sid else \
+                      first_true(enumerate(ready_l), 0, (lambda n_nid_cap_ndn: n_nid_cap_ndn[1][2]>tree_ndn))[0]
+            pass;              #log('ready_p={}',(ready_p))
+            # Show results
+            if ready_p!=-1:
+                select_node(ready_l[ready_p][0])
+                if opts['clos']:
+                    return None         # Close dlg
+                ready_st()
+            else: 
+                nfnd_st() 
+            return d(ctrls=[('what',d(items=opts['hist']))
+                           ,('prev',d(en=prev_en())),('pre_',d(en=prev_en()))
+                           ,('next',d(en=next_en())),('nex_',d(en=next_en()))]
+                    ,fid='what')
            #def do_find
-        wh_l    = []
-#       attrs   = 
-        DlgAgent(
-            form    =dict(cap=_('Find tree node'), w=400-40, h=35, h_max=35, resize=True)
+        ag      = DlgAgent(
+            form    =dict(cap=_('Find tree node'), w=415, h=55, h_max=55, resize=True)  #, border_ex=app.DLGBORDER_TOOLWINDOWSIZE
         ,   ctrls   =[0
-    ,('find',d(tp='bt'  ,t=0        ,l=0        ,w=0    ,cap=''     ,sto=False  ,def_bt='1'         ,call=do_find           ))  # Enter
-    ,('reex',d(tp='ch-b',tid='what' ,l=5+38*0   ,w=39   ,cap='.&*'  ,hint=_('Regular expression')   ,call=do_attr           ))  # &*
-    ,('case',d(tp='ch-b',tid='what' ,l=5+38*1   ,w=39   ,cap='&aA'  ,hint=_('Case sensative')       ,call=do_attr           ))  # &a
-    ,('word',d(tp='ch-b',tid='what' ,l=5+38*2   ,w=39   ,cap='"&w"' ,hint=_('Whole words')          ,call=do_attr           ))  # &w
-#   ,('xpth',d(tp='ch-b',tid='what' ,l=5+38*3   ,w=39   ,cap='&/'   ,hint=_('XPath expression')     ,call=do_attr           ))  # &/
-    ,('wrap',d(tp='ch-b',tid='what' ,l=5+38*3   ,w=39   ,cap='&O'   ,hint=_('Wrapped search')       ,call=do_attr           ))  # &/
-    ,('what',d(tp='cb'  ,t  =5      ,l=5+38*4+5 ,w=155  ,items=wh_l                                                 ,a='lR' ))  # 
-    ,('menu',d(tp='bt'  ,tid='what' ,l=325      ,w=30   ,cap='&='                                   ,call=do_menu   ,a='LR' ))  # &=
+    ,('pre_',d(tp='bt'  ,t=0        ,l=0        ,w=0    ,cap='&,'   ,sto=False              ,en=F       ,call=do_next           ))  # &,
+    ,('nex_',d(tp='bt'  ,t=0        ,l=0        ,w=0    ,cap='&.'   ,sto=False              ,en=F       ,call=do_next           ))  # &.
+    ,('find',d(tp='bt'  ,t=0        ,l=0        ,w=0    ,cap=''     ,sto=False  ,def_bt='1'             ,call=do_find           ))  # Enter
+    ,('reex',d(tp='ch-b',tid='what' ,l=5+38*0   ,w=39   ,cap='.&*'  ,hint=_('Regular expression')       ,call=do_attr           ))  # &*
+    ,('case',d(tp='ch-b',tid='what' ,l=5+38*1   ,w=39   ,cap='&aA'  ,hint=_('Case sensitive')           ,call=do_attr           ))  # &a
+    ,('word',d(tp='ch-b',tid='what' ,l=5+38*2   ,w=39   ,cap='"&w"' ,hint=_('Whole words')              ,call=do_attr           ))  # &w
+    ,('wrap',d(tp='ch-b',tid='what' ,l=5+38*3   ,w=39   ,cap='&O'   ,hint=_('Wrapped search')           ,call=do_attr           ))  # &/
+    ,('what',d(tp='cb'  ,t  =5      ,l=5+38*4+5 ,w=155  ,items=opts['hist']                                             ,a='lR' ))  # 
+    ,('prev',d(tp='bt'  ,tid='what' ,l=320      ,w=25   ,cap='&<'   ,hint=_('Find previos') ,en=F       ,call=do_next   ,a='LR' ))  # &=
+    ,('next',d(tp='bt'  ,tid='what' ,l=345      ,w=25   ,cap='&>'   ,hint=_('Find next')    ,en=F       ,call=do_next   ,a='LR' ))  # &=
+    ,('menu',d(tp='bt'  ,tid='what' ,l=380      ,w=30   ,cap='&='                                       ,call=do_menu   ,a='LR' ))  # &=
+    ,('stbr',d(tp='sb'              ,l=0        ,r=415                                   ,ali=ALI_BT                    ,a='lR' ))  # 
                     ][1:]
         ,   fid     ='what'
-        ,   vals    = d(reex=False,case=False,word=False,wrap=False)
-#       ,   vals    = d(reex=False,case=False,word=False,xpth=False,wrap=False)
-#                              ,options={'gen_repro_to_file':'repro_dlg_pres.py'}
-        ).show()
-        if not id_found:    return 
-        # Select node
-        app.tree_proc(ID_TREE, app.TREE_ITEM_SELECT, id_found)
-        c_min, r_min,   \
-        c_max, r_max    = app.tree_proc(ID_TREE, app.TREE_ITEM_GET_RANGE, id_found)
-        ed.set_caret(c_min, r_min)
+        ,   vals    = {k:opts[k] for k in ('reex','case','word','wrap')}
+                              #,options={'gen_repro_to_file':'repro_dlg_find_tree_node.py'}
+        )
+        stbr    = app.dlg_proc(ag.id_dlg, app.DLG_CTL_HANDLE, name='stbr')
+        app.statusbar_proc(stbr, app.STATUSBAR_ADD_CELL             , tag=1)
+        app.statusbar_proc(stbr, app.STATUSBAR_SET_CELL_AUTOSTRETCH , tag=1, value=True)
+        ag.show(lambda ag: apx.set_opt('cuda_ext.tree.find_node'
+                                      ,json.dumps(upd_dict(opts, ag.cvals(['reex','case','word','wrap'])))))
        #def find_tree_node
    
     @staticmethod
