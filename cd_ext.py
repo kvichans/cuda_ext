@@ -1,4 +1,4 @@
-''' Plugin for CudaText editor
+﻿''' Plugin for CudaText editor
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
@@ -94,20 +94,18 @@ class Tree_cmds:
     def find_tree_node():
         HELP_C  = _(
             'Search starts on Enter.'
-          '\rA found node after current one will be selected.'
-          '\rAll found nodes are remembered and dialog can jump over them:'
-          '\r    by buttons < or >'
-          '\r    by hotkeys Alt+< or Alt+> (Alt+, and Alt+. also work).'
-          '\rHint: Enter also jumps to next node.'
-          '\rIf option "O" (wrapped search) is tuned on:'
+          '\r• A found node after current one will be selected.'
+          '\r• All found nodes are remembered and dialog can jump over them:'
+          '\r    - by buttons < or >'
+          '\r    - by hotkeys Alt+< or Alt+> (Alt+, and Alt+. also work).'
+          '\r    - by Enter - to next node.'
+          '\r• If option "O" (wrapped search) is tuned on:'
           '\r    - Search continues from the start, when end of the tree is reached,'
           '\r    - Jumps to previous/next nodes are looped too.'
-          '\rOption ".* (Regular expression) allows to use python\'s syntax.'
-          '\r   See "docs.python.org/3/library/re.html".'
-          '\rIf option "Close on success" (in menu) is tuned on,'
-          '\r    dialog will close after successful search.'
-          '\rOption "Show full tree path" (in menu) allow to see in status'
-          '\r   the found node and all parents.'
+          '\r• Option ".*" (regular expression) allows to use Python reg.ex. See "docs.python.org/3/library/re.html".'
+          '\r• Option "w" (whole words) is ignored if entered string contains not a word.'
+          '\r• If option "Close on success" (in menu) is tuned on, dialog will close after successful search.'
+          '\r• Option "Show full tree path" (in menu) shows in the statusbar the path of the found node (names of all parents)'
         )
         opts_s  = apx.get_opt('cuda_ext.tree.find_node')
         opts    = json.loads(opts_s) if opts_s else d(reex=False,case=False,word=False,wrap=False,hist=[],clos=False)
@@ -184,6 +182,7 @@ class Tree_cmds:
                #def wnen_menu
             ag.show_menu(aid, 
                 [ d(tag='help'  ,cap=_('&Help...')                              ,cmd=wnen_menu
+                ),d(             cap='-'
                 ),d(tag='fpth'  ,cap=_('Show full tree path')   ,ch=opts['fpth'],cmd=wnen_menu
                 ),d(tag='clos'  ,cap=_('Close on success')      ,ch=opts['clos'],cmd=wnen_menu
                 )]
@@ -257,7 +256,7 @@ class Tree_cmds:
                     ,fid='what')
            #def do_find
         ag      = DlgAgent(
-            form    =dict(cap=_('Find tree node'), w=415, h=55, h_max=55, resize=True)  #, border_ex=app.DLGBORDER_TOOLWINDOWSIZE
+            form    =dict(cap=_('Find tree node'), w=415, h=58, h_max=58, resize=True)  #, border_ex=app.DLGBORDER_TOOLWINDOWSIZE
         ,   ctrls   =[0
     ,('pre_',d(tp='bt'  ,t=0        ,l=0        ,w=0    ,cap='&,'   ,sto=False              ,en=F       ,call=do_next           ))  # &,
     ,('nex_',d(tp='bt'  ,t=0        ,l=0        ,w=0    ,cap='&.'   ,sto=False              ,en=F       ,call=do_next           ))  # &.
