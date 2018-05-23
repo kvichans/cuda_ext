@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.5.07 2018-05-22'
+    '1.5.08 2018-05-23'
 ToDo: (see end of file)
 '''
 
@@ -97,15 +97,15 @@ class Tree_cmds:
           '\r• A found node after current one will be selected.'
           '\r• All found nodes are remembered and dialog can jump over them:'
           '\r    - by buttons < or >'
-          '\r    - by hotkeys Alt+< or Alt+> (Alt+, and Alt+. also work).'
-          '\r    - by Enter - to next node.'
+          '\r    - by hotkeys Alt+< or Alt+> (Alt+, and Alt+. also work)'
+          '\r    - by Enter - to next node'
           '\r• If option "O" (wrapped search) is tuned on:'
-          '\r    - Search continues from the start, when end of the tree is reached,'
-          '\r    - Jumps to previous/next nodes are looped too.'
+          '\r    - Search continues from the start, when end of the tree is reached'
+          '\r    - Jumps to previous/next nodes are looped too'
           '\r• Option ".*" (regular expression) allows to use Python reg.ex. See "docs.python.org/3/library/re.html".'
           '\r• Option "w" (whole words) is ignored if entered string contains not a word.'
           '\r• If option "Close on success" (in menu) is tuned on, dialog will close after successful search.'
-          '\r• Option "Show full tree path" (in menu) shows in the statusbar the path of the found node (names of all parents)'
+          '\r• Option "Show full tree path" (in menu) shows in the statusbar the path of the found node (names of all parents).'
         )
         opts_s  = apx.get_opt('cuda_ext.tree.find_node')
         opts    = json.loads(opts_s) if opts_s else d(reex=False,case=False,word=False,wrap=False,hist=[],clos=False)
@@ -162,7 +162,7 @@ class Tree_cmds:
         ready_l = []            # [(nid,cap|path,ndn)]
         ready_p = -1            # pos in ready_l
         nfnd_st = lambda: status(_('No suitable nodes'))
-        ready_st= lambda: status(f(_('{pos}/{all}:  {cap}'), pos=1+ready_p, all=len(ready_l), cap=ready_l[ready_p][1]))
+        ready_st= lambda: status(f('{pos}/{all}:  {cap}', pos=1+ready_p, all=len(ready_l), cap=ready_l[ready_p][1]))
         prev_en = lambda: ready_l and (opts['wrap'] or ready_p>0)
         next_en = lambda: ready_l and (opts['wrap'] or ready_p<(len(ready_l)-1))
         
@@ -190,7 +190,7 @@ class Tree_cmds:
             return d(fid='what')
            #def do_menu
         def do_next(aid, ag, data=''):
-            nonlocal ready_l, ready_p
+            nonlocal ready_p
             ready_n = ready_p + (-1 if aid in ('prev','pre_') else 1)
             ready_n = ready_n % len(ready_l) if opts['wrap'] else max(0, min(len(ready_l)-1, ready_n), 0)
             pass;              #log('ready_n,ready_p={}',(ready_n,ready_p))
@@ -205,8 +205,8 @@ class Tree_cmds:
         def do_find(aid, ag, data=''):
             nonlocal opts, tree_p, prev_wt, ready_l, ready_p
             # What/how/where will search
-            what        = ag.cval('what')#.strip()
-            if prev_wt==what:
+            what        = ag.cval('what')
+            if prev_wt==what and ready_l:
                 return do_next(ag, 'next')
             prev_wt  = what
             pass;              #log('what={}',(what))
@@ -266,8 +266,8 @@ class Tree_cmds:
     ,('word',d(tp='ch-b',tid='what' ,l=5+38*2   ,w=39   ,cap='"&w"' ,hint=_('Whole words')              ,call=do_attr           ))  # &w
     ,('wrap',d(tp='ch-b',tid='what' ,l=5+38*3   ,w=39   ,cap='&O'   ,hint=_('Wrapped search')           ,call=do_attr           ))  # &/
     ,('what',d(tp='cb'  ,t  =5      ,l=5+38*4+5 ,w=155  ,items=opts['hist']                                             ,a='lR' ))  # 
-    ,('prev',d(tp='bt'  ,tid='what' ,l=320      ,w=25   ,cap='&<'   ,hint=_('Find previos') ,en=F       ,call=do_next   ,a='LR' ))  # &=
-    ,('next',d(tp='bt'  ,tid='what' ,l=345      ,w=25   ,cap='&>'   ,hint=_('Find next')    ,en=F       ,call=do_next   ,a='LR' ))  # &=
+    ,('prev',d(tp='bt'  ,tid='what' ,l=320      ,w=25   ,cap='&<'   ,hint=_('Find previous'),en=F       ,call=do_next   ,a='LR' ))  # &<
+    ,('next',d(tp='bt'  ,tid='what' ,l=345      ,w=25   ,cap='&>'   ,hint=_('Find next')    ,en=F       ,call=do_next   ,a='LR' ))  # &>
     ,('menu',d(tp='bt'  ,tid='what' ,l=380      ,w=30   ,cap='&='                                       ,call=do_menu   ,a='LR' ))  # &=
     ,('stbr',d(tp='sb'              ,l=0        ,r=415                                   ,ali=ALI_BT                    ,a='lR' ))  # 
                     ][1:]
@@ -1470,6 +1470,156 @@ class Nav_cmds:
 #############################################################
 class Find_repl_cmds:
     @staticmethod
+    def dlg_find_in_lines(): #NOTE: dlg_find_in_lines
+        FORM_C  = _('Find "in lines"')
+        HELP_C  = _(
+            'Search "in lines" starts on Enter.'
+          '\r• A found fragment after first caret will be selected.'
+          '\r• All found fragments are remembered and dialog can jump over them by [Shift+]Enter or by menu commands.'
+          '\r• Option ".*" (regular expression) allows to use Python reg.ex. See "docs.python.org/3/library/re.html".'
+          '\r• Option "w" (whole words) is ignored if entered string contains not a word.'
+          '\r• If option "Close on success" (in menu) is tuned on, dialog will close after successful search.'
+          '\r• Command "Restore starting selection" (in menu) restores only first of starting carets.'
+        )
+        opts_s  = apx.get_opt('cuda_ext_kv.find_in_tab')
+        opts    = json.loads(opts_s) if opts_s else d(reex=False,case=False,word=False,hist=[],clos=False,usel=False)
+        # Scan ed
+        ed_crts = ed.get_carets()                                                       # Carets at start
+        ed_rlns = [(row, ed.get_text_line(row)) for row in range(ed.get_line_count())]  # [,(row,line),]
+        
+        # How to select node
+        def select_frag(frag_inf):  ed.set_caret(*frag_inf)
+        
+        # Ask
+        MAX_HIST= apx.get_opt('ui_max_history_edits', 20)
+        def add_to_hist(val, lst):
+            """ Add/Move val to list head. """
+            if val in lst:
+                if 0 == lst.index(val):   return lst
+                lst.remove(val)
+            lst.insert(0, val)
+            if len(lst)>MAX_HIST:
+                del lst[MAX_HIST:]
+            return lst
+           #def add_to_hist
+        def compile_pttn(pttn_s, reex, case, word):
+            pttn_s  =           pttn_s          if reex else \
+                          r'\b'+pttn_s+r'\b'    if word and re.match('^\w+$', pttn_s) else \
+                      re.escape(pttn_s)
+            return re.compile(pttn_s, 0 if case else re.I)
+        
+        prev_wt = None          # Prev what
+        ready_l = []            # [(row,col_bgn,col_end)]
+        ready_p = -1            # pos in ready_l
+        form_cap= lambda: f('{} ({}/{})', FORM_C, 1+ready_p, len(ready_l)) if ready_l else f('{} (0)', FORM_C)
+        
+        def do_attr(aid, ag, data=''):  nonlocal prev_wt;prev_wt = '';   return d(fid='what')
+        def do_menu(aid, ag, data=''):
+            def wnen_menu(ag, tag):
+                nonlocal opts
+                if   tag in ('prev','next'):    return do_find(tag, ag)
+                if   tag in ('clos','usel'):    opts[tag] = not opts[tag]
+                elif tag=='help':               app.msg_box(HELP_C, app.MB_OK)
+                elif tag=='rest':               ed.set_caret(*ed_crts[0]);      return None
+                return []
+               #def wnen_menu
+            ag.show_menu(aid, 
+                [ d(tag='help'  ,cap=_('&Help...')                                      ,cmd=wnen_menu
+                ),d(             cap='-'
+                ),d(tag='prev'  ,cap=_('Find &previous')                                ,cmd=wnen_menu  ,key='Shift+Enter'
+                ),d(tag='next'  ,cap=_('F&ind next')                                    ,cmd=wnen_menu  ,key='Enter'
+                ),d(             cap='-'
+                ),d(tag='clos'  ,cap=_('Close on success')          ,ch=opts['clos']    ,cmd=wnen_menu
+                ),d(tag='usel'  ,cap=_('Use selection from text')   ,ch=opts['usel']    ,cmd=wnen_menu
+                ),d(             cap='-'
+                ),d(tag='rest'  ,cap=_('Restore starting selection and close dilog &=') ,cmd=wnen_menu
+                )]
+            )
+            return d(fid='what')
+           #def do_menu
+        def do_find(aid, ag, data=''):
+            nonlocal opts, prev_wt, ready_l, ready_p
+            # What/how will search
+#           scam    = app.app_proc(app.PROC_GET_KEYSTATE, '')
+#           if scam not in ('', 's'):                       return  d(fid='what')
+#           prnx    = 'prev' if scam=='s' else 'next'
+            prnx    = 'prev' if aid in ('prev','pre_') else 'next'
+            crt     = ed.get_carets()[0][:]     # Current first caret (col,row, col?,row?)
+            min_rc  = (crt[1], crt[0])  if crt[2]==-1 else  min((crt[1], crt[0]), (crt[3], crt[2]))
+            max_rc  = (crt[1], crt[0])  if crt[2]==-1 else  max((crt[1], crt[0]), (crt[3], crt[2]))
+            what    = ag.cval('what')
+            if prev_wt==what and ready_l:
+                if 1==len(ready_l):                         return  d(fid='what')
+                ready_p = (ready_p + (-1 if aid in ('prev','pre_') else 1)) % len(ready_l)
+                select_frag(ready_l[ready_p])
+                return                      d(form=d(cap=form_cap()) ,fid='what')
+            prev_wt  = what
+            if not what:
+                ready_l, ready_p    = [], -1
+                return                      d(form=d(cap=FORM_C) ,fid='what')
+            opts['hist']= add_to_hist(what, opts['hist'])
+            opts.update(ag.cvals(['reex','case','word']))
+            # New search
+            ready_l = []
+            ready_p = -1
+            pttn_r  = compile_pttn(what, opts['reex'], opts['case'], opts['word'])
+            for row, line in ed_rlns:
+                mtchs   = pttn_r.finditer(line)
+                if not mtchs:  continue
+                for mtch in mtchs:
+                    fnd_bgn = mtch.start()
+                    fnd_end = mtch.end()
+                    if opts['clos']:
+                        select_frag(fnd_end, row, fnd_bgn, row)
+                        return None         # Close dlg
+                    ready_p = (len(ready_l) 
+                                if prnx=='next' and ready_p==-1 and                             # Need next and no yet
+                                    (row>max_rc[0] or row==max_rc[0] and fnd_bgn>max_rc[1])     # At more row or at more col in cur row
+                                or prnx=='prev'                 and                             # Need prev
+                                    (row<min_rc[0] or row==min_rc[0] and fnd_end<min_rc[1])     # At less row or at less col in cur row
+                                else ready_p)
+                    ready_l+= [(fnd_end, row, fnd_bgn, row)]
+            pass;              #log('ready_l={}',(ready_l))
+            ready_p = max(0, ready_p) if ready_l else -1
+            pass;              #log('ready_p={}',(ready_p))
+            # Show results
+            if ready_l:
+                select_frag(ready_l[ready_p])
+            return d(ctrls=[('what',d(items=opts['hist']))]
+                    ,form=d(cap=form_cap())
+                    ,fid='what')
+           #def do_find
+        what    = ed.get_text_sel() if opts['usel'] and 1==len(ed.get_carets()) else ''
+        what    = '' if '\r' in what or '\n' in what else what 
+        ag      = None
+        def cb_on_key_down(idd, idc, data=''):
+            scam    = app.app_proc(app.PROC_GET_KEYSTATE, '')
+            key     = app.app_proc(app.PROC_HOTKEY_INT_TO_STR, str(idc))
+            if ag and scam+key=='sEnter':   ag._update_on_call(do_find('prev', ag))
+            pass;              #log('scam,key={}',(scam,app.app_proc(app.PROC_HOTKEY_INT_TO_STR, str(idc))))
+        ag      = DlgAgent(
+            form    =dict(cap=FORM_C, w=255, h=33, h_max=33
+                         ,on_key_down=cb_on_key_down
+                         ,resize=True)  #, border_ex=app.DLGBORDER_TOOLWINDOWSIZE
+        ,   ctrls   =[0
+#   ,('pre_',d(tp='bt'  ,t=0        ,l=0        ,w=0    ,cap='&,'   ,sto=False                          ,call=do_find           ))  # &,
+#   ,('prev',d(tp='bt'  ,t=0        ,l=0        ,w=0    ,cap='&-'   ,sto=False                          ,call=do_find           ))  # &<
+    ,('find',d(tp='bt'  ,t=0        ,l=0        ,w=0    ,cap=''     ,sto=False  ,def_bt='1'             ,call=do_find           ))  # Enter
+    ,('reex',d(tp='ch-b',tid='what' ,l=5+38*0   ,w=39   ,cap='.&*'  ,hint=_('Regular expression')       ,call=do_attr           ))  # &*
+    ,('case',d(tp='ch-b',tid='what' ,l=5+38*1   ,w=39   ,cap='&aA'  ,hint=_('Case sensitive')           ,call=do_attr           ))  # &a
+    ,('word',d(tp='ch-b',tid='what' ,l=5+38*2   ,w=39   ,cap='"&w"' ,hint=_('Whole words')              ,call=do_attr           ))  # &w
+    ,('what',d(tp='cb'  ,t  =5      ,l=5+38*3+5 ,w=85   ,items=opts['hist']                                             ,a='lR' ))  # 
+    ,('menu',d(tp='bt'  ,tid='what' ,l=220      ,w=30   ,cap='&='                                       ,call=do_menu   ,a='LR' ))  # &=
+                    ][1:]
+        ,   fid     ='what'
+        ,   vals    = upd_dict({k:opts[k] for k in ('reex','case','word')}, d(what=what))
+                              #,options={'gen_repro_to_file':'repro_dlg_find_in_tab.py'}
+        )
+        ag.show(lambda ag: apx.set_opt('cuda_ext_kv.find_in_tab'
+                                      ,json.dumps(upd_dict(opts, ag.cvals(['reex','case','word'])))))
+       #def dlg_find_in_lines
+
+    @staticmethod
     def find_cb_by_cmd(updn):
         if app.app_api_version()<FROM_API_VERSION:  return app.msg_status(NEED_UPDATE)
         clip    = app.app_proc(app.PROC_GET_CLIP, '')
@@ -2542,6 +2692,7 @@ class Command:
     def fill_by_str(self):                      return Insert_cmds.fill_by_str()
     def insert_char_by_hex(self):               return Insert_cmds.insert_char_by_hex()
     
+    def dlg_find_in_lines(self):                return Find_repl_cmds.dlg_find_in_lines()
     def find_cb_string_next(self):              return Find_repl_cmds.find_cb_by_cmd('dn')
     def find_cb_string_prev(self):              return Find_repl_cmds.find_cb_by_cmd('up')
     def replace_all_sel_to_cb(self):            return Find_repl_cmds.replace_all_sel_to_cb()

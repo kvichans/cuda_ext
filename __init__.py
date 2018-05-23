@@ -35,6 +35,7 @@ class Command:
     def insert_char_by_hex(self):               return RLS.insert_char_by_hex()
     
     # Find_repl_cmds
+    def dlg_find_in_lines(self):                return RLS.dlg_find_in_lines()
     def find_cb_string_next(self):              return RLS.find_cb_string_next()
     def find_cb_string_prev(self):              return RLS.find_cb_string_prev()
     def replace_all_sel_to_cb(self):            return RLS.replace_all_sel_to_cb()

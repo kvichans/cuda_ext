@@ -1,3 +1,6 @@
+1.5.08 (2018-05-23)
+added: command 'Find "in lines"' to light search in text
+
 1.5.07 (2018-05-22)
 added: command 'Code Tree / Find node' - allow to jump over found nodes
 
