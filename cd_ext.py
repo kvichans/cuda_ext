@@ -1481,7 +1481,7 @@ class Find_repl_cmds:
           '\r• If option "Close on success" (in menu) is tuned on, dialog will close after successful search.'
           '\r• Command "Restore starting selection" (in menu) restores only first of starting carets.'
         )
-        opts_s  = apx.get_opt('cuda_ext_kv.find_in_tab')
+        opts_s  = apx.get_opt('cuda_ext.find.find_in_lines')
         opts    = json.loads(opts_s) if opts_s else d(reex=False,case=False,word=False,hist=[],clos=False,usel=False)
         # Scan ed
         ed_crts = ed.get_carets()                                                       # Carets at start
@@ -1532,7 +1532,7 @@ class Find_repl_cmds:
                 ),d(tag='clos'  ,cap=_('Close on success')          ,ch=opts['clos']    ,cmd=wnen_menu
                 ),d(tag='usel'  ,cap=_('Use selection from text')   ,ch=opts['usel']    ,cmd=wnen_menu
                 ),d(             cap='-'
-                ),d(tag='rest'  ,cap=_('Restore starting selection and close dilog &=') ,cmd=wnen_menu
+                ),d(tag='rest'  ,cap=_('Restore starting selection and close dialog &='),cmd=wnen_menu
                 )]
             )
             return d(fid='what')
@@ -1615,7 +1615,7 @@ class Find_repl_cmds:
         ,   vals    = upd_dict({k:opts[k] for k in ('reex','case','word')}, d(what=what))
                               #,options={'gen_repro_to_file':'repro_dlg_find_in_tab.py'}
         )
-        ag.show(lambda ag: apx.set_opt('cuda_ext_kv.find_in_tab'
+        ag.show(lambda ag: apx.set_opt('cuda_ext.find.find_in_lines'
                                       ,json.dumps(upd_dict(opts, ag.cvals(['reex','case','word'])))))
        #def dlg_find_in_lines
 
