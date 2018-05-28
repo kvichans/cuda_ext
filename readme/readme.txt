@@ -135,6 +135,7 @@ Menu items
 	- Delete duplicate spaces
 	-
 	- Re-wrap/split lines by margin
+	- Re-wrap/split comment at caret
 	- Align in lines to center by margin
 	- Align in lines to right by margin
 - File

@@ -107,10 +107,12 @@ class Tree_cmds:
         )
         ed_crts = ed.get_carets()           # Carets at start
         opts    = d(reex=False,case=False,word=False,wrap=False,hist=[],clos=False,fpth=False)
-        opts    = get_hist('tree.find_node', opts)
+        opts.update(get_hist('tree.find_node', opts))
         # Scan Tree
         ID_TREE = app.app_proc(app.PROC_SIDEPANEL_GET_CONTROL, 'Code tree')
         if not ID_TREE: return app.msg_status(_('No CodeTree'))
+        if not app.tree_proc(ID_TREE, app.TREE_ITEM_ENUM, 0):   # 0 is root
+            ed.cmd(cmds.cmd_TreeUpdate)                         # Try to build tree
         tree_t  = []        # [{nid:ID, sub:[{nid:ID, sub:{}, cap:'smth', path:['rt','smth']},], cap:'rt', path:[]},]
         tree_p  = []        # [,(ID, 'smth',['rt','smth']),]
         def scan_tree(id_prnt, tree_nds, path_prnt):
@@ -150,17 +152,17 @@ class Tree_cmds:
                 del lst[MAX_HIST:]
             return lst
            #def add_to_hist
-        def compile_pttn(pttn_s, reex, case, word):
-            pttn_s  =           pttn_s          if reex else \
+        compile_pttn= lambda    pttn_s, reex, case, word: re.compile(
+                                pttn_s          if reex else \
                           r'\b'+pttn_s+r'\b'    if word and re.match('^\w+$', pttn_s) else \
-                      re.escape(pttn_s)
-            return re.compile(pttn_s, 0 if case else re.I)
+                      re.escape(pttn_s), 0 if case else re.I)
         
         prev_wt = None          # Prev what
         ready_l = []            # [(nid,cap|path,ndn)]
         ready_p = -1            # pos in ready_l
         nfnd_st = lambda: status(_('No suitable nodes'))
         ready_st= lambda: status(f('{pos}/{all}:  {cap}', pos=1+ready_p, all=len(ready_l), cap=ready_l[ready_p][1]))
+        ready_er= lambda: status(_('Error'))
         
         def do_attr(aid, ag, data=''):
             nonlocal prev_wt
@@ -192,7 +194,7 @@ class Tree_cmds:
         def do_next(aid, ag, data=''):
             if not ready_l:         return d(fid='what')
             nonlocal ready_p
-            ready_n = ready_p + (-1 if aid in ('prev','pre_') else 1)
+            ready_n = ready_p + (-1 if aid=='prev' else 1)
             ready_n = ready_n % len(ready_l) if opts['wrap'] else max(0, min(len(ready_l)-1, ready_n), 0)
             pass;              #log('ready_n,ready_p={}',(ready_n,ready_p))
             if ready_p == ready_n:  return d(fid='what')
@@ -226,7 +228,12 @@ class Tree_cmds:
             # Search
             ready_l = []
             tree_ndn= -1
-            pttn_r  = compile_pttn(what, opts['reex'], opts['case'], opts['word'])
+            try:
+                pttn_r  = compile_pttn(what, opts['reex'], opts['case'], opts['word'])
+            except:
+                ready_er()
+                return d(ctrls=[('what',d(items=opts['hist']))]
+                        ,fid='what')
             for ndn, (nid, cap, path) in enumerate(nodes):
                 if not pttn_r.search(cap):  continue
                 if opts['clos']:
@@ -254,7 +261,6 @@ class Tree_cmds:
             scam    = app.app_proc(app.PROC_GET_KEYSTATE, '')
             key     = app.app_proc(app.PROC_HOTKEY_INT_TO_STR, str(idc))
             if ag and scam+key=='sEnter':   ag._update_on_call(do_next('prev', ag))
-            pass;              #log('scam,key={}',(scam,app.app_proc(app.PROC_HOTKEY_INT_TO_STR, str(idc))))
         ag      = DlgAgent(
             form    =dict(cap=_('Find tree node'), w=365, h=58, h_max=58
                          ,on_key_down=cb_on_key_down
@@ -1466,27 +1472,38 @@ class Nav_cmds:
 
 #############################################################
 class Find_repl_cmds:
+    fil_restart_dlg = False
+    fil_ed_crts     = None                  # Carets at start
+    fil_what        = None                  # String to search 
     @staticmethod
     def dlg_find_in_lines(): #NOTE: dlg_find_in_lines
-        FORM_C  = _('Find "in lines"')
+        Find_repl_cmds.fil_ed_crts  = ed.get_carets()            # Carets at start
+        Find_repl_cmds.fil_what     = None
+        while True:
+            Find_repl_cmds.fil_restart_dlg  = False
+            Find_repl_cmds._dlg_fil()
+            if not Find_repl_cmds.fil_restart_dlg:  break
+    @staticmethod
+    def _dlg_fil():
+#       FORM_C  = f(_('Find "in lines" {}'), 1+ed.get_prop(app.PROP_INDEX_GROUP))
+        FORM_C  =   _('Find "in lines"')
         HELP_C  = _(
-            'Search "in lines" starts on Enter.'
+            '• Search "in lines" starts on Enter or Shift+Enter or imediatly (if "Instant search" is tuned on).'
           '\r• A found fragment after first caret will be selected.'
           '\r• All found fragments are remembered and dialog can jump over them by [Shift+]Enter or by menu commands.'
           '\r• Option ".*" (regular expression) allows to use Python reg.ex. See "docs.python.org/3/library/re.html".'
           '\r• Option "w" (whole words) is ignored if entered string contains not a word.'
           '\r• If option "Close on success" (in menu) is tuned on, dialog will close after successful search.'
+          '\r• If option "Instant search" (in menu) is tuned on, search result will update on start and after each change of pattern.'
           '\r• Command "Restore starting selection" (in menu) restores only first of starting carets.'
         )
         pass;                  #log('###',())
         pass;                  #log('hist={}',(get_hist('find.find_in_lines')))
-        opts    = d(reex=False,case=False,word=False,hist=[],clos=False,usel=False)
-        opts    = get_hist('find.find_in_lines', opts)
-        # Scan ed
-        ed_crts = ed.get_carets()           # Carets at start
-        
+        opts    = d(reex=False,case=False,word=False,hist=[],clos=False,usel=False,inst=False)
+        opts.update(get_hist('find.find_in_lines', opts))
+
         # How to select node
-        def select_frag(frag_inf):  ed.set_caret(*frag_inf)
+        select_frag = lambda frag_inf:  ed.set_caret(*frag_inf)
         
         # Ask
         MAX_HIST= apx.get_opt('ui_max_history_edits', 20)
@@ -1500,25 +1517,35 @@ class Find_repl_cmds:
                 del lst[MAX_HIST:]
             return lst
            #def add_to_hist
-        def compile_pttn(pttn_s, reex, case, word):
-            pttn_s  =           pttn_s          if reex else \
+        compile_pttn= lambda    pttn_s, reex, case, word: re.compile(
+                                pttn_s          if reex else \
                           r'\b'+pttn_s+r'\b'    if word and re.match('^\w+$', pttn_s) else \
-                      re.escape(pttn_s)
-            return re.compile(pttn_s, 0 if case else re.I)
+                      re.escape(pttn_s), 0 if case else re.I)
         
         prev_wt = None          # Prev what
         ready_l = []            # [(row,col_bgn,col_end)]
         ready_p = -1            # pos in ready_l
         form_cap= lambda: f('{} ({}/{})', FORM_C, 1+ready_p, len(ready_l)) if ready_l else f('{} (0)', FORM_C)
+        form_cpw= lambda: FORM_C + (_(' (Type to find)') if opts['inst'] else _(' (ENTER to find)'))
+        form_err= lambda: FORM_C +  _(' (Error)')
         
-        def do_attr(aid, ag, data=''):  nonlocal prev_wt;prev_wt = '';   return d(fid='what')
+        def do_attr(aid, ag, data=''):
+            nonlocal prev_wt
+            prev_wt = ''
+            return do_find('find', ag, 'stay')  # if opts['inst'] else d(fid='what')
         def do_menu(aid, ag, data=''):
             def wnen_menu(ag, tag):
                 nonlocal opts
-                if   tag in ('prev','next'):    return do_find(tag, ag)
-                if   tag in ('clos','usel'):    opts[tag] = not opts[tag]
-                elif tag=='help':               app.msg_box(HELP_C, app.MB_OK)
-                elif tag=='rest':               ed.set_caret(*ed_crts[0]);      return None
+                if tag in ('clos','usel','inst'):   opts[tag] = not opts[tag]
+                if tag=='help':                     app.msg_box(HELP_C, app.MB_OK)
+                if tag in ('prev','next'):          return do_find(tag, ag)
+                if tag=='rest':
+                    ed.set_caret(*Find_repl_cmds.fil_ed_crts[0])
+                    return None
+                if tag=='inst':
+                    Find_repl_cmds.fil_what         = ag.cval('what')
+                    Find_repl_cmds.fil_restart_dlg  = True
+                    return None
                 return []
                #def wnen_menu
             ag.show_menu(aid, 
@@ -1529,6 +1556,7 @@ class Find_repl_cmds:
                 ),d(             cap='-'
                 ),d(tag='clos'  ,cap=_('Close on success')          ,ch=opts['clos']    ,cmd=wnen_menu
                 ),d(tag='usel'  ,cap=_('Use selection from text')   ,ch=opts['usel']    ,cmd=wnen_menu
+                ),d(tag='inst'  ,cap=_('Instant search')            ,ch=opts['inst']    ,cmd=wnen_menu
                 ),d(             cap='-'
                 ),d(tag='rest'  ,cap=_('Restore starting selection and close dialog &='),cmd=wnen_menu
                 )]
@@ -1537,30 +1565,36 @@ class Find_repl_cmds:
            #def do_menu
         def do_find(aid, ag, data=''):
             nonlocal opts, prev_wt, ready_l, ready_p
+            pass;              #log('aid, data={}',(aid, data))
             # What/how will search
-#           scam    = app.app_proc(app.PROC_GET_KEYSTATE, '')
-#           if scam not in ('', 's'):                       return  d(fid='what')
-#           prnx    = 'prev' if scam=='s' else 'next'
-            prnx    = 'prev' if aid in ('prev','pre_') else 'next'
+            prnx    = 'prev' if aid=='prev' else 'next'
             crt     = ed.get_carets()[0][:]     # Current first caret (col,row, col?,row?)
             min_rc  = (crt[1], crt[0])  if crt[2]==-1 else  min((crt[1], crt[0]), (crt[3], crt[2]))
             max_rc  = (crt[1], crt[0])  if crt[2]==-1 else  max((crt[1], crt[0]), (crt[3], crt[2]))
             what    = ag.cval('what')
-            if prev_wt==what and ready_l:
+            if prev_wt==what and ready_l:# and 'stay' not in data:
+                pass;          #log('will jump',())
                 if 1==len(ready_l):                         return  d(fid='what')
-                ready_p = (ready_p + (-1 if aid in ('prev','pre_') else 1)) % len(ready_l)
+                ready_p = (ready_p + (-1 if aid=='prev' else 1)) % len(ready_l)
                 select_frag(ready_l[ready_p])
                 return                      d(form=d(cap=form_cap()) ,fid='what')
             prev_wt  = what
             if not what:
                 ready_l, ready_p    = [], -1
-                return                      d(form=d(cap=FORM_C) ,fid='what')
-            opts['hist']= add_to_hist(what, opts['hist'])
+                return                      d(form=d(cap=form_cpw()) ,fid='what')
+            if not opts['inst']:
+                opts['hist']= add_to_hist(what, opts['hist'])
             opts.update(ag.cvals(['reex','case','word']))
             # New search
             ready_l = []
             ready_p = -1
-            pttn_r  = compile_pttn(what, opts['reex'], opts['case'], opts['word'])
+            pttn_r  = None
+            try:
+                pttn_r  = compile_pttn(what, opts['reex'], opts['case'], opts['word'])
+            except:
+                return d(ctrls=[('what',d(items=opts['hist']))]
+                        ,form=d(cap=form_err())
+                        ,fid='what')
             for row in range(ed.get_line_count()):
                 line    = ed.get_text_line(row)
                 mtchs   = pttn_r.finditer(line)
@@ -1583,37 +1617,44 @@ class Find_repl_cmds:
             pass;              #log('ready_p={}',(ready_p))
             # Show results
             if ready_l:
+                if aid=='find' and 'stay' in data:
+                    ready_p = (ready_p-1) % len(ready_l)
+                pass;          #log('show rslt ready_p={}',(ready_p,))
                 select_frag(ready_l[ready_p])
             return d(ctrls=[('what',d(items=opts['hist']))]
                     ,form=d(cap=form_cap())
                     ,fid='what')
            #def do_find
-        what    = ed.get_text_sel() if opts['usel'] and 1==len(ed.get_carets()) else ''
+        what    = Find_repl_cmds.fil_what   if Find_repl_cmds.fil_what is not None      else \
+                  ed.get_text_sel()         if opts['usel'] and 1==len(ed.get_carets()) else ''
         what    = '' if '\r' in what or '\n' in what else what 
         ag      = None
         def cb_on_key_down(idd, idc, data=''):
             scam    = app.app_proc(app.PROC_GET_KEYSTATE, '')
             key     = app.app_proc(app.PROC_HOTKEY_INT_TO_STR, str(idc))
             if ag and scam+key=='sEnter':   ag._update_on_call(do_find('prev', ag))
-            pass;              #log('scam,key={}',(scam,app.app_proc(app.PROC_HOTKEY_INT_TO_STR, str(idc))))
+        wh_tp   = 'ed'      if opts['inst'] else 'cb'
+        wh_call = do_find   if opts['inst'] else None
         ag      = DlgAgent(
-            form    =dict(cap=FORM_C, w=255, h=35, h_max=35
+            form    =dict(cap=form_cpw(), w=255, h=35, h_max=35
                          ,on_key_down=cb_on_key_down
                          ,resize=True)  #, border_ex=app.DLGBORDER_TOOLWINDOWSIZE
         ,   ctrls   =[0
-    ,('find',d(tp='bt'  ,t=0        ,l=0        ,w=0    ,cap=''     ,sto=False  ,def_bt='1'             ,call=do_find           ))  # Enter
-    ,('reex',d(tp='ch-b',tid='what' ,l=5+38*0   ,w=39   ,cap='.&*'  ,hint=_('Regular expression')       ,call=do_attr           ))  # &*
-    ,('case',d(tp='ch-b',tid='what' ,l=5+38*1   ,w=39   ,cap='&aA'  ,hint=_('Case sensitive')           ,call=do_attr           ))  # &a
-    ,('word',d(tp='ch-b',tid='what' ,l=5+38*2   ,w=39   ,cap='"&w"' ,hint=_('Whole words')              ,call=do_attr           ))  # &w
-    ,('what',d(tp='cb'  ,t  =5      ,l=5+38*3+5 ,w=85   ,items=opts['hist']                                             ,a='lR' ))  # 
-    ,('menu',d(tp='bt'  ,tid='what' ,l=220      ,w=30   ,cap='&='                                       ,call=do_menu   ,a='LR' ))  # &=
+    ,('find',d(tp='bt'  ,t=0        ,l=0        ,w=0    ,cap=''     ,sto=False  ,def_bt='1'         ,call=do_find           ))  # Enter
+    ,('reex',d(tp='chb' ,tid='what' ,l=5+38*0   ,w=39   ,cap='.&*'  ,hint=_('Regular expression')   ,call=do_attr           ))  # &*
+    ,('case',d(tp='chb' ,tid='what' ,l=5+38*1   ,w=39   ,cap='&aA'  ,hint=_('Case sensitive')       ,call=do_attr           ))  # &a
+    ,('word',d(tp='chb' ,tid='what' ,l=5+38*2   ,w=39   ,cap='"&w"' ,hint=_('Whole words')          ,call=do_attr           ))  # &w
+    ,('what',d(tp=wh_tp ,t  =5      ,l=5+38*3+5 ,w=85   ,items=opts['hist']                         ,call=wh_call   ,a='lR' ))  # 
+    ,('menu',d(tp='bt'  ,tid='what' ,l=220      ,w=30   ,cap='&='                                   ,call=do_menu   ,a='LR' ))  # &=
                     ][1:]
         ,   fid     ='what'
         ,   vals    = upd_dict({k:opts[k] for k in ('reex','case','word')}, d(what=what))
-                              #,options={'gen_repro_to_file':'repro_dlg_find_in_tab.py'}
+                              #,options={'gen_repro_to_file':'repro_dlg_find_in_lines.py'}
         )
+        if opts['inst'] and what:
+            ag._update_on_call(do_find('find', ag, 'stay'))
         ag.show(lambda ag: set_hist('find.find_in_lines', upd_dict(opts, ag.cvals(['reex','case','word']))))
-       #def dlg_find_in_lines
+       #def _dlg_fil
 
     @staticmethod
     def find_cb_by_cmd(updn):
