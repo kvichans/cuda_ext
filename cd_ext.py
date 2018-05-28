@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.5.08 2018-05-23'
+    '1.5.09 2018-05-28'
 ToDo: (see end of file)
 '''
 
@@ -95,10 +95,7 @@ class Tree_cmds:
         HELP_C  = _(
             'Search starts on Enter.'
           '\r• A found node after current one will be selected.'
-          '\r• All found nodes are remembered and dialog can jump over them:'
-          '\r    - by buttons < or >'
-          '\r    - by hotkeys Alt+< or Alt+> (Alt+, and Alt+. also work)'
-          '\r    - by Enter - to next node'
+          '\r• All found nodes are remembered and dialog can jump over them by [Shift+]Enter or by menu commands.'
           '\r• If option "O" (wrapped search) is tuned on:'
           '\r    - Search continues from the start, when end of the tree is reached'
           '\r    - Jumps to previous/next nodes are looped too'
@@ -106,10 +103,11 @@ class Tree_cmds:
           '\r• Option "w" (whole words) is ignored if entered string contains not a word.'
           '\r• If option "Close on success" (in menu) is tuned on, dialog will close after successful search.'
           '\r• Option "Show full tree path" (in menu) shows in the statusbar the path of the found node (names of all parents).'
+          '\r• Command "Restore starting selection" (in menu) restores only first of starting carets.'
         )
-        opts_s  = apx.get_opt('cuda_ext.tree.find_node')
-        opts    = json.loads(opts_s) if opts_s else d(reex=False,case=False,word=False,wrap=False,hist=[],clos=False)
-        opts.setdefault('fpth', False)
+        ed_crts = ed.get_carets()           # Carets at start
+        opts    = d(reex=False,case=False,word=False,wrap=False,hist=[],clos=False,fpth=False)
+        opts    = get_hist('tree.find_node', opts)
         # Scan Tree
         ID_TREE = app.app_proc(app.PROC_SIDEPANEL_GET_CONTROL, 'Code tree')
         if not ID_TREE: return app.msg_status(_('No CodeTree'))
@@ -163,8 +161,6 @@ class Tree_cmds:
         ready_p = -1            # pos in ready_l
         nfnd_st = lambda: status(_('No suitable nodes'))
         ready_st= lambda: status(f('{pos}/{all}:  {cap}', pos=1+ready_p, all=len(ready_l), cap=ready_l[ready_p][1]))
-        prev_en = lambda: ready_l and (opts['wrap'] or ready_p>0)
-        next_en = lambda: ready_l and (opts['wrap'] or ready_p<(len(ready_l)-1))
         
         def do_attr(aid, ag, data=''):
             nonlocal prev_wt
@@ -173,23 +169,28 @@ class Tree_cmds:
         def do_menu(aid, ag, data=''):
             def wnen_menu(ag, tag):
                 nonlocal opts, prev_wt
-                if   tag in ('fpth','clos'):
-                    prev_wt = ''
-                    opts[tag] = not opts[tag]
-                elif tag=='help':
-                    app.msg_box(HELP_C, app.MB_OK)
+                if   tag in ('prev','next'):    return do_next(tag, ag)
+                if   tag in ('fpth','clos'):    prev_wt = '';   opts[tag] = not opts[tag]
+                elif tag=='help':               app.msg_box(HELP_C, app.MB_OK)
+                elif tag=='rest':               ed.set_caret(*ed_crts[0]);      return None
                 return []
                #def wnen_menu
             ag.show_menu(aid, 
                 [ d(tag='help'  ,cap=_('&Help...')                              ,cmd=wnen_menu
                 ),d(             cap='-'
+                ),d(tag='prev'  ,cap=_('Find &previous')                        ,cmd=wnen_menu  ,key='Shift+Enter'
+                ),d(tag='next'  ,cap=_('F&ind next')                            ,cmd=wnen_menu  ,key='Enter'
+                ),d(             cap='-'
                 ),d(tag='fpth'  ,cap=_('Show full tree path')   ,ch=opts['fpth'],cmd=wnen_menu
                 ),d(tag='clos'  ,cap=_('Close on success')      ,ch=opts['clos'],cmd=wnen_menu
+                ),d(             cap='-'
+                ),d(tag='rest'  ,cap=_('Restore starting selection and close dialog &='),cmd=wnen_menu
                 )]
             )
             return d(fid='what')
            #def do_menu
         def do_next(aid, ag, data=''):
+            if not ready_l:         return d(fid='what')
             nonlocal ready_p
             ready_n = ready_p + (-1 if aid in ('prev','pre_') else 1)
             ready_n = ready_n % len(ready_l) if opts['wrap'] else max(0, min(len(ready_l)-1, ready_n), 0)
@@ -198,23 +199,19 @@ class Tree_cmds:
             ready_p = ready_n
             ready_st()
             select_node(ready_l[ready_p][0])
-            return d(ctrls=[('prev',d(en=prev_en())),('pre_',d(en=prev_en()))
-                           ,('next',d(en=next_en())),('nex_',d(en=next_en()))]
-                    ,fid='what')
+            return d(fid='what')
            #def do_next
         def do_find(aid, ag, data=''):
             nonlocal opts, tree_p, prev_wt, ready_l, ready_p
             # What/how/where will search
             what        = ag.cval('what')
             if prev_wt==what and ready_l:
-                return do_next(ag, 'next')
+                return do_next('next', ag)
             prev_wt  = what
             pass;              #log('what={}',(what))
             if not what:
                 ready_l, ready_p    = [], -1
-                return d(ctrls=[('prev',d(en=prev_en())),('pre_',d(en=prev_en()))
-                               ,('next',d(en=next_en())),('nex_',d(en=next_en()))]
-                        ,fid='what')
+                return d(fid='what')
             opts['hist']= add_to_hist(what, opts['hist'])
             opts.update(ag.cvals(['reex','case','word','wrap']))
             pass;              #log('opts={}',(opts))
@@ -250,26 +247,27 @@ class Tree_cmds:
                 ready_st()
             else: 
                 nfnd_st() 
-            return d(ctrls=[('what',d(items=opts['hist']))
-                           ,('prev',d(en=prev_en())),('pre_',d(en=prev_en()))
-                           ,('next',d(en=next_en())),('nex_',d(en=next_en()))]
+            return d(ctrls=[('what',d(items=opts['hist']))]
                     ,fid='what')
            #def do_find
+        def cb_on_key_down(idd, idc, data=''):
+            scam    = app.app_proc(app.PROC_GET_KEYSTATE, '')
+            key     = app.app_proc(app.PROC_HOTKEY_INT_TO_STR, str(idc))
+            if ag and scam+key=='sEnter':   ag._update_on_call(do_next('prev', ag))
+            pass;              #log('scam,key={}',(scam,app.app_proc(app.PROC_HOTKEY_INT_TO_STR, str(idc))))
         ag      = DlgAgent(
-            form    =dict(cap=_('Find tree node'), w=415, h=58, h_max=58, resize=True)  #, border_ex=app.DLGBORDER_TOOLWINDOWSIZE
+            form    =dict(cap=_('Find tree node'), w=365, h=58, h_max=58
+                         ,on_key_down=cb_on_key_down
+                         ,resize=True)  #, border_ex=app.DLGBORDER_TOOLWINDOWSIZE
         ,   ctrls   =[0
-    ,('pre_',d(tp='bt'  ,t=0        ,l=0        ,w=0    ,cap='&,'   ,sto=False              ,en=F       ,call=do_next           ))  # &,
-    ,('nex_',d(tp='bt'  ,t=0        ,l=0        ,w=0    ,cap='&.'   ,sto=False              ,en=F       ,call=do_next           ))  # &.
     ,('find',d(tp='bt'  ,t=0        ,l=0        ,w=0    ,cap=''     ,sto=False  ,def_bt='1'             ,call=do_find           ))  # Enter
     ,('reex',d(tp='ch-b',tid='what' ,l=5+38*0   ,w=39   ,cap='.&*'  ,hint=_('Regular expression')       ,call=do_attr           ))  # &*
     ,('case',d(tp='ch-b',tid='what' ,l=5+38*1   ,w=39   ,cap='&aA'  ,hint=_('Case sensitive')           ,call=do_attr           ))  # &a
     ,('word',d(tp='ch-b',tid='what' ,l=5+38*2   ,w=39   ,cap='"&w"' ,hint=_('Whole words')              ,call=do_attr           ))  # &w
     ,('wrap',d(tp='ch-b',tid='what' ,l=5+38*3   ,w=39   ,cap='&O'   ,hint=_('Wrapped search')           ,call=do_attr           ))  # &/
     ,('what',d(tp='cb'  ,t  =5      ,l=5+38*4+5 ,w=155  ,items=opts['hist']                                             ,a='lR' ))  # 
-    ,('prev',d(tp='bt'  ,tid='what' ,l=320      ,w=25   ,cap='&<'   ,hint=_('Find previous'),en=F       ,call=do_next   ,a='LR' ))  # &<
-    ,('next',d(tp='bt'  ,tid='what' ,l=345      ,w=25   ,cap='&>'   ,hint=_('Find next')    ,en=F       ,call=do_next   ,a='LR' ))  # &>
-    ,('menu',d(tp='bt'  ,tid='what' ,l=380      ,w=30   ,cap='&='                                       ,call=do_menu   ,a='LR' ))  # &=
-    ,('stbr',d(tp='sb'              ,l=0        ,r=415                                   ,ali=ALI_BT                    ,a='lR' ))  # 
+    ,('menu',d(tp='bt'  ,tid='what' ,l=330      ,w=30   ,cap='&='                                       ,call=do_menu   ,a='LR' ))  # &=
+    ,('stbr',d(tp='sb'              ,l=0        ,r=365                                   ,ali=ALI_BT                    ,a='lR' ))  # 
                     ][1:]
         ,   fid     ='what'
         ,   vals    = {k:opts[k] for k in ('reex','case','word','wrap')}
@@ -278,8 +276,7 @@ class Tree_cmds:
         stbr    = app.dlg_proc(ag.id_dlg, app.DLG_CTL_HANDLE, name='stbr')
         app.statusbar_proc(stbr, app.STATUSBAR_ADD_CELL             , tag=1)
         app.statusbar_proc(stbr, app.STATUSBAR_SET_CELL_AUTOSTRETCH , tag=1, value=True)
-        ag.show(lambda ag: apx.set_opt('cuda_ext.tree.find_node'
-                                      ,json.dumps(upd_dict(opts, ag.cvals(['reex','case','word','wrap'])))))
+        ag.show(lambda ag: set_hist('tree.find_node', upd_dict(opts, ag.cvals(['reex','case','word','wrap']))))
        #def find_tree_node
    
     @staticmethod
@@ -1481,11 +1478,12 @@ class Find_repl_cmds:
           '\r• If option "Close on success" (in menu) is tuned on, dialog will close after successful search.'
           '\r• Command "Restore starting selection" (in menu) restores only first of starting carets.'
         )
-        opts_s  = apx.get_opt('cuda_ext.find.find_in_lines')
-        opts    = json.loads(opts_s) if opts_s else d(reex=False,case=False,word=False,hist=[],clos=False,usel=False)
+        pass;                  #log('###',())
+        pass;                  #log('hist={}',(get_hist('find.find_in_lines')))
+        opts    = d(reex=False,case=False,word=False,hist=[],clos=False,usel=False)
+        opts    = get_hist('find.find_in_lines', opts)
         # Scan ed
-        ed_crts = ed.get_carets()                                                       # Carets at start
-        ed_rlns = [(row, ed.get_text_line(row)) for row in range(ed.get_line_count())]  # [,(row,line),]
+        ed_crts = ed.get_carets()           # Carets at start
         
         # How to select node
         def select_frag(frag_inf):  ed.set_caret(*frag_inf)
@@ -1563,7 +1561,8 @@ class Find_repl_cmds:
             ready_l = []
             ready_p = -1
             pttn_r  = compile_pttn(what, opts['reex'], opts['case'], opts['word'])
-            for row, line in ed_rlns:
+            for row in range(ed.get_line_count()):
+                line    = ed.get_text_line(row)
                 mtchs   = pttn_r.finditer(line)
                 if not mtchs:  continue
                 for mtch in mtchs:
@@ -1598,12 +1597,10 @@ class Find_repl_cmds:
             if ag and scam+key=='sEnter':   ag._update_on_call(do_find('prev', ag))
             pass;              #log('scam,key={}',(scam,app.app_proc(app.PROC_HOTKEY_INT_TO_STR, str(idc))))
         ag      = DlgAgent(
-            form    =dict(cap=FORM_C, w=255, h=33, h_max=33
+            form    =dict(cap=FORM_C, w=255, h=35, h_max=35
                          ,on_key_down=cb_on_key_down
                          ,resize=True)  #, border_ex=app.DLGBORDER_TOOLWINDOWSIZE
         ,   ctrls   =[0
-#   ,('pre_',d(tp='bt'  ,t=0        ,l=0        ,w=0    ,cap='&,'   ,sto=False                          ,call=do_find           ))  # &,
-#   ,('prev',d(tp='bt'  ,t=0        ,l=0        ,w=0    ,cap='&-'   ,sto=False                          ,call=do_find           ))  # &<
     ,('find',d(tp='bt'  ,t=0        ,l=0        ,w=0    ,cap=''     ,sto=False  ,def_bt='1'             ,call=do_find           ))  # Enter
     ,('reex',d(tp='ch-b',tid='what' ,l=5+38*0   ,w=39   ,cap='.&*'  ,hint=_('Regular expression')       ,call=do_attr           ))  # &*
     ,('case',d(tp='ch-b',tid='what' ,l=5+38*1   ,w=39   ,cap='&aA'  ,hint=_('Case sensitive')           ,call=do_attr           ))  # &a
@@ -1615,8 +1612,7 @@ class Find_repl_cmds:
         ,   vals    = upd_dict({k:opts[k] for k in ('reex','case','word')}, d(what=what))
                               #,options={'gen_repro_to_file':'repro_dlg_find_in_tab.py'}
         )
-        ag.show(lambda ag: apx.set_opt('cuda_ext.find.find_in_lines'
-                                      ,json.dumps(upd_dict(opts, ag.cvals(['reex','case','word'])))))
+        ag.show(lambda ag: set_hist('find.find_in_lines', upd_dict(opts, ag.cvals(['reex','case','word']))))
        #def dlg_find_in_lines
 
     @staticmethod
@@ -2571,14 +2567,15 @@ class Command:
     def open_recent(self):
         home_s      = os.path.expanduser('~')
         hist_fs_f   = app.app_path(app.APP_DIR_SETTINGS)+os.sep+'history files.json'
-#       hist_f      = app.app_path(app.APP_DIR_SETTINGS)+os.sep+'history.json'
         if not os.path.exists(hist_fs_f):   return app.msg_status(_('No files in history'))
         hist_full_js= json.loads(open(hist_fs_f, encoding='utf8').read())
         hist_fs     = [f.replace('|', os.sep) for f in hist_full_js]
         hist_fts    = [(f.replace(home_s, '~'), os.path.getmtime(f)) 
                         for f in hist_fs if os.path.exists(f)]
-        sort_as     = apx.get_opt('cuda_ext.open-recent.sort_as', 't')
-        show_as     = apx.get_opt('cuda_ext.open-recent.show_as', 'n')
+        sort_as     = get_hist([           'open-recent','sort_as'],
+                      apx.get_opt('cuda_ext.open-recent.sort_as',    't'))
+        show_as     = get_hist([           'open-recent','show_as'],
+                      apx.get_opt('cuda_ext.open-recent.show_as',    'n'))
         while True:
             hist_fts    = sorted(hist_fts
                                 , key=lambda ft:(ft[1]          if sort_as=='t' else 
@@ -2603,11 +2600,11 @@ class Command:
             if ans is None: return
             if ans==(0+len(hist_fts)):
                 show_as     = 'p' if show_as=='n' else 'n'
-                apx.set_opt('cuda_ext.open-recent.show_as', show_as)
+                set_hist(['open-recent','show_as'], show_as)
                 continue #while
             if ans==(1+len(hist_fts)):
                 sort_as     = 'p' if sort_as=='t' else 't'
-                apx.set_opt('cuda_ext.open-recent.sort_as', sort_as)
+                set_hist(['open-recent','sort_as'], sort_as)
                 continue #while
             return app.file_open(hist_fts[ans][0].replace('~', home_s))
 #           break#while

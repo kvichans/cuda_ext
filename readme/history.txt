@@ -1,8 +1,15 @@
+1.5.09 (2018-05-28)
+changed: Command 'File: Open recent file' stores data in "plugin history.json" (not in "user.json")
+changed: Command 'Find "in lines"' stores data in "plugin history.json" (not in "user.json")
+changed: Command 'Code Tree: Fine node' stores data in "plugin history.json" (not in "user.json")
+changed: Dialog 'Code Tree: Fine node' uses [Shift+]Enter to jump (buttons for Alt+ <>,. are deleted)
+added: Dialog 'Code Tree: Fine node' has new menu command "Restore starting selection"
+
 1.5.08 (2018-05-23)
 added: command 'Find "in lines"' to light search in text
 
 1.5.07 (2018-05-22)
-added: command 'Code Tree / Find node' - allow to jump over found nodes
+changed: command 'Code Tree / Find node' - allow to jump over found nodes
 
 1.5.06 (2018-05-17)
 added: command 'Code Tree / Find node'
