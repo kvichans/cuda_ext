@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.5.09 2018-05-28'
+    '1.5.11 2018-05-28'
 ToDo: (see end of file)
 '''
 
@@ -1493,13 +1493,14 @@ class Find_repl_cmds:
           '\r• All found fragments are remembered and dialog can jump over them by [Shift+]Enter or by menu commands.'
           '\r• Option ".*" (regular expression) allows to use Python reg.ex. See "docs.python.org/3/library/re.html".'
           '\r• Option "w" (whole words) is ignored if entered string contains not a word.'
-          '\r• If option "Close on success" (in menu) is tuned on, dialog will close after successful search.'
+#         '\r• If option "Close on success" (in menu) is tuned on, dialog will close after successful search.'
           '\r• If option "Instant search" (in menu) is tuned on, search result will update on start and after each change of pattern.'
           '\r• Command "Restore starting selection" (in menu) restores only first of starting carets.'
         )
         pass;                  #log('###',())
         pass;                  #log('hist={}',(get_hist('find.find_in_lines')))
-        opts    = d(reex=False,case=False,word=False,hist=[],clos=False,usel=False,inst=False)
+        opts    = d(reex=False,case=False,word=False,hist=[]           ,usel=False,inst=False,insm=3)
+#       opts    = d(reex=False,case=False,word=False,hist=[],clos=False,usel=False,inst=False)
         opts.update(get_hist('find.find_in_lines', opts))
 
         # How to select node
@@ -1526,7 +1527,9 @@ class Find_repl_cmds:
         ready_l = []            # [(row,col_bgn,col_end)]
         ready_p = -1            # pos in ready_l
         form_cap= lambda: f('{} ({}/{})', FORM_C, 1+ready_p, len(ready_l)) if ready_l else f('{} (0)', FORM_C)
-        form_cpw= lambda: FORM_C + (_(' (Type to find)') if opts['inst'] else _(' (ENTER to find)'))
+        form_cpw= lambda: FORM_C + (f(_(' (Type {} character(s) to find)'), opts['insm']) 
+                                        if opts['inst'] else 
+                                      _(' (ENTER to find)'))
         form_err= lambda: FORM_C +  _(' (Error)')
         
         def do_attr(aid, ag, data=''):
@@ -1542,21 +1545,25 @@ class Find_repl_cmds:
                 if tag=='rest':
                     ed.set_caret(*Find_repl_cmds.fil_ed_crts[0])
                     return None
+                if tag=='insm':
+                    opts['insm']    = int(app.dlg_input(_('Instant search minumum'), str(opts['insm'])))
                 if tag=='inst':
                     Find_repl_cmds.fil_what         = ag.cval('what')
                     Find_repl_cmds.fil_restart_dlg  = True
                     return None
                 return []
                #def wnen_menu
+            insm_c  = f(_('Instant search minimum: {}...'), opts['insm'])
             ag.show_menu(aid, 
                 [ d(tag='help'  ,cap=_('&Help...')                                      ,cmd=wnen_menu
                 ),d(             cap='-'
                 ),d(tag='prev'  ,cap=_('Find &previous')                                ,cmd=wnen_menu  ,key='Shift+Enter'
                 ),d(tag='next'  ,cap=_('F&ind next')                                    ,cmd=wnen_menu  ,key='Enter'
                 ),d(             cap='-'
-                ),d(tag='clos'  ,cap=_('Close on success')          ,ch=opts['clos']    ,cmd=wnen_menu
+#               ),d(tag='clos'  ,cap=_('Close on success')          ,ch=opts['clos']    ,cmd=wnen_menu
                 ),d(tag='usel'  ,cap=_('Use selection from text')   ,ch=opts['usel']    ,cmd=wnen_menu
                 ),d(tag='inst'  ,cap=_('Instant search')            ,ch=opts['inst']    ,cmd=wnen_menu
+                ),d(tag='insm'  ,cap=insm_c                                             ,cmd=wnen_menu
                 ),d(             cap='-'
                 ),d(tag='rest'  ,cap=_('Restore starting selection and close dialog &='),cmd=wnen_menu
                 )]
@@ -1582,6 +1589,9 @@ class Find_repl_cmds:
             if not what:
                 ready_l, ready_p    = [], -1
                 return                      d(form=d(cap=form_cpw()) ,fid='what')
+            if opts['inst'] and len(what)<opts['insm'] and not opts['reex'] :
+                ready_l, ready_p    = [], -1
+                return                      d(form=d(cap=form_cpw()) ,fid='what')
             if not opts['inst']:
                 opts['hist']= add_to_hist(what, opts['hist'])
             opts.update(ag.cvals(['reex','case','word']))
@@ -1602,9 +1612,9 @@ class Find_repl_cmds:
                 for mtch in mtchs:
                     fnd_bgn = mtch.start()
                     fnd_end = mtch.end()
-                    if opts['clos']:
-                        select_frag(fnd_end, row, fnd_bgn, row)
-                        return None         # Close dlg
+#                   if opts['clos']:
+#                       select_frag(fnd_end, row, fnd_bgn, row)
+#                       return None         # Close dlg
                     ready_p = (len(ready_l) 
                                 if prnx=='next' and ready_p==-1 and                             # Need next and no yet
                                     (row>max_rc[0] or row==max_rc[0] and fnd_bgn>max_rc[1])     # At more row or at more col in cur row

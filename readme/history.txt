@@ -1,3 +1,6 @@
+1.5.11 (2018-05-28)
+added: Instant search minimum input size to start
+
 1.5.10 (2018-05-28)
 added: Instant search to dialog "Find in lines" (by option in local menu)
 
