@@ -1,5 +1,7 @@
-1.5.11 (2018-05-28)
-added: Instant search minimum input size to start
+1.5.11 (2018-05-29)
+added: "Find in lines": Instant search minimum input size to start
+added: "Find in lines": Shift+Esc to close and restore initial selection
+added: "Code Tree: Find node": Shift+Esc to close and restore initial selection
 
 1.5.10 (2018-05-28)
 added: Instant search to dialog "Find in lines" (by option in local menu)
@@ -7,9 +9,9 @@ added: Instant search to dialog "Find in lines" (by option in local menu)
 1.5.09 (2018-05-28)
 changed: Command "File: Open recent file" stores data in "plugin history.json" (not in "user.json")
 changed: Command "Find in lines" stores data in "plugin history.json" (not in "user.json")
-changed: Command "Code Tree: Fine node" stores data in "plugin history.json" (not in "user.json")
-changed: Dialog "Code Tree: Fine node" uses [Shift+]Enter to jump (buttons for Alt+ <>,. are deleted)
-added: Dialog "Code Tree: Fine node" has new menu command "Restore starting selection"
+changed: Command "Code Tree: Find node" stores data in "plugin history.json" (not in "user.json")
+changed: Dialog "Code Tree: Find node" uses [Shift+]Enter to jump (buttons for Alt+ <>,. are deleted)
+added: Dialog "Code Tree: Find node" has new menu command "Restore starting selection"
 
 1.5.08 (2018-05-23)
 added: command "Find in lines" to light search in text

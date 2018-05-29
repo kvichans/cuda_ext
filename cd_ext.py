@@ -103,7 +103,7 @@ class Tree_cmds:
           '\r• Option "w" (whole words) is ignored if entered string contains not a word.'
           '\r• If option "Close on success" (in menu) is tuned on, dialog will close after successful search.'
           '\r• Option "Show full tree path" (in menu) shows in the statusbar the path of the found node (names of all parents).'
-          '\r• Command "Restore starting selection" (in menu) restores only first of starting carets.'
+          '\r• Command "Restore initial selection" (in menu) restores only first of initial carets.'
         )
         ed_crts = ed.get_carets()           # Carets at start
         opts    = d(reex=False,case=False,word=False,wrap=False,hist=[],clos=False,fpth=False)
@@ -178,15 +178,15 @@ class Tree_cmds:
                 return []
                #def wnen_menu
             ag.show_menu(aid, 
-                [ d(tag='help'  ,cap=_('&Help...')                              ,cmd=wnen_menu
+                [ d(tag='help'  ,cap=_('&Help...')                                      ,cmd=wnen_menu
                 ),d(             cap='-'
-                ),d(tag='prev'  ,cap=_('Find &previous')                        ,cmd=wnen_menu  ,key='Shift+Enter'
-                ),d(tag='next'  ,cap=_('F&ind next')                            ,cmd=wnen_menu  ,key='Enter'
+                ),d(tag='prev'  ,cap=_('Find &previous')                                ,cmd=wnen_menu  ,key='Shift+Enter'
+                ),d(tag='next'  ,cap=_('F&ind next')                                    ,cmd=wnen_menu  ,key='Enter'
                 ),d(             cap='-'
-                ),d(tag='fpth'  ,cap=_('Show full tree path')   ,ch=opts['fpth'],cmd=wnen_menu
-                ),d(tag='clos'  ,cap=_('Close on success')      ,ch=opts['clos'],cmd=wnen_menu
+                ),d(tag='fpth'  ,cap=_('Show full tree path')   ,ch=opts['fpth']        ,cmd=wnen_menu
+                ),d(tag='clos'  ,cap=_('Close on success')      ,ch=opts['clos']        ,cmd=wnen_menu
                 ),d(             cap='-'
-                ),d(tag='rest'  ,cap=_('Restore starting selection and close dialog &='),cmd=wnen_menu
+                ),d(tag='rest'  ,cap=_('Restore initial selection and close dialog &=') ,cmd=wnen_menu,key='Shift+Esc'
                 )]
             )
             return d(fid='what')
@@ -261,6 +261,9 @@ class Tree_cmds:
             scam    = app.app_proc(app.PROC_GET_KEYSTATE, '')
             key     = app.app_proc(app.PROC_HOTKEY_INT_TO_STR, str(idc))
             if ag and scam+key=='sEnter':   ag._update_on_call(do_next('prev', ag))
+            if ag and scam+key=='sEsc':     # Shift+Esc
+                ed.set_caret(*ed_crts[0])
+                ag.hide()
         ag      = DlgAgent(
             form    =dict(cap=_('Find tree node'), w=365, h=58, h_max=58
                          ,on_key_down=cb_on_key_down
@@ -1488,14 +1491,14 @@ class Find_repl_cmds:
 #       FORM_C  = f(_('Find "in lines" {}'), 1+ed.get_prop(app.PROP_INDEX_GROUP))
         FORM_C  =   _('Find "in lines"')
         HELP_C  = _(
-            '• Search "in lines" starts on Enter or Shift+Enter or imediatly (if "Instant search" is tuned on).'
+            '• Search "in lines" starts on Enter or Shift+Enter or immediately (if "Instant search" is tuned on).'
           '\r• A found fragment after first caret will be selected.'
           '\r• All found fragments are remembered and dialog can jump over them by [Shift+]Enter or by menu commands.'
           '\r• Option ".*" (regular expression) allows to use Python reg.ex. See "docs.python.org/3/library/re.html".'
           '\r• Option "w" (whole words) is ignored if entered string contains not a word.'
 #         '\r• If option "Close on success" (in menu) is tuned on, dialog will close after successful search.'
-          '\r• If option "Instant search" (in menu) is tuned on, search result will update on start and after each change of pattern.'
-          '\r• Command "Restore starting selection" (in menu) restores only first of starting carets.'
+          '\r• If option "Instant search" (in menu) is tuned on, search result will be updated on start and after each change of pattern.'
+          '\r• Command "Restore initial selection" (in menu) restores only first of initial carets.'
         )
         pass;                  #log('###',())
         pass;                  #log('hist={}',(get_hist('find.find_in_lines')))
@@ -1546,7 +1549,8 @@ class Find_repl_cmds:
                     ed.set_caret(*Find_repl_cmds.fil_ed_crts[0])
                     return None
                 if tag=='insm':
-                    opts['insm']    = int(app.dlg_input(_('Instant search minumum'), str(opts['insm'])))
+                    insm    = app.dlg_input(_('Instant search minimum'), str(opts['insm']))
+                    opts['insm']    = int(insm) if insm and re.match(r'^\d+$', insm) else opts['insm']
                 if tag=='inst':
                     Find_repl_cmds.fil_what         = ag.cval('what')
                     Find_repl_cmds.fil_restart_dlg  = True
@@ -1565,7 +1569,7 @@ class Find_repl_cmds:
                 ),d(tag='inst'  ,cap=_('Instant search')            ,ch=opts['inst']    ,cmd=wnen_menu
                 ),d(tag='insm'  ,cap=insm_c                                             ,cmd=wnen_menu
                 ),d(             cap='-'
-                ),d(tag='rest'  ,cap=_('Restore starting selection and close dialog &='),cmd=wnen_menu
+                ),d(tag='rest'  ,cap=_('Restore initial selection and close dialog &=') ,cmd=wnen_menu  ,key='Shift+Esc'
                 )]
             )
             return d(fid='what')
@@ -1642,7 +1646,11 @@ class Find_repl_cmds:
         def cb_on_key_down(idd, idc, data=''):
             scam    = app.app_proc(app.PROC_GET_KEYSTATE, '')
             key     = app.app_proc(app.PROC_HOTKEY_INT_TO_STR, str(idc))
+            pass;              #log('scam,key={}',(scam,key))
             if ag and scam+key=='sEnter':   ag._update_on_call(do_find('prev', ag))
+            if ag and scam+key=='sEsc':     # Shift+Esc
+                ed.set_caret(*Find_repl_cmds.fil_ed_crts[0])
+                ag.hide()
         wh_tp   = 'ed'      if opts['inst'] else 'cb'
         wh_call = do_find   if opts['inst'] else None
         ag      = DlgAgent(
