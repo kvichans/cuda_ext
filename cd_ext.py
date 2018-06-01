@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.5.11 2018-05-28'
+    '1.5.12 2018-06-01'
 ToDo: (see end of file)
 '''
 
@@ -12,6 +12,7 @@ from    fnmatch         import fnmatch
 
 import  cudatext            as app
 from    cudatext        import ed
+from    cudatext_keys   import *
 import  cudatext_cmd        as cmds
 import  cudax_lib           as apx
 from    cudax_lib       import log
@@ -186,7 +187,7 @@ class Tree_cmds:
                 ),d(tag='fpth'  ,cap=_('Show full tree path')   ,ch=opts['fpth']        ,cmd=wnen_menu
                 ),d(tag='clos'  ,cap=_('Close on success')      ,ch=opts['clos']        ,cmd=wnen_menu
                 ),d(             cap='-'
-                ),d(tag='rest'  ,cap=_('Restore initial selection and close dialog &=') ,cmd=wnen_menu,key='Shift+Esc'
+                ),d(tag='rest'  ,cap=_('Restore initial selection and close dialog &=') ,cmd=wnen_menu  ,key='Shift+Esc'
                 )]
             )
             return d(fid='what')
@@ -257,17 +258,21 @@ class Tree_cmds:
             return d(ctrls=[('what',d(items=opts['hist']))]
                     ,fid='what')
            #def do_find
-        def cb_on_key_down(idd, idc, data=''):
-            scam    = app.app_proc(app.PROC_GET_KEYSTATE, '')
-            key     = app.app_proc(app.PROC_HOTKEY_INT_TO_STR, str(idc))
-            if ag and scam+key=='sEnter':   ag._update_on_call(do_next('prev', ag))
-            if ag and scam+key=='sEsc':     # Shift+Esc
+        def do_key_down(idd, idc, data=''):
+            scam    = data if data else app.app_proc(app.PROC_GET_KEYSTATE, '')
+            if 0:pass
+            elif (scam,idc)==('s',VK_ENTER):        # Shift+Enter
+                ag._update_on_call(do_next('prev', ag))
+            elif (scam,idc)==('s',VK_ESCAPE):       # Shift+Esc
                 ed.set_caret(*ed_crts[0])
                 ag.hide()
+            else: return 
+            return False
         ag      = DlgAgent(
             form    =dict(cap=_('Find tree node'), w=365, h=58, h_max=58
-                         ,on_key_down=cb_on_key_down
-                         ,resize=True)  #, border_ex=app.DLGBORDER_TOOLWINDOWSIZE
+                         ,on_key_down=do_key_down
+                         ,border=app.DBORDER_SIZE
+                         ,resize=True)
         ,   ctrls   =[0
     ,('find',d(tp='bt'  ,t=0        ,l=0        ,w=0    ,cap=''     ,sto=False  ,def_bt='1'             ,call=do_find           ))  # Enter
     ,('reex',d(tp='ch-b',tid='what' ,l=5+38*0   ,w=39   ,cap='.&*'  ,hint=_('Regular expression')       ,call=do_attr           ))  # &*
@@ -1484,14 +1489,14 @@ class Find_repl_cmds:
         Find_repl_cmds.fil_what     = None
         while True:
             Find_repl_cmds.fil_restart_dlg  = False
-            Find_repl_cmds._dlg_fil()
+            Find_repl_cmds._dlg_FIL()
             if not Find_repl_cmds.fil_restart_dlg:  break
     @staticmethod
-    def _dlg_fil():
-#       FORM_C  = f(_('Find "in lines" {}'), 1+ed.get_prop(app.PROP_INDEX_GROUP))
-        FORM_C  =   _('Find "in lines"')
+    def _dlg_FIL():
+#       FORM_C  = f(_('Find in Lines {}'), 1+ed.get_prop(app.PROP_INDEX_GROUP))
+        FORM_C  =   _('Find in Lines')
         HELP_C  = _(
-            '• Search "in lines" starts on Enter or Shift+Enter or immediately (if "Instant search" is tuned on).'
+            '• Search "in Lines" starts on Enter or Shift+Enter or immediately (if "Instant search" is tuned on).'
           '\r• A found fragment after first caret will be selected.'
           '\r• All found fragments are remembered and dialog can jump over them by [Shift+]Enter or by menu commands.'
           '\r• Option ".*" (regular expression) allows to use Python reg.ex. See "docs.python.org/3/library/re.html".'
@@ -1499,6 +1504,7 @@ class Find_repl_cmds:
 #         '\r• If option "Close on success" (in menu) is tuned on, dialog will close after successful search.'
           '\r• If option "Instant search" (in menu) is tuned on, search result will be updated on start and after each change of pattern.'
           '\r• Command "Restore initial selection" (in menu) restores only first of initial carets.'
+#         '\r• Ctrl+F calls native dialog Find.'
         )
         pass;                  #log('###',())
         pass;                  #log('hist={}',(get_hist('find.find_in_lines')))
@@ -1555,6 +1561,10 @@ class Find_repl_cmds:
                     Find_repl_cmds.fil_what         = ag.cval('what')
                     Find_repl_cmds.fil_restart_dlg  = True
                     return None
+                if tag=='natf':
+                    ag.hide()
+                    ed.cmd(cmds.cmd_DialogFind)
+                    return None
                 return []
                #def wnen_menu
             insm_c  = f(_('Instant search minimum: {}...'), opts['insm'])
@@ -1569,6 +1579,7 @@ class Find_repl_cmds:
                 ),d(tag='inst'  ,cap=_('Instant search')            ,ch=opts['inst']    ,cmd=wnen_menu
                 ),d(tag='insm'  ,cap=insm_c                                             ,cmd=wnen_menu
                 ),d(             cap='-'
+                ),d(tag='natf'  ,cap=_('Call native Find dialog')                       ,cmd=wnen_menu  ,key='Ctrl+F'
                 ),d(tag='rest'  ,cap=_('Restore initial selection and close dialog &=') ,cmd=wnen_menu  ,key='Shift+Esc'
                 )]
             )
@@ -1643,27 +1654,33 @@ class Find_repl_cmds:
                   ed.get_text_sel()         if opts['usel'] and 1==len(ed.get_carets()) else ''
         what    = '' if '\r' in what or '\n' in what else what 
         ag      = None
-        def cb_on_key_down(idd, idc, data=''):
-            scam    = app.app_proc(app.PROC_GET_KEYSTATE, '')
-            key     = app.app_proc(app.PROC_HOTKEY_INT_TO_STR, str(idc))
-            pass;              #log('scam,key={}',(scam,key))
-            if ag and scam+key=='sEnter':   ag._update_on_call(do_find('prev', ag))
-            if ag and scam+key=='sEsc':     # Shift+Esc
+        def do_key_down(idd, idc, data=''):
+            scam    = data if data else app.app_proc(app.PROC_GET_KEYSTATE, '')
+            if 0:pass
+            elif (scam,idc)==('s',VK_ENTER):        # Shift+Enter
+                ag._update_on_call(do_find('prev', ag))
+            elif (scam,idc)==('s',VK_ESCAPE):       # Shift+Esc
                 ed.set_caret(*Find_repl_cmds.fil_ed_crts[0])
                 ag.hide()
+            elif (scam,idc)==('c',ord('F')):        # Ctrl+F
+                ag.hide()
+                ed.cmd(cmds.cmd_DialogFind)
+            else: return 
+            return False
         wh_tp   = 'ed'      if opts['inst'] else 'cb'
         wh_call = do_find   if opts['inst'] else None
         ag      = DlgAgent(
             form    =dict(cap=form_cpw(), w=255, h=35, h_max=35
-                         ,on_key_down=cb_on_key_down
-                         ,resize=True)  #, border_ex=app.DLGBORDER_TOOLWINDOWSIZE
+                         ,on_key_down=do_key_down
+                         ,border=app.DBORDER_SIZE
+                         ,resize=True)
         ,   ctrls   =[0
     ,('find',d(tp='bt'  ,t=0        ,l=0        ,w=0    ,cap=''     ,sto=False  ,def_bt='1'         ,call=do_find           ))  # Enter
     ,('reex',d(tp='chb' ,tid='what' ,l=5+38*0   ,w=39   ,cap='.&*'  ,hint=_('Regular expression')   ,call=do_attr           ))  # &*
     ,('case',d(tp='chb' ,tid='what' ,l=5+38*1   ,w=39   ,cap='&aA'  ,hint=_('Case sensitive')       ,call=do_attr           ))  # &a
     ,('word',d(tp='chb' ,tid='what' ,l=5+38*2   ,w=39   ,cap='"&w"' ,hint=_('Whole words')          ,call=do_attr           ))  # &w
     ,('what',d(tp=wh_tp ,t  =5      ,l=5+38*3+5 ,w=85   ,items=opts['hist']                         ,call=wh_call   ,a='lR' ))  # 
-    ,('menu',d(tp='bt'  ,tid='what' ,l=220      ,w=30   ,cap='&='                                   ,call=do_menu   ,a='LR' ))  # &=
+    ,('menu',d(tp='bt'  ,tid='what' ,l=220      ,w=30   ,cap='&='                   ,on_menu=do_menu,call=do_menu   ,a='LR' ))  # &=
                     ][1:]
         ,   fid     ='what'
         ,   vals    = upd_dict({k:opts[k] for k in ('reex','case','word')}, d(what=what))
@@ -1672,7 +1689,7 @@ class Find_repl_cmds:
         if opts['inst'] and what:
             ag._update_on_call(do_find('find', ag, 'stay'))
         ag.show(lambda ag: set_hist('find.find_in_lines', upd_dict(opts, ag.cvals(['reex','case','word']))))
-       #def _dlg_fil
+       #def _dlg_FIL
 
     @staticmethod
     def find_cb_by_cmd(updn):

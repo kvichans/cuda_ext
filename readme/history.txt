@@ -1,3 +1,6 @@
+1.5.12 (2018-06-01)
+added: Call native Find dlg
+
 1.5.11 (2018-05-29)
 added: "Find in lines": Instant search minimum input size to start
 added: "Find in lines": Shift+Esc to close and restore initial selection

@@ -759,15 +759,6 @@ def dlg_proc_wpr(id_dialog, id_action, prop='', index=-1, index2=-1, name=''):
     """
     if id_action==app.DLG_SCALE:
         return
-#   if id_dialog==0:
-#       print('idd=dlg_proc(0, {})'.format(DLG_PROC_I2S[id_action]))
-#   else:
-#       print('dlg_proc(idd, {}, index={}, name="{}", prop={}, index2={})'.format(   DLG_PROC_I2S[id_action], 
-#           index, name, 
-#           '""' if type(prop)==str else prop, 
-##           '""' if type(prop)==str else {k:prop[k] for k in prop if k not in ['on_change']}, 
-#           index2))
-    #print('#dlg_proc id_action='+str(id_action)+' prop='+repr(prop))
 
     scale_on_set    = id_action in (app.DLG_PROP_SET, app.DLG_CTL_PROP_SET)
     scale_on_get    = id_action in (app.DLG_PROP_GET, app.DLG_CTL_PROP_GET)
@@ -775,8 +766,6 @@ def dlg_proc_wpr(id_dialog, id_action, prop='', index=-1, index2=-1, name=''):
     if id_action==DLG_CTL_ADD_SET:  # Join ADD and SET for a control
         res = ctl_ind = \
         app.dlg_proc(id_dialog, app.DLG_CTL_ADD, name, -1, -1, '')       # type in name
-#       if name in ('label', 'button', 'checkbutton') and 'h' not in prop:
-#           prop['h'] = app.dlg_proc(id_dialog, app.DLG_CTL_PROP_GET, index=ctl_ind)['h']
         _os_scale(              app.DLG_CTL_PROP_SET, prop, ctl_ind, -1, '')
         app.dlg_proc(id_dialog, app.DLG_CTL_PROP_SET, prop, ctl_ind, -1, '')
     else:
@@ -862,7 +851,6 @@ class BaseDlgAgent:
         """ Show the form """
         ed_caller   = ed
         
-#       app.dlg_proc(self.id_dlg, app.DLG_SCALE)        #??
 #       pass;                   pr_   = dlg_proc_wpr(self.id_dlg, app.DLG_CTL_PROP_GET, name='edch')
 #       pass;                   log('exit,pr_={}',('edch', {k:v for k,v in pr_.items() if k in ('h','y')}))
         app.dlg_proc(self.id_dlg, app.DLG_SHOW_MODAL)
@@ -881,10 +869,6 @@ class BaseDlgAgent:
         pass;                  #log('ed_to_fcs.get_filename()={}',(ed_to_fcs.get_filename()))
         if ed_to_fcs:
             ed_to_fcs.focus()
-#           pass;               log('self.opts={}',(self.opts))
-#           self.opts['on_exit_focus_to_ed'].focus()
-#       else:
-#           ed_caller.focus()
        #def show
         
     def fattr(self, attr, live=True, defv=None):
@@ -919,7 +903,6 @@ class BaseDlgAgent:
         if not live:        return rsp
         if attr=='val':     return self._take_val(name, rsp, defv)
         return                     self._take_it_cl(name, attr, rsp, defv)
-#       return self._take_val(name, rsp, defv)   if attr=='val' and live else    rsp
        #def cattr
 
     def cattrs(self, name, attrs=None, live=True):
@@ -938,18 +921,18 @@ class BaseDlgAgent:
     def chandle(self, name):
         return app.dlg_proc(self.id_dlg, app.DLG_CTL_HANDLE, name=name)
 
-    def bind_do(self, names=None, gui2data=True):
-        names   = names if names else self.binds.keys()
-        assert self.bindof
-        for name in names:
-            if name not in self.binds: continue
-            attr    = 'val'
-            if gui2data:
-                self.bindof.__setattr__(self.binds[name], self.cattr(name, attr))
-            else:
-                val = self.bindof.__getattr(self.binds[name])
-                self.update({'ctrls':[(name, {attr:val})]})
-       #def bind_do
+#   def bind_do(self, names=None, gui2data=True):
+#       names   = names if names else self.binds.keys()
+#       assert self.bindof
+#       for name in names:
+#           if name not in self.binds: continue
+#           attr    = 'val'
+#           if gui2data:
+#               self.bindof.__setattr__(self.binds[name], self.cattr(name, attr))
+#           else:
+#               val = self.bindof.__getattr(self.binds[name])
+#               self.update({'ctrls':[(name, {attr:val})]})
+#      #def bind_do
 
     def __init__(self, ctrls, form=None, focused=None, options=None):
         # Fields
@@ -959,7 +942,7 @@ class BaseDlgAgent:
         self.ctrls  = None                      # Conf-attrs of all controls by name (may be with 'val')
         self.form   = None                      # Conf-attrs of form
 #       self.callof = self.opts.get('callof')   # Object for callbacks
-        self.bindof = self.opts.get('bindof')   # Object for bind control's values to object's fields
+#       self.bindof = self.opts.get('bindof')   # Object for bind control's values to object's fields
         self.binds  = {}                        # {name:'other obj field name'}
         
         self._setup_base(ctrls, form, focused)
@@ -1006,6 +989,8 @@ class BaseDlgAgent:
             fpr     = BaseDlgAgent._form_acts('move', form=fpr      # Move and (maybe) resize
                                              , key4store=self.opts.get('form data key'))
             fpr['topmost']      = True
+            if 'border' in fpr:
+                fpr.pop('resize', None)
             dlg_proc_wpr(       self.id_dlg
                             , app.DLG_PROP_SET
                             , prop=fpr)
@@ -1082,9 +1067,6 @@ class BaseDlgAgent:
             pass;              #log('new_val={}',repr(new_val))
             int_sc = lambda s: _os_scale('unscale', {'w':int(s)})['w']
             new_val= [dict(nm=       ci[0]
-#                         ,wd=int( ci[1])
-#                         ,mi=int( ci[2])
-#                         ,ma=int( ci[3])
                           ,wd=int_sc(ci[1])
                           ,mi=int_sc(ci[2])
                           ,ma=int_sc(ci[3])
@@ -1147,9 +1129,6 @@ class BaseDlgAgent:
                 pass;          #log('cols={}',(cols))
                 str_sc = lambda n: str(_os_scale('scale', {'w':n})['w'])
                 cols   = '\t'.join(['\r'.join([       cd[    'nm']
-#                                             ,str(   cd[    'wd']   )
-#                                             ,str(   cd.get('mi' ,0))
-#                                             ,str(   cd.get('ma' ,0))
                                               ,str_sc(cd[    'wd']   )
                                               ,str_sc(cd.get('mi' ,0))
                                               ,str_sc(cd.get('ma' ,0))
@@ -1268,7 +1247,6 @@ class BaseDlgAgent:
             if apr:
                 out     += afix + repr(apr).strip('{}') 
             for k in pr:
-#               pr  = {k:(lambda idd,idc,data:print(repr(k))) for k in pr}
                 out     += afix + f('"{}":(lambda idd,idc,data:print("{}"))', k, k)
             out         += '}'
             return out
@@ -1529,12 +1507,8 @@ class DlgAgent(BaseDlgAgent):
         
         # Create controls
         for cid,cfg_ctrl in self.ctrls.items():
-#       for cid,cfg_ctrl in ctrls:
             cfg_ctrl.pop('callback', None)
             cfg_ctrl.pop('on_change', None)
-#           cid     = cfg_ctrl.get('cid', cfg_ctrl.get('name'))
-#           cfg_ctrl['cid']     = cid
-#           cfg_ctrl['name']    = cid
             assert 'type' in cfg_ctrl or 'tp'  in cfg_ctrl
             tp      = cfg_ctrl.get('tp',  cfg_ctrl.get('type'))
             cfg_ctrl['tp']      = tp
@@ -1543,7 +1517,6 @@ class DlgAgent(BaseDlgAgent):
                         , DLG_CTL_ADD_SET
                         , name=cfg_ctrl['type']
                         , prop=self._prepare_c_pr(cid, cfg_ctrl))
-            pass;              #cfg_ctrl['_idc']    = ind_c         # While API bug: name isnot work if contorl is in panel
            #for cnt
 
         # Resize callback
@@ -1555,7 +1528,7 @@ class DlgAgent(BaseDlgAgent):
                     self._update_on_call(upds)
             self.form['on_resize'] = da_rs_callbk
         
-        # Resize on start
+        # Move+Resize on start
         fpr     = self.form
         w0      = fpr['w']
         h0      = fpr['h']
@@ -1573,6 +1546,9 @@ class DlgAgent(BaseDlgAgent):
             self.form['on_resize'](self)
 
         fpr['topmost']      = True
+        if 'border' in fpr:
+            fpr.pop('resize', None)
+        pass;                  #log('fpr={}',fpr)
         dlg_proc_wpr(           self.id_dlg
                             , app.DLG_PROP_SET
                             , prop=fpr)                         # Upd live-attrs
@@ -1644,15 +1620,7 @@ class DlgAgent(BaseDlgAgent):
            #for on_key
 
         if callable(cfg_ctrl.get('menu')):
-            user_menubk = cfg_ctrl['menu']
-            
-            def da_mn_callbk(idd, idc, data):
-                pass;          #log('idc,cid={}',(idc,cid))
-                user_menubk(cid, self)
-               #def da_nm_callbk
-            
-            c_pr['on_menu'] = da_mn_callbk
-           #if callable
+            c_pr['on_menu'] = lambda idd, idc, data: cfg_ctrl['menu'](cid, self)
         
         return c_pr
        #def _prepare_c_pr
@@ -1667,12 +1635,9 @@ class DlgAgent(BaseDlgAgent):
         pr      = self.cattrs(cid, ('x','y','w','h'))
         x, y    = pr['x']+(pr['w'] if '+w' in where else 0) \
                 , pr['y']+(pr['h'] if '+h' in where else 0)
-        pass;                  #log('x, y={}',(x, y))
         prXY    = _os_scale('scale', {'x':x, 'y':y})
         x, y    = prXY['x'], prXY['y']
-        pass;                  #log('x, y={}',(x, y))
         x, y    = app.dlg_proc(self.id_dlg, app.DLG_COORD_LOCAL_TO_SCREEN, index=x, index2=y)
-        pass;                  #log('x, y={}',(x, y))
         
         def da_mn_callbk(it):
             pass;              #log('it[tag]={}',(it['tag']))
@@ -1745,10 +1710,10 @@ class DlgAgent(BaseDlgAgent):
     def _prepare_anchors(self):
         """ Translate attrs 'a' 'aid' to 'a_*','sp_*'
             Values for 'a' are str-mask with signs
-                'l' 'L'    fixed distanse ctrl-left     to trg-left  or trg-right
-                't' 'T'    fixed distanse ctrl-top      to trg-top   or trg-bottom
-                'r' 'R'    fixed distanse ctrl-right    to trg-left  or trg-right
-                'b' 'B'    fixed distanse ctrl-bottom   to trg-top   or trg-bottom
+                'l'/'L'    fixed distanse ctrl-left     to trg-left/trg-right
+                't'/'T'    fixed distanse ctrl-top      to trg-top /trg-bottom
+                'r'/'R'    fixed distanse ctrl-right    to trg-left/trg-right
+                'b'/'B'    fixed distanse ctrl-bottom   to trg-top /trg-bottom
         """
         fm_w    = self.form['w']
         fm_h    = self.form['h']
@@ -1824,12 +1789,9 @@ class DlgAgent(BaseDlgAgent):
         #   w[idth]  >>> r[ight ]=l+w
         #   h[eight] >>> b[ottom]=t+h
         #   b dont need for buttons, edit, labels
-#       if not [k for k in cnt.keys() if k in ('l','t','r','b','tid')]:
-#           return {k:v for (k,v) in cnt.items() if k in ('x','y','w','h')}
 
         pass;                  #log('cid, cnt={}',(cid, cnt))
         prP     =  {}
-        
         if 'h' not in cnt \
         and cnt['type'] in (  'button', 'checkbutton'
                             , 'label'
@@ -1841,7 +1803,6 @@ class DlgAgent(BaseDlgAgent):
             # OS specific control height
             cnt['h']    = get_gui_height(cnt['type'])
             prP['_ready_h'] = True
-#           cnt['h']    = app.app_proc(app.PROC_GET_GUI_HEIGHT, cnt['type'])
 
         if 'l' in cnt:
             prP['x']    = cnt['l']
@@ -1852,7 +1813,6 @@ class DlgAgent(BaseDlgAgent):
 
         if 't' in cnt:
             prP['y']    = cnt['t']
-#       t       = cnt.get('t', 0)   if 't' in cnt else  self.cattr(cid, 't', live=False)
         elif 'tid' in cnt:
             ctrls4t = ctrls4t if ctrls4t else self.ctrls
             assert cnt['tid'] in ctrls4t
@@ -1870,13 +1830,6 @@ class DlgAgent(BaseDlgAgent):
             prP['h']    = cnt['b'] - prP['y']
         if 'h' in cnt:
             prP['h']    = cnt['h']
-            
-#       b       = cnt.get('b', t+cnt.get('h', 0)) 
-
-#       l       = cnt['l']          if 'l' in cnt else  self.cattr(cid, 'l', live=False)
-#       r       = cnt.get('r', l+cnt.get('w', 0)) 
-#       prP     =  dict(x=l, y=t, w=r-l)
-#       prP.update(dict(h=cnt.get('h')))    if 0!=cnt.get('h', 0) else 0 
         pass;                  #log('cid, prP={}',(cid, prP))
         return prP
        #def _prep_pos_attrs
@@ -1994,10 +1947,9 @@ class DlgAgent(BaseDlgAgent):
 #class DlgAgent
 
 
-########################################################################
-########################################################################
-########################################################################
-#pass;                           from cudatext import *
+######################################
+#NOTE: dlg_valign_consts
+######################################
 def dlg_valign_consts():
     pass;                      #log('ok')
     rsp     = False
@@ -2055,53 +2007,51 @@ def dlg_valign_consts():
         nonlocal hints
         hints   = {sp:nc+': '+str(fits[sp]) for sp, nc in ctrls_sp}
         return {'ctrls':[(cid ,dict(y=ag.cattr(cid, 'y')+sht ,hint=hints[sp] ))]}
-#       return {'ctrls':[(cid ,dict(y=ag.cattr(cid, 'y')+sht ,x=ag.cattr(cid, 'x') ,hint=hints[sp] ))]}
-#       return {'ctrls':[dict(cid=cid ,t=ag.cattr(cid, 't')+sht ,l=ag.cattr(cid, 'l') ,w=ag.cattr(cid, 'w') ,hint=hints[sp] )]}
        #def up_dn
 
     cs      = ctrls
     cnts    = \
-            [('lb1' ,dict(tp='lb'    ,t= 10              ,l=  5  ,w=100  ,cap=cs[0]+' ==============='                          ))
+            [('lb1' ,dict(tp='lb'    ,t= 10              ,l=  5  ,w=100  ,cap=cs[0]+' ==============='                     ))
             ,('ch1' ,dict(tp='ch'    ,t= 10+fits['_sp1'] ,l=115  ,w=100  ,cap='=================',hint=hints['_sp1']     ,val=F))
             ,('up1' ,dict(tp='bt'    ,t= 10-3            ,l=230  ,w=50   ,cap=UP ,call=lambda cid,ag,d: up_dn(ag,'ch1',-1) ))
             ,('dn1' ,dict(tp='bt'    ,t= 10-3            ,l=280  ,w=50   ,cap=DN ,call=lambda cid,ag,d: up_dn(ag,'ch1', 1) ))
                 
-            ,('lb2' ,dict(tp='lb'    ,t= 40              ,l=  5  ,w=100  ,cap=cs[1]+' ==============='                          ))
+            ,('lb2' ,dict(tp='lb'    ,t= 40              ,l=  5  ,w=100  ,cap=cs[1]+' ==============='                     ))
             ,('ed2' ,dict(tp='ed'    ,t= 40+fits['_sp2'] ,l=115  ,w=100                          ,hint=hints['_sp2']     ,val='================='))
             ,('up2' ,dict(tp='bt'    ,t= 40-3            ,l=230  ,w=50   ,cap=UP ,call=lambda cid,ag,d: up_dn(ag,'ed2',-1) ))
             ,('dn2' ,dict(tp='bt'    ,t= 40-3            ,l=280  ,w=50   ,cap=DN ,call=lambda cid,ag,d: up_dn(ag,'ed2', 1) ))
                 
-            ,('lb3' ,dict(tp='lb'    ,t= 70              ,l=  5  ,w=100  ,cap=cs[2]+' ==============='                          ))
-            ,('bt3' ,dict(tp='bt'    ,t= 70+fits['_sp3'] ,l=115  ,w=100  ,cap='=================',hint=hints['_sp3']     ))
+            ,('lb3' ,dict(tp='lb'    ,t= 70              ,l=  5  ,w=100  ,cap=cs[2]+' ==============='                     ))
+            ,('bt3' ,dict(tp='bt'    ,t= 70+fits['_sp3'] ,l=115  ,w=100  ,cap='=================',hint=hints['_sp3']       ))
             ,('up3' ,dict(tp='bt'    ,t= 70-3            ,l=230  ,w=50   ,cap=UP ,call=lambda cid,ag,d: up_dn(ag,'bt3',-1) ))
             ,('dn3' ,dict(tp='bt'    ,t= 70-3            ,l=280  ,w=50   ,cap=DN ,call=lambda cid,ag,d: up_dn(ag,'bt3', 1) ))
                 
-            ,('lb4' ,dict(tp='lb'    ,t=100              ,l=  5  ,w=100  ,cap=cs[3]+' ==============='                          ))
+            ,('lb4' ,dict(tp='lb'    ,t=100              ,l=  5  ,w=100  ,cap=cs[3]+' ==============='                     ))
             ,('cbo4',dict(tp='cb-ro' ,t=100+fits['_sp4'] ,l=115  ,w=100  ,items=['============='],hint=hints['_sp4']     ,val=0))
             ,('up4' ,dict(tp='bt'    ,t=100-3            ,l=230  ,w=50   ,cap=UP ,call=lambda cid,ag,d: up_dn(ag,'cbo4',-1)))
             ,('dn4' ,dict(tp='bt'    ,t=100-3            ,l=280  ,w=50   ,cap=DN ,call=lambda cid,ag,d: up_dn(ag,'cbo4', 1)))
                 
-            ,('lb5' ,dict(tp='lb'    ,t=130              ,l=  5  ,w=100  ,cap=cs[4]+' ==============='                          ))
+            ,('lb5' ,dict(tp='lb'    ,t=130              ,l=  5  ,w=100  ,cap=cs[4]+' ==============='                     ))
             ,('cb5' ,dict(tp='cb'    ,t=130+fits['_sp5'] ,l=115  ,w=100  ,items=['============='],hint=hints['_sp5']     ,val='============='))
             ,('up5' ,dict(tp='bt'    ,t=130-3            ,l=230  ,w=50   ,cap=UP ,call=lambda cid,ag,d: up_dn(ag,'cb5',-1) ))
             ,('dn5' ,dict(tp='bt'    ,t=130-3            ,l=280  ,w=50   ,cap=DN ,call=lambda cid,ag,d: up_dn(ag,'cb5', 1) ))
                 
-            ,('lb6' ,dict(tp='lb'    ,t=160              ,l=  5  ,w=100  ,cap=cs[5]+' ==============='                          ))
+            ,('lb6' ,dict(tp='lb'    ,t=160              ,l=  5  ,w=100  ,cap=cs[5]+' ==============='                     ))
             ,('chb6',dict(tp='ch-bt' ,t=160+fits['_sp6'] ,l=115  ,w=100  ,cap='==========='      ,hint=hints['_sp6']     ,val=0))
             ,('up6' ,dict(tp='bt'    ,t=160-3            ,l=230  ,w=50   ,cap=UP ,call=lambda cid,ag,d: up_dn(ag,'chb6',-1)))
             ,('dn6' ,dict(tp='bt'    ,t=160-3            ,l=280  ,w=50   ,cap=DN ,call=lambda cid,ag,d: up_dn(ag,'chb6', 1)))
                 
-            ,('lb7', dict(tp='lb'    ,t=190              ,l=  5  ,w=100  ,cap=cs[6]+' ==============='                          ))
-            ,('lnb7',dict(tp='ln-lb' ,t=190+fits['_sp7'] ,l=115  ,w=100  ,cap='=================',props=hints['_sp7']    ))
+            ,('lb7', dict(tp='lb'    ,t=190              ,l=  5  ,w=100  ,cap=cs[6]+' ==============='                     ))
+            ,('lnb7',dict(tp='ln-lb' ,t=190+fits['_sp7'] ,l=115  ,w=100  ,cap='=================',props=hints['_sp7']      ))
             ,('up7' ,dict(tp='bt'    ,t=190-3            ,l=230  ,w=50   ,cap=UP ,call=lambda cid,ag,d: up_dn(ag,'lnb7',-1)))
             ,('dn7' ,dict(tp='bt'    ,t=190-3            ,l=280  ,w=50   ,cap=DN ,call=lambda cid,ag,d: up_dn(ag,'lnb7', 1)))
                 
-            ,('lb8' ,dict(tp='lb'    ,t=220              ,l=  5  ,w=100  ,cap=cs[7]+' 4444444444444444'                         ))
+            ,('lb8' ,dict(tp='lb'    ,t=220              ,l=  5  ,w=100  ,cap=cs[7]+' 4444444444444444'                    ))
             ,('sp8' ,dict(tp='sp-ed' ,t=220+fits['_sp8'] ,l=115  ,w=100  ,props='0,444444444,1'  ,hint=hints['_sp8']     ,val=444444444))
             ,('up8' ,dict(tp='bt'    ,t=220-3            ,l=230  ,w=50   ,cap=UP ,call=lambda cid,ag,d: up_dn(ag,'sp8',-1) ))
             ,('dn8' ,dict(tp='bt'    ,t=220-3            ,l=280  ,w=50   ,cap=DN ,call=lambda cid,ag,d: up_dn(ag,'sp8', 1) ))
                 
-            ,('lb9' ,dict(tp='lb'    ,t=250              ,l=  5  ,w=100  ,cap=cs[8]+' ==============='                          ))
+            ,('lb9' ,dict(tp='lb'    ,t=250              ,l=  5  ,w=100  ,cap=cs[8]+' ==============='                     ))
             ,('rd9' ,dict(tp='rd'    ,t=250+fits['_sp9'] ,l=115  ,w=100  ,cap='=================',hint=hints['_sp9']     ,val=F))
             ,('up9' ,dict(tp='bt'    ,t=250-3            ,l=230  ,w=50   ,cap=UP ,call=lambda cid,ag,d: up_dn(ag,'rd9',-1) ))
             ,('dn9' ,dict(tp='bt'    ,t=250-3            ,l=280  ,w=50   ,cap=DN ,call=lambda cid,ag,d: up_dn(ag,'rd9', 1) ))
@@ -2144,177 +2094,6 @@ def get_hotkeys_desc(cmd_id, ext_id=None, keys_js=None, def_ans=''):
     return desc
    #def get_hotkeys_desc
 
-class CdSw:
-    """ Proxy to use plugins both in CudaText and SynWrite"""
-    
-    ENC_UTF8    = str(app.EDENC_UTF8_NOBOM) if 'sw'==app.__name__ else 'UTF-8'
-
-    @staticmethod
-    def ed_group(grp):
-        if 'sw'==app.__name__:
-            return ed                   ##!!
-        else:
-            return app.ed_group(grp)
-
-    @staticmethod
-    def app_idle():
-        if 'sw'==app.__name__:
-            pass
-        else:
-            return app.app_idle()
-
-    @staticmethod
-    def file_open(filename, group=-1):
-        if 'sw'==app.__name__:
-            return app.file_open(filename, group=group)
-        else:
-            return app.file_open(filename, group)
-
-    @staticmethod
-    def get_groups_count():
-        if 'sw'==app.__name__:
-            dct = {
-                app.GROUPING_ONE     : 1,
-                app.GROUPING_2VERT   : 2,
-                app.GROUPING_2HORZ   : 2,
-                app.GROUPING_3VERT   : 3,
-                app.GROUPING_3HORZ   : 3,
-                app.GROUPING_1P2VERT : 3,
-                app.GROUPING_1P2HORZ : 3,
-                app.GROUPING_4VERT   : 4,
-                app.GROUPING_4HORZ   : 4,
-                app.GROUPING_4GRID   : 4,
-                app.GROUPING_6GRID   : 6
-            }
-            gr_mode = app.get_app_prop(app.PROP_GROUP_MODE)
-            return dct.get(gr_mode, 1)
-        else:
-            dct = {
-                app.GROUPS_ONE      : 1,
-                app.GROUPS_2VERT    : 2,
-                app.GROUPS_2HORZ    : 2,
-                app.GROUPS_3VERT    : 3,
-                app.GROUPS_3HORZ    : 3,
-                app.GROUPS_3PLUS    : 3,
-                app.GROUPS_1P2VERT  : 3,
-                app.GROUPS_1P2HORZ  : 3,
-                app.GROUPS_4VERT    : 4,
-                app.GROUPS_4HORZ    : 4,
-                app.GROUPS_4GRID    : 4,
-                app.GROUPS_6GRID    : 6
-            }
-            gr_mode = app.app_proc(app.PROC_GET_GROUPING, '')
-            return dct.get(gr_mode, 1)
-
-    @staticmethod
-    def get_carets(_ed):
-        if 'sw'==app.__name__:
-            x,y = _ed.get_caret_xy()
-            return [(x,y,-1,-1)]        ##!!
-        else:
-            return _ed.get_carets()
-
-    MARKERS_ADD             = 1 if 'sw'==app.__name__ else app.MARKERS_ADD
-    MARKERS_DELETE_ALL      = 2 if 'sw'==app.__name__ else app.MARKERS_DELETE_ALL
-    @staticmethod
-    def attr(_ed, id, **kwargs):
-        if 'sw'==app.__name__:
-            if id==CdSw.MARKERS_DELETE_ALL:
-                return _ed.set_attr(app.ATTRIB_CLEAR_ALL, 0)
-            x   = kwargs['x']
-            y   = kwargs['y']+1 ##!!
-            ln  = kwargs['len']
-            _ed.set_sel(ed.xy_pos(x, y), ln)
-            _ed.set_attr(app.ATTRIB_SET_UNDERLINE, 0)
-            _ed.set_sel(ed.xy_pos(x, y), 0)
-            return  ##!!
-        else:
-            return _ed.attr(id, **kwargs)             
-
-    PROC_GET_FIND_OPTIONS   = 22 if 'sw'==app.__name__ else app.PROC_GET_FIND_OPTIONS
-    PROC_GET_LANG           = 40 if 'sw'==app.__name__ else app.PROC_GET_LANG
-    @staticmethod
-    def app_proc(pid, defv):
-        if 'sw'!=app.__name__:
-            return app.app_proc(pid, defv)
-        if False:pass
-        elif pid==CdSw.PROC_GET_FIND_OPTIONS:
-            return ''
-        elif pid==CdSw.PROC_GET_LANG:
-            return 'en'
-        return ''
-
-    @staticmethod
-    def set_caret(_ed, posx, posy, endx=-1, endy=-1):
-        if 'sw'==app.__name__:
-           #_ed.set_caret_xy(x, y)
-            if endx==-1:    # no sel
-                return _ed.set_caret_xy(posx, posy)
-            else:           # with sel
-                pos = _ed.xy_pos(posx, posy)
-                end = _ed.xy_pos(endx, endy)
-                return _ed.set_sel(pos, end-pos)
-#               return _ed.set_caret_xy(posx, posy) ##!!
-        else:
-           #set_caret(posx, posy, endx=-1, endy=-1)
-            return _ed.set_caret(posx, posy, endx, endy)
-
-    @staticmethod
-    def dlg_dir(init_dir):
-        if 'sw'==app.__name__:
-            return app.dlg_folder('', init_dir)
-        else:
-            return app.dlg_dir(init_dir)
-    
-    MENU_LIST     = 0 if 'sw'==app.__name__ else app.MENU_LIST
-    MENU_LIST_ALT = 1 if 'sw'==app.__name__ else app.MENU_LIST_ALT
-    @staticmethod
-    def dlg_menu(mid, text, focused=0, caption=''):
-        if 'sw'==app.__name__:
-            return app.dlg_menu(app.MENU_SIMPLE if mid==CdSw.MENU_LIST else app.MENU_DOUBLE, '', text)
-        else:
-            return app.dlg_menu(mid, text, focused=focused, caption=caption)
-    
-    @staticmethod
-    def msg_status(msg, process_messages=False):
-        if 'sw'==app.__name__:
-            return app.msg_status(msg)
-        else:
-            return app.msg_status(msg, process_messages)
-    
-    @staticmethod
-    def msg_status_alt(msg, secs):
-        if 'sw'==app.__name__:
-            return app.msg_status(msg)
-        else:
-            return app.msg_status_alt(msg, secs)
-    
-    @staticmethod
-    def get_setting_dir():
-        return  app.app_ini_dir()       if 'sw'==app.__name__ else \
-                app.app_path(app.APP_DIR_SETTINGS)
-   #class CudSyn
-
-def gen_repro_code(idDlg, rerpo_fn):
-    # Repro-code
-    l       = chr(13)
-    srp     =    ''
-    srp    +=    'idd=dlg_proc(0, DLG_CREATE)'
-    for idC in range(app.dlg_proc(idDlg, app.DLG_CTL_COUNT)):
-        prC = dlg_proc_wpr(idDlg, app.DLG_CTL_PROP_GET, index=idC)
-        prTg= json.loads(prC.pop('tag','{}'))
-        prC.update(prTg)
-        srp+=l+f('idc=dlg_proc(idd, DLG_CTL_ADD,"{}")', prC.pop('type',None))
-        srp+=l+f('dlg_proc(idd, DLG_CTL_PROP_SET, index=idc, prop={})', repr(prC))
-    prD     = dlg_proc_wpr(idDlg, app.DLG_PROP_GET)
-    srp    +=l+f('dlg_proc(idd, DLG_PROP_SET, prop={})', repr({'cap':prD['cap'], 'w':prD['w'], 'h':prD['h']}))
-    srp    +=l+f('dlg_proc(idd, DLG_CTL_FOCUS, name="{}")', prD['focused'])
-    srp    +=l+  'dlg_proc(idd, DLG_SHOW_MODAL)'
-    srp    +=l+  'dlg_proc(idd, DLG_FREE)'
-    open(rerpo_fn, 'w', encoding='UTF-8').write(srp)
-    pass;                       log(r'exec(open(r"{}", encoding="UTF-8").read())', rerpo_fn)
-   #def gen_repro_code
-
 ######################################
 #NOTE: plugins history
 ######################################
@@ -2349,7 +2128,7 @@ def get_hist(key_or_path, default=None, module_name='_auto_detect', to_file=PLIN
     """
     to_file = to_file   if os.sep in to_file else   app.app_path(app.APP_DIR_SETTINGS)+os.sep+to_file
     if not os.path.exists(to_file):
-        pass;                   log('not exists',())
+        pass;                  #log('not exists',())
         return default
     data    = None
     try:
@@ -2473,8 +2252,7 @@ def get_translation(plug_file):
     '''
     plug_dir= os.path.dirname(plug_file)
     plug_mod= os.path.basename(plug_dir)
-    lng     = CdSw.app_proc(CdSw.PROC_GET_LANG, '')
-#   lng     = app.app_proc(app.PROC_GET_LANG, '')
+    lng     = app.app_proc(app.PROC_GET_LANG, '')
     lng_mo  = plug_dir+'/lang/{}/LC_MESSAGES/{}.mo'.format(lng, plug_mod)
     if os.path.isfile(lng_mo):
         t   = gettext.translation(plug_mod, plug_dir+'/lang', languages=[lng])
@@ -2485,6 +2263,12 @@ def get_translation(plug_file):
     return _
    #def get_translation
 
+_   = get_translation(__file__) # I18N
+
+
+######################################
+#NOTE: misc
+######################################
 def upd_dict(d1, d2):
     rsp = d1.copy()
     rsp.update(d2)
@@ -2499,7 +2283,6 @@ def deep_upd(dcts):
         return dcts
 
     dct1, *dcts = dcts
-#def deep_upd(dct1, *dcts):
     pass;                      #log('dct1, dcts={}',(dct1, dcts))
     rsp   = dct1.copy()
     for dct in dcts:
@@ -2526,8 +2309,6 @@ def ed_of_file_open(op_file):
             return op_ed
     return None
    #def ed_of_file_open
-
-_   = get_translation(__file__) # I18N
 
 if __name__ == '__main__' :     # Tests
     class C:
