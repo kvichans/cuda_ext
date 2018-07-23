@@ -2,11 +2,11 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.5.12 2018-06-01'
+    '1.5.13 2018-07-23'
 ToDo: (see end of file)
 '''
 
-import  re, os, sys, json, collections, time
+import  re, os, sys, json, collections, time, traceback
 from    collections     import deque
 from    fnmatch         import fnmatch
 
@@ -20,7 +20,7 @@ try:
     from    .cd_plug_lib    import *
     # I18N
     _   = get_translation(__file__)
-except: 
+except:
     _   = lambda p:p
 
 d       = dict
@@ -58,7 +58,7 @@ GAP     = 5
 def _file_open(op_file):
     if not app.file_open(op_file):
         return None
-    for h in app.ed_handles(): 
+    for h in app.ed_handles():
         op_ed   = app.Editor(h)
         if op_ed.get_filename() and os.path.samefile(op_file, op_ed.get_filename()):
             return op_ed
@@ -154,9 +154,10 @@ class Tree_cmds:
             return lst
            #def add_to_hist
         compile_pttn= lambda    pttn_s, reex, case, word: re.compile(
-                                pttn_s          if reex else \
-                          r'\b'+pttn_s+r'\b'    if word and re.match('^\w+$', pttn_s) else \
-                      re.escape(pttn_s), 0 if case else re.I)
+                                pttn_s          if reex else
+                          r'\b'+pttn_s+r'\b'    if word and re.match('^\w+$', pttn_s) else
+                      re.escape(pttn_s)
+                            ,   0 if case else re.I)
         
         prev_wt = None          # Prev what
         ready_l = []            # [(nid,cap|path,ndn)]
@@ -178,7 +179,7 @@ class Tree_cmds:
                 elif tag=='rest':               ed.set_caret(*ed_crts[0]);      return None
                 return []
                #def wnen_menu
-            ag.show_menu(aid, 
+            ag.show_menu(aid,
                 [ d(tag='help'  ,cap=_('&Help...')                                      ,cmd=wnen_menu
                 ),d(             cap='-'
                 ),d(tag='prev'  ,cap=_('Find &previous')                                ,cmd=wnen_menu  ,key='Shift+Enter'
@@ -253,8 +254,8 @@ class Tree_cmds:
                 if opts['clos']:
                     return None         # Close dlg
                 ready_st()
-            else: 
-                nfnd_st() 
+            else:
+                nfnd_st()
             return d(ctrls=[('what',d(items=opts['hist']))]
                     ,fid='what')
            #def do_find
@@ -266,7 +267,7 @@ class Tree_cmds:
             elif (scam,idc)==('s',VK_ESCAPE):       # Shift+Esc
                 ed.set_caret(*ed_crts[0])
                 ag.hide()
-            else: return 
+            else: return
             return False
         ag      = DlgAgent(
             form    =dict(cap=_('Find tree node'), w=365, h=58, h_max=58
@@ -314,11 +315,11 @@ class Tree_cmds:
         """
         ed.cmd(cmds.cmd_TreeUpdate)
         ID_TREE = app.app_proc(app.PROC_SIDEPANEL_GET_CONTROL, 'Code tree')
-        if not ID_TREE: return [], INF
         INF     = 0xFFFFFFFF
+        if not ID_TREE: return [], INF
         NO_ID   = -1
         def best_path(id_prnt, prnt_cap=''):
-            rsp_l   = [] 
+            rsp_l   = []
             kids    = app.tree_proc(ID_TREE, app.TREE_ITEM_ENUM, id_prnt)
             pass;              #LOG and log('>>id_prnt, prnt_cap, kids={}',(id_prnt, prnt_cap, len(kids) if kids else 0))
             if kids is None:
@@ -387,7 +388,7 @@ class Tabs_cmds:
             if ( group  ==edH.get_prop(app.PROP_INDEX_GROUP)
             and  tab_ind==edH.get_prop(app.PROP_INDEX_TAB)):
                 pass;           LOG and log('found',())
-                edH.focus() 
+                edH.focus()
                 return True
         return False
        #def _activate_tab
@@ -439,7 +440,7 @@ class Tabs_cmds:
         op_grp  = (me_grp+1)%grps \
                     if what_grp=='next' else \
                   (me_grp-1)%grps
-        op_hs   = [h for h in app.ed_handles() 
+        op_hs   = [h for h in app.ed_handles()
                     if app.Editor(h).get_prop(app.PROP_INDEX_GROUP)==op_grp]
         if len(op_hs)<2:  return
         op_ed   = app.ed_group(op_grp)
@@ -513,14 +514,17 @@ class SCBs:
             app.msg_status(f(_('Replace {} with clip'), repr(term[:50])))
        #def replace_term
 
-    lexer   = None
-    wrdchs  = ''
-    wrdcs_re= None
-    quotes  = ''
-    brckts  = ''
-    opn2cls = {}
-    cls2opn = {}
-    allspec = ''
+    lexer       = None
+    wrdchs      = ''
+    wrdcs_re    = None
+    quotes      = ''
+    brckts      = ''
+    opn2cls     = {}
+    cls2opn     = {}
+    allspec     = ''
+    notspec_re  = None
+    signs       = ''
+    signs_re    = None
     @staticmethod
     def _prep_static_data():
         lexer           = ed.get_prop(app.PROP_LEXER_FILE)
@@ -557,7 +561,7 @@ class SCBs:
         """
         NONE    = None, (None, None)
         crts    = ted.get_carets()
-        if len(crts)>1: 
+        if len(crts)>1:
             app.msg_status(_("Command doesn't work with multi-carets"))
             return NONE
         (cCrt, rCrt
@@ -666,7 +670,7 @@ class SCBs:
         """
         pass;                  #LOG and log('copy={}',(copy))
         crts    = ed.get_carets()
-        if len(crts)>1: 
+        if len(crts)>1:
             app.msg_status(_("Command doesn't work with multi-carets"))
             return False
         SCBs._prep_static_data()
@@ -707,7 +711,7 @@ class SCBs:
         ((rSelB, cSelB)
         ,(rSelE, cSelE))= apx.minmax((rCrt, cCrt), (rEnd, cEnd))
         cSelE          -= 1                 ##??
-        sSel            = ed.get_text_sel()
+#       sSel            = ed.get_text_sel()
         pass;                  #LOG and log('(rSelB, cSelB),(rSelE, cSelE),sSel={}',((rSelB, cSelB),(rSelE, cSelE),sSel[:50]))
         sBfr,cBfr,rBfr  = get_char_before(cSelB, rSelB, ' ')
         sAft,cAft,rAft  = get_char_after( cSelE, rSelE, ' ')
@@ -978,7 +982,7 @@ class Jumps_cmds:
         try:    row = int(clip)-1
         except: return  app.msg_status(_("No line number in clipboard"))
         if not (0 <= row < ed.get_line_count()):
-            return      app.msg_status(f(_("No line #{}"), row)) 
+            return      app.msg_status(f(_("No line #{}"), row))
         ed.set_caret(0, row)
        #def jump_to_line_by_cb
        
@@ -1047,7 +1051,7 @@ class Jumps_cmds:
                     )   for line_num in bm_lns]
         pass;                  #LOG and log('bms=¶{}',pf(bms))
         rCrt    = ed.get_carets()[0][1]
-        near    = min([(abs(line_n-rCrt), ind) 
+        near    = min([(abs(line_n-rCrt), ind)
                         for ind, (line_n, line_s, bm_kind) in enumerate(bms)])[1]
         ans = app.dlg_menu(app.MENU_LIST, '\n'.join([
                 f('{}\t{}{}'
@@ -1068,7 +1072,7 @@ class Jumps_cmds:
         pass;                  #return log('ok',())
         tnmd    = apx.get_opt('ui_tab_numbers', False)
         tbms    = []
-        for h_tab in app.ed_handles(): 
+        for h_tab in app.ed_handles():
             ted     = app.Editor(h_tab)
             bm_lns  = ted.bookmark(app.BOOKMARK_GET_LIST, 0)
             if not bm_lns:  continue
@@ -1093,7 +1097,7 @@ class Jumps_cmds:
         if not tbms:    return app.msg_status(_('No numbered bookmarks in tabs') if what=='n' else _('No bookmarks in tabs'))
         tid     = ed.get_prop(app.PROP_TAB_ID)
         rCrt    = ed.get_carets()[0][1]
-        near    = min([(abs(line_n-rCrt) if tid==tab_id else 0xFFFFFF, ind) 
+        near    = min([(abs(line_n-rCrt) if tid==tab_id else 0xFFFFFF, ind)
                     for ind, (line_n, line_s, bm_kind, tab_info, tab_id) in enumerate(tbms)])[1]
         ans     = app.dlg_menu(app.MENU_LIST, '\n'.join([
                         f('{}\t{}:{}{}'
@@ -1141,7 +1145,7 @@ class Prgph_cmds:
         cu_row  = rCrt
         
         cu_line = ed.get_text_line(cu_row)
-        if ''==cu_line.strip() and what in ('bgn', 'end'):  return 
+        if ''==cu_line.strip() and what in ('bgn', 'end'):  return
         
         cu_skip = False
         if what=='end' and cu_row+1<ed.get_line_count():
@@ -1172,7 +1176,7 @@ class Prgph_cmds:
                     aim = 'found'
                     break#for
                #for test_row
-            if aim!='found':    return 
+            if aim!='found':    return
             what    = 'bgn' if what in ('nxt', 'prv') else what
             cu_row  = test_row
             
@@ -1218,12 +1222,12 @@ class Prgph_cmds:
                 apx.set_opt('margin_right'  , int(ans[0]) if ans[0].isdigit() else df_mrg)
                 apx.set_opt('margin_left_1' , int(ans[1]) if ans[1].isdigit() else 0)
                 apx.set_opt('margin_left'   , int(ans[2]) if ans[2].isdigit() else 0)
-            return 
+            return
         
         if 0==apx.get_opt('margin_right', 0):
             Prgph_cmds.align_prgph('?')
             if 0==apx.get_opt('margin_right', 0):
-                return 
+                return
             
         crts    = ed.get_carets()
         if len(crts)>1:
@@ -1241,7 +1245,7 @@ class Prgph_cmds:
         pass;                  #return
         
         for (prph_bgn_r, prphs_end_r) in reversed(prphs):
-            prph_text   = ' '.join([ed.get_text_line(r) 
+            prph_text   = ' '.join([ed.get_text_line(r)
                                     for r in range(prph_bgn_r, prphs_end_r+1)])     # join
             pass;              #LOG and log('prph_text={}',(prph_text))
             prph_text   = re.sub(r'(\s)\s+', r'\1', prph_text)                      # reduce
@@ -1296,7 +1300,7 @@ class Prgph_cmds:
                     for    ws,sh in         zip(line_ws,shifts)]
         if how=='r':
             return [sh
-                   +' '*(wd-ns) 
+                   +' '*(wd-ns)
                    +''.join(ws)
                     for ns,ws,sh,wd in zip(line_ns,line_ws,shifts,widths)]
         if how=='c':
@@ -1504,7 +1508,7 @@ class Find_repl_cmds:
 #         '\r• If option "Close on success" (in menu) is tuned on, dialog will close after successful search.'
           '\r• If option "Instant search" (in menu) is tuned on, search result will be updated on start and after each change of pattern.'
           '\r• Command "Restore initial selection" (in menu) restores only first of initial carets.'
-#         '\r• Ctrl+F calls native dialog Find.'
+          '\r• Ctrl+F (or Ctrl+R) to call appication dialog Find (or Replace).'
         )
         pass;                  #log('###',())
         pass;                  #log('hist={}',(get_hist('find.find_in_lines')))
@@ -1528,19 +1532,31 @@ class Find_repl_cmds:
             return lst
            #def add_to_hist
         compile_pttn= lambda    pttn_s, reex, case, word: re.compile(
-                                pttn_s          if reex else \
-                          r'\b'+pttn_s+r'\b'    if word and re.match('^\w+$', pttn_s) else \
-                      re.escape(pttn_s), 0 if case else re.I)
+                                pttn_s          if reex else
+                          r'\b'+pttn_s+r'\b'    if word and re.match('^\w+$', pttn_s) else
+                      re.escape(pttn_s)
+                            ,   0 if case else re.I)
         
         prev_wt = None          # Prev what
         ready_l = []            # [(row,col_bgn,col_end)]
         ready_p = -1            # pos in ready_l
         form_cap= lambda: f('{} ({}/{})', FORM_C, 1+ready_p, len(ready_l)) if ready_l else f('{} (0)', FORM_C)
-        form_cpw= lambda: FORM_C + (f(_(' (Type {} character(s) to find)'), opts['insm']) 
-                                        if opts['inst'] else 
+        form_cpw= lambda: FORM_C + (f(_(' (Type {} character(s) to find)'), opts['insm'])
+                                        if opts['inst'] else
                                       _(' (ENTER to find)'))
         form_err= lambda: FORM_C +  _(' (Error)')
         
+        def switch_to_dlg(ag, dlg='find'):
+            ag.opts['on_exit_focus_to_ed'] = None
+            ag.hide()
+            ed.cmd(cmds.cmd_DialogFind if dlg=='find' else cmds.cmd_DialogReplace)
+            if app.app_api_version()>='1.0.248':
+                app.app_proc(app.PROC_SET_FINDER_PROP, d(
+                    find_d      = ag.cval('what')
+                ,   op_regex_d  = ag.cval('reex')
+                ,   op_case_d   = ag.cval('case')
+                ,   op_word_d   = ag.cval('word')
+                ))
         def do_attr(aid, ag, data=''):
             nonlocal prev_wt
             prev_wt = ''
@@ -1562,13 +1578,12 @@ class Find_repl_cmds:
                     Find_repl_cmds.fil_restart_dlg  = True
                     return None
                 if tag=='natf':
-                    ag.hide()
-                    ed.cmd(cmds.cmd_DialogFind)
+                    switch_to_dlg(ag)
                     return None
                 return []
                #def wnen_menu
             insm_c  = f(_('Instant search minimum: {}...'), opts['insm'])
-            ag.show_menu(aid, 
+            ag.show_menu(aid,
                 [ d(tag='help'  ,cap=_('&Help...')                                      ,cmd=wnen_menu
                 ),d(             cap='-'
                 ),d(tag='prev'  ,cap=_('Find &previous')                                ,cmd=wnen_menu  ,key='Shift+Enter'
@@ -1630,7 +1645,7 @@ class Find_repl_cmds:
 #                   if opts['clos']:
 #                       select_frag(fnd_end, row, fnd_bgn, row)
 #                       return None         # Close dlg
-                    ready_p = (len(ready_l) 
+                    ready_p = (len(ready_l)
                                 if prnx=='next' and ready_p==-1 and                             # Need next and no yet
                                     (row>max_rc[0] or row==max_rc[0] and fnd_bgn>max_rc[1])     # At more row or at more col in cur row
                                 or prnx=='prev'                 and                             # Need prev
@@ -1652,7 +1667,7 @@ class Find_repl_cmds:
            #def do_find
         what    = Find_repl_cmds.fil_what   if Find_repl_cmds.fil_what is not None      else \
                   ed.get_text_sel()         if opts['usel'] and 1==len(ed.get_carets()) else ''
-        what    = '' if '\r' in what or '\n' in what else what 
+        what    = '' if '\r' in what or '\n' in what else what
         ag      = None
         def do_key_down(idd, idc, data=''):
             scam    = data if data else app.app_proc(app.PROC_GET_KEYSTATE, '')
@@ -1662,10 +1677,9 @@ class Find_repl_cmds:
             elif (scam,idc)==('s',VK_ESCAPE):       # Shift+Esc
                 ed.set_caret(*Find_repl_cmds.fil_ed_crts[0])
                 ag.hide()
-            elif (scam,idc)==('c',ord('F')):        # Ctrl+F
-                ag.hide()
-                ed.cmd(cmds.cmd_DialogFind)
-            else: return 
+            elif (scam,idc)==('c',ord('F')) or (scam,idc)==('c',ord('R')):        # Ctrl+F or Ctrl+R
+                switch_to_dlg(ag, 'find' if idc==ord('F') else 'repl')
+            else: return
             return False
         wh_tp   = 'ed'      if opts['inst'] else 'cb'
         wh_call = do_find   if opts['inst'] else None
@@ -1812,14 +1826,14 @@ class Find_repl_cmds:
         ((rTx1, cTx1)
         ,(rTx2, cTx2))  = apx.minmax((rCrt, cCrt), (rEnd, cEnd))
         ls_txt  = ed.get_text_substr(0,rTx1, 0,rTx2+(0 if 0==cEnd else 1))
-        if spr not in ls_txt: 
+        if spr not in ls_txt:
             return app.msg_status(NO_SPR_IN_LINES.format(spr))
         lines   = ls_txt.splitlines()
         ln_poss = [(ln, ln.find(spr)) for ln in lines]
         max_pos =    max([p for (l,p) in ln_poss])
         if max_pos== min([p if p>=0 else max_pos for (l,p) in ln_poss]):
             return app.msg_status(DONT_NEED_CHANGE)
-        nlines  = [ln       if pos==-1 or max_pos==pos else 
+        nlines  = [ln       if pos==-1 or max_pos==pos else
                    ln[:pos]+' '*(max_pos-pos)+ln[pos:]
                    for (ln,pos) in ln_poss
                   ]
@@ -1858,8 +1872,7 @@ class Find_repl_cmds:
         def parse_step(step):
             if step in 't\t':               return '\t'
             if not step.replace(' ', ''):   return step
-            if step[0].isdigit() and \
-               step[1]=='b':                return ' '*int(step[0])
+            if step[0].isdigit():           return ' '*int(step[0])
             return ''
         vals        = dict(olds=old_s
                           ,news=new_s)
@@ -2125,7 +2138,7 @@ class Find_repl_cmds:
         # Split by margin
         margin -= (len(cm_prfx) + (tab_sz-1)*cm_prfx.count('\t'))
         pass;                   LOG and log('margin,tab_sz={}',(margin,tab_sz))
-        words   = [(m.start(), m.end(), m.group()) 
+        words   = [(m.start(), m.end(), m.group())
                     for m in re.finditer(r'\b\S+\b', text)]
         pass;                  #LOG and log('words={}',(words))
         lines   = []
@@ -2249,7 +2262,7 @@ class Insert_cmds:
     def paste_to_1st_col():
         ''' Paste from clipboard without replacement caret/selection
                 but only insert before current line
-        ''' 
+        '''
         pass;                      #LOG and log('')
         clip    = app.app_proc(app.PROC_GET_CLIP, '')
         if not clip:    return
@@ -2481,16 +2494,16 @@ class Command:
             elif grouping==app.GROUPS_ONE:
                 return      # No splitter
 
-            elif (what=='main' 
+            elif (what=='main'
 #           and   grouping!=app.GROUPS_3PLUS):      id_splt = 'G1'
             and   grouping!=app.GROUPS_1P2VERT
             and   grouping!=app.GROUPS_1P2HORZ):    id_splt = 'G1'
             
-            elif (what=='main' 
+            elif (what=='main'
 #           and   grouping==app.GROUPS_3PLUS):      id_splt = 'G3'
             and   grouping==app.GROUPS_1P2VERT):    id_splt = 'G3'
 
-            elif (what=='main' 
+            elif (what=='main'
             and   grouping==app.GROUPS_1P2HORZ):    id_splt = 'G3'
 
             #     what=='curr'
@@ -2566,7 +2579,7 @@ class Command:
 #       (vh, shown, pos_old, prn_size)  = app.app_proc(app.PROC_GET_SPLIT, id_splt)
         pass;                  #LOG and log('id_splt, vh, shown, pos_old, prn_size={}',(id_splt, vh, shown, pos_old, prn_size))
         if not shown:           return
-        pos_new     = int(factor * pos_old) 
+        pos_new     = int(factor * pos_old)
         pass;                  #LOG and log('pos_new={}',(pos_new))
         pos_new     = max(100, min(prn_size-100, pos_new))
         pass;                  #LOG and log('pos_new={}',(pos_new))
@@ -2646,7 +2659,7 @@ class Command:
         if not os.path.exists(hist_fs_f):   return app.msg_status(_('No files in history'))
         hist_full_js= json.loads(open(hist_fs_f, encoding='utf8').read())
         hist_fs     = [f.replace('|', os.sep) for f in hist_full_js]
-        hist_fts    = [(f.replace(home_s, '~'), os.path.getmtime(f)) 
+        hist_fts    = [(f.replace(home_s, '~'), os.path.getmtime(f))
                         for f in hist_fs if os.path.exists(f)]
         sort_as     = get_hist([           'open-recent','sort_as'],
                       apx.get_opt('cuda_ext.open-recent.sort_as',    't'))
@@ -2654,22 +2667,22 @@ class Command:
                       apx.get_opt('cuda_ext.open-recent.show_as',    'n'))
         while True:
             hist_fts    = sorted(hist_fts
-                                , key=lambda ft:(ft[1]          if sort_as=='t' else 
-                                                 ft[0].upper()  if show_as=='p' else 
+                                , key=lambda ft:(ft[1]          if sort_as=='t' else
+                                                 ft[0].upper()  if show_as=='p' else
                                                  os.path.basename(ft[0]).upper()
                                                 )
                                 , reverse=(sort_as=='t'))
             ans         = app.dlg_menu(app.MENU_LIST, '\n'.join([
-                            (fn if show_as=='p' else 
-                             f('{} ({})', os.path.basename(fn), os.path.dirname(fn))) 
-                            + '\t' 
+                            (fn if show_as=='p' else
+                             f('{} ({})', os.path.basename(fn), os.path.dirname(fn)))
+                            + '\t'
                             + time.strftime("%Y/%b/%d %H:%M", time.gmtime(tm))
                             for fn,tm in hist_fts
                           ]
-                          +['<Show "name (path)">'  if show_as=='p' else 
+                          +['<Show "name (path)">'  if show_as=='p' else
                             '<Show "path/name">']
-                          +['<Sort by path>'        if sort_as=='t' and show_as=='p' else 
-                            '<Sort by name>'        if sort_as=='t' and show_as=='n' else 
+                          +['<Sort by path>'        if sort_as=='t' and show_as=='p' else
+                            '<Sort by name>'        if sort_as=='t' and show_as=='n' else
                             '<Sort by time>']
                                                                )
                                       )
@@ -2697,9 +2710,9 @@ class Command:
         files   = []
         dirs    = set()
         for dirpath, dirnames, filenames in os.walk(src_dir):
-            dir_fs  = [dirpath+os.sep+fn for fn in filenames 
+            dir_fs  = [dirpath+os.sep+fn for fn in filenames
                         if any(map(lambda mask:fnmatch(fn, mask), masks))]
-#           dir_fs  = [dirpath+os.sep+fn for fn in filenames 
+#           dir_fs  = [dirpath+os.sep+fn for fn in filenames
 #                       if fnmatch(fn, mask)]
             if dir_fs:
                 files  += dir_fs
@@ -2708,7 +2721,7 @@ class Command:
         pass;                  #LOG and log('dirs={}',(dirs))
         if app.ID_OK!=app.msg_box(
             f(_('Open {} file(s) from {} folder(s)?{}'), len(files), len(dirs), '\n   '+'\n   '.join(
-                files 
+                files
                     if len(files) < 5*2+2 else
                 files[:5] + ['...'] + files[-5:]
             ))
@@ -2731,11 +2744,11 @@ class Command:
                           '\nCommand will use file content from disk.'
                         '\n\nContinue?')
                            ,app.MB_YESNO+app.MB_ICONQUESTION
-                           )!=app.ID_YES:   return 
+                           )!=app.ID_YES:   return
         try:
             os.startfile(cf_path)
         except Exception as ex:
-            pass;               log(traceback.format_exc()) 
+            pass;               log(traceback.format_exc())
             return app.msg_status(_('Error: '+ex))
        #def open_with_defapp
     
@@ -2883,7 +2896,7 @@ class Command:
 
 
 def fnd_mtch_char(ed4find, c_opn, c_cls, line, col, row, to_end):
-    """ Find paired char c_opn from (col, row) in dir to_end and 
+    """ Find paired char c_opn from (col, row) in dir to_end and
             skip inside pair (c_opn, c_cls)
     """
     assert line     ==ed4find.get_text_line(row)
