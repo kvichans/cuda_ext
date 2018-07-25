@@ -1,5 +1,8 @@
+1.5.15 (2018-07-25)
+changed: Command "Activate previously active tab" works with only two tabs
+
 1.5.14 (2018-07-25)
-added: Dialog to switch to previously active tab
+added: Command "Choose previously active tab". Dialog to switch to previously active tab
 
 1.5.13 (2018-07-23)
 fixed: Allow only digit in dialog "Reindent selected lines"

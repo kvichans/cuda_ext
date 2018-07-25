@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.5.14 2018-07-25'
+    '1.5.15 2018-07-25'
 ToDo: (see end of file)
 '''
 
@@ -2413,16 +2413,16 @@ class Insert_cmds:
     
 class Command:
     def __init__(self):
-#       self.cur_tab_id = None
-#       self.pre_tab_id = None
         
         # Data for go_back_tab with "visit history"
-        self.lock_on_fcs  = False
-        self.tid_hist   = None
-#       self.tid_hist   = deque(()
-#                       , apx.get_opt('tab_histoty_size', 10))  # append to left, scan from left, loose from right
-        self.tid_hist_i = 0
-        self.CASM_state = ''                                    # String has "c"/"a"/"s"/"m" if Ctrl/Alt/Shift/Meta-Win pressed
+#       self.lock_on_fcs  = False
+#       self.tid_hist   = None
+        
+        self.cur_tab_id = None
+        self.pre_tab_id = None
+        self.tid_hist   = deque((), apx.get_opt('ui_max_history_edits', 20))  # append to left, scan from left, loose from right
+#       self.tid_hist_i = 0
+#       self.CASM_state = ''                                    # String has "c"/"a"/"s"/"m" if Ctrl/Alt/Shift/Meta-Win pressed
         
     def _move_splitter(self, what, factor):
         ''' Move one of splitters
@@ -2815,6 +2815,24 @@ class Command:
     def _activate_tab_other_group(self
         , what_tab='next', what_grp='next'):    return Tabs_cmds._activate_tab_other_group(what_tab, what_grp)
 
+    def on_focus(self, ed_self):
+        pass;                  #log('ok',())
+        # Add/Rise to/in history
+        self.pre_tab_id = self.cur_tab_id
+        self.cur_tab_id = ed_self.get_prop(app.PROP_TAB_ID)
+        if self.cur_tab_id in self.tid_hist:
+            self.tid_hist.remove(self.cur_tab_id)
+        self.tid_hist.appendleft(self.cur_tab_id)
+        #NOTE: on_focus
+       #def on_focus
+       
+    def go_back_tab(self):
+        pass;                  #log('self.pre_tab_id={}',(self.pre_tab_id))
+        if  self.pre_tab_id:
+            pre_ed  = apx.get_tab_by_id(self.pre_tab_id)
+            if pre_ed:  pre_ed.focus()
+       #def go_back_tab
+
     go_back_dlg_keys    = None
     def go_back_dlg(self):
         scam    = app.app_proc(app.PROC_GET_KEYSTATE, '')
@@ -2828,16 +2846,6 @@ class Command:
             Command.go_back_dlg_keys    = cfg_keys
         cfg_keys    = Command.go_back_dlg_keys
         
-        if self.tid_hist is None:
-            # First call
-            self.tid_hist   = deque((), apx.get_opt('tab_histoty_size', 10))  # append to left, scan from left, loose from right
-            app.app_proc(app.PROC_SET_EVENTS
-                        ,    'cuda_ext'         #module_name
-                        +';'+'on_focus'         #event_list
-                        +';'+''                 #lexer_list
-                        +';'+''                 #keycode_list
-                        )
-            return app.msg_box(_('Tab switcher is ready to go back'), app.MB_OK)
         if not self.tid_hist:
             return app.msg_status(_('Yet no tabs to go back'))
         pass;                  #app.Editor.__str__ = lambda self: f('<Ed({}:{}:{})>',self.get_prop(app.PROP_TAB_ID, ''),self.get_prop(app.PROP_TAB_TITLE),self.get_filename())
@@ -2896,7 +2904,7 @@ class Command:
         items       = [ed_tit for (ed_, ed_tid, ed_tit, ed_fn) in eds_hist]
         pass;                  #log('items={}',(items))
         ag_hist     = DlgAgent(
-            form    =dict(cap=_('Tab switcher (go back)'), w=400, h=300
+            form    =dict(cap=_('Tab switcher (go back)'), w=250, h=300
                          ,on_key_down   =do_key_down
                          ,on_key_up     =do_key_up)
         ,   ctrls   =[0
@@ -2911,74 +2919,6 @@ class Command:
         if ed_back:  ed_back.focus()
        #def go_back_dlg
     
-    def go_back_tab(self):
-        if app.app_api_version()<'1.0.143': return app.msg_status(NEED_UPDATE)
-        if self.tid_hist is None:
-            # First call
-            self.tid_hist   = deque(()
-                            , apx.get_opt('tab_histoty_size', 10))  # append to left, scan from left, loose from right
-            app.app_proc(app.PROC_SET_EVENTS
-                        ,    'cuda_ext'                             #module_name
-                        +';'+'on_console_nav,on_key_up,on_focus'    #event_list
-                        +';'+''                                     #lexer_list
-#                       +';'+',,'                                   #lexer_list
-                        +';'+''                                     #keycode_list
-                        )
-            return app.msg_status(_('Ready to "Activate previously active tab (go back)"'))
-        CASM_state      = app.app_proc(app.PROC_GET_KEYSTATE, '')
-        self.lock_on_fcs= bool(CASM_state)
-        pass;                  #LOG and log('ok self.CASM_state={} KEYSTATE={}',self.CASM_state, CASM_state)
-        pass;                  #LOG and log('CASM="{}", self.CASM="{}", lock={}',CASM_state, self.CASM_state, self.lock_on_fcs)
-        self.CASM_state = CASM_state
-        #NOTE: go_back_tab
-        if (1+self.tid_hist_i)>=len(self.tid_hist): return app.msg_status(_('No more tabs in History'))
-        self.tid_hist_i+= 1
-        assert self.tid_hist_i<len(self.tid_hist)
-        tid     = list(self.tid_hist)[self.tid_hist_i]
-        self.tid_hist.remove(tid)
-        self.tid_hist.appendleft(tid)
-        pass;                  #LOG and log('bk jump! h_i={}, h={}, tid="{}"',self.tid_hist_i, list(self.tid_hist), tid)
-        back_ed = apx.get_tab_by_id(tid)
-        if back_ed:  back_ed.focus()
-
-#       if  self.pre_tab_id \
-#       and self.pre_tab_id!=self.cur_tab_id:
-#           pre_ed  = apx.get_tab_by_id(self.pre_tab_id)
-#           if pre_ed:  pre_ed.focus()
-       #def go_back_tab
-
-    def on_focus(self, ed_self):
-        pass;                  #log('ok',())
-        if self.lock_on_fcs:
-            pass;              #LOG and log('locked',())
-            return
-        if self.tid_hist is None:
-            return
-        # Add/Rise to/in history
-        tid          = ed_self.get_prop(app.PROP_TAB_ID)
-        if tid in self.tid_hist:
-            self.tid_hist.remove(tid)
-        self.tid_hist.appendleft(tid)
-        self.tid_hist_i = 0
-        pass;                  #LOG and log('H updd! h_i={}, h={}, tid="{}"',self.tid_hist_i, list(self.tid_hist), tid)
-
-#       self.pre_tab_id = self.cur_tab_id
-#       self.cur_tab_id = tid
-        #NOTE: on_focus
-       #def on_focus
-       
-    def on_key_up(self, ed_self, key, state):
-        if app.app_api_version()<'1.0.143': return app.msg_status(NEED_UPDATE)
-        if self.tid_hist is None:
-            return
-        CASM_state      = app.app_proc(app.PROC_GET_KEYSTATE, '')
-        pass;                  #LOG and log('CASM="{}", self.CASM="{}"',CASM_state, self.CASM_state)
-        if CASM_state!=self.CASM_state or not CASM_state:
-            pass;              #LOG and log('unlock')
-            self.lock_on_fcs= False
-            self.CASM_state = ''
-            self.tid_hist_i = 0
-
     def scroll_to(self, place):                             return Jumps_cmds.scroll_to(place)
     def jump_to_matching_bracket(self):                     return Jumps_cmds.jump_to_matching_bracket()
     def jump_to_status_line(self, status, nx_pr, bgn_end):  return Jumps_cmds.jump_to_status_line(status, nx_pr, bgn_end)
