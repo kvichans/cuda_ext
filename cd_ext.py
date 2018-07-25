@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.5.13 2018-07-23'
+    '1.5.14 2018-07-25'
 ToDo: (see end of file)
 '''
 
@@ -2815,6 +2815,98 @@ class Command:
     def _activate_tab_other_group(self
         , what_tab='next', what_grp='next'):    return Tabs_cmds._activate_tab_other_group(what_tab, what_grp)
 
+    def go_back_dlg(self):
+        scam    = app.app_proc(app.PROC_GET_KEYSTATE, '')
+        pass;                  #log('ok scam,self.tid_hist={}',(scam,self.tid_hist))
+        
+        lcmds   = app.app_proc(app.PROC_GET_COMMANDS, '')
+        cfg_keys= [(cmd['key1'], cmd['key2'])
+                    for cmd in lcmds 
+                    if cmd['type']=='plugin' and cmd['p_method']=='go_back_dlg'][0]
+
+        
+        if self.tid_hist is None:
+            # First call
+            self.tid_hist   = deque((), apx.get_opt('tab_histoty_size', 10))  # append to left, scan from left, loose from right
+            app.app_proc(app.PROC_SET_EVENTS
+                        ,    'cuda_ext'         #module_name
+                        +';'+'on_focus'         #event_list
+                        +';'+''                 #lexer_list
+                        +';'+''                 #keycode_list
+                        )
+            return app.msg_box(_('Tab switcher is ready to go back'), app.MB_OK)
+        if not self.tid_hist:
+            return app.msg_status(_('Yet no tabs to go back'))
+        pass;                   app.Editor.__str__ = lambda self: f('<Ed({}:{}:{})>',self.get_prop(app.PROP_TAB_ID, ''),self.get_prop(app.PROP_TAB_TITLE),self.get_filename())
+        pass;                   app.Editor.__repr__ = app.Editor.__str__
+        eds         = [app.Editor(h) for h in app.ed_handles()]
+        ed_tids     = [(ed_, ed_.get_prop(app.PROP_TAB_ID, '')) for ed_ in eds]
+        eds_hist    = [(ed_, ed_tid ,ed_.get_prop(app.PROP_TAB_TITLE) ,ed_.get_filename())
+                        for h_tid in self.tid_hist 
+                        for (ed_, ed_tid) in ed_tids 
+                        if h_tid==ed_tid]
+        pass;                  #log('eds_hist={}',(eds_hist))
+        start_sel   = min(1, len(eds_hist)-1)
+        ed_back     = eds_hist[start_sel][0]
+        ag_hist     = None
+        
+        def do_key_up(idd, idc, data=None):
+            scam    = data if data is not None else app.app_proc(app.PROC_GET_KEYSTATE, '')
+            pass;              #log('scam={}',(scam))
+            if 'c' not in scam:
+                ag_hist.hide()
+           #def do_key_up
+        
+        def do_key_down(idd, idc, data=None):
+            nonlocal ed_back
+            scam    = data if data is not None else app.app_proc(app.PROC_GET_KEYSTATE, '')
+            pass;              #log('scam={}',(scam))
+            s2S     = d(s='Shift+', c='Ctrl+', a='Alt+')
+            hold_key= ''.join(s2S[c] for c in scam) + chr(idc)
+            pass;              #log('idc, hold_key,cfg_keys={}',(idc, hold_key,cfg_keys))
+            sel_to  = ''
+            if 0:pass
+            elif idc==VK_ENTER:                     ag_hist.hide()
+            elif idc==VK_ESCAPE:    ed_back=None;   ag_hist.hide()
+            elif idc==VK_TAB and scam== '': sel_to  = 'next'
+            elif idc==VK_TAB and scam=='s': sel_to  = 'prev'
+            elif hold_key in cfg_keys:      sel_to  = 'next'
+            else:   return 
+            
+            pass;              #log('sel_to={}',(sel_to))
+            if sel_to:
+                shft= 1 if sel_to=='next' else -1
+                sel = (ag_hist.cval('tits') + shft) % len(eds_hist)
+                pass;          #log('sel={}',(ag_hist.cval('tits'), sel))
+                ag_hist._update_on_call(d(vals=d(tits=sel)))
+                return False
+           #def do_key_down
+        
+        def do_select(aid, ag, data=''):
+            nonlocal ed_back
+            sel     = ag_hist.cval(aid)
+            pass;              #log('sel={}',(sel))
+            ed_back = eds_hist[sel][0]
+            return []
+        
+        items       = [ed_tit for (ed_, ed_tid, ed_tit, ed_fn) in eds_hist]
+        pass;                  #log('items={}',(items))
+        ag_hist     = DlgAgent(
+            form    =dict(cap=_('Tab switcher (go back)'), w=400, h=300
+                         ,on_key_down   =do_key_down
+                         ,on_key_up     =do_key_up)
+        ,   ctrls   =[0
+                     ,('tits',d(tp='lbx',items=items   ,ali=ALI_CL ,call=do_select ))
+                    ][1:]
+        ,   fid     ='tits'
+        ,   vals    = d(tits=start_sel)
+                              #,options={'gen_repro_to_file':'repro_dlg_find_tree_node.py'}
+        )
+        ag_hist.show()
+        pass;                  #log('ed_back={}',(ed_back))
+        if ed_back:  ed_back.focus()
+       #def go_back_dlg
+    
     def go_back_tab(self):
         if app.app_api_version()<'1.0.143': return app.msg_status(NEED_UPDATE)
         if self.tid_hist is None:
@@ -2852,6 +2944,7 @@ class Command:
        #def go_back_tab
 
     def on_focus(self, ed_self):
+        pass;                  #log('ok',())
         if self.lock_on_fcs:
             pass;              #LOG and log('locked',())
             return

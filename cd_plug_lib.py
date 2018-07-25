@@ -13,14 +13,9 @@ ToDo: (see end of file)
 import  sys, os, gettext, logging, inspect, time, collections, json, re, subprocess
 from    time        import perf_counter
 
-try:
-    import  cudatext            as app
-    from    cudatext        import ed
-    import  cudax_lib           as apx
-except:
-    import  sw                  as app
-    from    sw              import ed
-    from . import cudax_lib     as apx
+import  cudatext            as app
+from    cudatext        import ed
+import  cudax_lib           as apx
 
 pass;                           # Logging
 pass;                           from pprint import pformat
@@ -866,8 +861,8 @@ class BaseDlgAgent:
                         if 'on_exit_focus_to_ed' not in self.opts else \
                       self.opts['on_exit_focus_to_ed']
         pass;                  #log('self.opts={}',(self.opts))
-        pass;                  #log('ed_to_fcs.get_filename()={}',(ed_to_fcs.get_filename()))
         if ed_to_fcs:
+            pass;              #log('ed_to_fcs.get_filename()={}',(ed_to_fcs.get_filename()))
             ed_to_fcs.focus()
        #def show
         
@@ -1540,7 +1535,7 @@ class DlgAgent(BaseDlgAgent):
         fpr     = BaseDlgAgent._form_acts('move', form=fpr)         # Move and (maybe) resize
         pass;                  #log('fpr is self.form={}',(fpr is self.form))
         if 'on_resize' in self.form and \
-           (fpr['w'] != w0 or \
+           (fpr['w'] != w0 or
             fpr['h'] != h0):
             pass;              #log('fpr[w],fpr[h],w0,h0={}',(fpr['w'], fpr['h'], w0,h0))
             self.form['on_resize'](self)
@@ -1653,7 +1648,7 @@ class DlgAgent(BaseDlgAgent):
         def fill_mn(mid_prn, its):
             for it in its:
                 if it['cap']=='-':
-                    app.menu_proc(  mid_prn, app.MENU_ADD, caption='-');
+                    app.menu_proc(  mid_prn, app.MENU_ADD, caption='-')
                     continue
                 mid =(app.menu_proc(mid_prn, app.MENU_ADD, caption=it['cap'], command= lambda _it=it:da_mn_callbk(_it))     # _it=it solves lambda closure problem
                         if 'cmd' in it else 

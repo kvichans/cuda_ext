@@ -286,6 +286,10 @@ method=nav_by_console_err
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Tabs_cmds
+[item170]
+section=commands
+caption=Cuda&-Ext\Ta&bs\Choose previously active tab to activate (go &back)
+method=go_back_dlg
 [item171]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate previously active tab (go &back)
