@@ -2815,15 +2815,18 @@ class Command:
     def _activate_tab_other_group(self
         , what_tab='next', what_grp='next'):    return Tabs_cmds._activate_tab_other_group(what_tab, what_grp)
 
+    go_back_dlg_keys    = None
     def go_back_dlg(self):
         scam    = app.app_proc(app.PROC_GET_KEYSTATE, '')
         pass;                  #log('ok scam,self.tid_hist={}',(scam,self.tid_hist))
         
-        lcmds   = app.app_proc(app.PROC_GET_COMMANDS, '')
-        cfg_keys= [(cmd['key1'], cmd['key2'])
-                    for cmd in lcmds 
-                    if cmd['type']=='plugin' and cmd['p_method']=='go_back_dlg'][0]
-
+        if not Command.go_back_dlg_keys:
+            lcmds   = app.app_proc(app.PROC_GET_COMMANDS, '')
+            cfg_keys= [(cmd['key1'], cmd['key2'])
+                        for cmd in lcmds 
+                        if cmd['type']=='plugin' and cmd['p_method']=='go_back_dlg'][0]
+            Command.go_back_dlg_keys    = cfg_keys
+        cfg_keys    = Command.go_back_dlg_keys
         
         if self.tid_hist is None:
             # First call
@@ -2837,8 +2840,8 @@ class Command:
             return app.msg_box(_('Tab switcher is ready to go back'), app.MB_OK)
         if not self.tid_hist:
             return app.msg_status(_('Yet no tabs to go back'))
-        pass;                   app.Editor.__str__ = lambda self: f('<Ed({}:{}:{})>',self.get_prop(app.PROP_TAB_ID, ''),self.get_prop(app.PROP_TAB_TITLE),self.get_filename())
-        pass;                   app.Editor.__repr__ = app.Editor.__str__
+        pass;                  #app.Editor.__str__ = lambda self: f('<Ed({}:{}:{})>',self.get_prop(app.PROP_TAB_ID, ''),self.get_prop(app.PROP_TAB_TITLE),self.get_filename())
+        pass;                  #app.Editor.__repr__ = app.Editor.__str__
         eds         = [app.Editor(h) for h in app.ed_handles()]
         ed_tids     = [(ed_, ed_.get_prop(app.PROP_TAB_ID, '')) for ed_ in eds]
         eds_hist    = [(ed_, ed_tid ,ed_.get_prop(app.PROP_TAB_TITLE) ,ed_.get_filename())
@@ -2879,6 +2882,7 @@ class Command:
                 sel = (ag_hist.cval('tits') + shft) % len(eds_hist)
                 pass;          #log('sel={}',(ag_hist.cval('tits'), sel))
                 ag_hist._update_on_call(d(vals=d(tits=sel)))
+                ed_back     = eds_hist[sel][0]
                 return False
            #def do_key_down
         
