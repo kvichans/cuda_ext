@@ -2871,8 +2871,8 @@ class Command:
             if 0:pass
             elif idc==VK_ENTER:                     ag_hist.hide()
             elif idc==VK_ESCAPE:    ed_back=None;   ag_hist.hide()
-            elif idc==VK_TAB and scam== '': sel_to  = 'next'
-            elif idc==VK_TAB and scam=='s': sel_to  = 'prev'
+            elif idc==VK_TAB and scam== 'c':sel_to  = 'next'
+            elif idc==VK_TAB and scam=='cs':sel_to  = 'prev'
             elif hold_key in cfg_keys:      sel_to  = 'next'
             else:   return 
             
