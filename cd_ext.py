@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.5.15 2018-07-25'
+    '1.5.16 2018-08-15'
 ToDo: (see end of file)
 '''
 
@@ -2413,16 +2413,11 @@ class Insert_cmds:
     
 class Command:
     def __init__(self):
-        
         # Data for go_back_tab with "visit history"
-#       self.lock_on_fcs  = False
-#       self.tid_hist   = None
-        
         self.cur_tab_id = None
         self.pre_tab_id = None
         self.tid_hist   = deque((), apx.get_opt('ui_max_history_edits', 20))  # append to left, scan from left, loose from right
-#       self.tid_hist_i = 0
-#       self.CASM_state = ''                                    # String has "c"/"a"/"s"/"m" if Ctrl/Alt/Shift/Meta-Win pressed
+       #def __init__
         
     def _move_splitter(self, what, factor):
         ''' Move one of splitters
@@ -2762,6 +2757,24 @@ class Command:
         app.msg_status(f(_('Removed characters: {}'), in_size-len(body)))
        #def remove_unprinted
     
+    def remove_xml_tags(self):
+        rxCmt   = re.compile('<!--.*?-->', re.DOTALL)
+        rxTag   = re.compile('<.*?>', re.DOTALL)
+        body    = ed.get_text_all()
+        if not rxCmt.search(body) and not rxTag.search(body):
+            return app.msg_status(_('No tags'))
+        cmts    = rxCmt.findall(body)
+        body    = rxCmt.sub('', body)
+        tags    = rxTag.findall(body)
+        body    = rxTag.sub('', body)
+        ed.set_text_all(body)
+        app.msg_status(
+            f(_('Stripping is done. Removed tags: {}'), len(tags))
+                if not cmts else
+            f(_('Stripping is done. Removed comments: {}, removed tags: {}'), len(cmts), len(tags))
+        )
+       #def remove_xml_tags
+    
     def on_console_nav(self, ed_self, text):    return Nav_cmds.on_console_nav(ed_self, text)
     def _open_file_near(self, where='right'):   return Nav_cmds._open_file_near(where)
     def open_selected(self):                    return Nav_cmds.open_selected()
@@ -2833,18 +2846,19 @@ class Command:
             if pre_ed:  pre_ed.focus()
        #def go_back_tab
 
-    go_back_dlg_keys    = None
+#   go_back_dlg_keys    = None
     def go_back_dlg(self):
         scam    = app.app_proc(app.PROC_GET_KEYSTATE, '')
         pass;                  #log('ok scam,self.tid_hist={}',(scam,self.tid_hist))
         
-        if not Command.go_back_dlg_keys:
+        if not hasattr(Command.go_back_dlg, 'cfg_keys'): Command.go_back_dlg.cfg_keys=None
+        if not Command.go_back_dlg.cfg_keys:
             lcmds   = app.app_proc(app.PROC_GET_COMMANDS, '')
             cfg_keys= [(cmd['key1'], cmd['key2'])
                         for cmd in lcmds 
                         if cmd['type']=='plugin' and cmd['p_method']=='go_back_dlg'][0]
-            Command.go_back_dlg_keys    = cfg_keys
-        cfg_keys    = Command.go_back_dlg_keys
+            Command.go_back_dlg.cfg_keys    = cfg_keys
+        cfg_keys    = Command.go_back_dlg.cfg_keys
         
         if not self.tid_hist:
             return app.msg_status(_('Yet no tabs to go back'))
@@ -2879,6 +2893,8 @@ class Command:
             if 0:pass
             elif idc==VK_ENTER:                     ag_hist.hide()
             elif idc==VK_ESCAPE:    ed_back=None;   ag_hist.hide()
+            elif idc==VK_DOWN:              sel_to  = 'next'
+            elif idc==VK_UP:                sel_to  = 'prev'
             elif idc==VK_TAB and scam== 'c':sel_to  = 'next'
             elif idc==VK_TAB and scam=='sc':sel_to  = 'prev'
             elif hold_key in cfg_keys:      sel_to  = 'next'

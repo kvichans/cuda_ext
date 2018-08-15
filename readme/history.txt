@@ -1,3 +1,6 @@
+1.5.16 (2018-08-15)
+added: Command "Strip HTML tags"
+
 1.5.15 (2018-07-25)
 changed: Command "Activate previously active tab" works with only two tabs
 

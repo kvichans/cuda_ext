@@ -71,6 +71,11 @@ section=commands
 caption=Cuda&-Ext\&Find/Replace\Remove all ASCII chars 0..31 (excluding 9,10,13)
 method=remove_unprinted
 
+[item21]
+section=commands
+caption=Cuda&-Ext\&Find/Replace\Strip HTML tags
+method=remove_xml_tags
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Insert_cmds
 [item41]
