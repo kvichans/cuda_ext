@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.5.16 2018-08-15'
+    '1.5.17 2018-08-17'
 ToDo: (see end of file)
 '''
 
@@ -2412,11 +2412,11 @@ class Insert_cmds:
    #class Insert_cmds
     
 class Command:
-    def __init__(self):
+#   def __init__(self):
         # Data for go_back_tab with "visit history"
-        self.cur_tab_id = None
-        self.pre_tab_id = None
-        self.tid_hist   = deque((), apx.get_opt('ui_max_history_edits', 20))  # append to left, scan from left, loose from right
+#       self.cur_tab_id = None
+#       self.pre_tab_id = None
+#       self.tid_hist   = deque((), apx.get_opt('ui_max_history_edits', 20))  # append to left, scan from left, loose from right
        #def __init__
         
     def _move_splitter(self, what, factor):
@@ -2828,111 +2828,164 @@ class Command:
     def _activate_tab_other_group(self
         , what_tab='next', what_grp='next'):    return Tabs_cmds._activate_tab_other_group(what_tab, what_grp)
 
-    def on_focus(self, ed_self):
-        pass;                  #log('ok',())
+#   def on_focus(self, ed_self):
+#       pass;                  #log('ok',())
         # Add/Rise to/in history
-        self.pre_tab_id = self.cur_tab_id
-        self.cur_tab_id = ed_self.get_prop(app.PROP_TAB_ID)
-        if self.cur_tab_id in self.tid_hist:
-            self.tid_hist.remove(self.cur_tab_id)
-        self.tid_hist.appendleft(self.cur_tab_id)
+#       self.pre_tab_id = self.cur_tab_id
+#       self.cur_tab_id = ed_self.get_prop(app.PROP_TAB_ID)
+#       if self.cur_tab_id in self.tid_hist:
+#           self.tid_hist.remove(self.cur_tab_id)
+#       self.tid_hist.appendleft(self.cur_tab_id)
         #NOTE: on_focus
        #def on_focus
        
     def go_back_tab(self):
-        pass;                  #log('self.pre_tab_id={}',(self.pre_tab_id))
-        if  self.pre_tab_id:
-            pre_ed  = apx.get_tab_by_id(self.pre_tab_id)
-            if pre_ed:  pre_ed.focus()
+        if app.app_api_version()<'1.0.251':
+            return app.msg_status(NEED_UPDATE)
+        eds         = [app.Editor(h) for h in app.ed_handles()]     # Native order
+        ed_tats     = [(ed_, ed_.get_prop(app.PROP_ACTIVATION_TIME, '')) for ed_ in eds]
+        ed_tats     = [(at, ed_) for (ed_, at) in ed_tats if at]    # Only activated
+        if len(ed_tats)<2:
+            return app.msg_status(_('No yet other activated tab'))
+        ed_tats.sort(reverse=True)
+        ed_back     = ed_tats[1][1]
+        ed_back.focus()
        #def go_back_tab
 
 #   go_back_dlg_keys    = None
     def go_back_dlg(self):
+        if app.app_api_version()<'1.0.251':
+            return app.msg_status(NEED_UPDATE)
         scam    = app.app_proc(app.PROC_GET_KEYSTATE, '')
-        pass;                  #log('ok scam,self.tid_hist={}',(scam,self.tid_hist))
+        cfg_keys= get_plugcmd_hotkeys('go_back_dlg')
+        pass;                  #log('ok scam,cfg_keys={}',(scam,cfg_keys))
+        act_clr     = rgb_to_int(232,232,232)
+        pss_clr     = rgb_to_int(216,216,216)
         
-        if not hasattr(Command.go_back_dlg, 'cfg_keys'): Command.go_back_dlg.cfg_keys=None
-        if not Command.go_back_dlg.cfg_keys:
-            lcmds   = app.app_proc(app.PROC_GET_COMMANDS, '')
-            cfg_keys= [(cmd['key1'], cmd['key2'])
-                        for cmd in lcmds 
-                        if cmd['type']=='plugin' and cmd['p_method']=='go_back_dlg'][0]
-            Command.go_back_dlg.cfg_keys    = cfg_keys
-        cfg_keys    = Command.go_back_dlg.cfg_keys
-        
-        if not self.tid_hist:
-            return app.msg_status(_('Yet no tabs to go back'))
-        pass;                  #app.Editor.__str__ = lambda self: f('<Ed({}:{}:{})>',self.get_prop(app.PROP_TAB_ID, ''),self.get_prop(app.PROP_TAB_TITLE),self.get_filename())
-        pass;                  #app.Editor.__repr__ = app.Editor.__str__
-        eds         = [app.Editor(h) for h in app.ed_handles()]
-        ed_tids     = [(ed_, ed_.get_prop(app.PROP_TAB_ID, '')) for ed_ in eds]
-        eds_hist    = [(ed_, ed_tid ,ed_.get_prop(app.PROP_TAB_TITLE) ,ed_.get_filename())
-                        for h_tid in self.tid_hist 
-                        for (ed_, ed_tid) in ed_tids 
-                        if h_tid==ed_tid]
+        side_pns    = app.app_proc(app.PROC_SIDEPANEL_ENUM,   '').split('\n')
+        botm_pns    = app.app_proc(app.PROC_BOTTOMPANEL_ENUM, '').split('\n')
+        panels      = [((app.PROC_SIDEPANEL_ACTIVATE,  (pn,True)), pn)  for pn in side_pns] \
+                    + [(None, '')] \
+                    + [((app.PROC_BOTTOMPANEL_ACTIVATE, pn)      , pn)  for pn in botm_pns]
+        panels      = [(act, pn)     for (act, pn) in panels if pn!='Menu']
+        eds         = [app.Editor(h) for h in app.ed_handles()]     # Native order
+        ed_tats     = [(ed_, ed_.get_prop(app.PROP_ACTIVATION_TIME, '')) for ed_ in eds]
+        ed_tats     = [(at, ed_) for (ed_, at) in ed_tats if at]    # Only activated
+        ed_tats.sort(reverse=True)
+        eds         = [ed_       for (at, ed_) in ed_tats]          # Sorted by activation time
+        eds         = eds[:apx.get_opt('ui_max_history_edits', 20)] # Cut olds
+#       eds         = eds if ed in eds else [ed]+eds
+        eds         = eds if eds else [ed]
+        eds_hist    = [(ed_, ed_.get_prop(app.PROP_TAB_ID, '')
+                           , ed_.get_prop(app.PROP_TAB_TITLE) 
+                           , ed_.get_filename()
+                       ) for ed_ in eds]
         pass;                  #log('eds_hist={}',(eds_hist))
         start_sel   = min(1, len(eds_hist)-1)
+        pass;                  #log('start_sel,len(eds_hist)={}',(start_sel,len(eds_hist)))
         ed_back     = eds_hist[start_sel][0]
+        panel_to    = None
+        start_pnls  = get_hist('switcher.start_panel', 'Code tree')
+
         ag_hist     = None
-        
         def do_key_up(idd, idc, data=None):
             scam    = data if data is not None else app.app_proc(app.PROC_GET_KEYSTATE, '')
-            pass;              #log('scam={}',(scam))
             if 'c' not in scam:
                 ag_hist.hide()
            #def do_key_up
         
         def do_key_down(idd, idc, data=None):
-            nonlocal ed_back
+            nonlocal ed_back, panel_to
             scam    = data if data is not None else app.app_proc(app.PROC_GET_KEYSTATE, '')
             pass;              #log('scam={}',(scam))
-            s2S     = d(s='Shift+', c='Ctrl+', a='Alt+')
-            hold_key= ''.join(s2S[c] for c in scam) + chr(idc)
-            pass;              #log('idc, hold_key,cfg_keys={}',(idc, hold_key,cfg_keys))
+            k2K     = d(s='Shift+', c='Ctrl+', a='Alt+')
+            hotkey  = ''.join(k2K[k] for k in scam) + chr(idc)
+            pass;              #log('idc, hotkey,cfg_keys={}',(idc, hotkey,cfg_keys))
+            to_othr = False
             sel_to  = ''
             if 0:pass
-            elif idc==VK_ENTER:                     ag_hist.hide()
-            elif idc==VK_ESCAPE:    ed_back=None;   ag_hist.hide()
+            elif idc==VK_ENTER:                             ag_hist.hide()
+            elif idc==VK_ESCAPE:    panel_to=ed_back=None;  ag_hist.hide()
+            
+            elif idc in (VK_LEFT, VK_RIGHT):to_othr = True
+            
             elif idc==VK_DOWN:              sel_to  = 'next'
             elif idc==VK_UP:                sel_to  = 'prev'
             elif idc==VK_TAB and scam== 'c':sel_to  = 'next'
             elif idc==VK_TAB and scam=='sc':sel_to  = 'prev'
-            elif hold_key in cfg_keys:      sel_to  = 'next'
+            elif hotkey in cfg_keys:        sel_to  = 'next'
             else:   return 
+            
+            fid = ag_hist.fattr('fid')
+            if to_othr:
+                fid = 'pnls' if fid=='tabs' else 'tabs'
+                ag_hist._update_on_call(d(
+                    form=d(fid=fid)
+                ,   ctrls=[('tabs',d(color=act_clr if fid=='tabs' else pss_clr))
+                          ,('pnls',d(color=act_clr if fid=='pnls' else pss_clr ))
+                          ]
+                ))
+                ed_back     = None if fid=='pnls' else eds_hist[ag_hist.cval('tabs')][0]
+                panel_to    = None if fid=='tabs' else panels[  ag_hist.cval('pnls')]
+                return False
             
             pass;              #log('sel_to={}',(sel_to))
             if sel_to:
-                shft= 1 if sel_to=='next' else -1
-                sel = (ag_hist.cval('tits') + shft) % len(eds_hist)
-                pass;          #log('sel={}',(ag_hist.cval('tits'), sel))
-                ag_hist._update_on_call(d(vals=d(tits=sel)))
-                ed_back     = eds_hist[sel][0]
+                ed_back     = None
+                panel_to    = None
+                shft        = 1 if sel_to=='next' else -1
+                if fid=='tabs':
+                    sel = (ag_hist.cval('tabs') + shft) % len(eds_hist)
+                    ed_back     = eds_hist[sel][0]
+                    pass;      #log('sel={}',(ag_hist.cval('tabs'), sel))
+                    ag_hist._update_on_call(d(vals=d(tabs=sel)))
+                if fid=='pnls':
+                    sel = (ag_hist.cval('pnls') + shft) % len(panels)
+                    panel_to    = panels[sel]
+                    if not panel_to[0]:
+                        sel = (sel              + shft) % len(panels)
+                        panel_to= panels[sel]
+                    pass;      #log('sel={}',(ag_hist.cval('pnls'), sel))
+                    ag_hist._update_on_call(d(vals=d(pnls=sel)))
                 return False
            #def do_key_down
         
         def do_select(aid, ag, data=''):
-            nonlocal ed_back
+            nonlocal ed_back, panel_to
+            if aid=='pnls': return []
             sel     = ag_hist.cval(aid)
             pass;              #log('sel={}',(sel))
-            ed_back = eds_hist[sel][0]
+            if aid=='tabs':
+                ed_back = eds_hist[sel][0]
+            if aid=='pnls':
+                panel_to= panels[sel]
             return []
         
+        panls       = [(pn if pn else '—'*100) for act,pn in panels]
         items       = [ed_tit for (ed_, ed_tid, ed_tit, ed_fn) in eds_hist]
         pass;                  #log('items={}',(items))
         ag_hist     = DlgAgent(
-            form    =dict(cap=_('Tab switcher (go back)'), w=250, h=300
+            form    =dict(cap=_('Switcher'), w=350, h=300
                          ,on_key_down   =do_key_down
                          ,on_key_up     =do_key_up)
         ,   ctrls   =[0
-                     ,('tits',d(tp='lbx',items=items   ,ali=ALI_CL ,call=do_select ))
+                     ,('tabs',d(tp='lbx',items=items   ,ali=ALI_CL          ,call=do_select ,color=act_clr ))
+                     ,('pnls',d(tp='lbx',items=panls   ,ali=ALI_RT  ,w=110  ,call=do_select ,color=pss_clr ))
                     ][1:]
-        ,   fid     ='tits'
-        ,   vals    = d(tits=start_sel)
+        ,   fid     ='tabs'
+        ,   vals    = d(tabs=start_sel
+                       ,pnls=panls.index(start_pnls) if start_pnls in panls else 0)
                               #,options={'gen_repro_to_file':'repro_dlg_find_tree_node.py'}
         )
         ag_hist.show()
         pass;                  #log('ed_back={}',(ed_back))
-        if ed_back:  ed_back.focus()
+        if ed_back:
+            ed_back.focus()
+        elif panel_to and panel_to[0]:
+            set_hist('switcher.start_panel', panel_to[1])
+            pass;              #log('panel_to[0]={}',(panel_to[0]))
+#           app.app_proc(panel_to[0][0], panel_to[0][1])
+            app.app_proc(*(panel_to[0]))
        #def go_back_dlg
     
     def scroll_to(self, place):                             return Jumps_cmds.scroll_to(place)

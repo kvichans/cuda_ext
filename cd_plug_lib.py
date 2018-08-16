@@ -11,6 +11,7 @@ ToDo: (see end of file)
 '''
 
 import  sys, os, gettext, logging, inspect, time, collections, json, re, subprocess
+from    functools   import lru_cache
 from    time        import perf_counter
 
 import  cudatext            as app
@@ -2088,6 +2089,15 @@ def get_hotkeys_desc(cmd_id, ext_id=None, keys_js=None, def_ans=''):
                        ]).strip('/')
     return desc
    #def get_hotkeys_desc
+
+@lru_cache(maxsize=32)
+def get_plugcmd_hotkeys(plugcmd):
+    lcmds   = app.app_proc(app.PROC_GET_COMMANDS, '')
+    cfg_keys= [(cmd['key1'], cmd['key2'])
+                for cmd in lcmds 
+                if cmd['type']=='plugin' and cmd['p_method']==plugcmd][0]
+    return cfg_keys
+   #def get_plugcmd_hotkeys
 
 ######################################
 #NOTE: plugins history
