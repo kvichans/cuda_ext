@@ -294,7 +294,7 @@ method=nav_by_console_err
 ; Tabs_cmds
 [item170]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Choose previously active tab to activate (go &back)
+caption=Cuda&-Ext\Ta&bs\Choose tab/panel to switch to
 method=go_back_dlg
 [item171]
 section=commands

@@ -2828,19 +2828,8 @@ class Command:
     def _activate_tab_other_group(self
         , what_tab='next', what_grp='next'):    return Tabs_cmds._activate_tab_other_group(what_tab, what_grp)
 
-#   def on_focus(self, ed_self):
-#       pass;                  #log('ok',())
-        # Add/Rise to/in history
-#       self.pre_tab_id = self.cur_tab_id
-#       self.cur_tab_id = ed_self.get_prop(app.PROP_TAB_ID)
-#       if self.cur_tab_id in self.tid_hist:
-#           self.tid_hist.remove(self.cur_tab_id)
-#       self.tid_hist.appendleft(self.cur_tab_id)
-        #NOTE: on_focus
-       #def on_focus
-       
     def go_back_tab(self):
-        if app.app_api_version()<'1.0.251':
+        if app.app_api_version()<'1.0.253':
             return app.msg_status(NEED_UPDATE)
         eds         = [app.Editor(h) for h in app.ed_handles()]     # Native order
         ed_tats     = [(ed_, ed_.get_prop(app.PROP_ACTIVATION_TIME, '')) for ed_ in eds]
@@ -2852,9 +2841,8 @@ class Command:
         ed_back.focus()
        #def go_back_tab
 
-#   go_back_dlg_keys    = None
     def go_back_dlg(self):
-        if app.app_api_version()<'1.0.251':
+        if app.app_api_version()<'1.0.253':
             return app.msg_status(NEED_UPDATE)
         scam    = app.app_proc(app.PROC_GET_KEYSTATE, '')
         cfg_keys= get_plugcmd_hotkeys('go_back_dlg')
@@ -2865,8 +2853,8 @@ class Command:
         side_pns    = app.app_proc(app.PROC_SIDEPANEL_ENUM,   '').split('\n')
         botm_pns    = app.app_proc(app.PROC_BOTTOMPANEL_ENUM, '').split('\n')
         panels      = [((app.PROC_SIDEPANEL_ACTIVATE,  (pn,True)), pn)  for pn in side_pns] \
-                    + [(None, '')] \
-                    + [((app.PROC_BOTTOMPANEL_ACTIVATE, pn)      , pn)  for pn in botm_pns]
+                    + [( None                                    , '')                    ] \
+                    + [((app.PROC_BOTTOMPANEL_ACTIVATE,(pn,True)), pn)  for pn in botm_pns]
         panels      = [(act, pn)     for (act, pn) in panels if pn!='Menu']
         eds         = [app.Editor(h) for h in app.ed_handles()]     # Native order
         ed_tats     = [(ed_, ed_.get_prop(app.PROP_ACTIVATION_TIME, '')) for ed_ in eds]
@@ -2900,7 +2888,7 @@ class Command:
             pass;              #log('scam={}',(scam))
             k2K     = d(s='Shift+', c='Ctrl+', a='Alt+')
             hotkey  = ''.join(k2K[k] for k in scam) + chr(idc)
-            pass;              #log('idc, hotkey,cfg_keys={}',(idc, hotkey,cfg_keys))
+            pass;              #log('idc,hotkey,cfg_keys={}',(idc,hotkey,cfg_keys))
             to_othr = False
             sel_to  = ''
             if 0:pass
@@ -2927,7 +2915,6 @@ class Command:
                 ))
                 ed_back     = None if fid=='pnls' else eds_hist[ag_hist.cval('tabs')][0]
                 panel_to    = None if fid=='tabs' else panels[  ag_hist.cval('pnls')]
-                return False
             
             pass;              #log('sel_to={}',(sel_to))
             if sel_to:
@@ -2947,30 +2934,38 @@ class Command:
                         panel_to= panels[sel]
                     pass;      #log('sel={}',(ag_hist.cval('pnls'), sel))
                     ag_hist._update_on_call(d(vals=d(pnls=sel)))
-                return False
+            
+            return False
            #def do_key_down
         
         def do_select(aid, ag, data=''):
             nonlocal ed_back, panel_to
-            if aid=='pnls': return []
             sel     = ag_hist.cval(aid)
             pass;              #log('sel={}',(sel))
             if aid=='tabs':
                 ed_back = eds_hist[sel][0]
+                panel_to= None
             if aid=='pnls':
+                ed_back = None
                 panel_to= panels[sel]
             return []
         
+        def do_dclk(aid, ag, data=''):
+            do_select(aid, ag)
+            if aid=='pnls' and not panel_to[0]:
+                return []   # Ignore
+            return None     # Close dlg
+           #def do_dclk
+        
         panls       = [(pn if pn else '—'*100) for act,pn in panels]
         items       = [ed_tit for (ed_, ed_tid, ed_tit, ed_fn) in eds_hist]
-        pass;                  #log('items={}',(items))
         ag_hist     = DlgAgent(
             form    =dict(cap=_('Switcher'), w=350, h=300
                          ,on_key_down   =do_key_down
                          ,on_key_up     =do_key_up)
         ,   ctrls   =[0
-                     ,('tabs',d(tp='lbx',items=items   ,ali=ALI_CL          ,call=do_select ,color=act_clr ))
-                     ,('pnls',d(tp='lbx',items=panls   ,ali=ALI_RT  ,w=110  ,call=do_select ,color=pss_clr ))
+                     ,('tabs',d(tp='lbx',items=items   ,ali=ALI_CL          ,color=act_clr  ,call=do_select ,on_click_dbl=do_dclk   ))
+                     ,('pnls',d(tp='lbx',items=panls   ,ali=ALI_RT  ,w=110  ,color=pss_clr  ,call=do_select ,on_click_dbl=do_dclk   ))
                     ][1:]
         ,   fid     ='tabs'
         ,   vals    = d(tabs=start_sel
@@ -2978,13 +2973,10 @@ class Command:
                               #,options={'gen_repro_to_file':'repro_dlg_find_tree_node.py'}
         )
         ag_hist.show()
-        pass;                  #log('ed_back={}',(ed_back))
         if ed_back:
             ed_back.focus()
         elif panel_to and panel_to[0]:
             set_hist('switcher.start_panel', panel_to[1])
-            pass;              #log('panel_to[0]={}',(panel_to[0]))
-#           app.app_proc(panel_to[0][0], panel_to[0][1])
             app.app_proc(*(panel_to[0]))
        #def go_back_dlg
     
