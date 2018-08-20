@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.5.17 2018-08-17'
+    '1.5.18 2018-08-20'
 ToDo: (see end of file)
 '''
 
@@ -2746,6 +2746,47 @@ class Command:
             pass;               log(traceback.format_exc())
             return app.msg_status(_('Error: '+ex))
        #def open_with_defapp
+    
+    def save_tabs_to_file(self):
+        RES_ALL = 0
+        RES_VIS = 1
+        RES_SEP = 3
+        RES_OK = 4
+        
+        res = app.dlg_custom('Save editors to a single file',
+            410, 175,
+            '\n'.join([
+                'type=radio\1cap=Save all tabs (including not visible)\1pos=10,10,400,0\1val=1',    
+                'type=radio\1cap=Save visible editors in all groups\1pos=10,35,400,0',
+                'type=label\1cap=Separator line:\1pos=10,65,400,0',    
+                'type=edit\1val=-----\1pos=10,90,400,0',
+                'type=button\1cap=&OK\1pos=100,140,200,0',    
+                'type=button\1cap=Cancel\1pos=210,140,310,0'    
+            ]),
+            get_dict=True
+            )
+        if res is None: return
+        if res['clicked']!=RES_OK: return
+        
+        res_all = res[RES_ALL]=='1'
+        res_sep = res[RES_SEP]
+    
+        if res_all:
+            eds = [app.Editor(h) for h in app.ed_handles()]
+        else:
+            MAX_GROUPS = 6
+            eds = [app.ed_group(i) for i in range(MAX_GROUPS)]
+            eds = [i for i in eds if i]
+        
+        fn = app.dlg_file(False, 'saved.txt', '', '')
+        if not fn:
+            return 
+            
+        txt = ('\n'+res_sep+'\n').join([e.get_text_all() for e in eds])
+        with open(fn, 'w', encoding='utf8') as f:
+            f.write(txt)
+        app.msg_status('Saved: '+fn)
+       #def save_tabs_to_file
     
     def remove_unprinted(self):
         body    = ed.get_text_all()

@@ -679,3 +679,8 @@ section=commands
 caption=Cuda&-Ext\F&ile\Open &current file in default application
 method=open_with_defapp
 
+[item347]
+section=commands
+caption=Cuda&-Ext\F&ile\Save visible editors in all groups to single file...
+method=save_tabs_to_file
+

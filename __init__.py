@@ -106,6 +106,7 @@ class Command:
     def open_recent(self):                      return RLS.open_recent()
     def open_all_with_subdir(self):             return RLS.open_all_with_subdir()
     def open_with_defapp(self):                 return RLS.open_with_defapp()
+    def save_tabs_to_file(self):                return RLS.save_tabs_to_file()
     def remove_unprinted(self):                 return RLS.remove_unprinted()
     def remove_xml_tags(self):                  return RLS.remove_xml_tags()
 
