@@ -1,5 +1,5 @@
 1.5.18 (2018-08-20)
-added: Command "File \ Save visible editors in all groups to single file"
+added: Command "File \ Save editors to a single file"
 
 1.5.17 (2018-08-17)
 changed: Command "Choose previously active tab to activate" allows to activate panels
