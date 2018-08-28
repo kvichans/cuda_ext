@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.5.18 2018-08-20'
+    '1.5.19 2018-08-28'
 ToDo: (see end of file)
 '''
 
@@ -275,13 +275,13 @@ class Tree_cmds:
                          ,border=app.DBORDER_SIZE
                          ,resize=True)
         ,   ctrls   =[0
-    ,('find',d(tp='bt'  ,t=0        ,l=0        ,w=0    ,cap=''     ,sto=False  ,def_bt='1'             ,call=do_find           ))  # Enter
+    ,('find',d(tp='bt'  ,t=0        ,l=-99      ,w=44   ,cap=''     ,sto=False  ,def_bt='1'             ,call=do_find           ))  # Enter
     ,('reex',d(tp='ch-b',tid='what' ,l=5+38*0   ,w=39   ,cap='.&*'  ,hint=_('Regular expression')       ,call=do_attr           ))  # &*
     ,('case',d(tp='ch-b',tid='what' ,l=5+38*1   ,w=39   ,cap='&aA'  ,hint=_('Case sensitive')           ,call=do_attr           ))  # &a
     ,('word',d(tp='ch-b',tid='what' ,l=5+38*2   ,w=39   ,cap='"&w"' ,hint=_('Whole words')              ,call=do_attr           ))  # &w
     ,('wrap',d(tp='ch-b',tid='what' ,l=5+38*3   ,w=39   ,cap='&O'   ,hint=_('Wrapped search')           ,call=do_attr           ))  # &/
     ,('what',d(tp='cb'  ,t  =5      ,l=5+38*4+5 ,w=155  ,items=opts['hist']                                             ,a='lR' ))  # 
-    ,('menu',d(tp='bt'  ,tid='what' ,l=330      ,w=30   ,cap='&='                                       ,call=do_menu   ,a='LR' ))  # &=
+    ,('menu',d(tp='bt'  ,tid='what' ,l=320      ,w=40   ,cap='&='                                       ,call=do_menu   ,a='LR' ))  # &=
     ,('stbr',d(tp='sb'              ,l=0        ,r=365                                   ,ali=ALI_BT                    ,a='lR' ))  # 
                     ][1:]
         ,   fid     ='what'
@@ -1689,12 +1689,12 @@ class Find_repl_cmds:
                          ,border=app.DBORDER_SIZE
                          ,resize=True)
         ,   ctrls   =[0
-    ,('find',d(tp='bt'  ,t=0        ,l=0        ,w=0    ,cap=''     ,sto=False  ,def_bt='1'         ,call=do_find           ))  # Enter
+    ,('find',d(tp='bt'  ,t=0        ,l=-99      ,w=44   ,cap=''     ,sto=False  ,def_bt='1'         ,call=do_find           ))  # Enter
     ,('reex',d(tp='chb' ,tid='what' ,l=5+38*0   ,w=39   ,cap='.&*'  ,hint=_('Regular expression')   ,call=do_attr           ))  # &*
     ,('case',d(tp='chb' ,tid='what' ,l=5+38*1   ,w=39   ,cap='&aA'  ,hint=_('Case sensitive')       ,call=do_attr           ))  # &a
     ,('word',d(tp='chb' ,tid='what' ,l=5+38*2   ,w=39   ,cap='"&w"' ,hint=_('Whole words')          ,call=do_attr           ))  # &w
     ,('what',d(tp=wh_tp ,t  =5      ,l=5+38*3+5 ,w=85   ,items=opts['hist']                         ,call=wh_call   ,a='lR' ))  # 
-    ,('menu',d(tp='bt'  ,tid='what' ,l=220      ,w=30   ,cap='&='                   ,on_menu=do_menu,call=do_menu   ,a='LR' ))  # &=
+    ,('menu',d(tp='bt'  ,tid='what' ,l=210      ,w=40   ,cap='&='                   ,on_menu=do_menu,call=do_menu   ,a='LR' ))  # &=
                     ][1:]
         ,   fid     ='what'
         ,   vals    = upd_dict({k:opts[k] for k in ('reex','case','word')}, d(what=what))
