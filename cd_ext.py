@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.5.19 2018-08-28'
+    '1.5.20 2018-09-18'
 ToDo: (see end of file)
 '''
 
@@ -2877,7 +2877,7 @@ class Command:
         ed_tats     = [(at, ed_) for (ed_, at) in ed_tats if at]    # Only activated
         if len(ed_tats)<2:
             return app.msg_status(_('No yet other activated tab'))
-        ed_tats.sort(reverse=True)
+        ed_tats.sort(reverse=True, key=lambda ae:ae[0])
         ed_back     = ed_tats[1][1]
         ed_back.focus()
        #def go_back_tab
@@ -2900,7 +2900,7 @@ class Command:
         eds         = [app.Editor(h) for h in app.ed_handles()]     # Native order
         ed_tats     = [(ed_, ed_.get_prop(app.PROP_ACTIVATION_TIME, '')) for ed_ in eds]
         ed_tats     = [(at, ed_) for (ed_, at) in ed_tats if at]    # Only activated
-        ed_tats.sort(reverse=True)
+        ed_tats.sort(reverse=True, key=lambda ae:ae[0])
         eds         = [ed_       for (at, ed_) in ed_tats]          # Sorted by activation time
         eds         = eds[:apx.get_opt('ui_max_history_edits', 20)] # Cut olds
 #       eds         = eds if ed in eds else [ed]+eds

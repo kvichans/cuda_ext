@@ -1,3 +1,6 @@
+1.5.20 (2018-09-18)
+fixed: switcher
+
 1.5.19 (2018-08-28)
 fixed: layout for MacOS (Find in lines, Find in Tree)
 
