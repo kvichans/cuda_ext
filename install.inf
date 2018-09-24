@@ -648,7 +648,7 @@ caption=Cuda&-Ext\&Align\Align in lines to right by margin
 method=align_sel_to_right_by_margin
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; Misc_cmds
+; File_cmds
 [item341]
 section=commands
 caption=Cuda&-Ext\F&ile\Open &recent file...
@@ -666,20 +666,35 @@ method=rename_file
 
 [item344]
 section=commands
+caption=Cuda&-Ext\F&ile\Show in &hex viewer
+method=reopen_as_hex
+
+[item345]
+section=commands
+caption=Cuda&-Ext\F&ile\Show in &text editor
+method=reopen_as_text
+
+[item346]
+section=commands
+caption=Cuda&-Ext\F&ile\-
+method=_
+
+[item347]
+section=commands
 caption=Cuda&-Ext\F&ile\Ne&w file and save in current folder...
 method=new_file_save_as_near_cur
 
-[item345]
+[item348]
 section=commands
 caption=Cuda&-Ext\F&ile\Open &all files from folder with sub-folders...
 method=open_all_with_subdir
 
-[item346]
+[item349]
 section=commands
 caption=Cuda&-Ext\F&ile\Open &current file in default application
 method=open_with_defapp
 
-[item347]
+[item350]
 section=commands
 caption=Cuda&-Ext\F&ile\Save editors to a single file...
 method=save_tabs_to_file

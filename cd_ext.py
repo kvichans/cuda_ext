@@ -2638,6 +2638,28 @@ class Command:
         ed.set_caret(*crt)
        #def rename_file
 
+    def reopen_as(self, how):
+        fn  = ed.get_filename()
+        if not fn or ed.get_prop(app.PROP_MODIFIED):
+            return app.msg_status(_('Save file first'))
+        
+        if app.app_api_version()<'1.0.238':
+            return app.msg_status(NEED_UPDATE)
+        knd = ed.get_prop(app.PROP_KIND)
+        if knd==app.VMODE_TEXT and how=='text' \
+        or knd==app.VMODE_HEX  and how=='hex':
+            return app.msg_status(_('No need to do anything'))
+            
+        ed.cmd(cmds.cmd_FileClose)
+        if 0:pass
+        elif how=='text':
+            app.file_open(fn)
+            app.msg_status(_('Reopened in text editor'))
+        elif how=='hex':
+            app.file_open(fn, options='/view-hex')
+            app.msg_status(_('Reopened in hex viewer'))
+       #def reopen_as
+
     def new_file_save_as_near_cur(self):
         cur_fn  = ed.get_filename()
         if not cur_fn:  return app.msg_status(_('Warning: the command needs a named tab.'))
