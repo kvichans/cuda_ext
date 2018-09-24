@@ -651,51 +651,51 @@ method=align_sel_to_right_by_margin
 ; File_cmds
 [item341]
 section=commands
-caption=Cuda&-Ext\F&ile\Open &recent file...
+caption=Cuda&-Ext\Fi&le\Open &recent file...
 method=open_recent
 
 [item342]
 section=commands
-caption=Cuda&-Ext\F&ile\-
+caption=Cuda&-Ext\Fi&le\-
 method=_
 
 [item343]
 section=commands
-caption=Cuda&-Ext\F&ile\Re&name file...
+caption=Cuda&-Ext\Fi&le\Re&name file...
 method=rename_file
 
 [item344]
 section=commands
-caption=Cuda&-Ext\F&ile\Show in &hex viewer
+caption=Cuda&-Ext\Fi&le\Show in &hex viewer
 method=reopen_as_hex
 
 [item345]
 section=commands
-caption=Cuda&-Ext\F&ile\Show in &text editor
+caption=Cuda&-Ext\Fi&le\Show in &text editor
 method=reopen_as_text
 
 [item346]
 section=commands
-caption=Cuda&-Ext\F&ile\-
+caption=Cuda&-Ext\Fi&le\-
 method=_
 
 [item347]
 section=commands
-caption=Cuda&-Ext\F&ile\Ne&w file and save in current folder...
+caption=Cuda&-Ext\Fi&le\Ne&w file and save in current folder...
 method=new_file_save_as_near_cur
 
 [item348]
 section=commands
-caption=Cuda&-Ext\F&ile\Open &all files from folder with sub-folders...
+caption=Cuda&-Ext\Fi&le\Open &all files from folder with sub-folders...
 method=open_all_with_subdir
 
 [item349]
 section=commands
-caption=Cuda&-Ext\F&ile\Open &current file in default application
+caption=Cuda&-Ext\Fi&le\Open &current file in default application
 method=open_with_defapp
 
 [item350]
 section=commands
-caption=Cuda&-Ext\F&ile\Save editors to a single file...
+caption=Cuda&-Ext\Fi&le\Save editors to a single file...
 method=save_tabs_to_file
 

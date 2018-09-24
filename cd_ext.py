@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.5.20 2018-09-18'
+    '1.5.21 2018-09-24'
 ToDo: (see end of file)
 '''
 
@@ -2645,9 +2645,10 @@ class Command:
         
         if app.app_api_version()<'1.0.238':
             return app.msg_status(NEED_UPDATE)
-        knd = ed.get_prop(app.PROP_KIND)
-        if knd==app.VMODE_TEXT and how=='text' \
-        or knd==app.VMODE_HEX  and how=='hex':
+        kind_f  = ed.get_prop(app.PROP_KIND)
+        kind_v  = ed.get_prop(app.PROP_V_MODE)
+        if how=='text' and kind_f=='text'                          \
+        or how=='hex'  and kind_f=='bin'  and kind_v==app.VMODE_HEX:
             return app.msg_status(_('No need to do anything'))
             
         ed.cmd(cmds.cmd_FileClose)
