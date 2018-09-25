@@ -1,4 +1,4 @@
-''' Plugin for CudaText editor
+﻿''' Plugin for CudaText editor
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
@@ -1045,9 +1045,9 @@ class Jumps_cmds:
         bm_lns  = ed.bookmark(app.BOOKMARK_GET_LIST, 0)
         if not bm_lns:  return app.msg_status(_('No bookmarks'))
         tab_sps = ' '*ed.get_prop(app.PROP_TAB_SIZE)
-        bms     = [ (line_num                                           # line number
-                    ,ed.get_text_line(line_num).replace('\t', tab_sps)  # line string
-                    ,ed.bookmark(app.BOOKMARK_GET_PROP, line_num)['kind']  # kind of bm
+        bms     = [ (line_num                                               # line number
+                    ,ed.get_text_line(line_num).replace('\t', tab_sps)      # line string
+                    ,ed.bookmark(app.BOOKMARK_GET_PROP, line_num)['kind']   # kind of bm
                     )   for line_num in bm_lns]
         pass;                  #LOG and log('bms=¶{}',pf(bms))
         rCrt    = ed.get_carets()[0][1]
@@ -1085,11 +1085,11 @@ class Jumps_cmds:
                       (f('(g{},t{}) ', 1+tab_grp, 1+tab_num) if tnmd else '') + tab_cap
             tab_id  = ted.get_prop(app.PROP_TAB_ID)
             tab_sps = ' '*ed.get_prop(app.PROP_TAB_SIZE)
-            tbms   += [ (line_num                                           # line number
-                        ,ted.get_text_line(line_num).replace('\t', tab_sps) # line string
+            tbms   += [ (line_num                                               # line number
+                        ,ted.get_text_line(line_num).replace('\t', tab_sps)     # line string
                         ,ted.bookmark(app.BOOKMARK_GET_PROP, line_num)['kind']  # kind of bm
-                        ,tab_info                                           # src tab '(group:num) title'
-                        ,tab_id                                             # src tab ID
+                        ,tab_info                                               # src tab '(group:num) title'
+                        ,tab_id                                                 # src tab ID
                         )   for line_num in bm_lns
                             if what=='a' or 1<ted.bookmark(app.BOOKMARK_GET_PROP, line_num)['kind']<10
                       ]
