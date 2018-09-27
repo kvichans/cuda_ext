@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.5.22 2018-09-25'
+    '1.5.23 2018-09-27'
 ToDo: (see end of file)
 '''
 
@@ -1711,19 +1711,32 @@ class Find_repl_cmds:
         clip    = app.app_proc(app.PROC_GET_CLIP, '')
         if ''==clip:    return
         clip    = clip.replace('\r\n', '\n').replace('\r', '\n')    ##??
-        user_opt= app.app_proc(app.PROC_GET_FIND_OPTIONS, '')
+
+        fpr         = None
+        user_opt    = None
         # c - Case, r - RegEx,  w - Word,  f - From-caret,  a - Wrapp,  b - Back
         find_opt= 'f'
-        find_opt= find_opt + ('c' if 'c' in user_opt else '')   # As user: Case
-        find_opt= find_opt + ('w' if 'w' in user_opt else '')   # As user: Word
-        find_opt= find_opt + ('a' if 'a' in user_opt else '')   # As user: Wrap
+        if app.app_api_version()>='1.0.248':
+            fpr     = app.app_proc(app.PROC_GET_FINDER_PROP, '')
+            find_opt= find_opt + ('c' if ('op_case_d' in fpr and fpr['op_case_d'] or fpr['op_case']) else '')
+            find_opt= find_opt + ('w' if ('op_word_d' in fpr and fpr['op_word_d'] or fpr['op_word']) else '')
+            find_opt= find_opt + ('a' if ('op_wrap_d' in fpr and fpr['op_wrap_d'] or fpr['op_wrap']) else '')
+        else:
+            user_opt= app.app_proc(app.PROC_GET_FIND_OPTIONS, '')   # Deprecated
+            find_opt= find_opt + ('c' if 'c' in user_opt else '')   # As user: Case
+            find_opt= find_opt + ('w' if 'w' in user_opt else '')   # As user: Word
+            find_opt= find_opt + ('a' if 'a' in user_opt else '')   # As user: Wrap
+
         ed.cmd(cmds.cmd_FinderAction, c1.join([]
             +['findprev' if updn=='up' else 'findnext']
             +[clip]
             +['']
             +[find_opt]
         ))
-        app.app_proc(app.PROC_SET_FIND_OPTIONS, user_opt)
+        if app.app_api_version()>='1.0.248':
+            app.app_proc(app.PROC_SET_FINDER_PROP, fpr)
+        else:
+            app.app_proc(app.PROC_SET_FIND_OPTIONS, user_opt)       # Deprecated
        #def find_cb_by_cmd
 
     @staticmethod
@@ -1732,13 +1745,22 @@ class Find_repl_cmds:
         crts    = ed.get_carets()
         if len(crts)>1: return app.msg_status(ONLY_SINGLE_CRT.format(_('Command')))
         seltext = ed.get_text_sel()
-        if not seltext: return
+        if not seltext: return app.msg_status(_('No selected text to replace'))
         clip    = app.app_proc(app.PROC_GET_CLIP, '')
-        user_opt= app.app_proc(app.PROC_GET_FIND_OPTIONS, '')
-        # c - Case, r - RegEx,  w - Word,  f - From-caret,  a - Wrap
+        if not clip:    return app.msg_status(_('No clipped text to replace'))
+
+        fpr         = None
+        user_opt    = None
+        # c - Case, r - RegEx,  w - Word,  f - From-caret,  a - Wrapp,  b - Back
         find_opt= 'a'
-        find_opt= find_opt + ('c' if 'c' in user_opt else '')   # As user: Case
-        find_opt= find_opt + ('w' if 'w' in user_opt else '')   # As user: Word
+        if app.app_api_version()>='1.0.248':
+            fpr     = app.app_proc(app.PROC_GET_FINDER_PROP, '')
+            find_opt= find_opt + ('c' if ('op_case_d' in fpr and fpr['op_case_d'] or fpr['op_case']) else '')
+            find_opt= find_opt + ('w' if ('op_word_d' in fpr and fpr['op_word_d'] or fpr['op_word']) else '')
+        else:
+            user_opt= app.app_proc(app.PROC_GET_FIND_OPTIONS, '')   # Deprecated
+            find_opt= find_opt + ('c' if 'c' in user_opt else '')   # As user: Case
+            find_opt= find_opt + ('w' if 'w' in user_opt else '')   # As user: Word
         ed.lock()
         pass;                  #log('seltext,clip,find_opt={}',(seltext,clip,find_opt))
         ed.cmd(cmds.cmd_FinderAction, c1.join([]
@@ -1748,55 +1770,58 @@ class Find_repl_cmds:
             +[find_opt]  # a - wrapped
         ))
         ed.unlock()
-        app.app_proc(app.PROC_SET_FIND_OPTIONS, user_opt)
+        if app.app_api_version()>='1.0.248':
+            app.app_proc(app.PROC_SET_FINDER_PROP, fpr)
+        else:
+            app.app_proc(app.PROC_SET_FIND_OPTIONS, user_opt)       # Deprecated
        #def replace_all_sel_to_cb
 
-    @staticmethod
-    def find_dlg_adapter(act):
-#       try:
-#           foo=1/0
-#       except Exception as ex:
-#           return
-#       pass;                   app.msg_status('No release yet (waiting API update)')
-#       pass;                   return
-        if app.app_api_version()<'1.0.144': return app.msg_status(NEED_UPDATE)
-        find_ss = app.app_proc(app.PROC_GET_FIND_STRINGS, '')
-        if not find_ss:                     return app.msg_status(_('Use Find/Replace dialog before'))
-        user_wht= find_ss[0] if find_ss else ''
-        user_rep= find_ss[1] if find_ss else ''
-        user_opt= app.app_proc(app.PROC_GET_FIND_OPTIONS, '')
-        # c - Case, r - RegEx,  w - Word,  f - From-caret,  a - Wrap
-        cmd_id  = apx.icase(False,''
-                ,   act=='mark'      , 'findmark'
-                ,   act=='count'     , 'findcnt'
-                ,   act=='find-first', 'findfirst'
-                ,   act=='find-next' , 'findnext'
-                ,   act=='find-prev' , 'findprev'
-                ,   act=='repl-next' , 'rep'
-                ,   act=='repl-stay' , 'repstop'
-                ,   act=='repl-all'  , 'repall'
-                )
-        cmd_opt = apx.icase(False,''
-                ,   act=='find-first' and 'f' in user_opt,  user_opt.replace('f', '')
-                ,   user_opt
-                )
-        pass;                  #LOG and log('cmd_id,user_opt,cmd_opt,user_wht,user_rep={}',(cmd_id,user_opt,cmd_opt,user_wht,user_rep))
-#       cmd_par = c1.join([]
-#                           +[cmd_id]
-#                           +[user_wht]
-#                           +[user_rep]
-#                           +[cmd_opt]  # a - wrapped
-#                           )
-#       pass;                   LOG and log('cmd_par={}',repr(cmd_par))
-#       ed.cmd(cmds.cmd_FinderAction, cmd_par)
-        ed.cmd(cmds.cmd_FinderAction, c1.join([]
-            +[cmd_id]
-            +[user_wht]
-            +[user_rep]
-            +[cmd_opt]  # a - wrapped
-        ))
-        app.app_proc(app.PROC_SET_FIND_OPTIONS, user_opt)
-       #def find_dlg_adapter
+#   @staticmethod
+#   def find_dlg_adapter(act):
+##       try:
+##           foo=1/0
+##       except Exception as ex:
+##           return
+##       pass;                   app.msg_status('No release yet (waiting API update)')
+##       pass;                   return
+#       if app.app_api_version()<'1.0.144': return app.msg_status(NEED_UPDATE)
+#       find_ss = app.app_proc(app.PROC_GET_FIND_STRINGS, '')
+#       if not find_ss:                     return app.msg_status(_('Use Find/Replace dialog before'))
+#       user_wht= find_ss[0] if find_ss else ''
+#       user_rep= find_ss[1] if find_ss else ''
+#       user_opt= app.app_proc(app.PROC_GET_FIND_OPTIONS, '')
+#       # c - Case, r - RegEx,  w - Word,  f - From-caret,  a - Wrap
+#       cmd_id  = apx.icase(False,''
+#               ,   act=='mark'      , 'findmark'
+#               ,   act=='count'     , 'findcnt'
+#               ,   act=='find-first', 'findfirst'
+#               ,   act=='find-next' , 'findnext'
+#               ,   act=='find-prev' , 'findprev'
+#               ,   act=='repl-next' , 'rep'
+#               ,   act=='repl-stay' , 'repstop'
+#               ,   act=='repl-all'  , 'repall'
+#               )
+#       cmd_opt = apx.icase(False,''
+#               ,   act=='find-first' and 'f' in user_opt,  user_opt.replace('f', '')
+#               ,   user_opt
+#               )
+#       pass;                  #LOG and log('cmd_id,user_opt,cmd_opt,user_wht,user_rep={}',(cmd_id,user_opt,cmd_opt,user_wht,user_rep))
+##       cmd_par = c1.join([]
+##                           +[cmd_id]
+##                           +[user_wht]
+##                           +[user_rep]
+##                           +[cmd_opt]  # a - wrapped
+##                           )
+##       pass;                   LOG and log('cmd_par={}',repr(cmd_par))
+##       ed.cmd(cmds.cmd_FinderAction, cmd_par)
+#       ed.cmd(cmds.cmd_FinderAction, c1.join([]
+#           +[cmd_id]
+#           +[user_wht]
+#           +[user_rep]
+#           +[cmd_opt]  # a - wrapped
+#       ))
+#       app.app_proc(app.PROC_SET_FIND_OPTIONS, user_opt)
+#      #def find_dlg_adapter
        
     data4_align_in_lines_by_sep = ''
     @staticmethod
@@ -2869,14 +2894,14 @@ class Command:
     def join_lines(self):                       return Find_repl_cmds.join_lines()
     def del_more_spaces(self):                  return Find_repl_cmds.del_more_spaces()
 
-    def mark_all_from(self):                    return Find_repl_cmds.find_dlg_adapter('mark')
-    def count_all_from(self):                   return Find_repl_cmds.find_dlg_adapter('count')
-    def find_first_from(self):                  return Find_repl_cmds.find_dlg_adapter('find-first')
-    def find_next_from(self):                   return Find_repl_cmds.find_dlg_adapter('find-next')
-    def find_prev_from(self):                   return Find_repl_cmds.find_dlg_adapter('find-prev')
-    def repl_next_from(self):                   return Find_repl_cmds.find_dlg_adapter('repl-next')
-    def repl_stay_from(self):                   return Find_repl_cmds.find_dlg_adapter('repl-stay')
-    def repl_all_from(self):                    return Find_repl_cmds.find_dlg_adapter('repl-all')
+#   def mark_all_from(self):                    return Find_repl_cmds.find_dlg_adapter('mark')
+#   def count_all_from(self):                   return Find_repl_cmds.find_dlg_adapter('count')
+#   def find_first_from(self):                  return Find_repl_cmds.find_dlg_adapter('find-first')
+#   def find_next_from(self):                   return Find_repl_cmds.find_dlg_adapter('find-next')
+#   def find_prev_from(self):                   return Find_repl_cmds.find_dlg_adapter('find-prev')
+#   def repl_next_from(self):                   return Find_repl_cmds.find_dlg_adapter('repl-next')
+#   def repl_stay_from(self):                   return Find_repl_cmds.find_dlg_adapter('repl-stay')
+#   def repl_all_from(self):                    return Find_repl_cmds.find_dlg_adapter('repl-all')
 
     def copy_term(self):                        return SCBs.copy_term()
     def replace_term(self):                     return SCBs.replace_term()
