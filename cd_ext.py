@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.5.23 2018-09-27'
+    '1.5.24 2018-09-28'
 ToDo: (see end of file)
 '''
 
@@ -2390,6 +2390,57 @@ class Insert_cmds:
        #def paste_with_indent
 
     @staticmethod
+    def paste_trimmed():
+        clip = app.app_proc(app.PROC_GET_CLIP, '')
+        if not clip.strip():
+            return msg_status(_('Clipboard has no text'))
+        clip = '\n'.join(l.strip() for l in clip.splitlines())
+        
+        crts = ed.get_carets()
+        if len(crts)>1:
+            return app.msg_status(ONLY_SINGLE_CRT.format(_('Command')))
+        
+        x1, y1, x2, y2 = crts[0]
+        if y2>=0:
+            if (y1, x1)>(y2, x2):
+                x1, y1, x2, y2 = x2, y2, x1, y1
+            ed.delete(x1, y1, x2, y2)
+            clip += ('\n' if y1!=y2 and x2==0 else '') # To avoid bug in ed.insert
+        x, y = ed.insert(x1, y1, clip)
+        ed.set_caret(x, y)
+
+        app.msg_status(_('Pasted trimmed text'))
+       #def paste_trimmed
+
+    @staticmethod
+    def trim_sel(mode):
+        crts = ed.get_carets()
+        if len(crts)>1:
+            return app.msg_status(ONLY_SINGLE_CRT.format(_('Command')))
+    
+        x1, y1, x2, y2 = crts[0]
+        if y2<0:
+            return msg_status('Need selection')
+        
+        if (y1, x1)>(y2, x2):
+            x1, y1, x2, y2 = x2, y2, x1, y1
+        
+        text = ed.get_text_substr(x1, y1, x2, y2)
+        trimmer = lambda s:(s.lstrip()   if mode=='left'  else
+                            s.rstrip()   if mode=='right' else
+                            s.strip()   #if mode=='all'
+                           )
+        text2 = '\n'.join(trimmer(l) for l in text.splitlines())
+        if text==text2:
+            return app.msg_status(_('Text already trimmed'))
+        text2 += ('\n' if x2==0 else '')    # To avoid bug in ed.replace
+        
+        x3, y3 = ed.replace(x1, y1, x2, y2, text2)
+        ed.set_caret(x1, y1, x3, y3)
+        app.msg_status(_('Text trimmed'))
+       #def trim_sel
+
+    @staticmethod
     def fill_by_str():
         crts    = ed.get_carets()
         if all(-1==cEnd for cCrt, rCrt, cEnd, rEnd in crts):    return
@@ -2877,6 +2928,8 @@ class Command:
     def add_indented_line_below(self):          return Insert_cmds.add_indented_line_below()
     def paste_to_1st_col(self):                 return Insert_cmds.paste_to_1st_col()
     def paste_with_indent(self, where='above'): return Insert_cmds.paste_with_indent(where)
+    def paste_trimmed(self):                    return Insert_cmds.paste_trimmed()
+    def trim_sel(self, mode):                   return Insert_cmds.trim_sel(mode)
     def fill_by_str(self):                      return Insert_cmds.fill_by_str()
     def insert_char_by_hex(self):               return Insert_cmds.insert_char_by_hex()
     

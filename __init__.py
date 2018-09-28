@@ -31,6 +31,10 @@ class Command:
     def paste_with_indent_above(self):          return RLS.paste_with_indent('above')
     def paste_with_indent_below(self):          return RLS.paste_with_indent('below')
     def paste_as_lazarus(self):                 return RLS.paste_with_indent('lazar')
+    def paste_trimmed(self):                    return RLS.paste_trimmed()
+    def trim_sel_left(self):                    return RLS.trim_sel('left')
+    def trim_sel_right(self):                   return RLS.trim_sel('right')
+    def trim_sel_all(self):                     return RLS.trim_sel('all')
     def fill_by_str(self):                      return RLS.fill_by_str()
     def insert_char_by_hex(self):               return RLS.insert_char_by_hex()
     

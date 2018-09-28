@@ -121,10 +121,35 @@ method=_
 
 [item49]
 section=commands
+caption=Cuda&-Ext\&Insert\Paste trimmed text
+method=paste_trimmed
+
+[item50]
+section=commands
+caption=Cuda&-Ext\&Insert\Trim spaces in selection, left
+method=trim_sel_left
+
+[item51]
+section=commands
+caption=Cuda&-Ext\&Insert\Trim spaces in selection, right
+method=trim_sel_right
+
+[item52]
+section=commands
+caption=Cuda&-Ext\&Insert\Trim spaces in selection, all
+method=trim_sel_all
+
+[item53]
+section=commands
+caption=Cuda&-Ext\&Insert\-
+method=_
+
+[item54]
+section=commands
 caption=Cuda&-Ext\&Insert\F&ill selection by string...
 method=fill_by_str
 
-[item50]
+[item55]
 section=commands
 caption=Cuda&-Ext\&Insert\Insert &unicode char...
 method=insert_char_by_hex
