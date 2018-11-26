@@ -1,8 +1,8 @@
-﻿''' Plugin for CudaText editor
+''' Plugin for CudaText editor
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.5.24 2018-09-28'
+    '1.5.25 2018-11-26'
 ToDo: (see end of file)
 '''
 
@@ -2446,6 +2446,7 @@ class Insert_cmds:
         if all(-1==cEnd for cCrt, rCrt, cEnd, rEnd in crts):    return
         str2fill    = app.dlg_input('Enter string to fill selection', '')
         if not str2fill:    return
+        cnt = 0
         for cCrt, rCrt, cEnd, rEnd in crts:
             if -1  ==cEnd:    continue
             if rCrt!=rEnd:    continue
@@ -2455,7 +2456,12 @@ class Insert_cmds:
             trg_str = str2fill * (1  + int(trg_len/len(str2fill)))
             trg_str = trg_str[:trg_len]
             ed.replace(cSelB, rSelB, cSelE, rSelE, trg_str)
+            cnt += 1
            #for
+        if cnt>0:
+            app.msg_status(_('Changed %d selection(s)')%cnt)
+        else:
+            app.msg_status(_('Need single-line selection(s)'))
         pass;                   LOG and log('ok',())
        #def fill_by_str
 
