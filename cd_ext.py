@@ -3026,10 +3026,19 @@ class Command:
         start_pnls  = get_hist('switcher.start_panel', 'Code tree')
 
         ag_hist     = None
+        def do_show(idd, idc, data=None):
+            pass;              #log('scam={}',(app.app_proc(app.PROC_GET_KEYSTATE, '')))
+            if 'c' not in app.app_proc(app.PROC_GET_KEYSTATE, ''):
+                ag_hist.hide()
+            app.timer_proc(app.TIMER_START_ONE
+                          ,lambda tag: ag_hist.hide() 
+                                            if 'c' not in app.app_proc(app.PROC_GET_KEYSTATE, '') 
+                                            else 0
+                          ,200)
+           #def do_show
+        
         def do_key_up(idd, idc, data=None):
-#           scam    = data if data is not None else app.app_proc(app.PROC_GET_KEYSTATE, '')
-            scam    = app.app_proc(app.PROC_GET_KEYSTATE, '')
-            pass;              #log('data,scam={}',(data,scam))
+            scam    = data if data is not None else app.app_proc(app.PROC_GET_KEYSTATE, '')
             if 'c' not in scam:
                 ag_hist.hide()
            #def do_key_up
@@ -3115,7 +3124,7 @@ class Command:
             return self.go_back_tab()
         ag_hist     = DlgAgent(
             form    =dict(cap=_('Switcher'), w=350, h=300
-                         ,on_show       =do_key_up
+                         ,on_show       =do_show
                          ,on_key_down   =do_key_down
                          ,on_key_up     =do_key_up)
         ,   ctrls   =[0

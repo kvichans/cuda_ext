@@ -1,5 +1,6 @@
 1.5.26 (2018-11-26)
-fixed: Tab Switcher on click and on short call
+fixed: Tab Switcher dialog didn't close if Ctrl+<?> pressed and released very fast
+added: Tab Switcher dialog reacts to simple click too
 
 1.5.25 (2018-11-26)
 fixed: Messages for command "Fill selection by string"
