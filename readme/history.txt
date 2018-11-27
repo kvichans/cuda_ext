@@ -1,3 +1,9 @@
+1.5.26 (2018-11-26)
+fixed: Tab Switcher on click and on short call
+
+1.5.25 (2018-11-26)
+fixed: Messages for command "Fill selection by string"
+
 1.5.24 (2018-09-28)
 added: Paste trimmed text, Trim selection
 

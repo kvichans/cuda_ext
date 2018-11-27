@@ -1,8 +1,8 @@
-''' Plugin for CudaText editor
+﻿''' Plugin for CudaText editor
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.5.25 2018-11-26'
+    '1.5.26 2018-11-27'
 ToDo: (see end of file)
 '''
 
@@ -2992,7 +2992,9 @@ class Command:
     def go_back_dlg(self):
         if app.app_api_version()<'1.0.253':
             return app.msg_status(NEED_UPDATE)
-        scam    = app.app_proc(app.PROC_GET_KEYSTATE, '')
+#       scam    = app.app_proc(app.PROC_GET_KEYSTATE, '')
+        if 'c' not in app.app_proc(app.PROC_GET_KEYSTATE, ''):          # User already is released Ctrl
+            return self.go_back_tab()
         cfg_keys= get_plugcmd_hotkeys('go_back_dlg')
         pass;                  #log('ok scam,cfg_keys={}',(scam,cfg_keys))
         act_clr     = rgb_to_int(232,232,232)
@@ -3107,19 +3109,23 @@ class Command:
         
         panls       = [(pn if pn else '—'*100) for act,pn in panels]
         items       = [ed_tit for (ed_, ed_tid, ed_tit, ed_fn) in eds_hist]
+        if 'c' not in app.app_proc(app.PROC_GET_KEYSTATE, ''):          # User already is released Ctrl
+            return self.go_back_tab()
         ag_hist     = DlgAgent(
             form    =dict(cap=_('Switcher'), w=350, h=300
                          ,on_key_down   =do_key_down
                          ,on_key_up     =do_key_up)
         ,   ctrls   =[0
-                     ,('tabs',d(tp='lbx',items=items   ,ali=ALI_CL          ,color=act_clr  ,call=do_select ,on_click_dbl=do_dclk   ))
-                     ,('pnls',d(tp='lbx',items=panls   ,ali=ALI_RT  ,w=110  ,color=pss_clr  ,call=do_select ,on_click_dbl=do_dclk   ))
+                     ,('tabs',d(tp='lbx',items=items   ,ali=ALI_CL          ,color=act_clr  ,call=do_select ,on_click_dbl=do_dclk ,on_click=do_dclk   ))
+                     ,('pnls',d(tp='lbx',items=panls   ,ali=ALI_RT  ,w=110  ,color=pss_clr  ,call=do_select ,on_click_dbl=do_dclk ,on_click=do_dclk   ))
                     ][1:]
         ,   fid     ='tabs'
         ,   vals    = d(tabs=start_sel
                        ,pnls=panls.index(start_pnls) if start_pnls in panls else 0)
                               #,options={'gen_repro_to_file':'repro_dlg_find_tree_node.py'}
         )
+        if 'c' not in app.app_proc(app.PROC_GET_KEYSTATE, ''):          # User already is released Ctrl
+            return self.go_back_tab()
         ag_hist.show()
         if ed_back:
             ed_back.focus()
