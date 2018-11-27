@@ -3027,7 +3027,9 @@ class Command:
 
         ag_hist     = None
         def do_key_up(idd, idc, data=None):
-            scam    = data if data is not None else app.app_proc(app.PROC_GET_KEYSTATE, '')
+#           scam    = data if data is not None else app.app_proc(app.PROC_GET_KEYSTATE, '')
+            scam    = app.app_proc(app.PROC_GET_KEYSTATE, '')
+            pass;              #log('data,scam={}',(data,scam))
             if 'c' not in scam:
                 ag_hist.hide()
            #def do_key_up
@@ -3113,6 +3115,7 @@ class Command:
             return self.go_back_tab()
         ag_hist     = DlgAgent(
             form    =dict(cap=_('Switcher'), w=350, h=300
+                         ,on_show       =do_key_up
                          ,on_key_down   =do_key_down
                          ,on_key_up     =do_key_up)
         ,   ctrls   =[0
