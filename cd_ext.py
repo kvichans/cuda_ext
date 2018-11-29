@@ -1048,7 +1048,9 @@ class Jumps_cmds:
         (cCrt, rCrt, cEnd, rEnd)    = crts[0]
         if cEnd!=-1:        return app.msg_status(ONLY_FOR_NO_SEL.format(_('Command')))
             
-        folds   = ed.folding(app.FOLDING_GET_LIST)
+        folds   = ed.folding(app.FOLDING_GET_LIST) \
+                    if app.app_api_version() < '1.0.265' else \
+                  ed.folding(app.FOLDING_GET_LIST_FILTERED, item_y=rCrt, item_y2=rCrt)
         if not folds:       return app.msg_status(_('No staple to jump'))
         crt_r, crt_x, crt_c = rCrt, cCrt, ed.convert(app.CONVERT_CHAR_TO_COL, cCrt, rCrt)[0]
         pass;                  #log('what, crt_r, crt_x, crt_c={}', (what,crt_r, crt_x, crt_c))
