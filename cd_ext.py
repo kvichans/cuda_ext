@@ -1064,7 +1064,7 @@ class Jumps_cmds:
         if not folds:       return app.msg_status(_('No staple to jump'))
         best_yyс= None
         for y,y2,stp_x in folds:
-            if stp_x==0:
+            if True: #stp_x==0:
                 line_y  = ed.get_text_line(y)
                 stp_x   = len(line_y) - len(line_y.lstrip())                # Count of start blanks
             stp_c       = ed.convert(app.CONVERT_CHAR_TO_COL, stp_x, y)[0]  # Column of staple
