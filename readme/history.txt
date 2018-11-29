@@ -1,4 +1,7 @@
-1.5.26 (2018-11-26)
+1.5.27 (2018-11-29)
+added: Commands "To start/end of the nearest left staple"
+
+1.5.26 (2018-11-27)
 fixed: Tab Switcher dialog didn't close if Ctrl+<?> pressed and released very fast
 added: Tab Switcher dialog reacts to simple click too
 

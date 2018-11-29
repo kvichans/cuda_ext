@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.5.26 2018-11-27'
+    '1.5.27 2018-11-29'
 ToDo: (see end of file)
 '''
 
@@ -1039,6 +1039,44 @@ class Jumps_cmds:
             cEnd, rEnd  = (cCrt, rCrt) if cEnd==-1 else (cEnd, rEnd)
             ed.set_caret(cCrt + gap, rCrt, cEnd, rEnd)
        #def jump_ccsc
+ 
+    @staticmethod
+    def jump_staple(what):
+        """ Move a caret along the nearest left staple """ 
+        crts    = ed.get_carets()
+        if len(crts)>1:     return app.msg_status(ONLY_SINGLE_CRT.format(_('Command')))
+        (cCrt, rCrt, cEnd, rEnd)    = crts[0]
+        if cEnd!=-1:        return app.msg_status(ONLY_FOR_NO_SEL.format(_('Command')))
+            
+        folds   = ed.folding(app.FOLDING_GET_LIST)
+        if not folds:       return app.msg_status(_('No staple to jump'))
+        crt_r, crt_x, crt_c = rCrt, cCrt, ed.convert(app.CONVERT_CHAR_TO_COL, cCrt, rCrt)[0]
+        pass;                  #log('what, crt_r, crt_x, crt_c={}', (what,crt_r, crt_x, crt_c))
+        pass;                  #log('folds={}', (folds))
+        folds   = [(y, y2, x) for (y, y2, x, staple, folded) 
+                    in folds 
+                    if  staple and not folded
+                    and y<=crt_r<=y2
+                  ]
+        pass;                  #log('folds={}', (folds))
+        if not folds:       return app.msg_status(_('No staple to jump'))
+        best_yyс= None
+        for y,y2,stp_x in folds:
+            if stp_x==0:
+                line_y  = ed.get_text_line(y)
+                stp_x   = len(line_y) - len(line_y.lstrip())                # Count of start blanks
+            stp_c       = ed.convert(app.CONVERT_CHAR_TO_COL, stp_x, y)[0]  # Column of staple
+            best_yyс= (y,y2,stp_c) \
+                        if stp_c <= crt_c and (not best_yyс or stp_c > best_yyс[2]) else \
+                      best_yyс
+            pass;              #log('y,y2,stp_x,stp_c,best_yyс={}', ((y,y2),(stp_x,stp_c),best_yyс))
+        if not best_yyс:    return app.msg_status(_('No staple to jump'))
+        new_r   = best_yyс[0 if what=='bgn' else 1]
+        if new_r==crt_r:    return
+        new_x   = ed.convert(app.CONVERT_COL_TO_CHAR, crt_c, new_r)[0]
+        pass;                  #log('new_x, new_r={}', (new_x, new_r))
+        ed.set_caret(new_x, new_r)
+       #def jump_staple
  
     @staticmethod
     def dlg_bms_in_tab():
@@ -3027,7 +3065,6 @@ class Command:
 
         ag_hist     = None
         def do_show(idd, idc, data=None):
-            pass;              #log('scam={}',(app.app_proc(app.PROC_GET_KEYSTATE, '')))
             if 'c' not in app.app_proc(app.PROC_GET_KEYSTATE, ''):
                 ag_hist.hide()
             app.timer_proc(app.TIMER_START_ONE
@@ -3153,6 +3190,7 @@ class Command:
     def jump_ccsc(self, drct, sel):                         return Jumps_cmds.jump_ccsc(drct, sel)
     def dlg_bms_in_tab(self):                               return Jumps_cmds.dlg_bms_in_tab()
     def dlg_bms_in_tabs(self, what='a'):                    return Jumps_cmds.dlg_bms_in_tabs(what)
+    def jump_staple(self, what='end'):                      return Jumps_cmds.jump_staple(what)
     
     def go_prgph(self, what):                               return Prgph_cmds.go_prgph(what)
     def align_prgph(self, how):                             return Prgph_cmds.align_prgph(how)

@@ -251,6 +251,21 @@ section=commands
 caption=Cuda&-Ext\&Jump\Numbered bookmark list for all tabs...
 method=dlg_nbms_in_tabs
 
+[item90]
+section=commands
+caption=Cuda&-Ext\&Jump\-
+method=_
+
+[item91]
+section=commands
+caption=Cuda&-Ext\&Jump\To start of the nearest left staple
+method=jump_staple_start
+
+[item92]
+section=commands
+caption=Cuda&-Ext\&Jump\To end of the nearest left staple
+method=jump_staple_end
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Scroll_cmds
 [item111]
