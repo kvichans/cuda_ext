@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.5.27 2018-11-29'
+    '1.5.28 2018-12-03'
 ToDo: (see end of file)
 '''
 
@@ -851,9 +851,31 @@ class SCBs:
 class Jumps_cmds:
     @staticmethod
     def scroll_to(place):
-       #wraped      = apx.get_opt('wrap_mode', False, apx.CONFIG_LEV_FILE)
-       #last_on_top = apx.get_opt('show_last_line_on_top', False)
-        if place in ('cen', 'top', 'bot'):
+        wrapped         = ed.get_prop(app.PROP_WRAP)!=0
+        if place in ('cen', 'top', 'bot') and     wrapped:
+            # Alex: github.com/kvichans/cuda_ext/issues/119#issue-386725583
+            def get_pos(y, scr_lines):
+                if   place=='cen':
+                    return max(0, y-scr_lines//2)
+                elif place=='top':
+                    return y
+                elif place=='bot':
+                    return max(0, y-scr_lines+1)
+
+            x, y, x1, y1= ed.get_carets()[0]
+            scr_lines   = ed.get_prop(app.PROP_VISIBLE_LINES)
+            new_scrl    = get_pos(y, scr_lines)
+
+            wrapinfo    = ed.get_wrapinfo()
+            for n in reversed(range(len(wrapinfo))):
+                wi      = wrapinfo[n]
+                if wi['line']==y and wi['char']-1<=x:
+                    new_scrl = get_pos(n, scr_lines)
+                    break
+
+            ed.set_prop(app.PROP_SCROLL_VERT, new_scrl)
+            
+        if place in ('cen', 'top', 'bot') and not wrapped:
             txt_lines   = ed.get_line_count()
             old_top_line= ed.get_prop(app.PROP_LINE_TOP) if app.app_api_version()>='1.0.126' else ed.get_top()
             scr_lines   = ed.get_prop(app.PROP_VISIBLE_LINES)
@@ -879,7 +901,7 @@ class Jumps_cmds:
                 else: # old
                     ed.set_top(new_top_line)
 
-        if place in ('lf', 'rt') and 0==apx.get_opt('wrap_mode', 0):    # 0: off 
+        if place in ('lf', 'rt') and not wrapped:
             free_crt    = apx.get_opt('caret_after_end', False)
             move_crt    = apx.get_opt('cuda_ext_horz_scroll_move_caret', False)
             shift       = apx.get_opt('cuda_ext_horz_scroll_size', 30)

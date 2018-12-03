@@ -1,5 +1,8 @@
+1.5.28 (2018-12-03)
+fixed: "Scroll Current line to screen center/top/bottom" for wrapped text
+
 1.5.27 (2018-11-29)
-added: Commands "To start/end of the nearest left staple"
+added: Commands "Jump to start/end of the nearest left staple"
 
 1.5.26 (2018-11-27)
 fixed: Tab Switcher dialog didn't close if Ctrl+<?> pressed and released very fast
