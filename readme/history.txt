@@ -1,3 +1,6 @@
+1.5.29 (2018-12-05)
+added: Command "Open all files from folder with sub-folders" made faster and not flickering
+
 1.5.28 (2018-12-03)
 fixed: "Scroll Current line to screen center/top/bottom" for wrapped text
 
