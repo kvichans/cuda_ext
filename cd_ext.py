@@ -1,8 +1,8 @@
-﻿''' Plugin for CudaText editor
+''' Plugin for CudaText editor
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.5.28 2018-12-03'
+    '1.5.29 2018-12-05'
 ToDo: (see end of file)
 '''
 
@@ -2890,10 +2890,10 @@ class Command:
             , app.MB_OKCANCEL ):   return
             
         for (i, fn) in enumerate(files):
-            if i%8 == 0:
+            if i%5 == 0:
                 app.app_idle()
             app.app_proc(app.PROC_PROGRESSBAR, i * 100 // len(files))
-            app.file_open(fn)
+            app.file_open(fn, options='/passive /nonear')
         app.app_proc(app.PROC_PROGRESSBAR, -1)
        #def open_all_with_subdir
     
