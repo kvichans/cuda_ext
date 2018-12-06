@@ -1,8 +1,8 @@
-''' Plugin for CudaText editor
+﻿''' Plugin for CudaText editor
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.5.29 2018-12-05'
+    '1.5.30 2018-12-06'
 ToDo: (see end of file)
 '''
 
@@ -874,6 +874,7 @@ class Jumps_cmds:
                     break
 
             ed.set_prop(app.PROP_SCROLL_VERT, new_scrl)
+            return 
             
         if place in ('cen', 'top', 'bot') and not wrapped:
             txt_lines   = ed.get_line_count()
@@ -900,6 +901,7 @@ class Jumps_cmds:
                     ed.set_prop(app.PROP_LINE_TOP, str(new_top_line))
                 else: # old
                     ed.set_top(new_top_line)
+            return 
 
         if place in ('lf', 'rt') and not wrapped:
             free_crt    = apx.get_opt('caret_after_end', False)
@@ -2735,34 +2737,76 @@ class Command:
         old_fn  = os.path.basename(old_path)
         old_stem= old_fn[: old_fn.rindex('.')]  if '.' in old_fn else old_fn
         old_ext = old_fn[1+old_fn.rindex('.'):] if '.' in old_fn else ''
+
         DLG_W,\
-        DLG_H   = (450, 80)
-        new_stem= old_stem
-        new_ext = old_ext
-        while True:
-            btn,vals,_t,chds   = dlg_wrapper(_('Rename file'), GAP+DLG_W+GAP,GAP+80+GAP,     #NOTE: dlg-rename
-                 [dict(           tp='lb'   ,t=GAP          ,l=GAP          ,w=DLG_W-100    ,cap=_('Enter new file name:')  ) # &e
-                 ,dict(cid='stem',tp='ed'   ,t=GAP+18       ,l=GAP          ,w=DLG_W-100+10                                   ) # 
-                 ,dict(           tp='lb'   ,tid='stem'     ,l=GAP+DLG_W-100+12 ,w=8        ,cap='.'                        ) # &.
-                 ,dict(cid='sext',tp='ed'   ,tid='stem'     ,l=GAP+DLG_W-100+20 ,w=80                                       )
-                 ,dict(cid='!'   ,tp='bt'   ,t=GAP+80-28    ,l=GAP+DLG_W-170  ,w=80       ,cap=_('OK'),  props='1'        ) #     default
-                 ,dict(cid='-'   ,tp='bt'   ,t=GAP+80-28    ,l=GAP+DLG_W-80   ,w=80       ,cap=_('Cancel')                )
-                 ],    dict(stem=new_stem
-                           ,sext=new_ext), focus_cid='stem')
-            if btn is None or btn=='-': return None
-            new_stem    = vals['stem']
-            new_ext     = vals['sext']
-            if new_stem==old_stem and new_ext==old_ext:
-               return
+        DLG_H   = (250, 80)
+#       new_stem= old_stem
+#       new_ext = old_ext
+        new_path= old_path
+
+        def do_ok(aid, ag, data=''):
+            nonlocal new_path
+            new_stem    = ag.cval('stem')
+            new_ext     = ag.cval('sext')
             new_path    = os.path.dirname(old_path) + os.sep + new_stem + ('.'+new_ext if new_ext else '')
+            if new_path==old_path:
+               return None#break
             if os.path.isdir(new_path):
                 app.msg_box(f(_('There is directory with name:\n{}\n\nChoose another name.'), new_path), app.MB_OK)
-                continue#while
+                new_path= old_path
+                return []#continue#while
             if os.path.isfile(new_path):
-                if app.ID_NO==app.msg_box(_('File already exists.\nReplace?'), app.MB_YESNO):
-                    continue#while
-            break#while
-           #while
+                if app.ID_YES!=app.msg_box(f(_('File\n{}\nalready exists.\n\nReplace?'), new_path), app.MB_YESNO):
+                    new_path= old_path
+                    return []#continue#while
+            return None#break
+           #def do_ok
+        
+        ag      = DlgAgent(
+            form    =dict(cap=_('Rename file'), w=5+DLG_W+5, h=5+DLG_H+5, h_max=5+DLG_H+5
+                         ,border=app.DBORDER_SIZE
+                         ,resize=True)
+        ,   ctrls   =[0
+    ,('ste_',d(tp='lb'  ,t  =5          ,l=5                ,w=DLG_W-100    ,cap=_('Enter n&ew file name:')     )) # &e
+    ,('stem',d(tp='ed'  ,t  =5+18       ,l=5                ,w=DLG_W-100+10                             ,a='lR' )) # 
+    ,('sex_',d(tp='lb'  ,tid='stem'     ,l=5+DLG_W-100+10   ,w=10           ,cap='. '                   ,a='LR'  )) #
+    ,('sext',d(tp='ed'  ,tid='stem'     ,l=5+DLG_W-100+20   ,w=80                                       ,a='LR' ))
+    ,('!'   ,d(tp='bt'  ,t  =5+DLG_H-28 ,l=5+DLG_W-170      ,w=80           ,cap=_('OK')    ,def_bt='1' ,a='LR' ,call=do_ok)) #
+    ,('-'   ,d(tp='bt'  ,t  =5+DLG_H-28 ,l=5+DLG_W-80       ,w=80           ,cap=_('Cancel')            ,a='LR' ))
+                    ][1:]
+        ,   fid     ='stem'
+        ,   vals    = d(stem=old_stem, sext=old_ext)
+                              #,options={'gen_repro_to_file':'repro_dlg_find_tree_node.py'}
+        )
+        ag.show()
+
+#       while True:
+#           btn,vals,_t,chds   = dlg_wrapper(_('Rename file'), GAP+DLG_W+GAP,GAP+80+GAP,     #NOTE: dlg-rename
+#                [dict(           tp='lb'   ,t=GAP          ,l=GAP          ,w=DLG_W-100    ,cap=_('Enter new file name:')  ) # &e
+#                ,dict(cid='stem',tp='ed'   ,t=GAP+18       ,l=GAP          ,w=DLG_W-100+10                                   ) # 
+#                ,dict(           tp='lb'   ,tid='stem'     ,l=GAP+DLG_W-100+12 ,w=8        ,cap='.'                        ) # &.
+#                ,dict(cid='sext',tp='ed'   ,tid='stem'     ,l=GAP+DLG_W-100+20 ,w=80                                       )
+#                ,dict(cid='!'   ,tp='bt'   ,t=GAP+80-28    ,l=GAP+DLG_W-170  ,w=80       ,cap=_('OK'),  props='1'        ) #     default
+#                ,dict(cid='-'   ,tp='bt'   ,t=GAP+80-28    ,l=GAP+DLG_W-80   ,w=80       ,cap=_('Cancel')                )
+#                ],    dict(stem=old_stem
+#                          ,sext=old_ext), focus_cid='stem')
+#           if btn is None or btn=='-': return None
+#           new_stem    = vals['stem']
+#           new_ext     = vals['sext']
+#           if new_stem==old_stem and new_ext==old_ext:
+#              return
+#           new_path    = os.path.dirname(old_path) + os.sep + new_stem + ('.'+new_ext if new_ext else '')
+#           if os.path.isdir(new_path):
+#               app.msg_box(f(_('There is directory with name:\n{}\n\nChoose another name.'), new_path), app.MB_OK)
+#               continue#while
+#           if os.path.isfile(new_path):
+#               if app.ID_NO==app.msg_box(_('File already exists.\nReplace?'), app.MB_YESNO):
+#                   continue#while
+#           break#while
+#          #while
+
+        if new_path==old_path:
+           return
 
         group       = ed.get_prop(app.PROP_INDEX_GROUP)
         tab_pos     = ed.get_prop(app.PROP_INDEX_TAB)
