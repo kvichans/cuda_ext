@@ -1,5 +1,9 @@
+1.5.29 (2018-12-05)
+added: Command "Open all files from folder with sub-folders" made faster and not flickering
+added: Dialog "Rename file" made much wider
+
 1.5.28 (2018-12-03)
-fixed: "Scroll Current line to screen center/top/bottom" for wrapped text
+fixed: Commands "Scroll current line to screen center/top/bottom" worked wrong on wrapped lines
 
 1.5.27 (2018-11-29)
 added: Commands "Jump to start/end of the nearest left staple"
