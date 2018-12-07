@@ -2739,7 +2739,7 @@ class Command:
         old_ext = old_fn[1+old_fn.rindex('.'):] if '.' in old_fn else ''
 
         DLG_W,\
-        DLG_H   = (250, 80)
+        DLG_H   = (400, 80)
 #       new_stem= old_stem
 #       new_ext = old_ext
         new_path= old_path
@@ -2763,7 +2763,9 @@ class Command:
            #def do_ok
         
         ag      = DlgAgent(
-            form    =dict(cap=_('Rename file'), w=5+DLG_W+5, h=5+DLG_H+5, h_max=5+DLG_H+5
+            form    =dict(cap=_('Rename file')
+                         ,w=5+DLG_W+5, w_min=5+DLG_W-200+5
+                         ,h=5+DLG_H+5, h_max=5+DLG_H+5
                          ,border=app.DBORDER_SIZE
                          ,resize=True)
         ,   ctrls   =[0
