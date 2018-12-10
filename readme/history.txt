@@ -1,5 +1,5 @@
 1.5.30 (2018-12-06)
-fixed: Resizable dialog for command "Rename file"
+added: Dialog for command "Rename file" is now resizable
 
 1.5.29 (2018-12-05)
 added: Command "Open all files from folder with sub-folders" made faster and not flickering
