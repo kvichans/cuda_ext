@@ -2740,8 +2740,6 @@ class Command:
 
         DLG_W,\
         DLG_H   = (400, 80)
-#       new_stem= old_stem
-#       new_ext = old_ext
         new_path= old_path
 
         def do_ok(aid, ag, data=''):
@@ -2781,31 +2779,6 @@ class Command:
                               #,options={'gen_repro_to_file':'repro_dlg_find_tree_node.py'}
         )
         ag.show()
-
-#       while True:
-#           btn,vals,_t,chds   = dlg_wrapper(_('Rename file'), GAP+DLG_W+GAP,GAP+80+GAP,     #NOTE: dlg-rename
-#                [dict(           tp='lb'   ,t=GAP          ,l=GAP          ,w=DLG_W-100    ,cap=_('Enter new file name:')  ) # &e
-#                ,dict(cid='stem',tp='ed'   ,t=GAP+18       ,l=GAP          ,w=DLG_W-100+10                                   ) # 
-#                ,dict(           tp='lb'   ,tid='stem'     ,l=GAP+DLG_W-100+12 ,w=8        ,cap='.'                        ) # &.
-#                ,dict(cid='sext',tp='ed'   ,tid='stem'     ,l=GAP+DLG_W-100+20 ,w=80                                       )
-#                ,dict(cid='!'   ,tp='bt'   ,t=GAP+80-28    ,l=GAP+DLG_W-170  ,w=80       ,cap=_('OK'),  props='1'        ) #     default
-#                ,dict(cid='-'   ,tp='bt'   ,t=GAP+80-28    ,l=GAP+DLG_W-80   ,w=80       ,cap=_('Cancel')                )
-#                ],    dict(stem=old_stem
-#                          ,sext=old_ext), focus_cid='stem')
-#           if btn is None or btn=='-': return None
-#           new_stem    = vals['stem']
-#           new_ext     = vals['sext']
-#           if new_stem==old_stem and new_ext==old_ext:
-#              return
-#           new_path    = os.path.dirname(old_path) + os.sep + new_stem + ('.'+new_ext if new_ext else '')
-#           if os.path.isdir(new_path):
-#               app.msg_box(f(_('There is directory with name:\n{}\n\nChoose another name.'), new_path), app.MB_OK)
-#               continue#while
-#           if os.path.isfile(new_path):
-#               if app.ID_NO==app.msg_box(_('File already exists.\nReplace?'), app.MB_YESNO):
-#                   continue#while
-#           break#while
-#          #while
 
         if new_path==old_path:
            return
