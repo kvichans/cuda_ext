@@ -113,16 +113,14 @@ class Tree_cmds:
         props = []
         get(0, props)
         if not props:
-            return app.msg_status('No items in Code Tree')
+            return app.msg_status(_('No items in Code Tree'))
 
         items = [p['text'] for p in props]
         #items = ['    '*p['level']+p['text'] for p in props]
-        res = app.dlg_menu(app.MENU_LIST, items, caption='Symbols')
+        res = app.dlg_menu(app.MENU_LIST, items, caption=_('Symbols'))
         if res is None: return
         
-        prop = props[res]
-        x = prop['rng'][0]
-        y = prop['rng'][1]
+        x, y, x1, y1 = props[res]['rng']
         ed.set_caret(x, y)
         #def symbol_menu
     
