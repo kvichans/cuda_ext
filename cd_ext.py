@@ -104,11 +104,11 @@ class Tree_cmds:
                     rng = app.tree_proc(h_tree, app.TREE_ITEM_GET_RANGE, id)
                     prop['rng'] = rng
                     subs = prop['sub_items']
-                    if subs:
-                        get(id, props)
-                    # need items with sub_items too (e.g. Python lexer)
+                    # need items with sub_items too
                     if rng[0]>=0:
                         props.append(prop)
+                    if subs:
+                        get(id, props)
     
         props = []
         get(0, props)
