@@ -625,6 +625,11 @@ section=commands
 caption=Cuda&-Ext\Code &Tree\&Find node...
 method=find_tree_node
 
+[item274]
+section=commands
+caption=Cuda&-Ext\Code &Tree\&Symbols list...
+method=symbol_menu
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Align_cmds
 [item311]

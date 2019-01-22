@@ -1,8 +1,8 @@
-﻿''' Plugin for CudaText editor
+''' Plugin for CudaText editor
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.5.30 2018-12-06'
+    '1.5.31 2019-01-21'
 ToDo: (see end of file)
 '''
 
@@ -91,6 +91,39 @@ class Tree_cmds:
 #       app.msg_status(     f('[{:+}] {}', -gap, path))
        #def tree_path_to_status
    
+    @staticmethod
+    def symbol_menu():
+        h_tree = app.app_proc(app.PROC_GET_CODETREE, '')
+        
+        def get(id_node, props):
+            '''Get all tree nodes to "props" starting from id_node (e.g. 0)'''
+            nodes = app.tree_proc(h_tree, app.TREE_ITEM_ENUM, id_node)
+            if nodes:
+                for (id, cap) in nodes:
+                    prop = app.tree_proc(h_tree, app.TREE_ITEM_GET_PROPS, id)
+                    rng = app.tree_proc(h_tree, app.TREE_ITEM_GET_RANGE, id)
+                    prop['rng'] = rng
+                    subs = prop['sub_items']
+                    # need items with sub_items too
+                    if rng[0]>=0:
+                        props.append(prop)
+                    if subs:
+                        get(id, props)
+    
+        props = []
+        get(0, props)
+        if not props:
+            return app.msg_status(_('No items in Code Tree'))
+
+        items = [p['text'] for p in props]
+        #items = ['    '*p['level']+p['text'] for p in props]
+        res = app.dlg_menu(app.MENU_LIST, items, caption=_('Symbols'))
+        if res is None: return
+        
+        x, y, x1, y1 = props[res]['rng']
+        ed.set_caret(x, y)
+        #def symbol_menu
+    
     @staticmethod
     def find_tree_node():
         HELP_C  = _(
@@ -2912,7 +2945,7 @@ class Command:
             if i%5 == 0:
                 app.app_idle()
             app.app_proc(app.PROC_PROGRESSBAR, i * 100 // len(files))
-            app.file_open(fn, options='/passive /nonear')
+            app.file_open(fn, options='/passive /nonear /nontext-view-binary')
         app.app_proc(app.PROC_PROGRESSBAR, -1)
        #def open_all_with_subdir
     
@@ -3010,6 +3043,7 @@ class Command:
     def tree_path_to_status(self):              return Tree_cmds.tree_path_to_status()
     def set_nearest_tree_node(self):            return Tree_cmds.set_nearest_tree_node()
     def find_tree_node(self):                   return Tree_cmds.find_tree_node()
+    def symbol_menu(self):                      return Tree_cmds.symbol_menu()
     
     def add_indented_line_above(self):          return Insert_cmds.add_indented_line_above()
     def add_indented_line_below(self):          return Insert_cmds.add_indented_line_below()
