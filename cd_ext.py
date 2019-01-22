@@ -1,8 +1,8 @@
-''' Plugin for CudaText editor
+﻿''' Plugin for CudaText editor
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.5.31 2019-01-21'
+    '1.5.31 2019-01-22'
 ToDo: (see end of file)
 '''
 
@@ -95,29 +95,35 @@ class Tree_cmds:
     def symbol_menu():
         h_tree = app.app_proc(app.PROC_GET_CODETREE, '')
         
-        def get(id_node, props):
+        def tree_items_to_list(props=None, id_node=0, prefix=''):
             '''Get all tree nodes to "props" starting from id_node (e.g. 0)'''
+            props = [] if props is None else props 
             nodes = app.tree_proc(h_tree, app.TREE_ITEM_ENUM, id_node)
-            if nodes:
-                for (id, cap) in nodes:
-                    prop = app.tree_proc(h_tree, app.TREE_ITEM_GET_PROPS, id)
-                    rng = app.tree_proc(h_tree, app.TREE_ITEM_GET_RANGE, id)
+            if not nodes:
+                return 
+            for id_kid, cap in nodes:
+                prop = app.tree_proc(h_tree, app.TREE_ITEM_GET_PROPS, id_kid)
+                rng = app.tree_proc(h_tree, app.TREE_ITEM_GET_RANGE, id_kid)
+                subs = prop['sub_items']
+                if rng[0]>=0:
                     prop['rng'] = rng
-                    subs = prop['sub_items']
+                    prop['_t'] = f('{}{}\t{}'
+                                    , prefix
+                                    , prop['text']
+                                    , rng[1])
+                    props.append(prop)
+                if subs:
                     # need items with sub_items too
-                    if rng[0]>=0:
-                        props.append(prop)
-                    if subs:
-                        get(id, props)
+                    tree_items_to_list(props, id_kid, prefix+' '*4)
+            return props
+           #def tree_items_to_list
     
-        props = []
-        get(0, props)
+        props = tree_items_to_list()
         if not props:
             return app.msg_status(_('No items in Code Tree'))
 
-        items = [p['text'] for p in props]
-        #items = ['    '*p['level']+p['text'] for p in props]
-        res = app.dlg_menu(app.MENU_LIST, items, caption=_('Symbols'))
+        items = [p['_t'] for p in props]
+        res = app.dlg_menu(app.MENU_LIST+app.MENU_NO_FULLFILTER, items, caption=_('Symbols'))
         if res is None: return
         
         x, y, x1, y1 = props[res]['rng']
@@ -2412,9 +2418,9 @@ class Insert_cmds:
             Param
                 where   'above' Insert between this and prev line
                         'below' Insert between this and next line
-                        'lazar' Insert between this and prev line 
-                                    if caret before text else
-                                normal insert 
+#                       'lazar' Insert between this and prev line 
+#                                   if caret before text else
+#                               normal insert 
         '''
         clip    = app.app_proc(app.PROC_GET_CLIP, '')
         pass;                      #LOG and log('clip={}',repr(clip))
@@ -2434,8 +2440,8 @@ class Insert_cmds:
         if cEnd!=-1:    return app.msg_status(_('Command works only if no selection'))
         r4ins   = rCrt  # min(rCrt, rCrt if -1==rEnd else rEnd)
         ln_tx   = ed.get_text_line(r4ins).rstrip()
-        if where=='lazar':
-            return
+#       if where=='lazar':
+#           return
             
         if where=='below' and \
             any(map(lambda sign:ln_tx.lower().endswith(sign), END_SIGNS)):
