@@ -1941,15 +1941,13 @@ class Find_repl_cmds:
         # sort coords
         if (y1, x1)>(y2, x2):
             x1, y1, x2, y2 = x2, y2, x1, y1
-        rx1, ry1, rx2, ry2 = x1, y1, x2, y2
 
-        for y in range(y1, y2+1):
-            if y>y1:
-                rx1 = 0
-            if y<y2:
-                rx2 = max(rx2, len(ed.get_text_line(y)))
+        col1 = 0
+        col2 = x2
+        for y in range(y1, y2):
+            col2 = max(col2, len(ed.get_text_line(y)))
                 
-        ed.set_sel_rect(rx1, ry1, rx2, ry2)
+        ed.set_sel_rect(col1, y1, col2, y2)
         app.msg_status(_('Converted to column block'))
 
     
