@@ -77,6 +77,16 @@ section=commands
 caption=Cuda&-Ext\&Find/Replace\Strip HTML tags
 method=remove_xml_tags
 
+[item25]
+section=commands
+caption=Cuda&-Ext\&Find/Replace\-
+method=_
+
+[item26]
+section=commands
+caption=Cuda&-Ext\&Find/Replace\Convert multi-line selection to column selection
+method=convert_sel_to_column
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Insert_cmds
 [item41]
