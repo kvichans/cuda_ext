@@ -1,8 +1,9 @@
-﻿''' Plugin for CudaText editor
+''' Plugin for CudaText editor
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
+    Alexey Torgashin (CudaText)
 Version:
-    '1.5.31 2019-01-22'
+    '1.5.32 2019-03-02'
 ToDo: (see end of file)
 '''
 
@@ -1926,6 +1927,30 @@ class Find_repl_cmds:
 #       app.app_proc(app.PROC_SET_FIND_OPTIONS, user_opt)
 #      #def find_dlg_adapter
        
+    @staticmethod
+    def convert_sel_to_column():
+        '''
+        Convert single multi-line selection to column selection
+        '''
+        crts    = ed.get_carets()
+        if len(crts)>1:
+            return app.msg_status(ONLY_SINGLE_CRT.format(_('Command')))
+        x1, y1, x2, y2 = crts[0]
+        if y2<0 or y1==y2:
+            return app.msg_status(ONLY_FOR_ML_SEL.format(_('Command')))
+        # sort coords
+        if (y1, x1)>(y2, x2):
+            x1, y1, x2, y2 = x2, y2, x1, y1
+
+        col1 = 0
+        col2 = x2
+        for y in range(y1, y2):
+            col2 = max(col2, len(ed.get_text_line(y)))
+                
+        ed.set_sel_rect(col1, y1, col2, y2)
+        app.msg_status(_('Converted to column block'))
+
+    
     data4_align_in_lines_by_sep = ''
     @staticmethod
     def align_in_lines_by_sep():
@@ -3064,6 +3089,7 @@ class Command:
     def find_cb_string_next(self):              return Find_repl_cmds.find_cb_by_cmd('dn')
     def find_cb_string_prev(self):              return Find_repl_cmds.find_cb_by_cmd('up')
     def replace_all_sel_to_cb(self):            return Find_repl_cmds.replace_all_sel_to_cb()
+    def convert_sel_to_column(self):            return Find_repl_cmds.convert_sel_to_column()
     def align_in_lines_by_sep(self):            return Find_repl_cmds.align_in_lines_by_sep()
     def reindent(self):                         return Find_repl_cmds.reindent()
     def indent_sel_as_1st(self):                return Find_repl_cmds.indent_sel_as_1st()
