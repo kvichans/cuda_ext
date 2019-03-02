@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.3.15 2018-04-26'
+    '1.3.16 2019-03-02'
 '''
 
 from .cd_ext import Command as CommandRLS
@@ -59,6 +59,7 @@ class Command:
 #   def repl_stay_from(self):                   return RLS.repl_stay_from()
 #   def repl_all_from(self):                    return RLS.repl_all_from()
 
+    def convert_sel_to_column(self):            return RLS.convert_sel_to_column()
     def align_in_lines_by_sep(self):            return RLS.align_in_lines_by_sep()
     def reindent(self):                         return RLS.reindent()
     def join_lines(self):                       return RLS.join_lines()
