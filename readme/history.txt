@@ -1,12 +1,16 @@
-1.5.32 (2019-03-02)
+1.5.33 (2019-03-02)
+fixed: Start selection in "Code Tree\Symbols list"
 added: Command "Convert multi-line selection to column selection"
 
-1.5.31 (2019-01-21)
+1.5.32 (2019-01-24)
+fixed: Cancel doesnt act in dialog "Rename file"
+
+1.5.31 (2019-01-22)
 added: Command "Code Tree - Symbols list" to show Code Tree nodes in the menu form
 added: Improved command "Open all files from folder with sub-folders", so non-text files will be auto-opened (no asking) in binary viewer; but only in CudaText 1.71.6+
 
 1.5.30 (2018-12-06)
-added: Dialog for command "Rename file" is now resizable
+fixed: Dialog for command "Rename file" is now resizable
 
 1.5.29 (2018-12-05)
 added: Command "Open all files from folder with sub-folders" made faster and not flickering

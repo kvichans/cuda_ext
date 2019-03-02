@@ -31,7 +31,7 @@ class Command:
     def paste_to_1st_col(self):                 return RLS.paste_to_1st_col()
     def paste_with_indent_above(self):          return RLS.paste_with_indent('above')
     def paste_with_indent_below(self):          return RLS.paste_with_indent('below')
-    def paste_as_lazarus(self):                 return RLS.paste_with_indent('lazar')
+#   def paste_as_lazarus(self):                 return RLS.paste_with_indent('lazar')
     def paste_trimmed(self):                    return RLS.paste_trimmed()
     def trim_sel_left(self):                    return RLS.trim_sel('left')
     def trim_sel_right(self):                   return RLS.trim_sel('right')
@@ -49,6 +49,7 @@ class Command:
     def replace_term(self):                     return RLS.replace_term()
     def expand_sel(self):                       return RLS.expand_sel()
     def expand_sel_copy(self):                  return RLS.expand_sel_copy()
+    def convert_sel_to_column(self):            return RLS.convert_sel_to_column()
     
 #   def mark_all_from(self):                    return RLS.mark_all_from()
 #   def count_all_from(self):                   return RLS.count_all_from()
@@ -59,7 +60,6 @@ class Command:
 #   def repl_stay_from(self):                   return RLS.repl_stay_from()
 #   def repl_all_from(self):                    return RLS.repl_all_from()
 
-    def convert_sel_to_column(self):            return RLS.convert_sel_to_column()
     def align_in_lines_by_sep(self):            return RLS.align_in_lines_by_sep()
     def reindent(self):                         return RLS.reindent()
     def join_lines(self):                       return RLS.join_lines()

@@ -1,9 +1,9 @@
-''' Plugin for CudaText editor
+﻿''' Plugin for CudaText editor
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
 Version:
-    '1.5.32 2019-03-02'
+    '1.5.33 2019-03-02'
 ToDo: (see end of file)
 '''
 
@@ -101,7 +101,10 @@ class Tree_cmds:
             props = [] if props is None else props 
             nodes = app.tree_proc(h_tree, app.TREE_ITEM_ENUM, id_node)
             if not nodes:
-                return 
+                ed.cmd(cmds.cmd_TreeUpdate)
+                nodes = app.tree_proc(h_tree, app.TREE_ITEM_ENUM, id_node)
+                if not nodes:
+                    return 
             for id_kid, cap in nodes:
                 prop = app.tree_proc(h_tree, app.TREE_ITEM_GET_PROPS, id_kid)
                 rng = app.tree_proc(h_tree, app.TREE_ITEM_GET_RANGE, id_kid)
@@ -111,7 +114,7 @@ class Tree_cmds:
                     prop['_t'] = f('{}{}\t{}'
                                     , prefix
                                     , prop['text']
-                                    , rng[1])
+                                    , f('{}:{}', 1+rng[1], 1+rng[3]))
                     props.append(prop)
                 if subs:
                     # need items with sub_items too
@@ -119,13 +122,27 @@ class Tree_cmds:
             return props
            #def tree_items_to_list
     
-        props = tree_items_to_list()
-        if not props:
-            return app.msg_status(_('No items in Code Tree'))
+        while True:
+            props = tree_items_to_list()
+            if not props:
+                return app.msg_status(_('No items in Code Tree'))
 
-        items = [p['_t'] for p in props]
-        res = app.dlg_menu(app.MENU_LIST+app.MENU_NO_FULLFILTER, items, caption=_('Symbols'))
-        if res is None: return
+            items       = [p['_t'] for p in props]
+            crt_row     = ed.get_carets()[0][1]
+            covers      = [(p['rng'][3]-p['rng'][1], n) for n,p in enumerate(props) 
+                            if p['rng'][1] <= crt_row <= p['rng'][3]]
+            start_item  = min(covers)[1] if covers else 0
+            res = app.dlg_menu(app.MENU_LIST+app.MENU_NO_FULLFILTER
+                            , items 
+                            + ['<Update Code Tree>']
+                            , focused=start_item
+                            , caption=_('Code Tree symbols'))
+            if res is None: return
+            if res==len(props):
+                ed.cmd(cmds.cmd_TreeUpdate)
+                continue#while
+            break
+           #while
         
         x, y, x1, y1 = props[res]['rng']
         ed.set_caret(x, y)
@@ -885,6 +902,7 @@ class SCBs:
             return      set_sel(cBfr-nBfrGap, rBfr, cAft+nAftGap, rAft)
         return False
        #def expand_sel
+
 #  #class SCBs
 
 #############################################################
@@ -1866,7 +1884,7 @@ class Find_repl_cmds:
             find_opt= find_opt + ('c' if 'c' in user_opt else '')   # As user: Case
             find_opt= find_opt + ('w' if 'w' in user_opt else '')   # As user: Word
         ed.lock()
-        pass;                  #log('seltext,clip,find_opt={}',(seltext,clip,find_opt))
+        pass;                  #log('seltext,clip,find_opt={!r}',(seltext,clip,find_opt))
         ed.cmd(cmds.cmd_FinderAction, c1.join([]
             +['repall']
             +[seltext]
@@ -1949,8 +1967,8 @@ class Find_repl_cmds:
                 
         ed.set_sel_rect(col1, y1, col2, y2)
         app.msg_status(_('Converted to column block'))
+       #def convert_sel_to_column
 
-    
     data4_align_in_lines_by_sep = ''
     @staticmethod
     def align_in_lines_by_sep():
@@ -2833,10 +2851,10 @@ class Command:
         ,   ctrls   =[0
     ,('ste_',d(tp='lb'  ,t  =5          ,l=5                ,w=DLG_W-100    ,cap=_('Enter n&ew file name:')     )) # &e
     ,('stem',d(tp='ed'  ,t  =5+18       ,l=5                ,w=DLG_W-100+10                             ,a='lR' )) # 
-    ,('sex_',d(tp='lb'  ,tid='stem'     ,l=5+DLG_W-100+10   ,w=10           ,cap='. '                   ,a='LR'  )) #
+    ,('sex_',d(tp='lb'  ,tid='stem'     ,l=5+DLG_W-100+10   ,w=10           ,cap='. '                   ,a='LR' )) #
     ,('sext',d(tp='ed'  ,tid='stem'     ,l=5+DLG_W-100+20   ,w=80                                       ,a='LR' ))
-    ,('!'   ,d(tp='bt'  ,t  =5+DLG_H-28 ,l=5+DLG_W-170      ,w=80           ,cap=_('OK')    ,def_bt='1' ,a='LR' ,call=do_ok)) #
-    ,('-'   ,d(tp='bt'  ,t  =5+DLG_H-28 ,l=5+DLG_W-80       ,w=80           ,cap=_('Cancel')            ,a='LR' ))
+    ,('!'   ,d(tp='bt'  ,t  =5+DLG_H-28 ,l=5+DLG_W-170      ,w=80           ,cap=_('OK')    ,def_bt='1' ,a='LR' ,call=do_ok     )) #
+    ,('-'   ,d(tp='bt'  ,t  =5+DLG_H-28 ,l=5+DLG_W-80       ,w=80           ,cap=_('Cancel')            ,a='LR' ,call=LMBD_HIDE ))
                     ][1:]
         ,   fid     ='stem'
         ,   vals    = d(stem=old_stem, sext=old_ext)
@@ -3090,6 +3108,7 @@ class Command:
     def find_cb_string_prev(self):              return Find_repl_cmds.find_cb_by_cmd('up')
     def replace_all_sel_to_cb(self):            return Find_repl_cmds.replace_all_sel_to_cb()
     def convert_sel_to_column(self):            return Find_repl_cmds.convert_sel_to_column()
+
     def align_in_lines_by_sep(self):            return Find_repl_cmds.align_in_lines_by_sep()
     def reindent(self):                         return Find_repl_cmds.reindent()
     def indent_sel_as_1st(self):                return Find_repl_cmds.indent_sel_as_1st()

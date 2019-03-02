@@ -119,10 +119,10 @@ section=commands
 caption=Cuda&-Ext\&Insert\Paste with indent belo&w
 method=paste_with_indent_below
 
-[item47]
-section=commands
-caption=Cuda&-Ext\&Insert\Paste like La&zarus IDE
-method=paste_as_lazarus
+;[item47]
+;section=commands
+;caption=Cuda&-Ext\&Insert\Paste like La&zarus IDE
+;method=paste_as_lazarus
 
 [item48]
 section=commands
