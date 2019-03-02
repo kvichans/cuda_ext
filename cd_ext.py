@@ -1936,14 +1936,12 @@ class Find_repl_cmds:
         if len(crts)>1:
             return app.msg_status(ONLY_SINGLE_CRT.format(_('Command')))
         x1, y1, x2, y2 = crts[0]
-        if y2<0:
+        if y2<0 or y1==y2:
             return app.msg_status(ONLY_FOR_ML_SEL.format(_('Command')))
         # sort coords
         if (y1, x1)>(y2, x2):
             x1, y1, x2, y2 = x2, y2, x1, y1
         rx1, ry1, rx2, ry2 = x1, y1, x2, y2
-        if y1==y2:
-            return app.msg_status(ONLY_FOR_ML_SEL.format(_('Command')))
 
         for y in range(y1, y2+1):
             if y>y1:
