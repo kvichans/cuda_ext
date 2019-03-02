@@ -1,3 +1,6 @@
+1.5.32 (2019-03-02)
+added: Command "Convert multi-line selection to column selection"
+
 1.5.31 (2019-01-21)
 added: Command "Code Tree - Symbols list" to show Code Tree nodes in the menu form
 added: Improved command "Open all files from folder with sub-folders", so non-text files will be auto-opened (no asking) in binary viewer; but only in CudaText 1.71.6+
