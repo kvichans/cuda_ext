@@ -101,17 +101,16 @@ class Tree_cmds:
             props = [] if props is None else props 
             nodes = app.tree_proc(h_tree, app.TREE_ITEM_ENUM, id_node)
             if not nodes:
-                ed.cmd(cmds.cmd_TreeUpdate)
                 nodes = app.tree_proc(h_tree, app.TREE_ITEM_ENUM, id_node)
                 if not nodes:
                     return 
             for id_kid, cap in nodes:
-                prop = app.tree_proc(h_tree, app.TREE_ITEM_GET_PROPS, id_kid)
-                rng = app.tree_proc(h_tree, app.TREE_ITEM_GET_RANGE, id_kid)
-                subs = prop['sub_items']
+                prop    = app.tree_proc(h_tree, app.TREE_ITEM_GET_PROPS, id_kid)
+                rng     = app.tree_proc(h_tree, app.TREE_ITEM_GET_RANGE, id_kid)
+                subs    = prop['sub_items']
                 if rng[0]>=0:
                     prop['rng'] = rng
-                    prop['_t'] = f('{}{}\t{}'
+                    prop['_t']  = f('{}{}\t{}'
                                     , prefix
                                     , prop['text']
                                     , f('{}:{}', 1+rng[1], 1+rng[3]))
@@ -125,7 +124,9 @@ class Tree_cmds:
         while True:
             props = tree_items_to_list()
             if not props:
-                return app.msg_status(_('No items in Code Tree'))
+                ed.cmd(cmds.cmd_TreeUpdate)
+                if not props:
+                    return app.msg_status(_('No items in Code Tree'))
 
             items       = [p['_t'] for p in props]
             crt_row     = ed.get_carets()[0][1]
@@ -134,7 +135,7 @@ class Tree_cmds:
             start_item  = min(covers)[1] if covers else 0
             res = app.dlg_menu(app.MENU_LIST+app.MENU_NO_FULLFILTER
                             , items 
-                            + ['<Update Code Tree>']
+                            + [_('<Update Code Tree>')]
                             , focused=start_item
                             , caption=_('Code Tree symbols'))
             if res is None: return
