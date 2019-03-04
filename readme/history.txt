@@ -1,5 +1,5 @@
 1.5.33 (2019-03-02)
-fixed: Start selection in "Code Tree\Symbols list"
+added: Dialog “Symbols list” places initial listbox selection
 added: Command "Convert multi-line selection to column selection"
 
 1.5.32 (2019-01-24)
