@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
 Version:
-    '1.5.33 2019-03-02'
+    '1.5.34 2019-03-09'
 ToDo: (see end of file)
 '''
 
@@ -125,6 +125,7 @@ class Tree_cmds:
             props = tree_items_to_list()
             if not props:
                 ed.cmd(cmds.cmd_TreeUpdate)
+                props = tree_items_to_list()
                 if not props:
                     return app.msg_status(_('No items in Code Tree'))
 
