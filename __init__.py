@@ -2,10 +2,13 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.3.16 2019-03-02'
+    '1.7.01 2019-03-28'
 '''
 
-from .cd_ext import Command as CommandRLS
+from    .cd_ext import Command as CommandRLS
+from    .       import cd_ext_tabs
+from    .       import cd_ext_tree
+from    .       import cd_ext_find_repl
 
 RLS  = CommandRLS()
 class Command:
@@ -20,10 +23,10 @@ class Command:
     def open_selected(self):                    return RLS.open_selected()
     
     # Tree_cmds
-    def tree_path_to_status(self):              return RLS.tree_path_to_status()
-    def set_nearest_tree_node(self):            return RLS.set_nearest_tree_node()
-    def find_tree_node(self):                   return RLS.find_tree_node()
-    def symbol_menu(self):                      return RLS.symbol_menu()
+    def tree_path_to_status(self):              return cd_ext_tree.tree_path_to_status()
+    def set_nearest_tree_node(self):            return cd_ext_tree.set_nearest_tree_node()
+    def find_tree_node(self):                   return cd_ext_tree.find_tree_node()
+    def symbol_menu(self):                      return cd_ext_tree.symbol_menu()
     
     # Insert_cmds
     def add_indented_line_above(self):          return RLS.add_indented_line_above()
@@ -40,10 +43,10 @@ class Command:
     def insert_char_by_hex(self):               return RLS.insert_char_by_hex()
     
     # Find_repl_cmds
-    def dlg_find_in_lines(self):                return RLS.dlg_find_in_lines()
-    def find_cb_string_next(self):              return RLS.find_cb_string_next()
-    def find_cb_string_prev(self):              return RLS.find_cb_string_prev()
-    def replace_all_sel_to_cb(self):            return RLS.replace_all_sel_to_cb()
+    def dlg_find_in_lines(self):                return cd_ext_find_repl.dlg_find_in_lines()
+    def find_cb_string_next(self):              return cd_ext_find_repl.find_cb_by_cmd('dn')
+    def find_cb_string_prev(self):              return cd_ext_find_repl.find_cb_by_cmd('up')
+    def replace_all_sel_to_cb(self):            return cd_ext_find_repl.replace_all_sel_to_cb()
 
     def copy_term(self):                        return RLS.copy_term()
     def replace_term(self):                     return RLS.replace_term()
@@ -51,25 +54,16 @@ class Command:
     def expand_sel_copy(self):                  return RLS.expand_sel_copy()
     def convert_sel_to_column(self):            return RLS.convert_sel_to_column()
     
-#   def mark_all_from(self):                    return RLS.mark_all_from()
-#   def count_all_from(self):                   return RLS.count_all_from()
-#   def find_first_from(self):                  return RLS.find_first_from()
-#   def find_next_from(self):                   return RLS.find_next_from()
-#   def find_prev_from(self):                   return RLS.find_prev_from()
-#   def repl_next_from(self):                   return RLS.repl_next_from()
-#   def repl_stay_from(self):                   return RLS.repl_stay_from()
-#   def repl_all_from(self):                    return RLS.repl_all_from()
-
-    def align_in_lines_by_sep(self):            return RLS.align_in_lines_by_sep()
-    def reindent(self):                         return RLS.reindent()
-    def join_lines(self):                       return RLS.join_lines()
-    def del_more_spaces(self):                  return RLS.del_more_spaces()
-    def rewrap_sel_by_margin(self):             return RLS.rewrap_sel_by_margin()
-    def rewrap_cmt_at_caret(self):              return RLS.rewrap_cmt_at_caret()
-    def align_sel_to_center_by_margin(self):    return RLS.align_sel_by_margin('c')
-    def align_sel_to_right_by_margin(self):     return RLS.align_sel_by_margin('r')
-    def indent_sel_as_1st(self):                return RLS.indent_sel_as_1st()
-    def indent_sel_as_bgn(self):                return RLS.indent_sel_as_bgn()
+    def align_in_lines_by_sep(self):            return cd_ext_find_repl.align_in_lines_by_sep()
+    def reindent(self):                         return cd_ext_find_repl.reindent()
+    def join_lines(self):                       return cd_ext_find_repl.join_lines()
+    def del_more_spaces(self):                  return cd_ext_find_repl.del_more_spaces()
+    def rewrap_sel_by_margin(self):             return cd_ext_find_repl.rewrap_sel_by_margin()
+    def rewrap_cmt_at_caret(self):              return cd_ext_find_repl.rewrap_cmt_at_caret()
+    def align_sel_to_center_by_margin(self):    return cd_ext_find_repl.align_sel_by_margin('c')
+    def align_sel_to_right_by_margin(self):     return cd_ext_find_repl.align_sel_by_margin('r')
+    def indent_sel_as_1st(self):                return cd_ext_find_repl.indent_sel_as_1st()
+    def indent_sel_as_bgn(self):                return cd_ext_find_repl.indent_sel_as_bgn()
     
     # Jumps_cmds
     def scroll_to_center(self):                 return RLS.scroll_to('cen')
@@ -108,7 +102,6 @@ class Command:
     def less_curr_grp(self):                    return RLS._move_splitter('curr', 0.95)
 
     # Misc_cmds
-#   def edit_strcomment_chars(self):            return RLS.edit_strcomment_chars()
     def rename_file(self):                      return RLS.rename_file()
     def reopen_as_hex(self):                    return RLS.reopen_as('hex')
     def reopen_as_text(self):                   return RLS.reopen_as('text')
@@ -121,43 +114,43 @@ class Command:
     def remove_xml_tags(self):                  return RLS.remove_xml_tags()
 
     # Tabs_cmds
-    def to_tab_g1_t1(self):                     return RLS._activate_tab(0, 0)
-    def to_tab_g1_t2(self):                     return RLS._activate_tab(0, 1)
-    def to_tab_g1_t3(self):                     return RLS._activate_tab(0, 2)
-    def to_tab_g1_t4(self):                     return RLS._activate_tab(0, 3)
-    def to_tab_g1_t5(self):                     return RLS._activate_tab(0, 4)
-    def to_tab_g1_t6(self):                     return RLS._activate_tab(0, 5)
-    def to_tab_g1_t7(self):                     return RLS._activate_tab(0, 6)
-    def to_tab_g1_t8(self):                     return RLS._activate_tab(0, 7)
-    def to_tab_g1_t9(self):                     return RLS._activate_tab(0, 8)
-    def to_tab_g2_t1(self):                     return RLS._activate_tab(1, 0)
-    def to_tab_g2_t2(self):                     return RLS._activate_tab(1, 1)
-    def to_tab_g2_t3(self):                     return RLS._activate_tab(1, 2)
-    def to_tab_g2_t4(self):                     return RLS._activate_tab(1, 3)
-    def to_tab_g2_t5(self):                     return RLS._activate_tab(1, 4)
-    def to_tab_g2_t6(self):                     return RLS._activate_tab(1, 5)
-    def to_tab_g2_t7(self):                     return RLS._activate_tab(1, 6)
-    def to_tab_g2_t8(self):                     return RLS._activate_tab(1, 7)
-    def to_tab_g2_t9(self):                     return RLS._activate_tab(1, 8)
-    def to_tab_g1_last(self):                   return RLS._activate_last_tab(0)
-    def to_tab_g2_last(self):                   return RLS._activate_last_tab(1)
-    def to_next_tab(self):                      return RLS._activate_near_tab(1)
-    def to_prev_tab(self):                      return RLS._activate_near_tab(-1)
-    def move_tab(self):                         return RLS.move_tab()
-    def close_tab_from_next_group(self):        return RLS.close_tab_from_other_group('next')
-    def close_tab_from_prev_group(self):        return RLS.close_tab_from_other_group('prev')
+    def to_tab_g1_t1(self):                     return cd_ext_tabs._activate_tab(0, 0)
+    def to_tab_g1_t2(self):                     return cd_ext_tabs._activate_tab(0, 1)
+    def to_tab_g1_t3(self):                     return cd_ext_tabs._activate_tab(0, 2)
+    def to_tab_g1_t4(self):                     return cd_ext_tabs._activate_tab(0, 3)
+    def to_tab_g1_t5(self):                     return cd_ext_tabs._activate_tab(0, 4)
+    def to_tab_g1_t6(self):                     return cd_ext_tabs._activate_tab(0, 5)
+    def to_tab_g1_t7(self):                     return cd_ext_tabs._activate_tab(0, 6)
+    def to_tab_g1_t8(self):                     return cd_ext_tabs._activate_tab(0, 7)
+    def to_tab_g1_t9(self):                     return cd_ext_tabs._activate_tab(0, 8)
+    def to_tab_g2_t1(self):                     return cd_ext_tabs._activate_tab(1, 0)
+    def to_tab_g2_t2(self):                     return cd_ext_tabs._activate_tab(1, 1)
+    def to_tab_g2_t3(self):                     return cd_ext_tabs._activate_tab(1, 2)
+    def to_tab_g2_t4(self):                     return cd_ext_tabs._activate_tab(1, 3)
+    def to_tab_g2_t5(self):                     return cd_ext_tabs._activate_tab(1, 4)
+    def to_tab_g2_t6(self):                     return cd_ext_tabs._activate_tab(1, 5)
+    def to_tab_g2_t7(self):                     return cd_ext_tabs._activate_tab(1, 6)
+    def to_tab_g2_t8(self):                     return cd_ext_tabs._activate_tab(1, 7)
+    def to_tab_g2_t9(self):                     return cd_ext_tabs._activate_tab(1, 8)
+    def to_tab_g1_last(self):                   return cd_ext_tabs._activate_last_tab(0)
+    def to_tab_g2_last(self):                   return cd_ext_tabs._activate_last_tab(1)
+    def to_next_tab(self):                      return cd_ext_tabs._activate_near_tab(1)
+    def to_prev_tab(self):                      return cd_ext_tabs._activate_near_tab(-1)
+    def move_tab(self):                         return cd_ext_tabs.move_tab()
+    def close_tab_from_next_group(self):        return cd_ext_tabs.close_tab_from_other_group('next')
+    def close_tab_from_prev_group(self):        return cd_ext_tabs.close_tab_from_other_group('prev')
 
-    def view_next_tab_from_next_group(self):    return RLS._activate_tab_other_group('next', 'next')
-    def view_next_tab_from_prev_group(self):    return RLS._activate_tab_other_group('next', 'prev')
-    def view_prev_tab_from_next_group(self):    return RLS._activate_tab_other_group('prev', 'next')
-    def view_prev_tab_from_prev_group(self):    return RLS._activate_tab_other_group('prev', 'prev')
+    def view_next_tab_from_next_group(self):    return cd_ext_tabs._activate_tab_other_group('next', 'next')
+    def view_next_tab_from_prev_group(self):    return cd_ext_tabs._activate_tab_other_group('next', 'prev')
+    def view_prev_tab_from_next_group(self):    return cd_ext_tabs._activate_tab_other_group('prev', 'next')
+    def view_prev_tab_from_prev_group(self):    return cd_ext_tabs._activate_tab_other_group('prev', 'prev')
 
-    def view_first_tab_from_next_group(self):   return RLS._activate_tab_other_group('frst', 'next')
-    def view_first_tab_from_prev_group(self):   return RLS._activate_tab_other_group('frst', 'prev')
-    def view_last_tab_from_next_group(self):    return RLS._activate_tab_other_group('last', 'next')
-    def view_last_tab_from_prev_group(self):    return RLS._activate_tab_other_group('last', 'prev')
-    def go_back(self):                          return RLS.go_back_tab()
-    def go_back_dlg(self):                      return RLS.go_back_dlg()
+    def view_first_tab_from_next_group(self):   return cd_ext_tabs._activate_tab_other_group('frst', 'next')
+    def view_first_tab_from_prev_group(self):   return cd_ext_tabs._activate_tab_other_group('frst', 'prev')
+    def view_last_tab_from_next_group(self):    return cd_ext_tabs._activate_tab_other_group('last', 'next')
+    def view_last_tab_from_prev_group(self):    return cd_ext_tabs._activate_tab_other_group('last', 'prev')
+    def go_back(self):                          return cd_ext_tabs.go_back_tab()
+    def go_back_dlg(self):                      return cd_ext_tabs.go_back_dlg()
 
     # Paragraph_cmds
     def go_prgph_bgn(self):                     return RLS.go_prgph('bgn')

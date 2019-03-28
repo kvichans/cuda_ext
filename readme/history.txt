@@ -1,3 +1,10 @@
+1.7.01 (2019-03-28)
+added: Demand plugins cuda_kv_base, cuda_kv_dlg (auto installed by Addons Manager)
+fixed: Dialog "Symbol list" auto update symbol's data
+
+1.6.02 (2019-03-14)
+added: Command "Open file by selected name" searches in current dir and also in TEMP
+
 1.5.33 (2019-03-02)
 fixed: Dialog "Symbol list" places initial listbox selection
 added: Command "Convert multi-line selection to column selection"
