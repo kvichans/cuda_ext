@@ -622,23 +622,23 @@ method=align_prgph_f
 ; Tree_cmds
 [item271]
 section=commands
+caption=Cuda&-Ext\Code &Tree\&Symbols list...
+method=symbol_menu
+
+[item272]
+section=commands
 caption=Cuda&-Ext\Code &Tree\Show &current path in statusbar
 method=tree_path_to_status
 
-[item272]
+[item273]
 section=commands
 caption=Cuda&-Ext\Code &Tree\Set &active node, nearest to caret
 method=set_nearest_tree_node
 
-[item273]
+[item274]
 section=commands
 caption=Cuda&-Ext\Code &Tree\&Find node...
 method=find_tree_node
-
-[item274]
-section=commands
-caption=Cuda&-Ext\Code &Tree\&Symbols list...
-method=symbol_menu
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Align_cmds

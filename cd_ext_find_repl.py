@@ -128,18 +128,18 @@ def _dlg_FIL():
            #def wnen_menu
         insm_c  = f(_('Instant search minimum: {}...'), opts['insm'])
         ag.show_menu(set_all_for_tree(
-            [ d(tag='help'  ,cap=_('&Help...')                                      
-            ),d(             cap='-'
-            ),d(tag='prev'  ,cap=_('Find &previous')                                ,key='Shift+Enter'
-            ),d(tag='next'  ,cap=_('F&ind next')                                    ,key='Enter'
-            ),d(             cap='-'
-#           ),d(tag='clos'  ,cap=_('Close on success')          ,ch=opts['clos']    
-            ),d(tag='usel'  ,cap=_('Use selection from text')   ,ch=opts['usel']    
-            ),d(tag='inst'  ,cap=_('Instant search')            ,ch=opts['inst']    
-            ),d(tag='insm'  ,cap=insm_c                                             
-            ),d(             cap='-'
-            ),d(tag='natf'  ,cap=_('Call native Find dialog')                       ,key='Ctrl+F'
-            ),d(tag='rest'  ,cap=_('Restore initial selection and close dialog &=') ,key='Shift+Esc'
+            [ d(    tag='help'  ,cap=_('&Help...')                                      
+            ),d(                 cap='-'
+            ),d(    tag='prev'  ,cap=_('Find &previous')                                ,key='Shift+Enter'
+            ),d(    tag='next'  ,cap=_('F&ind next')                                    ,key='Enter'
+            ),d(                 cap='-'
+            ),d(                 cap=_('&Options')  ,sub=
+                [ d(tag='usel'  ,cap=_('Use selection from text')   ,ch=opts['usel']    
+                ),d(tag='inst'  ,cap=_('Instant search')            ,ch=opts['inst']    
+                ),d(tag='insm'  ,cap=insm_c                                             
+            )]),d(               cap='-'
+            ),d(    tag='natf'  ,cap=_('Call native Find dialog')                       ,key='Ctrl+F'
+            ),d(    tag='rest'  ,cap=_('Restore initial selection and close dialog &=') ,key='Shift+Esc'
             )], 'sub', 'cmd', wnen_menu)    # Set cmd=wnen_menu for all nodes
         ,   aid
         )

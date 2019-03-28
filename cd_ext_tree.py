@@ -179,15 +179,16 @@ def find_tree_node():
            #def wnen_menu
         
         ag.show_menu(set_all_for_tree(
-            [ d(tag='help'  ,cap=_('&Help...')
-            ),d(             cap='-'
-            ),d(tag='prev'  ,cap=_('Find &previous')                                ,key='Shift+Enter'
-            ),d(tag='next'  ,cap=_('F&ind next')                                    ,key='Enter'
-            ),d(             cap='-'
-            ),d(tag='fpth'  ,cap=_('Show full tree path')   ,ch=opts['fpth']
-            ),d(tag='clos'  ,cap=_('Close on success')      ,ch=opts['clos']
-            ),d(             cap='-'
-            ),d(tag='rest'  ,cap=_('Restore initial selection and close dialog &=') ,key='Shift+Esc'
+            [ d(    tag='help'  ,cap=_('&Help...')
+            ),d(                 cap='-'
+            ),d(    tag='prev'  ,cap=_('Find &previous')                                ,key='Shift+Enter'
+            ),d(    tag='next'  ,cap=_('F&ind next')                                    ,key='Enter'
+            ),d(                 cap='-'
+            ),d(                 cap=_('&Options')  ,sub=
+                [ d(tag='fpth'  ,cap=_('Show full tree path')   ,ch=opts['fpth']
+                ),d(tag='clos'  ,cap=_('Close on success')      ,ch=opts['clos']
+            )]),d(               cap='-'
+            ),d(    tag='rest'  ,cap=_('Restore initial selection and close dialog &=') ,key='Shift+Esc'
             )], 'sub', 'cmd', wnen_menu)    # Set cmd=wnen_menu for all nodes
         ,   aid)
         return d(fid='what')
