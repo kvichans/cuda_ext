@@ -16,75 +16,90 @@ events=on_console_nav
 [item9]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\Find "in lines"...
+hotkey=Shift+Ctrl+F
 method=dlg_find_in_lines
 
 [item10]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\-
+hotkey=
 method=_
 
 [item11]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\Find clipbrd: &next
+hotkey=Alt+PgDn
 method=find_cb_string_next
 [item12]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\Find clipbrd: &previous
+hotkey=Alt+PgUp
 method=find_cb_string_prev
 
 [item13]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\Replace &all occurrences of selected string with clipbrd
+hotkey=Shift+Ctrl+A
 method=replace_all_sel_to_cb
 
 [item14]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\-
+hotkey=
 method=_
 
 [item15]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\&Copy word or [string] or 'string' (no selection)
+hotkey=
 method=copy_term
 
 [item16]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\&Replace word or [string] or 'string' with clipbrd (no selection)
+hotkey=
 method=replace_term
 
 [item17]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\E&xpand selection to word or "string" or (string)
+hotkey=Alt+'
 method=expand_sel
 
 [item18]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\Expand and Cop&y selection to word or "string" or (string)
+hotkey=Shift+Alt+'
 method=expand_sel_copy
 
 [item19]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\-
+hotkey=
 method=_
 
 [item20]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\Remove all ASCII chars 0..31 (excluding 9,10,13)
+hotkey=
 method=remove_unprinted
 
 [item21]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\Strip HTML tags
+hotkey=
 method=remove_xml_tags
 
 [item25]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\-
+hotkey=
 method=_
 
 [item26]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\Convert multi-line selection to column selection
+hotkey=
 method=convert_sel_to_column
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -92,76 +107,91 @@ method=convert_sel_to_column
 [item41]
 section=commands
 caption=Cuda&-Ext\&Insert\Add indented line abo&ve
+hotkey=
 method=add_indented_line_above
 
 [item42]
 section=commands
 caption=Cuda&-Ext\&Insert\Add indented line &below
+hotkey=Ctrl+Enter
 method=add_indented_line_below
 
 [item43]
 section=commands
 caption=Cuda&-Ext\&Insert\-
+hotkey=
 method=_
 
 [item44]
 section=commands
 caption=Cuda&-Ext\&Insert\Paste to &first column
+hotkey=Shift+Ctrl+V
 method=paste_to_1st_col
 
 [item45]
 section=commands
 caption=Cuda&-Ext\&Insert\Paste with indent ab&ove
+hotkey=
 method=paste_with_indent_above
 
 [item46]
 section=commands
 caption=Cuda&-Ext\&Insert\Paste with indent belo&w
+hotkey=
 method=paste_with_indent_below
 
 ;[item47]
 ;section=commands
 ;caption=Cuda&-Ext\&Insert\Paste like La&zarus IDE
-;method=paste_as_lazarus
+;hotkey=
+method=paste_as_lazarus
 
 [item48]
 section=commands
 caption=Cuda&-Ext\&Insert\-
+hotkey=
 method=_
 
 [item49]
 section=commands
 caption=Cuda&-Ext\&Insert\Paste trimmed text
+hotkey=
 method=paste_trimmed
 
 [item50]
 section=commands
 caption=Cuda&-Ext\&Insert\Trim spaces in selection, left
+hotkey=
 method=trim_sel_left
 
 [item51]
 section=commands
 caption=Cuda&-Ext\&Insert\Trim spaces in selection, right
+hotkey=
 method=trim_sel_right
 
 [item52]
 section=commands
 caption=Cuda&-Ext\&Insert\Trim spaces in selection, all
+hotkey=
 method=trim_sel_all
 
 [item53]
 section=commands
 caption=Cuda&-Ext\&Insert\-
+hotkey=
 method=_
 
 [item54]
 section=commands
 caption=Cuda&-Ext\&Insert\F&ill selection by string...
+hotkey=
 method=fill_by_str
 
 [item55]
 section=commands
 caption=Cuda&-Ext\&Insert\Insert &unicode char...
+hotkey=
 method=insert_char_by_hex
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -169,111 +199,133 @@ method=insert_char_by_hex
 [item71]
 section=commands
 caption=Cuda&-Ext\&Jump\To matching bracket
+hotkey=Ctrl+]
 method=jump_to_matching_bracket
 
 [item72]
 section=commands
 caption=Cuda&-Ext\&Jump\-
+hotkey=
 method=_
 
 [item73]
 section=commands
 caption=Cuda&-Ext\&Jump\To next changed lines
+hotkey=
 method=jump_to_next_mod_lines
 
 [item74]
 section=commands
 caption=Cuda&-Ext\&Jump\To previous changed lines
+hotkey=
 method=jump_to_prev_mod_lines
 
 [item75]
 section=commands
 caption=Cuda&-Ext\&Jump\To next saved lines
+hotkey=
 method=jump_to_next_sav_lines
 
 [item76]
 section=commands
 caption=Cuda&-Ext\&Jump\To previous saved lines
+hotkey=
 method=jump_to_prev_sav_lines
 
 [item77]
 section=commands
 caption=Cuda&-Ext\&Jump\To next working lines
+hotkey=
 method=jump_to_next_wrk_lines
 
 [item78]
 section=commands
 caption=Cuda&-Ext\&Jump\To previous working lines
+hotkey=
 method=jump_to_prev_wrk_lines
 
 [item79]
 section=commands
 caption=Cuda&-Ext\&Jump\-
+hotkey=
 method=_
 
 [item80]
 section=commands
 caption=Cuda&-Ext\&Jump\To line with number in clipbrd
+hotkey=
 method=jump_to_line_by_cb
 
 [item81]
 section=commands
 caption=Cuda&-Ext\&Jump\-
+hotkey=
 method=_
 
 [item82]
 section=commands
 caption=Cuda&-Ext\&Jump\Left into CamelCase/snake_case
+hotkey=Shift+Ctrl+Alt+Left
 method=jump_left_ccsc
 
 [item83]
 section=commands
 caption=Cuda&-Ext\&Jump\Right into CamelCase/snake_case
+hotkey=Shift+Ctrl+Alt+Right
 method=jump_right_ccsc
 
 [item84]
 section=commands
 caption=Cuda&-Ext\&Jump\Left into CamelCase/snake_case and select
+hotkey=
 method=jump_sel_left_ccsc
 
 [item85]
 section=commands
 caption=Cuda&-Ext\&Jump\Right into CamelCase/snake_case and select
+hotkey=
 method=jump_sel_right_ccsc
 
 [item86]
 section=commands
 caption=Cuda&-Ext\&Jump\-
+hotkey=
 method=_
 
 [item87]
 section=commands
 caption=Cuda&-Ext\&Jump\Bookmark list for current tab...
+hotkey=Ctrl+Alt+B
 method=dlg_bms_in_tab
 
 [item88]
 section=commands
 caption=Cuda&-Ext\&Jump\Bookmark list for all tabs...
+hotkey=Shift+Alt+B
 method=dlg_bms_in_tabs
 
 [item89]
 section=commands
 caption=Cuda&-Ext\&Jump\Numbered bookmark list for all tabs...
+hotkey=Shift+Ctrl+Alt+B
 method=dlg_nbms_in_tabs
 
 [item90]
 section=commands
 caption=Cuda&-Ext\&Jump\-
+hotkey=
 method=_
 
 [item91]
 section=commands
 caption=Cuda&-Ext\&Jump\To start of the nearest left staple
+hotkey=Shift+Ctrl+PgUp
 method=jump_staple_start
 
 [item92]
 section=commands
 caption=Cuda&-Ext\&Jump\To end of the nearest left staple
+hotkey=Shift+Ctrl+PgDn
 method=jump_staple_end
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -281,31 +333,37 @@ method=jump_staple_end
 [item111]
 section=commands
 caption=Cuda&-Ext\Scr&oll\Current line to screen &center
+hotkey=
 method=scroll_to_center
 
 [item112]
 section=commands
 caption=Cuda&-Ext\Scr&oll\Current line to screen &top
+hotkey=
 method=scroll_to_top
 
 [item113]
 section=commands
 caption=Cuda&-Ext\Scr&oll\Current line to screen &bottom
+hotkey=
 method=scroll_to_bottom
 
 [item114]
 section=commands
 caption=Cuda&-Ext\Scr&oll\-
+hotkey=
 method=_
 
 [item115]
 section=commands
 caption=Cuda&-Ext\Scr&oll\Screen to &left
+hotkey=
 method=scroll_to_left
 
 [item116]
 section=commands
 caption=Cuda&-Ext\Scr&oll\Screen to &right
+hotkey=
 method=scroll_to_right
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -313,31 +371,37 @@ method=scroll_to_right
 [item141]
 section=commands
 caption=Cuda&-Ext\&Navigate\Open file by &selected name
+hotkey=Shift+Ctrl+O
 method=open_selected
 
 [item142]
 section=commands
 caption=Cuda&-Ext\&Navigate\-
+hotkey=
 method=_
 
 [item143]
 section=commands
 caption=Cuda&-Ext\&Navigate\Open file(s) in nearest &right tab(s)...
+hotkey=
 method=open_file_near_right
 
 [item144]
 section=commands
 caption=Cuda&-Ext\&Navigate\Open file(s) in nearest &left tab(s)...
+hotkey=
 method=open_file_near_left
 
 [item145]
 section=commands
 caption=Cuda&-Ext\&Navigate\-
+hotkey=
 method=_
 
 [item146]
 section=commands
 caption=Cuda&-Ext\&Navigate\Navigate by &error in console
+hotkey=
 method=nav_by_console_err
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -345,175 +409,215 @@ method=nav_by_console_err
 [item170]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Choose tab/panel to switch to
+hotkey=Ctrl+P
 method=go_back_dlg
 [item171]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate previously active tab (go &back)
+hotkey=Ctrl+[
 method=go_back
 
 [item172]
 section=commands
 caption=Cuda&-Ext\Ta&bs\-
+hotkey=
 method=_
 
 [item173]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Move tab to &position...
+hotkey=
 method=move_tab
 
 [item174]
 section=commands
 caption=Cuda&-Ext\Ta&bs\-
+hotkey=
 method=_
 
 [item175]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #1 in group #1
+hotkey=Ctrl+1
 method=to_tab_g1_t1
 [item176]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #2 in group #1
+hotkey=Ctrl+2
 method=to_tab_g1_t2
 [item177]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #3 in group #1
+hotkey=Ctrl+3
 method=to_tab_g1_t3
 [item178]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #4 in group #1
+hotkey=Ctrl+4
 method=to_tab_g1_t4
 [item179]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #5 in group #1
+hotkey=Ctrl+5
 method=to_tab_g1_t5
 [item180]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #6 in group #1
+hotkey=Ctrl+6
 method=to_tab_g1_t6
 [item181]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #7 in group #1
+hotkey=Ctrl+7
 method=to_tab_g1_t7
 [item182]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #8 in group #1
+hotkey=Ctrl+8
 method=to_tab_g1_t8
 [item183]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #9 in group #1
+hotkey=Ctrl+9
 method=to_tab_g1_t9
 
 [item184]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #1 in group #2
+hotkey=Alt+1
 method=to_tab_g2_t1
 [item185]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #2 in group #2
+hotkey=Alt+2
 method=to_tab_g2_t2
 [item186]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #3 in group #2
+hotkey=Alt+3
 method=to_tab_g2_t3
 [item187]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #4 in group #2
+hotkey=Alt+4
 method=to_tab_g2_t4
 [item188]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #5 in group #2
+hotkey=Alt+5
 method=to_tab_g2_t5
 [item189]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #6 in group #2
+hotkey=Alt+6
 method=to_tab_g2_t6
 [item190]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #7 in group #2
+hotkey=Alt+7
 method=to_tab_g2_t7
 [item191]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #8 in group #2
+hotkey=Alt+8
 method=to_tab_g2_t8
 [item192]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #9 in group #2
+hotkey=Alt+9
 method=to_tab_g2_t9
 
 [item193]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate last tab in group #1
+hotkey=Ctrl+0
 method=to_tab_g1_last
 [item194]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate last tab in group #2
+hotkey=Alt+0
 method=to_tab_g2_last
 
 [item195]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate next tab (global loop)
+hotkey=
 method=to_next_tab
 [item196]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate previous tab (global loop)
+hotkey=
 method=to_prev_tab
 
 [item197]
 section=commands
 caption=Cuda&-Ext\Ta&bs\-
+hotkey=
 method=_
 
 [item198]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Close tab in next group
+hotkey=
 method=close_tab_from_next_group
 [item199]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Close tab in previous group
+hotkey=
 method=close_tab_from_prev_group
 
 [item200]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\-
+hotkey=
 method=_
 
 [item201]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to next in next group
+hotkey=
 method=view_next_tab_from_next_group
 [item202]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to next in previous group
+hotkey=
 method=view_next_tab_from_prev_group
 [item203]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to previous in next group
+hotkey=
 method=view_prev_tab_from_next_group
 [item204]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to previous in previous group
+hotkey=
 method=view_prev_tab_from_prev_group
 
 [item205]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\-
+hotkey=
 method=_
 
 [item206]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to first in next group
+hotkey=
 method=view_first_tab_from_next_group
 [item207]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to first in previous group
+hotkey=
 method=view_first_tab_from_prev_group
 [item208]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to last in next group
+hotkey=
 method=view_last_tab_from_next_group
 [item209]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to last in previous group
+hotkey=
 method=view_last_tab_from_prev_group
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -521,49 +625,60 @@ method=view_last_tab_from_prev_group
 [item211]
 section=commands
 caption=Cuda&-Ext\&Splitters\Expand side panel
+hotkey=Shift+Ctrl+.
 method=more_tree
 [item212]
 section=commands
 caption=Cuda&-Ext\&Splitters\Narrow side panel
+hotkey=Shift+Ctrl+,
 method=less_tree
 
 [item213]
 section=commands
 caption=Cuda&-Ext\&Splitters\-
+hotkey=
 method=-
 [item214]
 section=commands
 caption=Cuda&-Ext\&Splitters\Expand bottom panel
+hotkey=Alt+.
 method=more_bottom
 [item215]
 section=commands
 caption=Cuda&-Ext\&Splitters\Narrow bottom panel
+hotkey=Alt+,
 method=less_bottom
 
 [item216]
 section=commands
 caption=Cuda&-Ext\&Splitters\-
+hotkey=
 method=-
 [item217]
 section=commands
 caption=Cuda&-Ext\&Splitters\Expand top-left group
+hotkey=Ctrl+.
 method=more_main_grp
 [item218]
 section=commands
 caption=Cuda&-Ext\&Splitters\Narrow top-left group
+hotkey=Ctrl+,
 method=less_main_grp
 
 [item219]
 section=commands
 caption=Cuda&-Ext\&Splitters\-
+hotkey=
 method=-
 [item220]
 section=commands
 caption=Cuda&-Ext\&Splitters\Expand active group
+hotkey=Shift+Alt+.
 method=more_curr_grp
 [item221]
 section=commands
 caption=Cuda&-Ext\&Splitters\Narrow active group
+hotkey=Shift+Alt+,
 method=less_curr_grp
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -571,51 +686,61 @@ method=less_curr_grp
 [item241]
 section=commands
 caption=Cuda&-Ext\Para&graph\Go to beginning
+hotkey=Ctrl+Alt+Left
 method=go_prgph_bgn
 
 [item242]
 section=commands
 caption=Cuda&-Ext\Para&graph\Go to end
+hotkey=Ctrl+Alt+Right
 method=go_prgph_end
 
 [item243]
 section=commands
 caption=Cuda&-Ext\Para&graph\Go to next
+hotkey=
 method=go_prgph_nxt
 
 [item244]
 section=commands
 caption=Cuda&-Ext\Para&graph\Go to previous
+hotkey=
 method=go_prgph_prv
 
 [item249]
 section=commands
 caption=Cuda&-Ext\Para&graph\-
+hotkey=
 method=_
 
 [item250]
 section=commands
 caption=Cuda&-Ext\Para&graph\Align: Configure...
+hotkey=
 method=align_prgph_cfg
 
 [item251]
 section=commands
 caption=Cuda&-Ext\Para&graph\Align: Left justify 
+hotkey=
 method=align_prgph_l
 
 [item252]
 section=commands
 caption=Cuda&-Ext\Para&graph\Align: Right justify 
+hotkey=
 method=align_prgph_r
 
 [item253]
 section=commands
 caption=Cuda&-Ext\Para&graph\Align: Center justify 
+hotkey=
 method=align_prgph_c
 
 [item254]
 section=commands
 caption=Cuda&-Ext\Para&graph\Align: Fully justify 
+hotkey=
 method=align_prgph_f
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -623,21 +748,25 @@ method=align_prgph_f
 [item271]
 section=commands
 caption=Cuda&-Ext\Code &Tree\&Symbols list...
+hotkey=Alt++
 method=symbol_menu
 
 [item272]
 section=commands
 caption=Cuda&-Ext\Code &Tree\Show &current path in statusbar
+hotkey=
 method=tree_path_to_status
 
 [item273]
 section=commands
 caption=Cuda&-Ext\Code &Tree\Set &active node, nearest to caret
+hotkey=
 method=set_nearest_tree_node
 
 [item274]
 section=commands
 caption=Cuda&-Ext\Code &Tree\&Find node...
+hotkey=
 method=find_tree_node
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -645,61 +774,73 @@ method=find_tree_node
 [item311]
 section=commands
 caption=Cuda&-Ext\&Align\Reindent selected lines...
+hotkey=
 method=reindent
 
 [item312]
 section=commands
 caption=Cuda&-Ext\&Align\Indent lines like the first selected
+hotkey=
 method=indent_sel_as_1st
 
 [item313]
 section=commands
 caption=Cuda&-Ext\&Align\Align indentation of selection(s)
+hotkey=
 method=indent_sel_as_bgn
 
 [item314]
 section=commands
 caption=Cuda&-Ext\&Align\Align in lines by separator...
+hotkey=
 method=align_in_lines_by_sep
 
 [item315]
 section=commands
 caption=Cuda&-Ext\&Align\-
+hotkey=
 method=_
 
 [item316]
 section=commands
 caption=Cuda&-Ext\&Align\Join selected lines
+hotkey=
 method=join_lines
 
 [item317]
 section=commands
 caption=Cuda&-Ext\&Align\Delete duplicate spaces
+hotkey=
 method=del_more_spaces
 
 [item318]
 section=commands
 caption=Cuda&-Ext\&Align\-
+hotkey=
 method=_
 
 [item319]
 section=commands
 caption=Cuda&-Ext\&Align\Re-wrap/split lines by margin...
+hotkey=
 method=rewrap_sel_by_margin
 
 [item320]
 section=commands
 caption=Cuda&-Ext\&Align\Re-wrap/split comment at caret
+hotkey=
 method=rewrap_cmt_at_caret
 
 [item321]
 section=commands
 caption=Cuda&-Ext\&Align\Align in lines to center by margin
+hotkey=
 method=align_sel_to_center_by_margin
 
 [item322]
 section=commands
 caption=Cuda&-Ext\&Align\Align in lines to right by margin
+hotkey=
 method=align_sel_to_right_by_margin
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -707,50 +848,60 @@ method=align_sel_to_right_by_margin
 [item341]
 section=commands
 caption=Cuda&-Ext\Fi&le\Open &recent file...
+hotkey=Ctrl+Alt+R
 method=open_recent
 
 [item342]
 section=commands
 caption=Cuda&-Ext\Fi&le\-
+hotkey=
 method=_
 
 [item343]
 section=commands
 caption=Cuda&-Ext\Fi&le\Re&name file...
+hotkey=
 method=rename_file
 
 [item344]
 section=commands
 caption=Cuda&-Ext\Fi&le\Show in &hex viewer
+hotkey=
 method=reopen_as_hex
 
 [item345]
 section=commands
 caption=Cuda&-Ext\Fi&le\Show in &text editor
+hotkey=
 method=reopen_as_text
 
 [item346]
 section=commands
 caption=Cuda&-Ext\Fi&le\-
+hotkey=
 method=_
 
 [item347]
 section=commands
 caption=Cuda&-Ext\Fi&le\Ne&w file and save in current folder...
+hotkey=
 method=new_file_save_as_near_cur
 
 [item348]
 section=commands
 caption=Cuda&-Ext\Fi&le\Open &all files from folder with sub-folders...
+hotkey=
 method=open_all_with_subdir
 
 [item349]
 section=commands
 caption=Cuda&-Ext\Fi&le\Open &current file in default application
+hotkey=
 method=open_with_defapp
 
 [item350]
 section=commands
 caption=Cuda&-Ext\Fi&le\Save editors to a single file...
+hotkey=
 method=save_tabs_to_file
 
