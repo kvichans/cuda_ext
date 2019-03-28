@@ -209,7 +209,7 @@ def find_tree_node():
     def do_find(ag, aid, data=''):
         nonlocal opts, tree_p, prev_wt, ready_l, ready_p
         # What/how/where will search
-        what        = ag.cval('what')
+        what        = ag.val('what')
         if prev_wt==what and ready_l:
             return do_next(ag, 'next')
         prev_wt  = what
@@ -218,7 +218,7 @@ def find_tree_node():
             ready_l, ready_p    = [], -1
             return d(fid='what')
         opts['hist']= add_to_hist(what, opts['hist'])
-        opts.update(ag.cvals(['reex','case','word','wrap']))
+        opts.update(ag.vals(['reex','case','word','wrap']))
         pass;                  #log('opts={}',(opts)) if iflog(log4fun,_log4mod) else 0
         tree_sid    = app.tree_proc(ID_TREE, app.TREE_ITEM_GET_SELECTED)    # cur
         nodes       = tree_p                                                # To find from top
@@ -296,7 +296,7 @@ def find_tree_node():
     stbr    = ag.chandle('stbr')
     app.statusbar_proc(stbr, app.STATUSBAR_ADD_CELL             , tag=1)
     app.statusbar_proc(stbr, app.STATUSBAR_SET_CELL_AUTOSTRETCH , tag=1, value=True)
-    ag.show(lambda ag: set_hist('tree.find_node', upd_dict(opts, ag.cvals(['reex','case','word','wrap']))))
+    ag.show(lambda ag: set_hist('tree.find_node', upd_dict(opts, ag.vals(['reex','case','word','wrap']))))
    #def find_tree_node
    
 

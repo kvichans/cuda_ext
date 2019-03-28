@@ -96,10 +96,10 @@ def _dlg_FIL():
         ed.cmd(cmds.cmd_DialogFind if dlg=='find' else cmds.cmd_DialogReplace)
         if app.app_api_version()>='1.0.248':
             app.app_proc(app.PROC_SET_FINDER_PROP, d(
-                find_d      = ag.cval('what')
-            ,   op_regex_d  = ag.cval('reex')
-            ,   op_case_d   = ag.cval('case')
-            ,   op_word_d   = ag.cval('word')
+                find_d      = ag.val('what')
+            ,   op_regex_d  = ag.val('reex')
+            ,   op_case_d   = ag.val('case')
+            ,   op_word_d   = ag.val('word')
             ))
     def do_attr(ag, aid, data=''):
         nonlocal prev_wt
@@ -118,7 +118,7 @@ def _dlg_FIL():
                 insm    = app.dlg_input(_('Instant search minimum'), str(opts['insm']))
                 opts['insm']    = int(insm) if insm and re.match(r'^\d+$', insm) else opts['insm']
             if tag=='inst':
-                fil_what         = ag.cval('what')
+                fil_what         = ag.val('what')
                 fil_restart_dlg  = True
                 return None
             if tag=='natf':
@@ -153,7 +153,7 @@ def _dlg_FIL():
         crt     = ed.get_carets()[0][:]     # Current first caret (col,row, col?,row?)
         min_rc  = (crt[1], crt[0])  if crt[2]==-1 else  min((crt[1], crt[0]), (crt[3], crt[2]))
         max_rc  = (crt[1], crt[0])  if crt[2]==-1 else  max((crt[1], crt[0]), (crt[3], crt[2]))
-        what    = ag.cval('what')
+        what    = ag.val('what')
         if prev_wt==what and ready_l:# and 'stay' not in data:
             pass;              #log('will jump',()) if iflog(log4fun,_log4mod) else 0
             if 1==len(ready_l):                         return  d(fid='what')
@@ -169,7 +169,7 @@ def _dlg_FIL():
             return                      d(form=d(cap=form_cpw()) ,fid='what')
         if not opts['inst']:
             opts['hist']= add_to_hist(what, opts['hist'])
-        opts.update(ag.cvals(['reex','case','word']))
+        opts.update(ag.vals(['reex','case','word']))
         # New search
         ready_l = []
         ready_p = -1
@@ -249,7 +249,7 @@ def _dlg_FIL():
     )
     if opts['inst'] and what:
         ag.update(do_find(ag, 'find', 'stay'))
-    ag.show(lambda ag: set_hist('find.find_in_lines', upd_dict(opts, ag.cvals(['reex','case','word']))))
+    ag.show(lambda ag: set_hist('find.find_in_lines', upd_dict(opts, ag.vals(['reex','case','word']))))
    #def _dlg_FIL
 
 
