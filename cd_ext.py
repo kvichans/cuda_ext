@@ -3,12 +3,11 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.01 2019-03-28'
+    '1.7.02 2019-03-29'
 ToDo: (see end of file)
 '''
 
-import  re, os, sys, json, collections, time, traceback
-from    collections     import deque
+import  re, os, sys, json, time, traceback
 from    fnmatch         import fnmatch
 
 import  cudatext            as app
@@ -27,27 +26,15 @@ except:
     _   = lambda p:p
 
 d       = dict
-OrdDict = collections.OrderedDict
-#first_true  = lambda iterable, default=False, pred=None: next(filter(pred, iterable), default)  # 10.1.2. Itertools Recipes
 
 FROM_API_VERSION    = '1.0.119'
 FROM_API_VERSION    = '1.0.182'     # PROC_SPLITTER_GET/SET, LOG_CONSOLE_GET_MEMO_LINES
-MIN_API_VER_4_REPL  = '1.0.169'
-MIN_API_VER_4_REPL  = '1.0.187'     # LEXER_GET_PROP
 
 ONLY_SINGLE_CRT     = _("{} doesn't work with multi-carets")
 ONLY_FOR_NO_SEL     = _("{} works when no selection")
 NO_PAIR_BRACKET     = _("Cannot find matching bracket for '{}'")
-FIND_FAIL_FOR_STR   = _("Cannot find: {}")
 NO_FILE_FOR_OPEN    = _("Cannot open: {}")
 NEED_UPDATE         = _("Need update CudaText")
-EMPTY_CLIP          = _("Empty value in clipboard")
-NO_LEXER            = _("No lexer")
-#UPDATE_FILE         = _("File '{}' is updated")
-USE_NOT_EMPTY       = _("Set not empty values")
-ONLY_FOR_ML_SEL     = _("{} works with multiline selection")
-NO_SPR_IN_LINES     = _("No separator '{}' in selected lines")
-DONT_NEED_CHANGE    = _("Text change not needed")
 
 pass;                           # Logging
 pass;                           from pprint import pformat
@@ -502,13 +489,15 @@ class Jumps_cmds:
             free_crt    = apx.get_opt('caret_after_end', False)
             move_crt    = apx.get_opt('cuda_ext_horz_scroll_move_caret', False)
             shift       = apx.get_opt('cuda_ext_horz_scroll_size', 30)
-            old_lf_col  = ed.get_prop(app.PROP_COLUMN_LEFT)
+#           old_lf_col  = ed.get_prop(app.PROP_COLUMN_LEFT)
+            old_lf_col  = ed.get_prop(app.PROP_SCROLL_HORZ)
             
             new_lf_col  = old_lf_col + (-shift if place=='lf' else shift)
             new_lf_col  = max(new_lf_col, 0)
             pass;              #LOG and log('cols,old_l,new_l={}',(old_lf_col,new_lf_col))
             if new_lf_col==old_lf_col:                          return # Good state
-            ed.set_prop(app.PROP_COLUMN_LEFT, str(new_lf_col))
+#           ed.set_prop(app.PROP_COLUMN_LEFT, str(new_lf_col))
+            ed.set_prop(app.PROP_SCROLL_HORZ, str(new_lf_col))
             
             if not (free_crt and move_crt):                     return # No need opts
             # Move caret if it isnot shown
