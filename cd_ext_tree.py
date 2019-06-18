@@ -2,19 +2,21 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.7.01 2019-03-28'
+    '1.7.02 2019-06-11'
 ToDo: (see end of file)
 '''
 
 import  re, os
 
-import  cudatext            as app
-from    cudatext        import ed
-from    cudatext_keys   import *
-import  cudatext_cmd        as cmds
-import  cudax_lib           as apx
-from    cuda_kv_base    import *
-from    cuda_kv_dlg     import *
+import          cudatext            as app
+from            cudatext        import ed
+from            cudatext_keys   import *
+import          cudatext_cmd        as cmds
+import          cudax_lib           as apx
+try:    from    cuda_kv_base    import *    # as separated plugin
+except: from     .cd_kv_base    import *    # as part of this plugin
+try:    from    cuda_kv_dlg     import *    # as separated plugin
+except: from     .cd_kv_dlg     import *    # as part of this plugin
 
 try:# I18N
     _   = get_translation(__file__)
@@ -28,13 +30,15 @@ first_true  = lambda iterable, default=False, pred=None: next(filter(pred, itera
 
 
 def symbol_menu():
+    symbol_menu_levels()
+def symbol_menu_levels(levels=0):
     pass;                       log4fun=-1== 1  # Order log in the function
     if  app.app_api_version() >= '1.0.277' and \
         ed.get_prop(app.PROP_CODETREE_MODIFIED_VERSION) < ed.get_prop(app.PROP_MODIFIED_VERSION):
         ed.cmd(cmds.cmd_TreeUpdate)
     h_tree = app.app_proc(app.PROC_GET_CODETREE, '')
         
-    def tree_items_to_list(props=None, id_node=0, prefix=''):
+    def tree_items_to_list(props=None, id_node=0, prefix='', more_levels=1000):
         '''Get all tree nodes to "props" starting from id_node (e.g. 0)'''
         props = [] if props is None else props 
         nodes = app.tree_proc(h_tree, app.TREE_ITEM_ENUM, id_node)
@@ -53,14 +57,15 @@ def symbol_menu():
                                 , prop['text']
                                 , f('{}:{}', 1+rng[1], 1+rng[3]))
                 props.append(prop)
-            if subs:
+            if subs and more_levels:
                 # need items with sub_items too
-                tree_items_to_list(props, id_kid, prefix+' '*4)
+                tree_items_to_list(props, id_kid, prefix+' '*4, more_levels-1)
         return props
        #def tree_items_to_list
     
+    old_api     = app.app_api_version() < '1.0.277'
     while True:
-        props = tree_items_to_list()
+        props = tree_items_to_list(more_levels=(levels-1 if levels else 1000))
         if not props:
             ed.cmd(cmds.cmd_TreeUpdate)
             props = tree_items_to_list()
@@ -74,12 +79,27 @@ def symbol_menu():
         start_item  = min(covers)[1] if covers else 0
         res = app.dlg_menu(app.MENU_LIST+app.MENU_NO_FULLFILTER
                         , items 
-                        + ([_('<Update Code Tree>')] if app.app_api_version() < '1.0.277' else [])
+                        + ([_('<Update Code Tree>')] if old_api else [])
+                        + [_('              <All levels>')]
+                        + [_('              <Only 1 up level>')]
+                        + [_('              <Only 2 up levels>')]
                         , focused=start_item
-                        , caption=_('Code Tree symbols'))
+                        , caption=_('Code Tree symbols')
+                                 + f(' ({})'    , len(items))
+                                 +(f(' (up {})' , levels    ) if levels else '')
+                        )
         if res is None: return
-        if res==len(props):
+        if res==len(props) and old_api:
             ed.cmd(cmds.cmd_TreeUpdate)
+            continue#while
+        if res==0+len(props) + (1 if old_api else 0):
+            levels  = 0
+            continue#while
+        if res==1+len(props) + (1 if old_api else 0):
+            levels  = 1
+            continue#while
+        if res==2+len(props) + (1 if old_api else 0):
+            levels  = 2
             continue#while
         break
        #while
@@ -178,7 +198,7 @@ def find_tree_node():
             return []
            #def wnen_menu
         
-        ag.show_menu(set_all_for_tree(
+        ag.show_menu(
             [ d(    tag='help'  ,cap=_('&Help...')
             ),d(                 cap='-'
             ),d(    tag='prev'  ,cap=_('Find &previous')                                ,key='Shift+Enter'
@@ -189,8 +209,10 @@ def find_tree_node():
                 ),d(tag='clos'  ,cap=_('Close on success')      ,ch=opts['clos']
             )]),d(               cap='-'
             ),d(    tag='rest'  ,cap=_('Restore initial selection and close dialog &=') ,key='Shift+Esc'
-            )], 'sub', 'cmd', wnen_menu)    # Set cmd=wnen_menu for all nodes
-        ,   aid)
+            )]
+        ,   aid
+        ,   cmd4all=wnen_menu                                   # Set cmd=wnen_menu for all nodes
+        )
         return d(fid='what')
        #def do_menu
     

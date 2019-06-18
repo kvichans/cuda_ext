@@ -3,24 +3,23 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.02 2019-03-29'
+    '1.7.03 2019-05-22'
 ToDo: (see end of file)
 '''
-
-import  re, os, sys, json, time, traceback
+import  re, os, sys, json, time, traceback, unicodedata
 from    fnmatch         import fnmatch
 
-import  cudatext            as app
-from    cudatext        import ed
-from    cudatext_keys   import *
-import  cudatext_cmd        as cmds
-import  cudax_lib           as apx
-#from    cudax_lib       import log
-from    cuda_kv_base    import *
-from    cuda_kv_dlg     import *
+import          cudatext            as app
+from            cudatext        import ed
+from            cudatext_keys   import *
+import          cudatext_cmd        as cmds
+import          cudax_lib           as apx
+
+try:    from    cuda_kv_base    import *    # as separated plugin
+except: from     .cd_kv_base    import *    # as part of this plugin
+try:    from    cuda_kv_dlg     import *    # as separated plugin
+except: from     .cd_kv_dlg     import *    # as part of this plugin
 try:
-#   from    .cd_plug_lib    import *
-    # I18N
     _   = get_translation(__file__)
 except:
     _   = lambda p:p
@@ -42,15 +41,22 @@ pass;                           pfrm100=lambda d:pformat(d,width=100)
 pass;                           LOG = (-2== 2)  # Do or dont logging.
 pass;                           ##!! waits correction
 
-c1      = chr(1)
+#C1      = chr(1)
 GAP     = 5
+
+def _get_filename(_ed):
+    fn  = _ed.get_filename()
+    if fn=='?':     # Not text content
+        fn  = _ed.get_filename('*') if app.app_api_version()>='1.0.287' else ''
+    return fn
+   #def _get_filename
 
 def _file_open(op_file):
     if not app.file_open(op_file):
         return None
     for h in app.ed_handles():
         op_ed   = app.Editor(h)
-        if op_ed.get_filename() and os.path.samefile(op_file, op_ed.get_filename()):
+        if _get_filename(op_ed) and os.path.samefile(op_file, _get_filename(op_ed)):
             return op_ed
     return None
    #def _file_open
@@ -1056,7 +1062,7 @@ class Nav_cmds:
 
     @staticmethod
     def _open_file_near(where='right'):
-        cur_path= ed.get_filename()
+        cur_path= _get_filename(ed)
         init_dir= os.path.dirname(cur_path) if cur_path else ''
         fls     = app.dlg_file(True, '*', init_dir, '')   # '*' - multi-select
         if not fls: return
@@ -1081,7 +1087,7 @@ class Nav_cmds:
         if app.app_api_version()<FROM_API_VERSION:  return app.msg_status(NEED_UPDATE)
         cons_out= '\n'.join(app.app_log(app.LOG_CONSOLE_GET_MEMO_LINES, ''))
 #       cons_out= app.app_log(app.LOG_CONSOLE_GET_LOG, '')
-        fn      = ed.get_filename()
+        fn      = _get_filename(ed)
         if not fn:      return app.msg_status(_('Only for saved file'))
         fn_ln_re= f('File "{}", line ', fn).replace('\\','\\\\')+'(\d+)'
         pass;                      #LOG and log('fn_ln_re={}',fn_ln_re)
@@ -1096,7 +1102,7 @@ class Nav_cmds:
     @staticmethod
     def open_selected():
         pass;                      #LOG and log('ok',)
-        bs_dirs     = [os.path.dirname(ed.get_filename())
+        bs_dirs     = [os.path.dirname(_get_filename(ed))
                     ,  os.environ.get('TEMP', '')
                     ]
         crts        = ed.get_carets()
@@ -1332,6 +1338,17 @@ class Insert_cmds:
        #def fill_by_str
 
     @staticmethod
+    def copy_unicode_char_name():
+        ch_xy   = ed.get_carets()[0][:2]
+        ch_line = ed.get_text_line(ch_xy[1])
+        ch      = ch_line[ch_xy[0]:ch_xy[0]+1]
+        if not ch: return 
+        ch_um   = unicodedata.name(ch)
+        app.app_proc(app.PROC_SET_CLIP, ch_um)
+        app.msg_status(f('Copy "{}"', ch_um))
+       #def copy_unicode_char_name
+
+    @staticmethod
     def insert_char_by_hex():
         hexcode = app.dlg_input('Unicode hex code:     0xhhhh  or  hhhh  or  hh', '')
         if not hexcode:
@@ -1530,7 +1547,7 @@ class Command:
 
 
     def rename_file(self):
-        old_path= ed.get_filename()
+        old_path= _get_filename(ed)
         if not old_path:
             return ed.cmd(cmds.cmd_FileSaveAs)
         old_fn  = os.path.basename(old_path)
@@ -1598,7 +1615,7 @@ class Command:
        #def rename_file
 
     def reopen_as(self, how):
-        fn  = ed.get_filename()
+        fn  = _get_filename(ed)
         if not fn or ed.get_prop(app.PROP_MODIFIED):
             return app.msg_status(_('Save file first'))
         
@@ -1621,7 +1638,7 @@ class Command:
        #def reopen_as
 
     def new_file_save_as_near_cur(self):
-        cur_fn  = ed.get_filename()
+        cur_fn  = _get_filename(ed)
         if not cur_fn:  return app.msg_status(_('Warning: the command needs a named tab.'))
         cur_dir = os.path.dirname(cur_fn)
         new_fn  = app.dlg_file(False, '', cur_dir, '')
@@ -1678,7 +1695,7 @@ class Command:
        #def open_recent
 
     def open_all_with_subdir(self):
-        src_dir = app.dlg_dir(os.path.dirname(ed.get_filename()))
+        src_dir = app.dlg_dir(os.path.dirname(_get_filename(ed)))
         if not src_dir: return
         masks   = app.dlg_input(_('Mask(s) for filename ("*" - all files; "*.txt *.bat" - two masks)'), '*')
         if not masks: return
@@ -1714,7 +1731,7 @@ class Command:
     
     def open_with_defapp(self):
         if not os.name=='nt':       return app.msg_status(_('Command is for Windows only.'))
-        cf_path     = ed.get_filename()
+        cf_path     = _get_filename(ed)
         if not cf_path:             return app.msg_status(_('No file to open. '))
         if ed.get_prop(app.PROP_MODIFIED) and \
             app.msg_box(  _('Text is modified!'
@@ -1810,6 +1827,7 @@ class Command:
     def paste_trimmed(self):                    return Insert_cmds.paste_trimmed()
     def trim_sel(self, mode):                   return Insert_cmds.trim_sel(mode)
     def fill_by_str(self):                      return Insert_cmds.fill_by_str()
+    def copy_unicode_char_name(self):           return Insert_cmds.copy_unicode_char_name()
     def insert_char_by_hex(self):               return Insert_cmds.insert_char_by_hex()
     
     def copy_term(self):                        return SCBs.copy_term()

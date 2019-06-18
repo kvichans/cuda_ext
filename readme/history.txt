@@ -1,6 +1,13 @@
+1.7.03 (2019-06-18)
+added: Dialog "Find in Lines" can be non-modal and docked
+added: Command "Split lines by margin" keeps empty and blank-only lines in selection
+added: Command "Copy unicode char name"
+added: Call dialog "Symbol list" with commands "Symbols list (only 1/2 up level)"
+fixed: Skip non-text (e.g. picture) tabs in text-only commands
+
 1.7.01 (2019-03-28)
 added: Demand plugins cuda_kv_base, cuda_kv_dlg (auto installed by Addons Manager)
-fixed: Dialog "Symbol list" auto update symbol's data
+fixed: Dialog "Symbol list" auto update symbol's tree
 
 1.6.02 (2019-03-14)
 added: Command "Open file by selected name" searches in current dir and also in TEMP

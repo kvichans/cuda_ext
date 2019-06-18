@@ -2,19 +2,21 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.7.01 2019-03-28'
+    '1.7.02 2019-06-18'
 ToDo: (see end of file)
 '''
 
 import  re, os, sys
 
-import  cudatext            as app
-from    cudatext        import ed
-from    cudatext_keys   import *
-import  cudatext_cmd        as cmds
-import  cudax_lib           as apx
-from    cuda_kv_base    import *
-from    cuda_kv_dlg     import *
+import          cudatext            as app
+from            cudatext        import ed
+from            cudatext_keys   import *
+import          cudatext_cmd        as cmds
+import          cudax_lib           as apx
+try:    from    cuda_kv_base    import *    # as separated plugin
+except: from     .cd_kv_base    import *    # as part of this plugin
+try:    from    cuda_kv_dlg     import *    # as separated plugin
+except: from     .cd_kv_dlg     import *    # as part of this plugin
 
 try:# I18N
     _   = get_translation(__file__)
@@ -25,342 +27,9 @@ pass;                           import cudatext_keys
 pass;                           _log4mod = LOG_FREE  # Order log in the module
 
 d       = dict
-c1      = chr(1)
+C1      = chr(1)
 
 class FiL:
-    rerun       = False
-    ed_crts     = None                                          # Carets at start
-    what        = None                                          # String to search 
-    ag          = None                                          # Nonmodal obj
-    
-    def show(self, reuse=True):
-        pass;                   log4fun=1                       # Order log in the function
-        FiL.ag      = FiL.ag if (reuse and FiL.ag and FiL.ag.islived()) else None
-        pass;                   log("FiL.ag={}",(FiL.ag)) if logif(log4fun,_log4mod) else 0
-        if FiL.ag:  return FiL.ag.activate()
-        FiL.ed_crts = ed.get_carets()                           # Carets at start
-        FiL.what    = None
-        while True:
-            FiL.rerun   = False
-            self._show()
-            pass;               log("FiL.rerun={}",(FiL.rerun)) if logif(log4fun,_log4mod) else 0
-            if not FiL.rerun:   break
-       #def show
-
-    def _show(self):
-        pass;                   log4fun=1                       # Order log in the function
-        pass;                   log("FiL.ag={}",(FiL.ag)) if logif(log4fun,_log4mod) else 0
-    #   FORM_C  = f(_('Find in Lines {}'), 1+ed.get_prop(app.PROP_INDEX_GROUP))
-        FORM_C  =   _('Find in Lines')
-        HELP_C  = _(
-            '• Search "in Lines" starts on Enter or Shift+Enter or immediately (if "Instant search" is tuned on).'
-          '\r• A found fragment after first caret will be selected.'
-          '\r• All found fragments are remembered and dialog can jump over them by [Shift+]Enter or by menu commands.'
-          '\r• Option ".*" (regular expression) allows to use Python reg.ex. See "docs.python.org/3/library/re.html".'
-          '\r• Option "w" (whole words) is ignored if entered string contains not a word.'
-          '\r• If option "Instant search" (in menu) is tuned on, search result will be updated on start and after each change of pattern.'
-          '\r• Command "Restore initial selection" (in menu) restores only first of initial carets.'
-          '\r• Ctrl+F (or Ctrl+R) to call appication dialog Find (or Replace).'
-        )
-        pass;                      #log('###',()) if logif(log4fun,_log4mod) else 0
-        pass;                      #log('hist={}',(get_hist('find.find_in_lines'))) if logif(log4fun,_log4mod) else 0
-        opts    = d(reex=False,case=False,word=False,hist=[],usel=False,dock='',nmdl=False,inst=False,insm=3)
-        opts.update(get_hist('find.find_in_lines', opts))
-
-        # How to select node
-        select_frag = lambda frag_inf:  ed.set_caret(*frag_inf)
-        
-        # Ask
-        compile_pttn= lambda    pttn_s, reex, case, word: re.compile(
-                                pttn_s          if reex else
-                          r'\b'+pttn_s+r'\b'    if word and re.match('^\w+$', pttn_s) else
-                      re.escape(pttn_s)
-                            ,   0 if case else re.I)
-        
-        prev_wt = None          # Prev what
-        ready_l = []            # [(row,col_bgn,col_end)]
-        ready_p = -1            # pos in ready_l
-        
-#       form_cap= lambda: f('{} ({}/{})', FORM_C, 1+ready_p, len(ready_l)) if ready_l else f('{} (0)', FORM_C)
-#       form_cpw= lambda: FORM_C + (f(_(' (Type {} character(s) to find)'), opts['insm'])
-#                                       if opts['inst'] else
-#                                     _(' (ENTER to find)'))
-#       form_err= lambda: FORM_C +  _(' (Error)')
-        
-#       mess_cap= lambda: (d(ctrls=d(mess=d(cap=form_cap())),fid='what') if opts['dock'] else d(form=d(cap=form_cap()),fid='what'))
-#       mess_cpw= lambda: (d(ctrls=d(mess=d(cap=form_cpw())),fid='what') if opts['dock'] else d(form=d(cap=form_cpw()),fid='what'))
-#       mess_err= lambda: (d(ctrls=d(mess=d(cap=form_err())),fid='what') if opts['dock'] else d(form=d(cap=form_err()),fid='what'))
-        def msg_(msg=None):
-            msg =(msg                                                   if msg else
-                  f('{}/{}', 1+ready_p, len(ready_l))                   if ready_l else
-                  f(_('Type {} character(s) to find'), opts['insm'])    if opts['inst'] else
-                  _('ENTER to find')
-                 )
-            msg = f('{}: {}' , FORM_C, msg)                     if opts['dock'] else \
-                  f('{} ({})', FORM_C, msg)
-            return msg
-           #def msg_
-        def msg_upd(msg=None):
-            msg = msg_(msg)
-            return {'ctrls':{'mess':{'cap':msg}},'fid':'what'}  if opts['dock'] else \
-                   {'form':         {'cap':msg} ,'fid':'what'}
-           #def msg_upd
-        
-        def switch_to_dlg(ag, dlg='find'):
-            ag.opts['on_exit_focus_to_ed'] = None
-            ag.hide()
-            ed.cmd(cmds.cmd_DialogFind if dlg=='find' else cmds.cmd_DialogReplace)
-            if app.app_api_version()>='1.0.248':
-                app.app_proc(app.PROC_SET_FINDER_PROP, d(
-                    find_d      = ag.val('what')
-                ,   op_regex_d  = ag.val('reex')
-                ,   op_case_d   = ag.val('case')
-                ,   op_word_d   = ag.val('word')
-                ))
-
-        def do_attr(ag, aid, data=''):
-            nonlocal prev_wt
-            prev_wt = ''
-            return do_find(ag, 'find', 'stay')  # if opts['inst'] else d(fid='what')
-
-        def do_menu(ag, aid, data=''):
-            def wnen_menu(ag, tag):
-                nonlocal opts
-                if tag in ('clos'
-                          ,'usel'
-                          ,'inst'):
-                    opts[tag]       = not opts[tag]
-                if tag in ('nmdl'
-                          ,):
-                    opts['nmdl']     = not opts['nmdl']
-                    FiL.rerun       = True
-                    if not opts['nmdl']:                        # Rerun nonmodal to modal
-                        app.timer_proc(app.TIMER_START_ONE, lambda tag:theFiL.show(False), 200, tag='')
-                    return None
-                if tag in ('dckt'
-                          ,'dckb'):
-                    dock_old        = opts['dock']
-                    opts['dock']    = 't' if tag=='dckt' and opts['dock']!='t' else \
-                                      'b' if tag=='dckb' and opts['dock']!='b' else \
-                                      ''
-                    FiL.rerun       = True
-                    if dock_old and not opts['dock']:           # Rerun dock to non dock
-                        app.timer_proc(app.TIMER_START_ONE, lambda tag:theFiL.show(False), 200, tag='')
-                    return None
-                if tag=='help':             app.msg_box(HELP_C, app.MB_OK)
-                if tag in ('prev','next'):  return do_find(ag, tag)
-                if tag=='rest':
-                    ed.set_caret(*FiL.ed_crts[0])
-                    return None
-                if tag=='insm':
-                    insm    = app.dlg_input(_('Instant search minimum'), str(opts['insm']))
-                    opts['insm']    = int(insm) if insm and re.match(r'^\d+$', insm) else opts['insm']
-                if tag=='inst':
-                    FiL.what        = ag.val('what')
-                    FiL.rerun       = True
-                    return None
-                if tag=='natf':
-                    switch_to_dlg(ag)
-                    return None
-                if tag=='natr':
-                    switch_to_dlg(ag, 'rep')
-                    return None
-                return []
-               #def wnen_menu
-            insm_c  = f(_('Instant search &minimum: {}...'), opts['insm'])
-            ag.show_menu(set_all_for_tree(
-    [ d(    tag='help'  ,cap=_('&Help...')                                      
-    ),d(                 cap='-'
-    ),d(    tag='prev'  ,cap=_('Find &previous')                                ,key='Shift+Enter'
-    ),d(    tag='next'  ,cap=_('F&ind next')                                    ,key='Enter'
-    ),d(                 cap='-'
-    ),d(                 cap=_('&Options')  ,sub=
-        [ d(tag='usel'  ,cap=_('Use &selection from text')  ,ch=opts['usel']
-        ),d(tag='nmdl'  ,cap=_('Do not hide on &ESC')       ,ch=opts['nmdl']    ,en=opts['dock']==''
-        ),d(             cap='-'
-        ),d(tag='dckt'  ,cap=_('Dock to window &top')       ,ch=opts['dock']=='t'
-        ),d(tag='dckb'  ,cap=_('Dock to window &bottom')    ,ch=opts['dock']=='b'
-        ),d(             cap='-'
-        ),d(tag='inst'  ,cap=_('&Instant search')           ,ch=opts['inst']
-        ),d(tag='insm'  ,cap=insm_c                                             
-    )]),d(               cap='-'
-    ),d(    tag='natf'  ,cap=_('Call app Find dialog')                          ,key='Ctrl+F'
-    ),d(    tag='natr'  ,cap=_('Call app Replace dialog')                       ,key='Ctrl+R'
-    ),d(    tag='rest'  ,cap=_('Restore initial selection and close dialog &=') ,key='Shift+Esc'
-                )], 'sub', 'cmd', wnen_menu)    # Set cmd=wnen_menu for all nodes
-            ,   aid
-            )
-            return d(fid='what')
-           #def do_menu
-        
-        def do_find(ag, aid, data=''):
-            nonlocal opts, prev_wt, ready_l, ready_p
-            pass;               log4fun=1                       # Order log in the function
-            pass;              #log('aid, data={}',(aid, data)) if logif(log4fun,_log4mod) else 0
-            # What/how will search
-            prnx    = 'prev' if aid=='prev' else 'next'
-            crt     = ed.get_carets()[0][:]     # Current first caret (col,row, col?,row?)
-            min_rc  = (crt[1], crt[0])  if crt[2]==-1 else  min((crt[1], crt[0]), (crt[3], crt[2]))
-            max_rc  = (crt[1], crt[0])  if crt[2]==-1 else  max((crt[1], crt[0]), (crt[3], crt[2]))
-            what    = ag.val('what')
-            if prev_wt==what and ready_l:# and 'stay' not in data:
-                pass;           log('will jump',()) if logif(log4fun,_log4mod) else 0
-                if 1==len(ready_l):                         return  d(fid='what')
-                ready_p = (ready_p + (-1 if aid=='prev' else 1)) % len(ready_l)
-                select_frag(ready_l[ready_p])
-                return                      msg_upd()
-#               return                      d(form=d(cap=form_cap()) ,fid='what')
-            prev_wt  = what
-            if not what:
-                ready_l, ready_p    = [], -1
-                return                      msg_upd()
-#               return                      d(form=d(cap=form_cpw()) ,fid='what')
-            if opts['inst'] and len(what)<opts['insm'] and not opts['reex'] :
-                ready_l, ready_p    = [], -1
-                return                      msg_upd()
-#               return                      d(form=d(cap=form_cpw()) ,fid='what')
-            if not opts['inst']:
-                opts['hist']= add_to_hist(what, opts['hist'])
-            opts.update(ag.vals(['reex','case','word']))
-            # New search
-            ready_l = []
-            ready_p = -1
-            pttn_r  = None
-            try:
-                pttn_r  = compile_pttn(what, opts['reex'], opts['case'], opts['word'])
-            except Exception as ex:
-                return [d(ctrls=[('what',d(items=opts['hist']))])
-                       ,msg_upd(str(ex))]
-#               return d(ctrls=[('what',d(items=opts['hist']))]
-#                       ,form=d(cap=form_err())
-#                       ,fid='what')
-            for row in range(ed.get_line_count()):
-                line    = ed.get_text_line(row)
-                mtchs   = pttn_r.finditer(line)
-                if not mtchs:  continue
-                for mtch in mtchs:
-                    fnd_bgn = mtch.start()
-                    fnd_end = mtch.end()
-                    ready_p = (len(ready_l)
-                                if prnx=='next' and ready_p==-1 and                             # Need next and no yet
-                                    (row>max_rc[0] or row==max_rc[0] and fnd_bgn>max_rc[1])     # At more row or at more col in cur row
-                                or prnx=='prev'                 and                             # Need prev
-                                    (row<min_rc[0] or row==min_rc[0] and fnd_end<min_rc[1])     # At less row or at less col in cur row
-                                else ready_p)
-                    ready_l+= [(fnd_end, row, fnd_bgn, row)]
-            pass;              #log('ready_l={}',(ready_l)) if logif(log4fun,_log4mod) else 0
-            ready_p = max(0, ready_p) if ready_l else -1
-            pass;              #log('ready_p={}',(ready_p)) if logif(log4fun,_log4mod) else 0
-            # Show results
-            if ready_l:
-                if aid=='find' and 'stay' in data:
-                    ready_p = (ready_p-1) % len(ready_l)
-                pass;          #log('show rslt ready_p={}',(ready_p,)) if logif(log4fun,_log4mod) else 0
-                select_frag(ready_l[ready_p])
-            pass;               log('ready_p={}/{}',ready_p,len(ready_l)) if logif(log4fun,_log4mod) else 0
-            pass;               log('msg_upd()={}',msg_upd()) if logif(log4fun,_log4mod) else 0
-            return [d(ctrls=d(what=d(items=opts['hist'])))
-                   ,msg_upd('0' if not ready_l else None)]
-#           return d(ctrls=[('what',d(items=opts['hist']))]
-#                   ,form=d(cap=form_cap())
-#                   ,fid='what')
-           #def do_find
-        
-        what    = FiL.what              if FiL.what is not None      else \
-                  ed.get_text_sel()     if opts['usel'] and 1==len(ed.get_carets()) else ''
-        what    = '' if '\r' in what or '\n' in what else what
-        
-        def do_key_down(ag, key, data=''):
-            scam    = data if data else app.app_proc(app.PROC_GET_KEYSTATE, '')
-            pass;              #log("scam,key={}",(scam,get_const_name(key, module=cudatext_keys)))
-            if 0:pass
-            elif (scam,key)==('s',VK_ENTER):                        # Shift+Enter
-                ag.update(do_find(ag, 'prev'))
-            elif (scam,key)==('' ,VK_ESCAPE) and opts['nmdl']:      # Esc
-                pass;           log("",())
-                ed.focus()
-                return False                                        # Dont close dlg
-            elif (scam,key)==('s',VK_ESCAPE):                       # Shift+Esc
-                ed.set_caret(*FiL.ed_crts[0])
-                ag.hide()
-            elif (scam,key)==('c',ord('F')) or \
-                 (scam,key)==('c',ord('R')):                        # Ctrl+F or Ctrl+R
-                switch_to_dlg(ag, 'find' if key==ord('F') else 'repl')
-            else: return [] # Nothing
-            return False    # Stop event
-           #def do_key_down
-        
-        wh_tp   = 'edit'    if opts['inst'] else 'cmbx'
-        wh_call = do_find   if opts['inst'] else None
-        dock    = opts['dock']
-        wtwd    = 200 if dock else 85
-        mswd    = 150 if dock else 0
-        menx    = 5+38*3+5+wtwd+5
-        msg     = msg_()
-        ag      = DlgAg(
-            form    =dict(cap=msg, w=5+38*3+5+wtwd+5+39+5, h=35, h_max=35
-                         ,on_key_down=do_key_down
-                         ,frame='resize'
-                         )
-        ,   ctrls   =[0
-      ,('find',d(tp='bttn'  ,y=0        ,x=-99      ,w=11   ,cap=''     ,sto=False  ,def_bt='1'         ,on=do_find         ))  # Enter
-      ,('reex',d(tp='chbt'  ,tid='what' ,x=5+38*0   ,w=39   ,cap='&.*'  ,hint=_('Regular expression')   ,on=do_attr         ))  # &*
-      ,('case',d(tp='chbt'  ,tid='what' ,x=5+38*1   ,w=39   ,cap='&aA'  ,hint=_('Case sensitive')       ,on=do_attr         ))  # &a
-      ,('word',d(tp='chbt'  ,tid='what' ,x=5+38*2   ,w=39   ,cap='"&w"' ,hint=_('Whole words')          ,on=do_attr         ))  # &w
-      ,('what',d(tp=wh_tp   ,y  =5      ,x=5+38*3+5 ,w=wtwd ,items=opts['hist']                         ,on=wh_call ,a=''   if dock else 'r>'   ))  # 
-      ,('menu',d(tp='bttn'  ,tid='what' ,x=menx     ,w=39   ,cap='&='                   ,on_menu=do_menu,on=do_menu ,a=''   if dock else '>>'   ))  # &=
-      ,('mess',d(tp='labl'  ,tid='what' ,x=menx+39+5,w=mswd ,cap=msg                                                ,a='r>' if dock else ''     ))  # 
-                    ][1:]
-        ,   fid     ='what'
-        ,   vals    =upd_dict({k:opts[k] for k in ('reex','case','word')}, d(what=what))
-       #,   opts={}
-        )
-        pass;                      #ag.gen_repro_code('repro_dlg_fil.py')
-        if opts['inst'] and what:
-            ag.update(do_find(ag, 'find', 'stay'))
-
-        FiL.ag  = ag if opts['nmdl'] or opts['dock'] else None
-        pass;                   log("FiL.ag={}",(FiL.ag)) if logif(log4fun,_log4mod) else 0
-        def on_exit(ag):
-            pass;                   log("FiL.rerun,FiL.ag={}",(FiL.rerun,FiL.ag)) if logif(log4fun,_log4mod) else 0
-            set_hist('find.find_in_lines', upd_dict(opts, ag.vals(['reex','case','word'])))
-            fil_ag  = None
-        ag.dock(opts['dock'])
-        ag.show( on_exit=on_exit
-                ,modal=not (opts['nmdl'] or opts['dock'])
-                )
-       #def _show
-   #class FiL
-theFiL          = FiL()                                         # Single obj
-
-def dlg_find_in_lines():                                        #NOTE: dlg_find_in_lines
-#   dlg_find_in_lines__old()
-    theFiL.show()   # new!
-   #def dlg_find_in_lines
-
-fil_restart_dlg = False
-fil_ed_crts     = None                                          # Carets at start
-fil_what        = None                                          # String to search 
-fil_ag          = None                                          # Nonmodal obj
-
-def dlg_find_in_lines__old():
-    global fil_restart_dlg, fil_ed_crts, fil_what, fil_ag
-    pass;                       log4fun=1                       # Order log in the function
-    pass;                       log("fil_ag={}",(fil_ag)) if logif(log4fun,_log4mod) else 0
-    if fil_ag:  return fil_ag.activate()
-    fil_ed_crts= ed.get_carets()                                # Carets at start
-    fil_what   = None
-    while True:
-        fil_restart_dlg  = False
-        _dlg_FIL()
-        pass;                   log("fil_restart_dlg={}",(fil_restart_dlg)) if logif(log4fun,_log4mod) else 0
-        if not fil_restart_dlg: break
-
-def _dlg_FIL():
-    global fil_ag
-    pass;                       log4fun=1                       # Order log in the function
-    pass;                       log("fil_ag={}",(fil_ag)) if logif(log4fun,_log4mod) else 0
-#   FORM_C  = f(_('Find in Lines {}'), 1+ed.get_prop(app.PROP_INDEX_GROUP))
     FORM_C  =   _('Find in Lines')
     HELP_C  = _(
         '• Search "in Lines" starts on Enter or Shift+Enter or immediately (if "Instant search" is tuned on).'
@@ -369,36 +38,312 @@ def _dlg_FIL():
       '\r• Option ".*" (regular expression) allows to use Python reg.ex. See "docs.python.org/3/library/re.html".'
       '\r• Option "w" (whole words) is ignored if entered string contains not a word.'
       '\r• If option "Instant search" (in menu) is tuned on, search result will be updated on start and after each change of pattern.'
-      '\r• Command "Restore initial selection" (in menu) restores only first of initial carets.'
+      '\r• Command "Restore initial selection" (Shift+Esc) restores only first of initial carets.'
       '\r• Ctrl+F (or Ctrl+R) to call appication dialog Find (or Replace).'
     )
-    pass;                      #log('###',()) if logif(log4fun,_log4mod) else 0
-    pass;                      #log('hist={}',(get_hist('find.find_in_lines'))) if logif(log4fun,_log4mod) else 0
-    opts    = d(reex=False,case=False,word=False,hist=[],usel=False,dock='',nmdl=False,inst=False,insm=3)
-#   opts    = d(reex=False,case=False,word=False,hist=[],usel=False        ,nmdl=False,inst=False,insm=3)
-#   opts    = d(reex=False,case=False,word=False,hist=[],usel=False                   ,inst=False,insm=3)
-    opts.update(get_hist('find.find_in_lines', opts))
 
-    # How to select node
+    # To select found fragment
     select_frag = lambda frag_inf:  ed.set_caret(*frag_inf)
         
-    # Ask
+    # To fit pattern to find
     compile_pttn= lambda    pttn_s, reex, case, word: re.compile(
                             pttn_s          if reex else
                       r'\b'+pttn_s+r'\b'    if word and re.match('^\w+$', pttn_s) else
                   re.escape(pttn_s)
                         ,   0 if case else re.I)
         
-    prev_wt = None          # Prev what
-    ready_l = []            # [(row,col_bgn,col_end)]
-    ready_p = -1            # pos in ready_l
-    form_cap= lambda: f('{} ({}/{})', FORM_C, 1+ready_p, len(ready_l)) if ready_l else f('{} (0)', FORM_C)
-    form_cpw= lambda: FORM_C + (f(_(' (Type {} character(s) to find)'), opts['insm'])
-                                    if opts['inst'] else
-                                  _(' (ENTER to find)'))
-    form_err= lambda: FORM_C +  _(' (Error)')
+    ed_crts     = None                                          # Carets at start
+    opts        = None
+
+    ag          = None                                          # Nonmodal obj
+
+    what        = ''                                            # String to search 
+    prev_wt     = ''                                            # Prev what
+    ready_l     = []                                            # [(row,col_bgn,col_end)]
+    ready_p     = -1                                            # pos in ready_l
+    
+    @staticmethod
+    def msg_(msg=None):
+        msg =(msg                                                       if msg else
+              f('{}/{}', 1+FiL.ready_p, len(FiL.ready_l))               if FiL.ready_l else
+              f(_('Type {} character(s) to find'), FiL.opts['insm'])    if FiL.opts['inst'] else
+              _('ENTER to find')
+             )
+        msg = f('{}: {}' , FiL.FORM_C, msg)                             if FiL.opts['dock'] else \
+              f('{} ({})', FiL.FORM_C, msg)
+        return msg
+       #def msg_
+    @staticmethod
+    def msg_upd(msg=None):
+        msg = FiL.msg_(msg)
+        return {'ctrls':{'mess':{'cap':msg}},'fid':'what'}              if FiL.opts['dock'] else \
+               {'form':         {'cap':msg} ,'fid':'what'}
+       #def msg_upd
         
-    def switch_to_dlg(ag, dlg='find'):
+
+    def show(self):
+        M,m     = self.__class__,self
+        pass;                   log4fun=0                       # Order log in the function
+
+        FiL.ed_crts = ed.get_carets()                           # Carets at start/activate
+        pass;                  #log__('hist={}',(get_hist('find.find_in_lines'))  ,__=(log4fun,_log4mod))
+        FiL.opts    = d(reex=False,case=False,word=False
+                    ,   hist=[]
+                    ,   usel=False
+                    ,   dock='',dock_ww=300
+                    ,   nmdl=False
+                    ,   inst=False,insm=3)                      # Default options
+        FiL.opts.update(get_hist('find.find_in_lines', FiL.opts))
+
+        FiL.ag      = FiL.ag if (FiL.ag and FiL.ag.islived()) else None
+        pass;                   log__("FiL.what={}",(FiL.what)  ,__=(log4fun,_log4mod))
+
+        FiL.ready_l = []
+        FiL.ready_p = -1
+        FiL.prev_wt = ''                                        # To refind 
+
+        what    = ed.get_text_sel() \
+                    if FiL.opts['usel'] and ed.get_text_sel() else \
+                  FiL.what
+        what    = '' if '\r' in what or '\n' in what else what
+        
+        pass;                   log__("FiL.ag={}",(FiL.ag)  ,__=(log4fun,_log4mod))
+        if FiL.ag:
+            ##??
+            FiL.ag.activate()
+            FiL.ag.update(d(vals=d(what=what)))
+            pass;               log__('FiL.prev_wt, len(FiL.ready_l)={}',(FiL.prev_wt, len(FiL.ready_l))  ,__=(log4fun,_log4mod))
+            return FiL.ag.update(self.do_find(FiL.ag, 'find'))                 # To refind 
+        
+        pass;                  #log__('###',()  ,__=(log4fun,_log4mod))
+
+        what_tp = 'edit'    if FiL.opts['inst'] else 'cmbx'
+        what_on = m.do_find if FiL.opts['inst'] else None
+        dock    = FiL.opts['dock']
+        wtwd    = FiL.opts['dock_ww']   if dock else 85
+        mswd    = 150                   if dock else 0
+        menx    = 5+38*3+5+wtwd+5
+        msg     = FiL.msg_()
+        ag      = DlgAg(
+            form    =dict(cap=msg, w=5+38*3+5+wtwd+5+39+5
+                         ,h=35, h_max=35                        # Only horz resize
+                         ,on_key_down=m.do_key_down
+                         ,frame='resize'
+                         )
+        ,   ctrls   =[0
+      ,('find',d(tp='bttn'  ,y=0        ,x=-99      ,w=11   ,cap=''     ,sto=False  ,def_bt='1'         ,on=m.do_find   ))  # Enter
+      ,('reex',d(tp='chbt'  ,tid='what' ,x=5+38*0   ,w=39   ,cap='&.*'  ,hint=_('Regular expression')   ,on=m.do_attr   ))  # &.
+      ,('case',d(tp='chbt'  ,tid='what' ,x=5+38*1   ,w=39   ,cap='&aA'  ,hint=_('Case sensitive')       ,on=m.do_attr   ))  # &a
+      ,('word',d(tp='chbt'  ,tid='what' ,x=5+38*2   ,w=39   ,cap='"&w"' ,hint=_('Whole words')          ,on=m.do_attr   ))  # &w
+      ,('what',d(tp=what_tp ,y  =5      ,x=5+38*3+5 ,w=wtwd ,items=FiL.opts['hist']                     ,on=what_on     ,a=''   if dock else 'r>'   ))  # 
+      ,('menu',d(tp='bttn'  ,tid='what' ,x=menx     ,w=39   ,cap='&='               ,on_menu=m.do_menu  ,on=m.do_menu   ,a=''   if dock else '>>'   ))  # &=
+      ,('mess',d(tp='labl'  ,tid='what' ,x=menx+39+5,w=mswd ,cap=msg                                                    ,a='r>' if dock else ''     ))  # 
+                    ][1:]
+        ,   fid     ='what'
+        ,   vals    =d(**{k:FiL.opts[k] for k in ('reex','case','word')}, what=what)
+#       ,   vals    =upd_dict({k:FiL.opts[k] for k in ('reex','case','word')}, d(what=what))
+       #,   opts    ={}
+        )
+        pass;                  #ag.gen_repro_code('repro_dlg_fil.py')
+        
+        pass;                   log__("FiL.opts[inst] and what={}",(FiL.opts['inst'], what)  ,__=(log4fun,_log4mod))
+        if FiL.opts['inst'] and what:
+            ag.update(m.do_find(ag, 'find'))
+
+        FiL.ag  = ag if FiL.opts['nmdl'] or FiL.opts['dock'] else None
+        pass;                   log__("FiL.ag={}",(FiL.ag)  ,__=(log4fun,_log4mod))
+
+        ag.dock(FiL.opts['dock'])
+        ag.show( on_exit=self.on_exit
+                ,modal=not (FiL.opts['nmdl'] or FiL.opts['dock'])
+                )
+       #def show
+
+
+    def do_find(self, ag, aid, data=''):
+        pass;                   log4fun=0                       # Order log in the function
+        pass;                   log__('aid, data={}',(aid, data)  ,__=(log4fun,_log4mod))
+        # What/how will search
+        prnx    = 'prev' if aid=='prev' else 'next'
+        crt     = ed.get_carets()[0][:]                         # Current first caret (col,row, col?,row?)
+        min_rc  = (crt[1], crt[0])  if crt[2]==-1 else  min((crt[1], crt[0]), (crt[3], crt[2]))
+        max_rc  = (crt[1], crt[0])  if crt[2]==-1 else  max((crt[1], crt[0]), (crt[3], crt[2]))
+        what    = ag.val('what')
+        pass;                   log__('what, FiL.prev_wt, len(FiL.ready_l)={}',(what, FiL.prev_wt, len(FiL.ready_l))  ,__=(log4fun,_log4mod))
+        if FiL.prev_wt==what and FiL.ready_l:                   # Jump to next/prev
+            if 1==len(FiL.ready_l):
+                pass;           log__('no jump for single',()  ,__=(log4fun,_log4mod))
+                return  d(fid='what')
+            FiL.ready_p = (FiL.ready_p + (-1 if aid=='prev' else 1)) % len(FiL.ready_l)
+            pass;               log__('jump to {}',(FiL.ready_p)  ,__=(log4fun,_log4mod))
+            FiL.select_frag(FiL.ready_l[FiL.ready_p])
+            return FiL.msg_upd()
+        FiL.prev_wt = what
+        FiL.what    = what
+        
+        FiL.opts.update(ag.vals(['reex','case','word']))
+        
+        if not what:                                            # Nothing to show
+            FiL.ready_l, FiL.ready_p    = [], -1
+            pass;               log__('no what',()  ,__=(log4fun,_log4mod))
+            return                      FiL.msg_upd()
+        if            FiL.opts['inst'] and \
+            len(what)<FiL.opts['insm'] and \
+                  not FiL.opts['reex']:                         # Not ready to find     reex??
+            FiL.ready_l, FiL.ready_p    = [], -1
+            pass;               log__('not ready',()  ,__=(log4fun,_log4mod))
+            return                      FiL.msg_upd()
+        
+        if not FiL.opts['inst']:
+            FiL.opts['hist']= add_to_hist(what, FiL.opts['hist'])
+        # New search
+        FiL.ready_l = []
+        FiL.ready_p = -1
+        pttn_r  = None
+        try:
+            pttn_r  = FiL.compile_pttn(what, FiL.opts['reex'], FiL.opts['case'], FiL.opts['word'])
+        except Exception as ex:
+            return [d(ctrls=[('what',d(items=FiL.opts['hist']))])
+                   ,FiL.msg_upd(str(ex))]
+
+        pass;                   log__('FiL.ready_p,min_rc,max_rc={}',(FiL.ready_p,min_rc,max_rc)  ,__=(log4fun,_log4mod))
+        FiL.ready_p = -1
+        for row in range(ed.get_line_count()):
+            line    = ed.get_text_line(row)
+            mtchs   = pttn_r.finditer(line)
+            if not mtchs:  continue
+            for mtch in mtchs:
+                fnd_bgn = mtch.start()
+                fnd_end = mtch.end()
+                if  FiL.ready_p==-1: 
+                    FiL.ready_p = ( len(FiL.ready_l)
+                            if                  FiL.ready_p==-1 and                         # Near after caret
+                                row>min_rc[0]  or row==min_rc[0] and fnd_bgn>=min_rc[1]
+                            or prnx=='next' and FiL.ready_p==-1 and                         # Need next and no yet
+                                (row>max_rc[0] or row==max_rc[0] and fnd_bgn>max_rc[1])     # At more row or at more col in cur row
+                            or prnx=='prev'                     and                         # Need prev
+                                (row<min_rc[0] or row==min_rc[0] and fnd_end<min_rc[1])     # At less row or at less col in cur row
+                            else FiL.ready_p)
+                FiL.ready_l+= [(fnd_end, row, fnd_bgn, row)]
+        pass;                  #log__('FiL.ready_p={}',(FiL.ready_p)  ,__=(log4fun,_log4mod))
+        pass;                  #log__('FiL.ready_l={}',(FiL.ready_l)  ,__=(log4fun,_log4mod))
+        FiL.ready_p = max(0, FiL.ready_p) if FiL.ready_l else -1
+        pass;                  #log__('FiL.ready_p={}',(FiL.ready_p)  ,__=(log4fun,_log4mod))
+        # Show results
+        if FiL.ready_l:
+#           if aid=='find' and 'stay' in data:
+#               FiL.ready_p = (FiL.ready_p-1) % len(FiL.ready_l)
+            pass;              #log__('show rslt FiL.ready_p={}',(FiL.ready_p,)  ,__=(log4fun,_log4mod))
+            FiL.select_frag(FiL.ready_l[FiL.ready_p])
+        pass;                   log__('FiL.ready_p={}/{}',FiL.ready_p,len(FiL.ready_l)  ,__=(log4fun,_log4mod))
+        pass;                   log__('msg_upd()={}',FiL.msg_upd()  ,__=(log4fun,_log4mod))
+        return [d(ctrls=d(what=d(items=FiL.opts['hist'])))
+               ,FiL.msg_upd('0' if not FiL.ready_l else None)]
+       #def do_find
+        
+
+    def do_menu(self, ag, aid, data=''):
+        def wnen_menu(ag, tag):
+            # Commands
+            if tag=='help':             return (app.msg_box(FiL.HELP_C, app.MB_OK)  , [])[1]
+            if tag in ('prev','next'):  return self.do_find(ag, tag)
+            if tag=='natf':             return (self.switch_to_dlg(ag, 'find')      , None)[1]
+            if tag=='natr':             return (self.switch_to_dlg(ag, 'repl')      , None)[1]
+            if tag=='rest':             return (ed.set_caret(*FiL.ed_crts[0])       , None)[1]
+            if tag=='hide':             return                                        None
+            # Options
+            if tag=='insm':
+                insm    = str(FiL.opts['insm'])
+                while True:
+                    insm        = app.dlg_input(_('Instant search - minimal length'), insm)
+                    if not insm:        return []
+                    if re.match(r'^\d+$', insm): break
+                FiL.opts['insm']= int(insm)
+                return FiL.msg_upd()
+            tohide  = '.' in tag
+            tag     = tag.strip('.')
+            if tag in ('usel'
+                      ,'inst'
+                      ,'nmdl'):
+                FiL.opts[tag]   = not FiL.opts[tag]
+            if tag in ('dckt'
+                      ,'dckb'):
+                FiL.opts['dock']= 't' if tag=='dckt' and FiL.opts['dock']!='t' else \
+                                  'b' if tag=='dckb' and FiL.opts['dock']!='b' else \
+                                  ''
+                FiL.opts['dock_ww'] = ag.cattr('what', 'w')
+            if tohide:
+                ag.hide()
+                return None
+            return []
+           #def wnen_menu
+        insm_c  = f(_('Instant search &min length: {}...'), FiL.opts['insm'])
+        modl    = not (FiL.opts['nmdl'] or FiL.opts['dock'])
+        ag.show_menu([(
+    ),d(tag='hide'  ,cap=_('Hide dialog &=')                                ,key=('Esc' if modl else '')
+    ),d(tag='rest'  ,cap=_('Hi&de dialog and restore selection')            ,key='Shift+Esc'
+    ),d(tag='help'  ,cap=_('&Help...')                                      
+    ),d(             cap='-'
+    ),d(tag='prev'  ,cap=_('Find &previous')                                ,key='Shift+Enter'
+    ),d(tag='next'  ,cap=_('F&ind next')                                    ,key='Enter'
+    ),d(             cap='-'
+    ),d(tag='natf'  ,cap=_('Move to app &Find dialog')                      ,key='Ctrl+F'
+    ),d(tag='natr'  ,cap=_('Move to app &Replace dialog')                   ,key='Ctrl+R'
+    ),d(             cap='-'
+    ),d(             cap=_('=== Options. ===')                                          ,en=False
+    ),d(tag='usel'  ,cap=_('Use &selection from document')          ,ch=FiL.opts['usel']
+    ),d(tag='nmdl.' ,cap=_('Do not hide on &ESC (close dialog)')    ,ch=FiL.opts['nmdl'],en=FiL.opts['dock']==''
+    ),d(             cap='-'
+    ),d(tag='dckt.' ,cap=_('Dock to window &top (close dialog)')    ,ch=FiL.opts['dock']=='t'
+    ),d(tag='dckb.' ,cap=_('Dock to window &bottom (close dialog)') ,ch=FiL.opts['dock']=='b'
+    ),d(             cap='-'
+    ),d(tag='inst.' ,cap=_('Inst&ant search (close dialog)')        ,ch=FiL.opts['inst']
+    ),d(tag='insm'  ,cap=insm_c                                                         ,en=FiL.opts['inst']
+                    )][1:]
+        ,   aid
+        ,   cmd4all=wnen_menu                               # Set cmd=wnen_menu for all nodes
+        )
+        return d(fid='what')
+       #def do_menu
+        
+
+    def on_exit(self, ag):
+        pass;                   log__("FiL.ag={}",(FiL.ag)  ,__=(_log4mod,))
+        set_hist('find.find_in_lines', {**FiL.opts, **ag.vals(['reex','case','word'])})
+#           set_hist('find.find_in_lines', upd_dict(opts, ag.vals(['reex','case','word'])))
+
+
+    def do_key_down(self, ag, key, data=''):
+        scam    = data if data else ag.scam()
+        pass;              #log("scam,key={}",(scam,get_const_name(key, module=cudatext_keys)))
+        if 0:pass
+        elif (scam,key)==('s',VK_ENTER):                        # Shift+Enter
+            ag.update(self.do_find(ag, 'prev'))
+        elif (scam,key)==('' ,VK_ESCAPE) and FiL.opts['nmdl']:  # Esc
+            pass;              #log("",())
+            ed.focus()
+            return False                                        # Dont close dlg
+#       elif (scam,key)==('' ,VK_ESCAPE):                       # Esc
+        elif (scam,key)==('s',VK_ESCAPE):                       # Shift+Esc
+            ed.set_caret(*FiL.ed_crts[0])
+            ag.hide()
+        elif (scam,key)==('c',ord('F')) or \
+             (scam,key)==('c',ord('R')):                        # Ctrl+F or Ctrl+R
+            self.switch_to_dlg(ag, 'find' if key==ord('F') else 'repl')
+        else: return [] # Nothing
+        return False    # Stop event
+       #def do_key_down
+        
+
+    def do_attr(self, ag, aid, data=''):
+        " State of re/word/case will be saved on exit. Need only new search. "
+        FiL.prev_wt = ''                                        # To refind 
+        return self.do_find(ag, 'find')                         # To refind 
+#       return self.do_find(ag, 'find', 'stay')                 # To refind 
+       #def do_attr
+
+
+    def switch_to_dlg(self, ag, dlg='find'):
         ag.opts['on_exit_focus_to_ed'] = None
         ag.hide()
         ed.cmd(cmds.cmd_DialogFind if dlg=='find' else cmds.cmd_DialogReplace)
@@ -409,190 +354,15 @@ def _dlg_FIL():
             ,   op_case_d   = ag.val('case')
             ,   op_word_d   = ag.val('word')
             ))
-    def do_attr(ag, aid, data=''):
-        nonlocal prev_wt
-        prev_wt = ''
-        return do_find(ag, 'find', 'stay')  # if opts['inst'] else d(fid='what')
-    def do_menu(ag, aid, data=''):
-        def wnen_menu(ag, tag):
-            global fil_restart_dlg
-            nonlocal opts
-            if tag in ('clos'
-                      ,'usel'
-                      ,'inst'):
-                opts[tag]       = not opts[tag]
-            if tag in ('nmdl'
-                      ,):
-                opts[tag]       = not opts[tag]
-                fil_restart_dlg = True
-                return None
-            if tag in ('dckt'
-                      ,'dckb'):
-                opts['dock']    = 't' if tag=='dckt' and opts['dock']!='t' else \
-                                  'b' if tag=='dckb' and opts['dock']!='b' else \
-                                  ''
-                fil_restart_dlg = True
-                return None
-#               ag.dock(side=opts['dock'])
-            if tag=='help':             app.msg_box(HELP_C, app.MB_OK)
-            if tag in ('prev','next'):  return do_find(ag, tag)
-            if tag=='rest':
-                ed.set_caret(*fil_ed_crts[0])
-                return None
-            if tag=='insm':
-                insm    = app.dlg_input(_('Instant search minimum'), str(opts['insm']))
-                opts['insm']    = int(insm) if insm and re.match(r'^\d+$', insm) else opts['insm']
-            if tag=='inst':
-                fil_what        = ag.val('what')
-                fil_restart_dlg = True
-                return None
-            if tag=='natf':
-                switch_to_dlg(ag)
-                return None
-            return []
-           #def wnen_menu
-        insm_c  = f(_('Instant search &minimum: {}...'), opts['insm'])
-        ag.show_menu(set_all_for_tree(
-            [ d(    tag='help'  ,cap=_('&Help...')                                      
-            ),d(                 cap='-'
-            ),d(    tag='prev'  ,cap=_('Find &previous')                                ,key='Shift+Enter'
-            ),d(    tag='next'  ,cap=_('F&ind next')                                    ,key='Enter'
-            ),d(                 cap='-'
-            ),d(                 cap=_('&Options')  ,sub=
-                [ d(tag='usel'  ,cap=_('Use &selection from text')          ,ch=opts['usel']
-                ),d(tag='nmdl'  ,cap=_('Do not hide on &ESC (need rerun)')  ,ch=opts['nmdl']        ,en=opts['dock']==''
-                ),d(                 cap='-'
-                ),d(tag='dckt'  ,cap=_('Dock to window &top')               ,ch=opts['dock']=='t'
-                ),d(tag='dckb'  ,cap=_('Dock to window &bottom')            ,ch=opts['dock']=='b'
-                ),d(                 cap='-'
-                ),d(tag='inst'  ,cap=_('&Instant search')                   ,ch=opts['inst']
-                ),d(tag='insm'  ,cap=insm_c                                             
-            )]),d(               cap='-'
-            ),d(    tag='natf'  ,cap=_('Call native Find dialog')                       ,key='Ctrl+F'
-            ),d(    tag='rest'  ,cap=_('Restore initial selection and close dialog &=') ,key='Shift+Esc'
-            )], 'sub', 'cmd', wnen_menu)    # Set cmd=wnen_menu for all nodes
-        ,   aid
-        )
-        return d(fid='what')
-       #def do_menu
-    def do_find(ag, aid, data=''):
-        nonlocal opts, prev_wt, ready_l, ready_p
-        pass;                  #log('aid, data={}',(aid, data)) if logif(log4fun,_log4mod) else 0
-        # What/how will search
-        prnx    = 'prev' if aid=='prev' else 'next'
-        crt     = ed.get_carets()[0][:]     # Current first caret (col,row, col?,row?)
-        min_rc  = (crt[1], crt[0])  if crt[2]==-1 else  min((crt[1], crt[0]), (crt[3], crt[2]))
-        max_rc  = (crt[1], crt[0])  if crt[2]==-1 else  max((crt[1], crt[0]), (crt[3], crt[2]))
-        what    = ag.val('what')
-        if prev_wt==what and ready_l:# and 'stay' not in data:
-            pass;              #log('will jump',()) if logif(log4fun,_log4mod) else 0
-            if 1==len(ready_l):                         return  d(fid='what')
-            ready_p = (ready_p + (-1 if aid=='prev' else 1)) % len(ready_l)
-            select_frag(ready_l[ready_p])
-            return                      d(form=d(cap=form_cap()) ,fid='what')
-        prev_wt  = what
-        if not what:
-            ready_l, ready_p    = [], -1
-            return                      d(form=d(cap=form_cpw()) ,fid='what')
-        if opts['inst'] and len(what)<opts['insm'] and not opts['reex'] :
-            ready_l, ready_p    = [], -1
-            return                      d(form=d(cap=form_cpw()) ,fid='what')
-        if not opts['inst']:
-            opts['hist']= add_to_hist(what, opts['hist'])
-        opts.update(ag.vals(['reex','case','word']))
-        # New search
-        ready_l = []
-        ready_p = -1
-        pttn_r  = None
-        try:
-            pttn_r  = compile_pttn(what, opts['reex'], opts['case'], opts['word'])
-        except:
-            return d(ctrls=[('what',d(items=opts['hist']))]
-                    ,form=d(cap=form_err())
-                    ,fid='what')
-        for row in range(ed.get_line_count()):
-            line    = ed.get_text_line(row)
-            mtchs   = pttn_r.finditer(line)
-            if not mtchs:  continue
-            for mtch in mtchs:
-                fnd_bgn = mtch.start()
-                fnd_end = mtch.end()
-                ready_p = (len(ready_l)
-                            if prnx=='next' and ready_p==-1 and                             # Need next and no yet
-                                (row>max_rc[0] or row==max_rc[0] and fnd_bgn>max_rc[1])     # At more row or at more col in cur row
-                            or prnx=='prev'                 and                             # Need prev
-                                (row<min_rc[0] or row==min_rc[0] and fnd_end<min_rc[1])     # At less row or at less col in cur row
-                            else ready_p)
-                ready_l+= [(fnd_end, row, fnd_bgn, row)]
-        pass;                  #log('ready_l={}',(ready_l)) if logif(log4fun,_log4mod) else 0
-        ready_p = max(0, ready_p) if ready_l else -1
-        pass;                  #log('ready_p={}',(ready_p)) if logif(log4fun,_log4mod) else 0
-        # Show results
-        if ready_l:
-            if aid=='find' and 'stay' in data:
-                ready_p = (ready_p-1) % len(ready_l)
-            pass;              #log('show rslt ready_p={}',(ready_p,)) if logif(log4fun,_log4mod) else 0
-            select_frag(ready_l[ready_p])
-        return d(ctrls=[('what',d(items=opts['hist']))]
-                ,form=d(cap=form_cap())
-                ,fid='what')
-       #def do_find
-    what    = fil_what              if fil_what is not None      else \
-              ed.get_text_sel()     if opts['usel'] and 1==len(ed.get_carets()) else ''
-    what    = '' if '\r' in what or '\n' in what else what
-    def do_key_down(ag, key, data=''):
-        scam    = data if data else app.app_proc(app.PROC_GET_KEYSTATE, '')
-        pass;                  #log("scam,key={}",(scam,get_const_name(key, module=cudatext_keys)))
-        if 0:pass
-        elif (scam,key)==('s',VK_ENTER):                        # Shift+Enter
-            ag.update(do_find(ag, 'prev'))
-        elif (scam,key)==('' ,VK_ESCAPE) and opts['nmdl']:      # Esc
-            pass;               log("",())
-            ed.focus()
-            return False                                        # Dont close dlg
-        elif (scam,key)==('s',VK_ESCAPE):                       # Shift+Esc
-            ed.set_caret(*fil_ed_crts[0])
-            ag.hide()
-        elif (scam,key)==('c',ord('F')) or \
-             (scam,key)==('c',ord('R')):                        # Ctrl+F or Ctrl+R
-            switch_to_dlg(ag, 'find' if key==ord('F') else 'repl')
-        else: return [] # Nothing
-        return False    # Stop event
-    wh_tp   = 'edit'    if opts['inst'] else 'cmbx'
-    wh_call = do_find   if opts['inst'] else None
-    ag      = DlgAg(
-        form    =dict(cap=form_cpw(), w=255, h=35, h_max=35
-                     ,on_key_down=do_key_down
-                     ,frame='resize'
-                     )
-    ,   ctrls   =[0
-  ,('find',d(tp='bttn'  ,y=0        ,x=-99      ,w=44   ,cap=''     ,sto=False  ,def_bt='1'         ,on=do_find         ))  # Enter
-  ,('reex',d(tp='chbt'  ,tid='what' ,x=5+38*0   ,w=39   ,cap='.&*'  ,hint=_('Regular expression')   ,on=do_attr         ))  # &*
-  ,('case',d(tp='chbt'  ,tid='what' ,x=5+38*1   ,w=39   ,cap='&aA'  ,hint=_('Case sensitive')       ,on=do_attr         ))  # &a
-  ,('word',d(tp='chbt'  ,tid='what' ,x=5+38*2   ,w=39   ,cap='"&w"' ,hint=_('Whole words')          ,on=do_attr         ))  # &w
-  ,('what',d(tp=wh_tp   ,y  =5      ,x=5+38*3+5 ,w=85   ,items=opts['hist']                         ,on=wh_call ,a='r>' ))  # 
-  ,('menu',d(tp='bttn'  ,tid='what' ,x=210      ,w=40   ,cap='&='                   ,on_menu=do_menu,on=do_menu ,a='>>' ))  # &=
-                ][1:]
-    ,   fid     ='what'
-    ,   vals    = upd_dict({k:opts[k] for k in ('reex','case','word')}, d(what=what))
-   #,   opts={}
-    )
-    pass;                      #ag.gen_repro_code('repro_dlg_fil.py')
-    if opts['inst'] and what:
-        ag.update(do_find(ag, 'find', 'stay'))
+       #def switch_to_dlg
 
-    fil_ag  = ag if opts['nmdl'] else None
-    pass;                       log("fil_ag={}",(fil_ag)) if logif(log4fun,_log4mod) else 0
-    def on_exit(ag):
-        global fil_ag
-        pass;                   log("fil_restart_dlg,fil_ag={}",(fil_restart_dlg,fil_ag)) if logif(log4fun,_log4mod) else 0
-        set_hist('find.find_in_lines', upd_dict(opts, ag.vals(['reex','case','word'])))
-        fil_ag  = None
-    ag.dock(opts['dock'])
-    ag.show( on_exit=on_exit
-            ,modal=not opts['nmdl']
-            )
-   #def _dlg_FIL
+   #class FiL
+theFiL          = FiL()                                         # Single obj
+
+def dlg_find_in_lines():                                        #NOTE: dlg_find_in_lines
+    theFiL.show()   # new!
+   #def dlg_find_in_lines
+
 
 
 def find_cb_by_cmd(updn):
@@ -616,7 +386,7 @@ def find_cb_by_cmd(updn):
         find_opt= find_opt + ('w' if 'w' in user_opt else '')   # As user: Word
         find_opt= find_opt + ('a' if 'a' in user_opt else '')   # As user: Wrap
 
-    ed.cmd(cmds.cmd_FinderAction, c1.join([]
+    ed.cmd(cmds.cmd_FinderAction, C1.join([]
         +['findprev' if updn=='up' else 'findnext']
         +[clip]
         +['']
@@ -651,8 +421,8 @@ def replace_all_sel_to_cb():
         find_opt= find_opt + ('c' if 'c' in user_opt else '')   # As user: Case
         find_opt= find_opt + ('w' if 'w' in user_opt else '')   # As user: Word
     ed.lock()
-    pass;                      #log('seltext,clip,find_opt={!r}',(seltext,clip,find_opt)) if logif(log4fun,_log4mod) else 0
-    ed.cmd(cmds.cmd_FinderAction, c1.join([]
+    pass;                      #log__('seltext,clip,find_opt={!r}',(seltext,clip,find_opt)  ,__=(log4fun,_log4mod))
+    ed.cmd(cmds.cmd_FinderAction, C1.join([]
         +['repall']
         +[seltext]
         +[clip]
@@ -708,7 +478,7 @@ def align_in_lines_by_sep():
     ,cEnd, rEnd)    = crts[0]
     if rEnd==-1 or rEnd==rCrt:
         return app.msg_status(_("{} works with multiline selection").format(_('Command')))
-    spr     = app.dlg_input('Enter separator string', data4_align_in_lines_by_sep)
+    spr     = app.dlg_input(_('Enter separator string'), data4_align_in_lines_by_sep)
     spr     = '' if spr is None else spr.strip()
     if not spr:
         return # Esc
@@ -798,7 +568,7 @@ def reindent():
     if not aid: return 
     old_s   = parse_step(vals['olds'].replace('.', ' '))
     new_s   = parse_step(vals['news'].replace('.', ' '))
-    pass;                      #log('old_s, new_s={}',(old_s, new_s)) if logif(log4fun,_log4mod) else 0
+    pass;                      #log__('old_s, new_s={}',(old_s, new_s)  ,__=(log4fun,_log4mod))
     if not old_s or not new_s or old_s==new_s:
         return app.msg_status(_('Reindent skipped'))
     
@@ -823,7 +593,7 @@ def reindent():
 #           continue
 #       old_s   = parse_step(vals['olds'].replace('.', ' '))
 #       new_s   = parse_step(vals['news'].replace('.', ' '))
-#       pass;                  #log('old_s, new_s={}',(old_s, new_s)) if logif(log4fun,_log4mod) else 0
+#       pass;                  #log__('old_s, new_s={}',(old_s, new_s)  ,__=(log4fun,_log4mod))
 #       if not old_s or not new_s or old_s==new_s:
 #           return app.msg_status(_('Reindent skipped'))
 #       break
@@ -831,20 +601,20 @@ def reindent():
         
     lines   = [ed.get_text_line(row) for row in range(rSelB, rSelE+1)]
     def reind_line(line, ost_l, nst):
-        pass;                  #log('line={}',repr(line)) if logif(log4fun,_log4mod) else 0
+        pass;                  #log__('line={}',repr(line)  ,__=(log4fun,_log4mod))
         if not line.startswith(ost_l[0]):    return line
         for n in range(1, 1000):
             if n == len(ost_l):
                 ost_l.append(ost_l[0]*n)
             if not line.startswith(ost_l[n]):
                 break
-        pass;                  #log('n,len(ost_l[n-1])={}',(n,len(ost_l[n-1]))) if logif(log4fun,_log4mod) else 0
+        pass;                  #log__('n,len(ost_l[n-1])={}',(n,len(ost_l[n-1]))  ,__=(log4fun,_log4mod))
         new_line    = nst*n + line[len(ost_l[n-1]):]
-        pass;                  #log('new={}',repr(new_line)) if logif(log4fun,_log4mod) else 0
+        pass;                  #log__('new={}',repr(new_line)  ,__=(log4fun,_log4mod))
         return new_line
     ost_l   = [old_s*n for n in range(1,20)]
     lines   = [reind_line(l, ost_l, new_s) for l in lines]
-    pass;                      #log('rSelB, rSelE, lines={}',(rSelB, rSelE, lines)) if logif(log4fun,_log4mod) else 0
+    pass;                      #log__('rSelB, rSelE, lines={}',(rSelB, rSelE, lines)  ,__=(log4fun,_log4mod))
     ed.replace_lines(rSelB, rSelE, lines)
     ed.set_caret(0,rSelE+1, 0,rSelB)
    #def reindent
@@ -862,7 +632,7 @@ def indent_sel_as_1st():
     (rSelE, cSelE)  = apx.minmax((rCrt, cCrt), (rEnd, cEnd))
     rSelE           = rSelE - (1 if 0==cSelE else 0)
     if rSelB==rSelE:
-        return app.msg_status(_('Need more then one selected lines'))
+        return app.msg_status(_('Need more than one selected lines'))
 
     first_s     = ed.get_text_line(rSelB)
     prfx_1st    = re.match(r'\s*', first_s).group(0) if first_s[0] in ' \t' else ''
@@ -931,16 +701,16 @@ def indent_sel_as_bgn():
     
 
 def align_sel_by_margin(how):
-    pass;                      #log('ok',()) if logif(log4fun,_log4mod) else 0
+    pass;                      #log__('ok',()  ,__=(log4fun,_log4mod))
     if not apx.get_opt('tab_spaces', False):
         return app.msg_status(_('Fail to use Tab to align'))
     mrgn    = apx.get_opt('margin', 0)
-    pass;                      #log('mrgn={}',(mrgn)) if logif(log4fun,_log4mod) else 0
+    pass;                      #log__('mrgn={}',(mrgn)  ,__=(log4fun,_log4mod))
     def align_line(line):
         strpd   = line.strip()
         lstr    = len(strpd)
         if lstr >= mrgn:
-            pass;              #log('lstr >= mrgn',()) if logif(log4fun,_log4mod) else 0
+            pass;              #log__('lstr >= mrgn',()  ,__=(log4fun,_log4mod))
             return  strpd                               # only strip
         if how=='r':
             return  ' '*(mrgn-lstr) + strpd             # r-align
@@ -1018,7 +788,7 @@ def _rewrap(margin, cmt_sgn, save_bl, rTx1, rTx2, sel_after):
     
     tab_sz  = apx.get_opt('tab_size', 8)
     lines   = [ed.get_text_line(nln) for nln in range(rTx1, rTx2+1)]
-    pass;                      #log('lines={}',(lines)) if logif(log4fun,_log4mod) else 0
+    pass;                      #log__('lines={}',(lines)  ,__=(log4fun,_log4mod))
     # Extract prefix by comment-sign
     cm_prfx = ''
     if lines[0].lstrip().startswith(cmt_sgn):
@@ -1026,7 +796,7 @@ def _rewrap(margin, cmt_sgn, save_bl, rTx1, rTx2, sel_after):
         cm_prfx = lines[0][:lines[0].index(cmt_sgn)+len(cmt_sgn)]
         if not all(map(lambda l:l.startswith(cm_prfx), lines)):
             return app.msg_status('Re-wrap needs same positions of comments')
-    pass;                      #log('1 cm_prfx={}',repr(cm_prfx)) if logif(log4fun,_log4mod) else 0
+    pass;                      #log__('1 cm_prfx={}',repr(cm_prfx)  ,__=(log4fun,_log4mod))
     # Can prefix is wider?
     if save_bl:
         for ext in range(1,100):
@@ -1038,7 +808,7 @@ def _rewrap(margin, cmt_sgn, save_bl, rTx1, rTx2, sel_after):
             else:
                 break#for ext
            #for ext
-    pass;                      #log('2 cm_prfx={}',repr(cm_prfx)) if logif(log4fun,_log4mod) else 0
+    pass;                      #log__('2 cm_prfx={}',repr(cm_prfx)  ,__=(log4fun,_log4mod))
     if len(cm_prfx)+10>margin:
         return app.msg_status('No text to re-wrap')
     # Join
@@ -1046,13 +816,13 @@ def _rewrap(margin, cmt_sgn, save_bl, rTx1, rTx2, sel_after):
     if not save_bl:
         lines   = [line.lstrip() for line in lines]
     text    = ' '.join(lines)
-    pass;                      #log('mid text={}',('\n'+text)) if logif(log4fun,_log4mod) else 0
+    pass;                      #log__('mid text={}',('\n'+text)  ,__=(log4fun,_log4mod))
     # Split by margin
     margin -= (len(cm_prfx) + (tab_sz-1)*cm_prfx.count('\t'))
-    pass;                      #log('margin,tab_sz={}',(margin,tab_sz)) if logif(log4fun,_log4mod) else 0
+    pass;                      #log__('margin,tab_sz={}',(margin,tab_sz)  ,__=(log4fun,_log4mod))
     words   = [(m.start(), m.end(), m.group())
                 for m in re.finditer(r'\b\S+\b', text)]
-    pass;                      #log('words={}',(words)) if logif(log4fun,_log4mod) else 0
+    pass;                      #log__('words={}',(words)  ,__=(log4fun,_log4mod))
     lines   = []
     last_pos= 0
     for word in words:
@@ -1066,7 +836,7 @@ def _rewrap(margin, cmt_sgn, save_bl, rTx1, rTx2, sel_after):
     lines  += [text[last_pos:]]
     # Re-join
     text    = '\n'.join(cm_prfx+line for line in lines)
-    pass;                      #log('fin text={}',('\n'+text)) if logif(log4fun,_log4mod) else 0
+    pass;                      #log__('fin text={}',('\n'+text)  ,__=(log4fun,_log4mod))
     # Modify ed
     _replace_lines(ed, rTx1, rTx2, text)
     if sel_after:
@@ -1123,19 +893,6 @@ def rewrap_sel_by_margin():
     aid,vals    = ag.show()
     if aid is None or aid=='cncl': return None
 
-#   aid,vals,_t,chds   = dlg_wrapper(_('Re-wrap lines'), 5+165+5,5+120+5,     #NOTE: dlg-rewrap
-#        [dict(           tp='lb'   ,tid='marg' ,l=5        ,w=120  ,cap=_('&Margin:')      ) # &m
-#        ,dict(cid='marg',tp='ed'   ,t=5        ,l=5+120    ,w=45                           ) # 
-#        ,dict(           tp='lb'   ,tid='csgn' ,l=5        ,w=120  ,cap=_('&Comment sign:')) # &c
-#        ,dict(cid='csgn',tp='ed'   ,t=5+30     ,l=5+120    ,w=45                           )
-#        ,dict(cid='svbl',tp='ch'   ,t=5+60     ,l=5        ,w=165  ,cap=_('&Keep indent')  ) # &s
-#        ,dict(cid='!'   ,tp='bt'   ,t=5+120-28 ,l=5        ,w=80   ,cap=_('OK'),  props='1') #     default
-#        ,dict(cid='-'   ,tp='bt'   ,t=5+120-28 ,l=5+80+5   ,w=80   ,cap=_('Cancel')        )
-#        ],    dict(marg=str(margin)
-#                  ,csgn=cmt_sgn
-#                  ,svbl=True), focus_cid='marg')
-#   if aid is None or aid=='-': return None
-
     if not vals['marg'].isdigit(): return app.msg_status('Not digit margin')
     margin  = int(vals['marg'])
     cmt_sgn =     vals['csgn']
@@ -1148,9 +905,32 @@ def rewrap_sel_by_margin():
     (rTx1,cTx1),\
     (rTx2,cTx2) = apx.minmax((rCrt, cCrt), (rEnd, cEnd))
     rTx2        = rTx2-1 if cTx2==0 and rTx1!=rTx2 else rTx2
-    pass;                      #log('rTx1, rTx2={}',(rTx1, rTx2)) if logif(log4fun,_log4mod) else 0
+    pass;                      #log__('rTx1, rTx2={}',(rTx1, rTx2)  ,__=(log4fun,_log4mod))
 
-    _rewrap(margin, cmt_sgn, save_bl, rTx1, rTx2, True)
+    def find_paragraphs_in_range(line1, line2):
+        " Author: github.com/Alexey-T "
+        rng = []
+        n2 = line2
+        while True:
+            if n2<line1: break 
+            while (n2>=line1) and not ed.get_text_line(n2).strip():
+                n2 -= 1
+            if n2<line1: break
+        
+            n1 = n2 
+            while (n1>line1) and ed.get_text_line(n1-1).strip():
+                n1 -= 1
+        
+            rng.insert(0, (n1, n2))
+            n2 = n1-1
+        return rng
+       #def find_paragraphs_in_range
+        
+    # Must processs lines by paragraphs to keep blank-only lines
+    ranges = find_paragraphs_in_range(rTx1, rTx2)
+    for rng in reversed(ranges):
+        _rewrap(margin, cmt_sgn, save_bl, rng[0], rng[1], True)
+#   _rewrap(    margin, cmt_sgn, save_bl, rTx1, rTx2, True)
    #def rewrap_sel_by_margin
         
 
@@ -1158,15 +938,15 @@ def _replace_lines(_ed, r_bgn, r_end, newlines):
     """ Replace full lines in [r_bgn, r_end] to newlines """
     if app.app_api_version()<'1.0.187': return app.msg_status(_('Need update application'))
     lines_n     = _ed.get_line_count()
-    pass;                      #log('lines_n, r_bgn, r_end, newlines={}',(lines_n, r_bgn, r_end, newlines)) if logif(log4fun,_log4mod) else 0
+    pass;                      #log__('lines_n, r_bgn, r_end, newlines={}',(lines_n, r_bgn, r_end, newlines)  ,__=(log4fun,_log4mod))
     if r_end < lines_n-1:
         # Replace middle lines
-        pass;                  #log('middle',()) if logif(log4fun,_log4mod) else 0
+        pass;                  #log__('middle',()  ,__=(log4fun,_log4mod))
         _ed.delete(0,r_bgn, 0,1+r_end)
         _ed.insert(0,r_bgn, newlines+'\n')
     else:
         # Replace final lines
-        pass;                  #log('final',()) if logif(log4fun,_log4mod) else 0
+        pass;                  #log__('final',()  ,__=(log4fun,_log4mod))
         _ed.delete(0,r_bgn, 0,lines_n)
         _ed.insert(0,r_bgn, newlines)
    #def _replace_lines

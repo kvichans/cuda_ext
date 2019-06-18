@@ -27,6 +27,8 @@ class Command:
     def set_nearest_tree_node(self):            return cd_ext_tree.set_nearest_tree_node()
     def find_tree_node(self):                   return cd_ext_tree.find_tree_node()
     def symbol_menu(self):                      return cd_ext_tree.symbol_menu()
+    def symbol_menu_up1(self):                  return cd_ext_tree.symbol_menu_levels(1)
+    def symbol_menu_up2(self):                  return cd_ext_tree.symbol_menu_levels(2)
     
     # Insert_cmds
     def add_indented_line_above(self):          return RLS.add_indented_line_above()
@@ -40,6 +42,7 @@ class Command:
     def trim_sel_right(self):                   return RLS.trim_sel('right')
     def trim_sel_all(self):                     return RLS.trim_sel('all')
     def fill_by_str(self):                      return RLS.fill_by_str()
+    def copy_unicode_char_name(self):           return RLS.copy_unicode_char_name()
     def insert_char_by_hex(self):               return RLS.insert_char_by_hex()
     
     # Find_repl_cmds

@@ -1,4 +1,5 @@
 [info]
+version=1.7.03
 title=CudaExt
 desc=Additional commands for CudaText in Commands dialog and Plugins menu
 type=cudatext-plugin
@@ -189,6 +190,17 @@ hotkey=
 method=fill_by_str
 
 [item55]
+section=commands
+caption=Cuda&-Ext\&Insert\-
+method=_
+
+[item56]
+section=commands
+caption=Cuda&-Ext\&Insert\Copy unicode char name
+hotkey=
+method=copy_unicode_char_name
+
+[item57]
 section=commands
 caption=Cuda&-Ext\&Insert\Insert &unicode char...
 hotkey=
@@ -745,11 +757,29 @@ method=align_prgph_f
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Tree_cmds
-[item271]
+[item268]
 section=commands
 caption=Cuda&-Ext\Code &Tree\&Symbols list...
 hotkey=Alt++
 method=symbol_menu
+
+[item269]
+section=commands
+caption=Cuda&-Ext\Code &Tree\&Symbols list (only 1 up level)...
+hotkey=
+method=symbol_menu_up1
+
+[item270]
+section=commands
+caption=Cuda&-Ext\Code &Tree\&Symbols list (only 2 up level)...
+hotkey=Shift+Alt++
+method=symbol_menu_up2
+
+[item271]
+section=commands
+caption=Cuda&-Ext\Code &Tree\-
+hotkey=
+method=_
 
 [item272]
 section=commands
