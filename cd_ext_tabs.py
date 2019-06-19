@@ -45,7 +45,7 @@ def go_back_dlg():
     pass;                       log4fun=0                       # Order log in the function
     if app.app_api_version()<'1.0.253':
         return app.msg_status(NEED_UPDATE)
-    pass;                       log("",( )) if logif(log4fun,_log4mod) else 0
+    pass;                       log__("",( )      ,__=(log4fun,_log4mod))
 #   scam    = app.app_proc(app.PROC_GET_KEYSTATE, '')
     if 'c' not in app.app_proc(app.PROC_GET_KEYSTATE, ''):      # User already is released Ctrl
         return go_back_tab()
@@ -79,7 +79,7 @@ def go_back_dlg():
     start_pnls  = get_hist('switcher.start_panel', 'Code tree')
 
     def do_show(ag, key, data=None):
-        pass;                   log("",( )) if logif(log4fun,_log4mod) else 0
+        pass;                   log__("",( )      ,__=(log4fun,_log4mod))
         
         if 'c' not in app.app_proc(app.PROC_GET_KEYSTATE, ''):  ag.hide()
         app.timer_proc(app.TIMER_START_ONE, lambda tag:         ag.hide() 
