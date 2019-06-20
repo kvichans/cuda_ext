@@ -471,6 +471,7 @@ def align_in_lines_by_sep():
             b
             c  = 1
     '''
+    global data4_align_in_lines_by_sep
     crts    = ed.get_carets()
     if len(crts)>1:
         return app.msg_status(_("{} doesn't work with multi-carets").format(_('Command')))
