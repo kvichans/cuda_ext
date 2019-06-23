@@ -345,8 +345,6 @@ class FiL:
 
     def switch_to_dlg(self, ag, dlg='find'):
         ag.opts['on_exit_focus_to_ed'] = None
-        ag.hide()
-        ed.cmd(cmds.cmd_DialogFind if dlg=='find' else cmds.cmd_DialogReplace)
         if app.app_api_version()>='1.0.248':
             app.app_proc(app.PROC_SET_FINDER_PROP, d(
                 find_d      = ag.val('what')
@@ -354,6 +352,8 @@ class FiL:
             ,   op_case_d   = ag.val('case')
             ,   op_word_d   = ag.val('word')
             ))
+        ag.hide()
+        ed.cmd(cmds.cmd_DialogFind if dlg=='find' else cmds.cmd_DialogReplace)
        #def switch_to_dlg
 
    #class FiL
