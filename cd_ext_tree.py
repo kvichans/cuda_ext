@@ -325,7 +325,7 @@ def find_tree_node():
 
 def tree_path_to_status():
     pass;                  #log('?',())
-    path_l, gap = Tree_cmds._get_best_tree_path(ed.get_carets()[0][1])
+    path_l, gap = _get_best_tree_path(ed.get_carets()[0][1])
     if not path_l:  return
     ID_TREE = app.app_proc(app.PROC_SIDEPANEL_GET_CONTROL, 'Code tree')
     if not ID_TREE: return
@@ -340,7 +340,7 @@ def tree_path_to_status():
    #def tree_path_to_status
    
 def set_nearest_tree_node():
-    path_l, gap = Tree_cmds._get_best_tree_path(ed.get_carets()[0][1])
+    path_l, gap = _get_best_tree_path(ed.get_carets()[0][1])
     if not path_l:  return
     ID_TREE = app.app_proc(app.PROC_SIDEPANEL_GET_CONTROL, 'Code tree')
     if not ID_TREE: return
@@ -365,57 +365,57 @@ def _get_best_tree_path(row):
     def best_path(id_prnt, prnt_cap=''):
         rsp_l   = []
         kids    = app.tree_proc(ID_TREE, app.TREE_ITEM_ENUM, id_prnt)
-        pass;              #LOG and log('>>id_prnt, prnt_cap, kids={}',(id_prnt, prnt_cap, len(kids) if kids else 0))
+        pass;                  #log('>>id_prnt, prnt_cap, kids={}',(id_prnt, prnt_cap, len(kids) if kids else 0))
         if kids is None:
-            pass;          #LOG and log('<<no kids',())
+            pass;              #log('<<no kids',())
             return [], INF
         row_bfr, kid_bfr, cap_bfr = -INF, NO_ID, ''
         row_aft, kid_aft, cap_aft = +INF, NO_ID, ''
         for kid, cap in kids:
-            pass;           LOG and log('kid, cap={}',(kid, cap))
+            pass;              #log('kid, cap={}',(kid, cap))
             cMin, rMin, \
             cMax, rMax  = app.tree_proc(ID_TREE, app.TREE_ITEM_GET_SYNTAX_RANGE , kid) \
                             if app.app_api_version() < '1.0.226' else \
                           app.tree_proc(ID_TREE, app.TREE_ITEM_GET_RANGE        , kid)
-            pass;          #LOG and log('? kid,cap, rMin,rMax,row={}',(kid,cap, rMin,rMax,row))
+            pass;              #log('? kid,cap, rMin,rMax,row={}',(kid,cap, rMin,rMax,row))
             if False:pass
             elif rMin<=row<=rMax:   # Cover!
                 sub_l, gap_sub  = best_path(kid, cap)
-                pass;      #LOG and log('? sub_l, gap_sub={}',(sub_l, gap_sub))
+                pass;          #log('? sub_l, gap_sub={}',(sub_l, gap_sub))
                 if gap_sub == 0:    # Sub-kid also covers
-                    pass;  #LOG and log('+ sub_l={}',(sub_l))
+                    pass;      #log('+ sub_l={}',(sub_l))
                     rsp_l   = [(kid, cap)] + sub_l
                 else:               # The kid is best
-                    pass;  #LOG and log('0 ',())
+                    pass;      #log('0 ',())
                     rsp_l   = [(kid, cap)]
-                pass;       LOG and log('<<! rsp_l={}',(rsp_l))
+                pass;          #log('<<! rsp_l={}',(rsp_l))
                 return rsp_l, 0
             elif row_bfr                  < rMax            < row:
                 row_bfr, kid_bfr, cap_bfr = rMax, kid, cap
-                pass;      #LOG and log('< row_bfr, kid_bfr, cap_bfr={}',(row_bfr, kid_bfr, cap_bfr))
+                pass;          #log('< row_bfr, kid_bfr, cap_bfr={}',(row_bfr, kid_bfr, cap_bfr))
             elif row_aft                  > rMin            > row:
                 row_aft, kid_aft, cap_aft = rMin, kid, cap
-                pass;      #LOG and log('> row_aft, kid_aft, cap_aft={}',(row_aft, kid_aft, cap_aft))
+                pass;          #log('> row_aft, kid_aft, cap_aft={}',(row_aft, kid_aft, cap_aft))
            #for kid
-        pass;              #LOG and log('? row_bfr, kid_bfr, cap_bfr={}',(row_bfr, kid_bfr, cap_bfr))
-        pass;              #LOG and log('? row_aft, kid_aft, cap_aft={}',(row_aft, kid_aft, cap_aft))
-        pass;              #LOG and log('? abs(row_bfr-row), abs(row_aft-row)={}',(abs(row_bfr-row), abs(row_aft-row)))
+        pass;                  #log('? row_bfr, kid_bfr, cap_bfr={}',(row_bfr, kid_bfr, cap_bfr))
+        pass;                  #log('? row_aft, kid_aft, cap_aft={}',(row_aft, kid_aft, cap_aft))
+        pass;                  #log('? abs(row_bfr-row), abs(row_aft-row)={}',(abs(row_bfr-row), abs(row_aft-row)))
         kid_x, cap_x, gap_x = (kid_bfr, cap_bfr, row_bfr-row) \
                             if abs(row_bfr-row) <= abs(row_aft-row) else \
                               (kid_aft, cap_aft, row_aft-row)
-        pass;              #LOG and log('kid_x, cap_x, gap_x={}',(kid_x, cap_x, gap_x))
+        pass;                  #log('kid_x, cap_x, gap_x={}',(kid_x, cap_x, gap_x))
         sub_l, gap_sub  = best_path(kid_x, cap_x)
-        pass;              #LOG and log('? sub_l,gap_sub ?? gap_x={}',(sub_l, gap_sub, gap_x))
+        pass;                  #log('? sub_l,gap_sub ?? gap_x={}',(sub_l, gap_sub, gap_x))
         if abs(gap_sub) <= abs(gap_x):  # Sub-kid better
             rsp_l  = [(kid_x, cap_x)] + sub_l
-            pass;           LOG and log('<<sub bt: rsp_l, gap_sub={}',(rsp_l, gap_sub))
+            pass;              #log('<<sub bt: rsp_l, gap_sub={}',(rsp_l, gap_sub))
             return rsp_l, gap_sub
         # The kid is best
         rsp_l   = [(kid_x, cap_x)]
-        pass;               LOG and log('<<bst: rsp_l, gap_x={}',(rsp_l, gap_x))
+        pass;                  #log('<<bst: rsp_l, gap_x={}',(rsp_l, gap_x))
         return rsp_l, gap_x
        #def best_path
     lst, gap= best_path(0)
-    pass;                   LOG and log('lst, gap={}',(lst, gap))
+    pass;                      #log('lst, gap={}',(lst, gap))
     return lst, gap
    #def _get_best_tree_path
