@@ -1593,7 +1593,7 @@ class Command:
                     }
         )
         rsp,vals    = ag.show()
-        if not rsp: return
+        if rsp!='!': return
         new_path    = rsp
 
         group       = ed.get_prop(app.PROP_INDEX_GROUP)

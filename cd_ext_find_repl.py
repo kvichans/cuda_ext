@@ -594,13 +594,13 @@ def reindent():
     ,('new_',d(tp='labl',tid='news' ,x=5        ,w=150  ,cap='>'+_('&New indent step:') ,hint=fill_h)) # &n
     ,('news',d(tp='edit',y=50       ,x=5+150+5  ,w= 80                                              ))
     ,('okok',d(tp='bttn',y=90       ,x=245-170-5,w= 80  ,cap=_('OK')                    ,def_bt='1' ,on=acts)) #   
-    ,('cncl',d(tp='bttn',y=90       ,x=245-80-5 ,w= 80  ,cap=_('Cancel')                            ))
+    ,('cncl',d(tp='bttn',y=90       ,x=245-80-5 ,w= 80  ,cap=_('Cancel')                            ,on=CB_HIDE))
             ][1:]
         ,   vals    = vals
         ,   fid     = 'olds'
         )
     aid, vals   = ag.show()
-    if not aid: return 
+    if aid!='okok': return 
     old_s   = parse_step(vals['olds'].replace('.', ' '))
     new_s   = parse_step(vals['news'].replace('.', ' '))
     pass;                      #log__('old_s, new_s={}',(old_s, new_s)  ,__=(log4fun,_log4mod))
@@ -926,7 +926,7 @@ def rewrap_sel_by_margin():
                ,fid='marg'
         )
     aid,vals    = ag.show()
-    if aid is None or aid=='cncl': return None
+    if aid!='okok': return 
 
     if not vals['marg'].isdigit(): return app.msg_status('Not digit margin')
     margin  = int(vals['marg'])
