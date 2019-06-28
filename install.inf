@@ -103,6 +103,12 @@ caption=Cuda&-Ext\&Find/Replace\Convert multi-line selection to column selection
 hotkey=
 method=convert_sel_to_column
 
+[item27]
+section=commands
+caption=Cuda&-Ext\&Find/Replace\Reverse selection text, by lines
+hotkey=
+method=convert_reverse_selection
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Insert_cmds
 [item41]

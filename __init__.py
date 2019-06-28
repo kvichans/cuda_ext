@@ -50,12 +50,13 @@ class Command:
     def find_cb_string_next(self):              return cd_ext_find_repl.find_cb_by_cmd('dn')
     def find_cb_string_prev(self):              return cd_ext_find_repl.find_cb_by_cmd('up')
     def replace_all_sel_to_cb(self):            return cd_ext_find_repl.replace_all_sel_to_cb()
+    def convert_sel_to_column(self):            return cd_ext_find_repl.convert_sel_to_column()
+    def convert_reverse_selection(self):        return cd_ext_find_repl.convert_reverse_selection()
 
     def copy_term(self):                        return RLS.copy_term()
     def replace_term(self):                     return RLS.replace_term()
     def expand_sel(self):                       return RLS.expand_sel()
     def expand_sel_copy(self):                  return RLS.expand_sel_copy()
-    def convert_sel_to_column(self):            return RLS.convert_sel_to_column()
     
     def align_in_lines_by_sep(self):            return cd_ext_find_repl.align_in_lines_by_sep()
     def reindent(self):                         return cd_ext_find_repl.reindent()

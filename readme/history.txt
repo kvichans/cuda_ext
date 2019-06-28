@@ -1,3 +1,6 @@
+1.7.04 (2019-06-28)
+added: Command "Reverse selection text, by lines"
+
 1.7.03 (2019-06-18)
 added: Dialog "Find in Lines" can be non-modal and docked
 added: Command "Split lines by margin" keeps empty and blank-only lines in selection

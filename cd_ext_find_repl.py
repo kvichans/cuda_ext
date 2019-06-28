@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.7.02 2019-06-18'
+    '1.7.04 2019-06-28'
 ToDo: (see end of file)
 '''
 
@@ -458,6 +458,40 @@ def convert_sel_to_column():
     ed.set_sel_rect(col1, y1, col2, y2)
     app.msg_status(_('Converted to column block'))
    #def convert_sel_to_column
+   
+def convert_reverse_selection():
+    " Author: github.com/Alexey-T "
+    carets = ed.get_carets()
+    rng = []
+
+    for x1, y1, x2, y2 in carets:
+        if y2>=0:
+            if (y1, x1)>(y2, x2):
+                x1, y1, x2, y2 = x2, y2, x1, y1
+                    
+            if y1==y2:
+                rng.append((x1, y1, x2))
+            else:
+                rng.append((x1, y1, len(ed.get_text_line(y1))))
+                for y in range(y1+1, y2):
+                    rng.append((0, y, len(ed.get_text_line(y))))
+                rng.append((0, y2, x2))
+
+    # delete empty fragments
+    rng = [r for r in rng if r[2]>r[0]]
+
+    for x1, y1, x2 in reversed(rng):                
+        s = ed.get_text_substr(x1, y1, x2, y1)
+        ed.replace(x1, y1, x2, y1, s[::-1])
+
+    n = len(rng)
+    if n==0:
+        app.msg_status(_('Make selection first'))
+    elif n==1:                
+        app.msg_status(_('Reversed 1 fragment'))
+    elif n>1:
+        app.msg_status(f(_('Reversed {} fragments'), n))
+   #def convert_reverse_selection
 
 data4_align_in_lines_by_sep = ''
 def align_in_lines_by_sep():
