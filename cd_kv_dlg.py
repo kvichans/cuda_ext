@@ -535,6 +535,8 @@ class DlgAg:
                                ,opts={'_skip_ctrls_upd':True})  # Agent acts: stretch column(s), ...
                 self._skip_free = (event=='on_resize')          # Ban to close dlg by some events (on_resize,...)
                 upds    = u_callbk(self, key, data)
+                if event=='on_close_query':                     # No upd, only bool about form close
+                    return upds
                 return self.update(upds)
             return form_callbk
             
@@ -945,7 +947,7 @@ class DlgAg:
         # Copy smth to props
         if 'props' in cnt:
             pass
-        elif tp=='label' and 'cap' in cnt and cnt['cap'][0]=='>':       # cap='>smth' -> cap='smth', props='1' (r-align)
+        elif tp=='label' and cnt.get('cap', '').startswith('>'):        # cap='>smth' -> cap='smth', props='1' (r-align)
             cnt['cap']  = cnt['cap'][1:]
             cnt['props']= '1'
         elif tp=='label' and    cnt.get('ralign'):                      # ralign -> props

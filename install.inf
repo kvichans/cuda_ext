@@ -819,11 +819,11 @@ caption=Cuda&-Ext\&Align\Indent lines like the first selected
 hotkey=
 method=indent_sel_as_1st
 
-[item313]
-section=commands
-caption=Cuda&-Ext\&Align\Align indentation of selection(s)
-hotkey=
-method=indent_sel_as_bgn
+;[item313]
+;section=commands
+;caption=Cuda&-Ext\&Align\Align indentation of selection(s)
+;hotkey=
+;method=indent_sel_as_bgn
 
 [item314]
 section=commands

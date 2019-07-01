@@ -42,6 +42,13 @@ class odct(collections.OrderedDict):
     def __repr__(self):
         return self.__str__()
 
+class dcta(dict):
+    def __getattr__(self, name):
+        return self.get(name)
+    def __setattr__(self, name, value):
+        di  = self
+        di[name] = value
+
 
 #########################
 #NOTE: log utility
@@ -49,7 +56,7 @@ class odct(collections.OrderedDict):
 LOG_FREE    = 0                                                 # No order (=False)
 LOG_ALLOW   = 1                                                 # Allowed one (=True)
 LOG_NEED    = 2                                                 # Required all
-LOG_FORBID  = 3                                                 # Forbidden all
+LOG_FORBID  = -1                                                # Forbidden all
 def iflog(*log_levels):
     " Get permission to log on multiple orders"
     if 2==len(log_levels):
@@ -57,6 +64,11 @@ def iflog(*log_levels):
         if      l1==LOG_FORBID  or l2==LOG_FORBID:      return False  # If at least one is FORBID
         if      l1==LOG_NEED    or l2==LOG_NEED:        return True   # If at least one is NEED 
         return  l1==LOG_ALLOW   or l2==LOG_ALLOW                      # If at least one is ALLOW
+    if 3==len(log_levels):
+        l1,l2,l3= log_levels
+        if      l1==LOG_FORBID  or l2==LOG_FORBID  or l3==LOG_FORBID:   return False  # If at least one is FORBID
+        if      l1==LOG_NEED    or l2==LOG_NEED    or l3==LOG_NEED:     return True   # If at least one is NEED 
+        return  l1==LOG_ALLOW   or l2==LOG_ALLOW   or l3==LOG_ALLOW                   # If at least one is ALLOW
     if      any([LOG_FORBID  ==l for l in log_levels]): return False  # If at least one is FORBID
     if      any([LOG_NEED    ==l for l in log_levels]): return True   # If at least one is NEED 
     return  any([LOG_ALLOW   ==l for l in log_levels])                # If at least one is ALLOW
@@ -333,6 +345,25 @@ def get_plugcmd_hotkeys(plugcmd):
    #def get_plugcmd_hotkeys
 
 
+MAX_HIST= apx.get_opt('ui_max_history_edits', 20)
+
+def add_to_history(val:str, lst:list, max_len=MAX_HIST, unicase=True)->list:
+    """ Add/Move val to list head. """
+    pass;                  #LOG and log('val, lst={}',(val, lst))
+    lst_u = [ s.upper() for s in lst] if unicase else lst
+    val_u = val.upper()               if unicase else val
+    if val_u in lst_u:
+        if 0 == lst_u.index(val_u):   return lst
+        del lst[lst_u.index(val_u)]
+    lst.insert(0, val)
+    pass;                  #LOG and log('lst={}',lst)
+    if len(lst)>max_len:
+        del lst[max_len:]
+    pass;                  #LOG and log('lst={}',lst)
+    return lst
+   #def add_to_history
+
+
 ######################################
 #NOTE: plugins history
 ######################################
@@ -366,7 +397,7 @@ def get_hist(key_or_path, default=None, module_name='_auto_detect', to_file=PLIN
                 get_hist(['q','n'], 0, None)    returns 4
     """
     pass;                       log4fun=0                       # Order log in the function
-    pass;                       log('key,def,mod,to_f={}',(key_or_path,default,module_name,to_file)) if iflog(log4fun,_log4mod) else 0
+    pass;                       log__('key,def,mod,to_f={}',(key_or_path,default,module_name,to_file)      ,__=(log4fun,_log4mod))
     to_file = to_file   if os.sep in to_file else   app.app_path(app.APP_DIR_SETTINGS)+os.sep+to_file
     if not os.path.exists(to_file):
         pass;                  #log('not exists',())
@@ -440,7 +471,7 @@ def set_hist(key_or_path, value=None, module_name='_auto_detect', kill=False, to
             set_hist('n',       kill=True)      {"plg":{"k":1, "p":{"m":2}}}    (nothing to kill)
     """
     pass;                       log4fun=0                       # Order log in the function
-    pass;                      #log('key,val,mod,kill,to_f={}',(key_or_path, value, module_name, kill, to_file)) if iflog(log4fun,_log4mod) else 0
+    pass;                      #log__('key,val,mod,kill,to_f={}',(key_or_path, value, module_name, kill, to_file)      ,__=(log4fun,_log4mod))
     to_file = to_file   if os.sep in to_file else   app.app_path(app.APP_DIR_SETTINGS)+os.sep+to_file
     body    = json.loads(open(to_file).read(), object_pairs_hook=odict) \
                 if os.path.exists(to_file) and os.path.getsize(to_file) != 0 else \
@@ -568,6 +599,7 @@ def dispose(dct, key):
 def likesint(what):     return isinstance(what, int)
 def likesstr(what):     return isinstance(what, str)
 def likeslist(what):    return isinstance(what, tuple) or isinstance(what, list)
+def likesdict(what):    return isinstance(what, dict)
    
 if __name__ == '__main__' :
     # To start the tests run in Console
