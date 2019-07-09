@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.03 2019-07-01'
+    '1.7.05 2019-07-09'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata
@@ -118,7 +118,7 @@ class SCBs:
         if SCBs.lexer==lexer and SCBs.quotes: return
         SCBs.wrdchs     = apx.get_opt('word_chars', '') + '_'
         SCBs.wrdcs_re   = re.compile(r'^[\w'+re.escape(SCBs.wrdchs)+']+')
-        SCBs.quotes     = apx.get_opt('cudaext_quotes', '"'+"'")
+        SCBs.quotes     = apx.get_opt('cudaext_quotes', '"'+"'`")
         SCBs.brckts     = apx.get_opt('cudaext_brackets', '[](){}<>')
         SCBs.opn2cls    = {SCBs.brckts[i  ]:SCBs.brckts[i+1] for i in range(0,len(SCBs.brckts),2)}
         SCBs.cls2opn    = {SCBs.brckts[i+1]:SCBs.brckts[i  ] for i in range(0,len(SCBs.brckts),2)}
@@ -137,7 +137,7 @@ class SCBs:
                 [abc]|·    ·|(abc)              any brackets from [](){}<>      · is [^\w_'"]
             Params from def/user/lex
                 word_chars          (no)        Append chars to \w
-                cudaext_quotes      '"          Using quotes 
+                cudaext_quotes      '"`         Using quotes 
                 cudaext_brackets    [](){}<>    Using brackets
             Params
                 ted     (ed)
@@ -1593,7 +1593,7 @@ class Command:
                     }
         )
         rsp,vals    = ag.show()
-        if rsp!='!': return
+        if rsp in (None, '-'): return
         new_path    = rsp
 
         group       = ed.get_prop(app.PROP_INDEX_GROUP)

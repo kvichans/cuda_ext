@@ -1,3 +1,7 @@
+1.7.05 (2019-07-09)
+added: "`" uses like " and ' in commands "Copy/Replace word", "Expand [and Copy ] selection to word"
+fixed: Rename file
+
 1.7.04 (2019-06-28)
 added: Command "Reverse selection text, by lines"
 
