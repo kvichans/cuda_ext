@@ -256,6 +256,36 @@ def move_tab():
    #def move_tab
 
 
+def find_tab():
+    pttn = app.dlg_input('What to find in tab title', '')
+    if pttn is None: return
+    for h in app.ed_handles():
+        ed_ = app.Editor(h)
+        if pttn in ed_.get_prop(app.PROP_TAB_TITLE):
+            ed_.focus()
+            return 
+    app.msg_status(f(_('No tab with "{}" in title'), pttn))
+   #def find_tab
+
+
+def to_tab_ask_num():
+    while True:
+        grp_num = app.dlg_input('What tab number to activate? Input: [group:]number', '')
+        if grp_num is None: return
+        if re.match(r'(\d:)?\d+', grp_num):
+            break
+    me_grp  = ed.get_prop(app.PROP_INDEX_GROUP)
+    grp     = int(grp_num.split(':')[0])-1 if ':' in grp_num else me_grp
+    num     = int(grp_num.split(':')[1])-1 if ':' in grp_num else int(grp_num)-1
+    for h in app.ed_handles():
+        ed_ = app.Editor(h)
+        if grp == ed_.get_prop(app.PROP_INDEX_GROUP) and \
+           num == ed_.get_prop(app.PROP_INDEX_TAB):
+            ed_.focus()
+    app.msg_status(f(_('No tab "{}"'), grp_num))
+   #def to_tab_ask_num
+
+
 def _activate_tab_other_group(what_tab='next', what_grp='next'):
     grps    = apx.get_groups_count()
     if 1==grps:  return

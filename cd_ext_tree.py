@@ -83,6 +83,7 @@ def symbol_menu_levels(levels=0):
                         + [_('              <All levels>')]
                         + [_('              <Only 1 up level>')]
                         + [_('              <Only 2 up levels>')]
+                        + [_('              <Only 3 up levels>')]
                         , focused=start_item
                         , caption=_('Code Tree symbols')
                                  + f(' ({})'    , len(items))
@@ -101,6 +102,9 @@ def symbol_menu_levels(levels=0):
         if res==2+len(props) + (1 if old_api else 0):
             levels  = 2
             continue#while
+        if res==3+len(props) + (1 if old_api else 0):
+            levels  = 3
+            continue#while
         break
        #while
         
@@ -111,19 +115,19 @@ def symbol_menu_levels(levels=0):
 
 def find_tree_node():
     pass;                       log4fun=-1==-1  # Order log in the function
-    HELP_C  = _(
-        'Search starts on Enter.'
-      '\r• A found node after current one will be selected.'
-      '\r• All found nodes are remembered and dialog can jump over them by [Shift+]Enter or by menu commands.'
-      '\r• If option "O" (wrapped search) is tuned on:'
-      '\r    - Search continues from the start, when end of the tree is reached'
-      '\r    - Jumps to previous/next nodes are looped too'
-      '\r• Option ".*" (regular expression) allows to use Python reg.ex. See "docs.python.org/3/library/re.html".'
-      '\r• Option "w" (whole words) is ignored if entered string contains not a word.'
-      '\r• If option "Close on success" (in menu) is tuned on, dialog will close after successful search.'
-      '\r• Option "Show full tree path" (in menu) shows in the statusbar the path of the found node (names of all parents).'
-      '\r• Command "Restore initial selection" (in menu) restores only first of initial carets.'
-    )
+    HELP_C  = _('''
+Search starts on Enter.
+• A found node after current one will be selected.
+• All found nodes are remembered and dialog can jump over them by [Shift+]Enter or by menu commands.
+• If option "O" (wrapped search) is tuned on:
+    - Search continues from the start, when end of the tree is reached
+    - Jumps to previous/next nodes are looped too
+• Option ".*" (regular expression) allows to use Python reg.ex. See "docs.python.org/3/library/re.html".
+• Option "w" (whole words) is ignored if entered string contains not a word.
+• If option "Close on success" (in menu) is tuned on, dialog will close after successful search.
+• Option "Show full tree path" (in menu) shows in the statusbar the path of the found node (names of all parents).
+• Command "Restore initial selection" (in menu) restores only first of initial carets.
+    ''').strip()
     ed_crts = ed.get_carets()           # Carets at start
     opts    = d(reex=False,case=False,word=False,wrap=False,hist=[],clos=False,fpth=False)
     opts.update(get_hist('tree.find_node', opts))

@@ -449,190 +449,202 @@ method=move_tab
 
 [item174]
 section=commands
+caption=Cuda&-Ext\Ta&bs\&Find tab by title...
+hotkey=
+method=find_tab
+
+[item175]
+section=commands
+caption=Cuda&-Ext\Ta&bs\Activate tab by &number...
+hotkey=
+method=to_tab_ask_num
+
+[item184]
+section=commands
 caption=Cuda&-Ext\Ta&bs\-
 hotkey=
 method=_
 
-[item175]
+[item185]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #1 in group #1
 hotkey=Ctrl+1
 method=to_tab_g1_t1
-[item176]
+[item186]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #2 in group #1
 hotkey=Ctrl+2
 method=to_tab_g1_t2
-[item177]
+[item187]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #3 in group #1
 hotkey=Ctrl+3
 method=to_tab_g1_t3
-[item178]
+[item188]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #4 in group #1
 hotkey=Ctrl+4
 method=to_tab_g1_t4
-[item179]
+[item189]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #5 in group #1
 hotkey=Ctrl+5
 method=to_tab_g1_t5
-[item180]
+[item190]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #6 in group #1
 hotkey=Ctrl+6
 method=to_tab_g1_t6
-[item181]
+[item191]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #7 in group #1
 hotkey=Ctrl+7
 method=to_tab_g1_t7
-[item182]
+[item192]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #8 in group #1
 hotkey=Ctrl+8
 method=to_tab_g1_t8
-[item183]
+[item193]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #9 in group #1
 hotkey=Ctrl+9
 method=to_tab_g1_t9
 
-[item184]
+[item194]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #1 in group #2
 hotkey=Alt+1
 method=to_tab_g2_t1
-[item185]
+[item195]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #2 in group #2
 hotkey=Alt+2
 method=to_tab_g2_t2
-[item186]
+[item196]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #3 in group #2
 hotkey=Alt+3
 method=to_tab_g2_t3
-[item187]
+[item197]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #4 in group #2
 hotkey=Alt+4
 method=to_tab_g2_t4
-[item188]
+[item198]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #5 in group #2
 hotkey=Alt+5
 method=to_tab_g2_t5
-[item189]
+[item199]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #6 in group #2
 hotkey=Alt+6
 method=to_tab_g2_t6
-[item190]
+[item200]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #7 in group #2
 hotkey=Alt+7
 method=to_tab_g2_t7
-[item191]
+[item201]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #8 in group #2
 hotkey=Alt+8
 method=to_tab_g2_t8
-[item192]
+[item202]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #9 in group #2
 hotkey=Alt+9
 method=to_tab_g2_t9
 
-[item193]
+[item203]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate last tab in group #1
 hotkey=Ctrl+0
 method=to_tab_g1_last
-[item194]
+[item204]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate last tab in group #2
 hotkey=Alt+0
 method=to_tab_g2_last
 
-[item195]
+[item205]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate next tab (global loop)
 hotkey=
 method=to_next_tab
-[item196]
+[item206]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate previous tab (global loop)
 hotkey=
 method=to_prev_tab
 
-[item197]
+[item207]
 section=commands
 caption=Cuda&-Ext\Ta&bs\-
 hotkey=
 method=_
 
-[item198]
+[item208]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Close tab in next group
 hotkey=
 method=close_tab_from_next_group
-[item199]
+[item209]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Close tab in previous group
 hotkey=
 method=close_tab_from_prev_group
 
-[item200]
+[item210]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\-
 hotkey=
 method=_
 
-[item201]
+[item211]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to next in next group
 hotkey=
 method=view_next_tab_from_next_group
-[item202]
+[item212]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to next in previous group
 hotkey=
 method=view_next_tab_from_prev_group
-[item203]
+[item213]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to previous in next group
 hotkey=
 method=view_prev_tab_from_next_group
-[item204]
+[item214]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to previous in previous group
 hotkey=
 method=view_prev_tab_from_prev_group
 
-[item205]
+[item215]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\-
 hotkey=
 method=_
 
-[item206]
+[item216]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to first in next group
 hotkey=
 method=view_first_tab_from_next_group
-[item207]
+[item217]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to first in previous group
 hotkey=
 method=view_first_tab_from_prev_group
-[item208]
+[item218]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to last in next group
 hotkey=
 method=view_last_tab_from_next_group
-[item209]
+[item219]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to last in previous group
 hotkey=
@@ -640,60 +652,60 @@ method=view_last_tab_from_prev_group
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Move_sep_cmds
-[item211]
+[item221]
 section=commands
 caption=Cuda&-Ext\&Splitters\Expand side panel
 hotkey=Shift+Ctrl+.
 method=more_tree
-[item212]
+[item222]
 section=commands
 caption=Cuda&-Ext\&Splitters\Narrow side panel
 hotkey=Shift+Ctrl+,
 method=less_tree
 
-[item213]
+[item223]
 section=commands
 caption=Cuda&-Ext\&Splitters\-
 hotkey=
 method=-
-[item214]
+[item224]
 section=commands
 caption=Cuda&-Ext\&Splitters\Expand bottom panel
 hotkey=Alt+.
 method=more_bottom
-[item215]
+[item225]
 section=commands
 caption=Cuda&-Ext\&Splitters\Narrow bottom panel
 hotkey=Alt+,
 method=less_bottom
 
-[item216]
+[item226]
 section=commands
 caption=Cuda&-Ext\&Splitters\-
 hotkey=
 method=-
-[item217]
+[item227]
 section=commands
 caption=Cuda&-Ext\&Splitters\Expand top-left group
 hotkey=Ctrl+.
 method=more_main_grp
-[item218]
+[item228]
 section=commands
 caption=Cuda&-Ext\&Splitters\Narrow top-left group
 hotkey=Ctrl+,
 method=less_main_grp
 
-[item219]
+[item229]
 section=commands
 caption=Cuda&-Ext\&Splitters\-
 hotkey=
 method=-
-[item220]
+[item230]
 section=commands
 caption=Cuda&-Ext\&Splitters\Expand active group
 hotkey=Shift+Alt+.
 method=more_curr_grp
-[item221]
+[item231]
 section=commands
 caption=Cuda&-Ext\&Splitters\Narrow active group
 hotkey=Shift+Alt+,
@@ -771,13 +783,13 @@ method=symbol_menu
 
 [item269]
 section=commands
-caption=Cuda&-Ext\Code &Tree\&Symbols list (only 1 up level)...
+caption=Cuda&-Ext\Code &Tree\Symbols list (only &1 up level)...
 hotkey=
 method=symbol_menu_up1
 
 [item270]
 section=commands
-caption=Cuda&-Ext\Code &Tree\&Symbols list (only 2 up level)...
+caption=Cuda&-Ext\Code &Tree\Symbols list (only &2 up level)...
 hotkey=Shift+Alt++
 method=symbol_menu_up2
 

@@ -1,3 +1,7 @@
+1.7.06 (2019-07-17)
+added: Command "Tabs\Find tab by title..."
+added: Command "Tabs\Activate tab by number..."
+
 1.7.05 (2019-07-09)
 added: "`" uses like " and ' in commands "Copy/Replace word", "Expand [and Copy ] selection to word"
 fixed: Rename file

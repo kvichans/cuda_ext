@@ -866,11 +866,10 @@ class Prgph_cmds:
         pass;                  #LOG and log('how={}',(how))
         df_mrg  = apx.get_opt('margin', 80)
         if how=='?':
-            df_m    = str(df_mrg)
             ans     = app.dlg_input_ex(3, _('Align paragraphs - options (default values)')
-                , _('Paragraph right margin ('+df_m+')'), str(apx.get_opt('margin_right'    , df_mrg))
-                , _('Indent of first line (0)')         , str(apx.get_opt('margin_left_1'   , 0))
-                , _('Indent of other lines (0)')        , str(apx.get_opt('margin_left'     , 0))
+                , f(_('Paragraph right margin ({})'),df_mrg), str(apx.get_opt('margin_right'    , df_mrg))
+                , _('Indent of first line (0)')             , str(apx.get_opt('margin_left_1'   , 0))
+                , _('Indent of other lines (0)')            , str(apx.get_opt('margin_left'     , 0))
                 )
             if ans:
                 apx.set_opt('margin_right'  , int(ans[0]) if ans[0].isdigit() else df_mrg)
@@ -1092,7 +1091,7 @@ class Nav_cmds:
         fn_ln_re= f('File "{}", line ', fn).replace('\\','\\\\')+'(\d+)'
         pass;                      #LOG and log('fn_ln_re={}',fn_ln_re)
         mtchs   = list(re.finditer(fn_ln_re, cons_out, re.I))
-        if not mtchs:   return app.msg_status(_('In output no errors or no current file: '+fn))
+        if not mtchs:   return app.msg_status(_('In output no errors or no current file: ')+fn)
         mtch    = mtchs[-1]
         row     = int(mtch.group(1))-1
         pass;                      #LOG and log('row={}',row)
@@ -1743,7 +1742,7 @@ class Command:
             os.startfile(cf_path)
         except Exception as ex:
             pass;               log(traceback.format_exc())
-            return app.msg_status(_('Error: '+ex))
+            return app.msg_status(_('Error: ')+ex)
        #def open_with_defapp
     
     def save_tabs_to_file(self):

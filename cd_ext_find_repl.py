@@ -31,16 +31,16 @@ C1      = chr(1)
 
 class FiL:
     FORM_C  =   _('Find in Lines')
-    HELP_C  = _(
-        '• Search "in Lines" starts on Enter or Shift+Enter or immediately (if "Instant search" is tuned on).'
-      '\r• A found fragment after first caret will be selected.'
-      '\r• All found fragments are remembered and dialog can jump over them by [Shift+]Enter or by menu commands.'
-      '\r• Option ".*" (regular expression) allows to use Python reg.ex. See "docs.python.org/3/library/re.html".'
-      '\r• Option "w" (whole words) is ignored if entered string contains not a word.'
-      '\r• If option "Instant search" (in menu) is tuned on, search result will be updated on start and after each change of pattern.'
-      '\r• Command "Restore initial selection" (Shift+Esc) restores only first of initial carets.'
-      '\r• Ctrl+F (or Ctrl+R) to call appication dialog Find (or Replace).'
-    )
+    HELP_C  = _('''
+• Search "in Lines" starts on Enter or Shift+Enter or immediately (if "Instant search" is tuned on).
+• A found fragment after first caret will be selected.
+• All found fragments are remembered and dialog can jump over them by [Shift+]Enter or by menu commands.
+• Option ".*" (regular expression) allows to use Python reg.ex. See "docs.python.org/3/library/re.html".
+• Option "w" (whole words) is ignored if entered string contains not a word.
+• If option "Instant search" (in menu) is tuned on, search result will be updated on start and after each change of pattern.
+• Command "Restore initial selection" (Shift+Esc) restores only first of initial carets.
+• Ctrl+F (or Ctrl+R) to call appication dialog Find (or Replace).
+    ''').strip()
 
     # To select found fragment
     select_frag = lambda frag_inf:  ed.set_caret(*frag_inf)
@@ -556,14 +556,15 @@ def reindent():
     ed_blanks   = '.'*ed_tab_sz
     old_s       = 't' if first_s.startswith('\t')   else ed_blanks
     new_s       = 't' if old_s!='t' else ed_blanks
-    fill_h      = _('To specify two/four/eight blanks enter'
-                    '\r    these blanks'
-                    '\ror'
-                    '\r    "2b"/"4b"/"8b"'
-                    '\ror'
-                    '\r    ".."/"...."/"........" (dots).'
-                    '\rTo specify TAB enter "t".'
-                  )
+    fill_h      = _('''
+To specify two/four/eight blanks enter
+    these blanks
+or
+    "2b"/"4b"/"8b"
+or
+    ".."/"...."/"........" (dots).
+To specify TAB enter "t".
+                  ''').strip()
     def parse_step(step):
         if step in 't\t':               return '\t'
         if not step.replace(' ', ''):   return step
@@ -575,10 +576,10 @@ def reindent():
     def acts(ag, cid, data=''):
         vals    = ag.vals()
         if ''==vals['olds'] or vals['olds'][0] not in ' .t2345678':
-            app.msg_box(_('Fill "Old step".\n\n'+fill_h.replace('\r', '\n')), app.MB_OK)
+            app.msg_box(_('Fill "Old step".\n\n')+fill_h, app.MB_OK)
             return d(fid='olds')
         if ''==vals['news'] or vals['news'][0] not in ' .t2345678':
-            app.msg_box(_('Fill "New step".\n\n'+fill_h.replace('\r', '\n')), app.MB_OK)
+            app.msg_box(_('Fill "New step".\n\n')+fill_h, app.MB_OK)
             return d(fid='news')
         ag.hide(cid)
        #def acts
@@ -607,33 +608,6 @@ def reindent():
     if not old_s or not new_s or old_s==new_s:
         return app.msg_status(_('Reindent skipped'))
     
-#   fid         = 'olds'
-#   while True:
-#       btn,vals,_t,_p = dlg_wrapper(f(_('Reindent selected lines ({})'), rSelE-rSelB+1), 245,120,     #NOTE: dlg-reindent
-#            [dict(           tp='lb'   ,tid='olds' ,l=5        ,w=150  ,cap='>'+_('&Old indent step:') ,hint=fill_h) # &o
-#            ,dict(cid='olds',tp='ed'   ,t=10       ,l=5+150+5  ,w= 80                                              ) # 
-#            ,dict(           tp='lb'   ,tid='news' ,l=5        ,w=150  ,cap='>'+_('&New indent step:') ,hint=fill_h) # &n
-#            ,dict(cid='news',tp='ed'   ,t=50       ,l=5+150+5  ,w= 80                                              )
-#            ,dict(cid='!'   ,tp='bt'   ,t=90       ,l=245-170-5,w= 80  ,cap=_('OK')                    ,def_bt='1' ) #   
-#            ,dict(cid='-'   ,tp='bt'   ,t=90       ,l=245-80-5 ,w= 80  ,cap=_('Cancel')                            )
-#            ],    vals, focus_cid=fid)
-#       if btn is None or btn=='-': return None
-#       if ''==vals['olds'] or vals['olds'][0] not in ' .t2345678':
-#           app.msg_box(_('Fill "Old step".\n\n'+fill_h.replace('\r', '\n')), app.MB_OK)
-#           fid = 'olds'
-#           continue
-#       if ''==vals['news'] or vals['news'][0] not in ' .t2345678':
-#           app.msg_box(_('Fill "New step".\n\n'+fill_h.replace('\r', '\n')), app.MB_OK)
-#           fid = 'news'
-#           continue
-#       old_s   = parse_step(vals['olds'].replace('.', ' '))
-#       new_s   = parse_step(vals['news'].replace('.', ' '))
-#       pass;                  #log__('old_s, new_s={}',(old_s, new_s)  ,__=(log4fun,_log4mod))
-#       if not old_s or not new_s or old_s==new_s:
-#           return app.msg_status(_('Reindent skipped'))
-#       break
-#      #while
-        
     lines   = [ed.get_text_line(row) for row in range(rSelB, rSelE+1)]
     def reind_line(line, ost_l, nst):
         pass;                  #log__('line={}',repr(line)  ,__=(log4fun,_log4mod))
