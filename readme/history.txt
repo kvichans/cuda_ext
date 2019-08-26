@@ -1,3 +1,6 @@
+1.7.08 (2019-08-26)
+added: Dialog "Find in lines" have both visible input: to instant find and to save history
+
 1.7.06 (2019-07-17)
 added: Command "Tabs\Find tab by title..."
 added: Command "Tabs\Activate tab by number..."
