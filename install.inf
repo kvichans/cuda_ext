@@ -1,10 +1,11 @@
 [info]
-version=1.7.03
+version=1.7.11
 title=CudaExt
 desc=Additional commands for CudaText in Commands dialog and Plugins menu
 type=cudatext-plugin
 subdir=cuda_ext
 homepage=https://github.com/kvichans/cuda_ext
+api=1.0.299
 
 [item1]
 section=events
@@ -459,192 +460,192 @@ caption=Cuda&-Ext\Ta&bs\Activate tab by &number...
 hotkey=
 method=to_tab_ask_num
 
-[item184]
+[item176]
 section=commands
 caption=Cuda&-Ext\Ta&bs\-
 hotkey=
 method=_
 
-[item185]
+[item177]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #1 in group #1
 hotkey=Ctrl+1
 method=to_tab_g1_t1
-[item186]
+[item178]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #2 in group #1
 hotkey=Ctrl+2
 method=to_tab_g1_t2
-[item187]
+[item179]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #3 in group #1
 hotkey=Ctrl+3
 method=to_tab_g1_t3
-[item188]
+[item180]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #4 in group #1
 hotkey=Ctrl+4
 method=to_tab_g1_t4
-[item189]
+[item181]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #5 in group #1
 hotkey=Ctrl+5
 method=to_tab_g1_t5
-[item190]
+[item182]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #6 in group #1
 hotkey=Ctrl+6
 method=to_tab_g1_t6
-[item191]
+[item183]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #7 in group #1
 hotkey=Ctrl+7
 method=to_tab_g1_t7
-[item192]
+[item184]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #8 in group #1
 hotkey=Ctrl+8
 method=to_tab_g1_t8
-[item193]
+[item185]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #9 in group #1
 hotkey=Ctrl+9
 method=to_tab_g1_t9
 
-[item194]
+[item186]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #1 in group #2
 hotkey=Alt+1
 method=to_tab_g2_t1
-[item195]
+[item187]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #2 in group #2
 hotkey=Alt+2
 method=to_tab_g2_t2
-[item196]
+[item188]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #3 in group #2
 hotkey=Alt+3
 method=to_tab_g2_t3
-[item197]
+[item189]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #4 in group #2
 hotkey=Alt+4
 method=to_tab_g2_t4
-[item198]
+[item190]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #5 in group #2
 hotkey=Alt+5
 method=to_tab_g2_t5
-[item199]
+[item191]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #6 in group #2
 hotkey=Alt+6
 method=to_tab_g2_t6
-[item200]
+[item192]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #7 in group #2
 hotkey=Alt+7
 method=to_tab_g2_t7
-[item201]
+[item193]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #8 in group #2
 hotkey=Alt+8
 method=to_tab_g2_t8
-[item202]
+[item194]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab #9 in group #2
 hotkey=Alt+9
 method=to_tab_g2_t9
 
-[item203]
+[item195]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate last tab in group #1
 hotkey=Ctrl+0
 method=to_tab_g1_last
-[item204]
+[item196]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate last tab in group #2
 hotkey=Alt+0
 method=to_tab_g2_last
 
-[item205]
+[item197]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate next tab (global loop)
 hotkey=
 method=to_next_tab
-[item206]
+[item198]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate previous tab (global loop)
 hotkey=
 method=to_prev_tab
 
-[item207]
+[item199]
 section=commands
 caption=Cuda&-Ext\Ta&bs\-
 hotkey=
 method=_
 
-[item208]
+[item200]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Close tab in next group
 hotkey=
 method=close_tab_from_next_group
-[item209]
+[item201]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Close tab in previous group
 hotkey=
 method=close_tab_from_prev_group
 
-[item210]
+[item202]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\-
 hotkey=
 method=_
 
-[item211]
+[item203]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to next in next group
 hotkey=
 method=view_next_tab_from_next_group
-[item212]
+[item204]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to next in previous group
 hotkey=
 method=view_next_tab_from_prev_group
-[item213]
+[item205]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to previous in next group
 hotkey=
 method=view_prev_tab_from_next_group
-[item214]
+[item206]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to previous in previous group
 hotkey=
 method=view_prev_tab_from_prev_group
 
-[item215]
+[item207]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\-
 hotkey=
 method=_
 
-[item216]
+[item208]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to first in next group
 hotkey=
 method=view_first_tab_from_next_group
-[item217]
+[item209]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to first in previous group
 hotkey=
 method=view_first_tab_from_prev_group
-[item218]
+[item210]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to last in next group
 hotkey=
 method=view_last_tab_from_next_group
-[item219]
+[item211]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to last in previous group
 hotkey=
@@ -659,7 +660,7 @@ hotkey=Shift+Ctrl+.
 method=more_tree
 [item222]
 section=commands
-caption=Cuda&-Ext\&Splitters\Narrow side panel
+caption=Cuda&-Ext\&Splitters\Shrink side panel
 hotkey=Shift+Ctrl+,
 method=less_tree
 
@@ -675,7 +676,7 @@ hotkey=Alt+.
 method=more_bottom
 [item225]
 section=commands
-caption=Cuda&-Ext\&Splitters\Narrow bottom panel
+caption=Cuda&-Ext\&Splitters\Shrink bottom panel
 hotkey=Alt+,
 method=less_bottom
 
@@ -691,7 +692,7 @@ hotkey=Ctrl+.
 method=more_main_grp
 [item228]
 section=commands
-caption=Cuda&-Ext\&Splitters\Narrow top-left group
+caption=Cuda&-Ext\&Splitters\Shrink top-left group
 hotkey=Ctrl+,
 method=less_main_grp
 
@@ -707,9 +708,31 @@ hotkey=Shift+Alt+.
 method=more_curr_grp
 [item231]
 section=commands
-caption=Cuda&-Ext\&Splitters\Narrow active group
+caption=Cuda&-Ext\&Splitters\Shrink active group
 hotkey=Shift+Alt+,
 method=less_curr_grp
+
+[item232]
+section=commands
+caption=Cuda&-Ext\&Splitters\-
+hotkey=
+method=_
+
+[item233]
+section=commands
+caption=Cuda&-Ext\&Splitters\&Remove group/panel layout...
+hotkey=
+method=remove_layout
+[item234]
+section=commands
+caption=Cuda&-Ext\&Splitters\&Save group/panel layout...
+hotkey=
+method=save_layout
+[item235]
+section=commands
+caption=Cuda&-Ext\&Splitters\&Restore group/panel layout...
+hotkey=
+method=restore_layout
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Paragraph_cmds

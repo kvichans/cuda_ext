@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.7.01 2019-03-28'
+    '1.7.11 2019-09-09'
 ToDo: (see end of file)
 '''
 
@@ -325,3 +325,4 @@ def close_tab_from_other_group(what_grp='next'):
     me_ed   = app.ed_group(me_grp)
     me_ed.focus()
    #def close_tab_from_other_group
+

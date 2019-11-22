@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.05 2019-07-09'
+    '1.7.11 2019-09-09'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata
@@ -1379,6 +1379,74 @@ class Command:
 #   def __init__(self):
        #def __init__
         
+
+    def layouts(self, what):
+        lts     = get_hist('splitters_layouts', {}) # {nm:{side:pos, bott:pos, spl1:pos, spl2:pos, spl3:pos, spl4:pos, spl5:pos}}
+        pass;                  #log("lts={}",pfrm100(lts))
+
+        if False:pass
+        elif what=='save':
+            nm      = ''
+            while True:
+                nm  = app.dlg_input(_('Name to save splitters layout'), f'#{1+len(lts)}')
+                if not nm: return 
+                if nm not in lts:       break#while
+                qu  = f(_('Layout with name "{nm}" already exists. Replace?'), nm)
+#               qu  = _(f'Layout with name "{nm}" already exists. Replace?')
+                ans = app.msg_box(qu, app.MB_YESNOCANCEL+app.MB_ICONQUESTION)
+                if ans==app.ID_CANCEL:  return 
+                if ans==app.ID_YES:     break#while
+            # (vh, shown, pos_old, prn_size)  = app.app_proc(app.PROC_SPLITTER_GET, id_splt)
+            sid_vis  = lambda sid: app.app_proc(app.PROC_SPLITTER_GET, sid)[1]
+            sid_pos  = lambda sid: app.app_proc(app.PROC_SPLITTER_GET, sid)[2]
+            lt  = dict( side=sid_pos(app.SPLITTER_SIDE)     if sid_vis(app.SPLITTER_SIDE)   else 0,
+                        bott=sid_pos(app.SPLITTER_BOTTOM)   if sid_vis(app.SPLITTER_BOTTOM) else 0,
+                        spl1=sid_pos(app.SPLITTER_G1)       if sid_vis(app.SPLITTER_G1)     else 0,
+                        spl2=sid_pos(app.SPLITTER_G2)       if sid_vis(app.SPLITTER_G2)     else 0,
+                        spl3=sid_pos(app.SPLITTER_G3)       if sid_vis(app.SPLITTER_G3)     else 0,
+                        spl4=sid_pos(app.SPLITTER_G4)       if sid_vis(app.SPLITTER_G4)     else 0,
+                        spl5=sid_pos(app.SPLITTER_G5)       if sid_vis(app.SPLITTER_G5)     else 0,
+                        grps=app.app_proc(app.PROC_GET_GROUPING, ''),
+                )
+            lts[nm] = lt
+            set_hist('splitters_layouts', lts)
+        
+        elif what in ('remove', 'restore'):
+            if not lts: return app.msg_status(_('No saved layout'))
+            nm      = ''
+            lt      = None
+            if 1==len(lts) and what=='restore':
+                nm  = list(lts)[0]
+                lt  = lts[nm]
+            else:
+                cap     = _('Remove layout?') if what=='remove' else _('Restore layout?')
+                ans     = app.dlg_menu(app.MENU_LIST, '\n'.join([nm for nm in lts]), caption=cap)
+                if ans is None: return 
+                nm      = list(lts.keys())[ans]
+                if what=='remove':
+                    del lts[nm]
+                    set_hist('splitters_layouts', lts)
+                    return 
+                lt  = lts[nm]
+            # Restore
+            pass;              #log("lt={}",pfrm100(lt))
+            if  app.app_proc(app.PROC_GET_GROUPING, '')!=lt['grps']:
+                app.app_proc(app.PROC_SET_GROUPING,      lt['grps'])
+            sid_pos  = lambda sid, pos: app.app_proc(app.PROC_SPLITTER_SET, (sid, pos))
+            if lt['side']:
+                app.app_proc(app.PROC_SHOW_SIDEPANEL_SET, True)
+                sid_pos(app.SPLITTER_SIDE   , lt['side'])
+            if lt['bott']:
+                app.app_proc(app.PROC_SHOW_BOTTOMPANEL_SET, True)
+                sid_pos(app.SPLITTER_BOTTOM , lt['bott'])
+            for g in range(1,6):
+                if lt[f'spl{g}']:
+                    app.app_proc(app.PROC_SPLITTER_SET, (eval(f'app.SPLITTER_G{g}'), lt[f'spl{g}']))
+            app.msg_status(_('Restored layout: ')+nm)
+#           app.msg_status(_(f'Restored layout: {nm}'))
+       #def layouts
+
+
     def _move_splitter(self, what, factor):
         ''' Move one of splitters
             Params:
@@ -1672,11 +1740,11 @@ class Command:
                             + time.strftime("%Y/%b/%d %H:%M", time.gmtime(tm))
                             for fn,tm in hist_fts
                           ]
-                          +['<Show "name (path)">'  if show_as=='p' else
-                            '<Show "path/name">']
-                          +['<Sort by path>'        if sort_as=='t' and show_as=='p' else
-                            '<Sort by name>'        if sort_as=='t' and show_as=='n' else
-                            '<Sort by time>']
+                          +[_('<Show "name (path)">')   if show_as=='p' else
+                            _('<Show "path/name">')]
+                          +[_('<Sort by path>')         if sort_as=='t' and show_as=='p' else
+                            _('<Sort by name>')         if sort_as=='t' and show_as=='n' else
+                            _('<Sort by time>')]
                                                                )
                                       )
             if ans is None: return

@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.7.06 2019-07-17'
+    '1.7.11 2019-09-09'
 '''
 
 from    .cd_ext import Command as CommandRLS
@@ -104,6 +104,9 @@ class Command:
     def less_main_grp(self):                    return RLS._move_splitter('main', 0.95)
     def more_curr_grp(self):                    return RLS._move_splitter('curr', 1.05)
     def less_curr_grp(self):                    return RLS._move_splitter('curr', 0.95)
+    def restore_layout(self):                   return RLS.layouts('restore')
+    def remove_layout(self):                    return RLS.layouts('remove')
+    def save_layout(self):                      return RLS.layouts('save')
 
     # Misc_cmds
     def rename_file(self):                      return RLS.rename_file()
