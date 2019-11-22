@@ -1,23 +1,23 @@
-﻿# SOME DESCRIPTIVE TITLE.
+# SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR ORGANIZATION
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2019-07-17 12:00+0300\n"
+"POT-Creation-Date: 2019-11-22 15:01+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=cp1251\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: pygettext.py 1.5\n"
 
 
-#: cd_ext.py:32 cd_ext_find_repl.py:405 cd_ext_find_repl.py:445
-#: cd_ext_find_repl.py:511 cd_ext_find_repl.py:545 cd_ext_find_repl.py:635
-#: cd_ext_find_repl.py:750 cd_ext_find_repl.py:773
+#: cd_ext.py:32 cd_ext_find_repl.py:431 cd_ext_find_repl.py:471
+#: cd_ext_find_repl.py:537 cd_ext_find_repl.py:571 cd_ext_find_repl.py:661
+#: cd_ext_find_repl.py:776 cd_ext_find_repl.py:799
 msgid "{} doesn't work with multi-carets"
 msgstr ""
 
@@ -33,7 +33,7 @@ msgstr ""
 msgid "Cannot open: {}"
 msgstr ""
 
-#: cd_ext.py:36 cd_ext_find_repl.py:369 cd_ext_find_repl.py:403
+#: cd_ext.py:36 cd_ext_find_repl.py:395 cd_ext_find_repl.py:429
 msgid "Need update CudaText"
 msgstr ""
 
@@ -49,7 +49,7 @@ msgstr ""
 msgid "Replace {} with clip"
 msgstr ""
 
-#: cd_ext.py:152 cd_ext.py:261 cd_ext_find_repl.py:881
+#: cd_ext.py:152 cd_ext.py:261 cd_ext_find_repl.py:907
 msgid "Command doesn't work with multi-carets"
 msgstr ""
 
@@ -59,10 +59,10 @@ msgstr ""
 
 #: cd_ext.py:532 cd_ext.py:535 cd_ext.py:607 cd_ext.py:661 cd_ext.py:663
 #: cd_ext.py:797 cd_ext.py:887 cd_ext.py:1171 cd_ext.py:1199 cd_ext.py:1272
-#: cd_ext.py:1290 cd_ext_find_repl.py:405 cd_ext_find_repl.py:445
-#: cd_ext_find_repl.py:448 cd_ext_find_repl.py:511 cd_ext_find_repl.py:515
-#: cd_ext_find_repl.py:545 cd_ext_find_repl.py:635 cd_ext_find_repl.py:750
-#: cd_ext_find_repl.py:757 cd_ext_find_repl.py:773
+#: cd_ext.py:1290 cd_ext_find_repl.py:431 cd_ext_find_repl.py:471
+#: cd_ext_find_repl.py:474 cd_ext_find_repl.py:537 cd_ext_find_repl.py:541
+#: cd_ext_find_repl.py:571 cd_ext_find_repl.py:661 cd_ext_find_repl.py:776
+#: cd_ext_find_repl.py:783 cd_ext_find_repl.py:799
 msgid "Command"
 msgstr ""
 
@@ -154,7 +154,31 @@ msgstr ""
 msgid "Need single-line selection(s)"
 msgstr ""
 
-#: cd_ext.py:1564
+#: cd_ext.py:1391
+msgid "Name to save splitters layout"
+msgstr ""
+
+#: cd_ext.py:1394
+msgid "Layout with name \"{nm}\" already exists. Replace?"
+msgstr ""
+
+#: cd_ext.py:1415
+msgid "No saved layout"
+msgstr ""
+
+#: cd_ext.py:1422
+msgid "Remove layout?"
+msgstr ""
+
+#: cd_ext.py:1422
+msgid "Restore layout?"
+msgstr ""
+
+#: cd_ext.py:1445
+msgid "Restored layout: "
+msgstr ""
+
+#: cd_ext.py:1632
 msgid ""
 "There is directory with name:\n"
 "{}\n"
@@ -162,7 +186,7 @@ msgid ""
 "Choose another name."
 msgstr ""
 
-#: cd_ext.py:1567
+#: cd_ext.py:1635
 msgid ""
 "File\n"
 "{}\n"
@@ -171,23 +195,23 @@ msgid ""
 "Replace?"
 msgstr ""
 
-#: cd_ext.py:1575
+#: cd_ext.py:1643
 msgid "Rename file"
 msgstr ""
 
-#: cd_ext.py:1581
+#: cd_ext.py:1649
 msgid "Enter n&ew file name:"
 msgstr ""
 
-#: cd_ext.py:1585 cd_ext_find_repl.py:597 cd_ext_find_repl.py:894
+#: cd_ext.py:1653 cd_ext_find_repl.py:623 cd_ext_find_repl.py:920
 msgid "OK"
 msgstr ""
 
-#: cd_ext.py:1586 cd_ext_find_repl.py:598 cd_ext_find_repl.py:895
+#: cd_ext.py:1654 cd_ext_find_repl.py:624 cd_ext_find_repl.py:921
 msgid "Cancel"
 msgstr ""
 
-#: cd_ext.py:1603
+#: cd_ext.py:1671
 msgid ""
 "Text modified.\n"
 "Save it?\n"
@@ -197,47 +221,67 @@ msgid ""
 "Cancel - Nothing"
 msgstr ""
 
-#: cd_ext.py:1619
+#: cd_ext.py:1687
 msgid "Save file first"
 msgstr ""
 
-#: cd_ext.py:1627
+#: cd_ext.py:1695
 msgid "No need to do anything"
 msgstr ""
 
-#: cd_ext.py:1633
+#: cd_ext.py:1701
 msgid "Reopened in text editor"
 msgstr ""
 
-#: cd_ext.py:1636
+#: cd_ext.py:1704
 msgid "Reopened in hex viewer"
 msgstr ""
 
-#: cd_ext.py:1641
+#: cd_ext.py:1709
 msgid "Warning: the command needs a named tab."
 msgstr ""
 
-#: cd_ext.py:1652
+#: cd_ext.py:1720
 msgid "No files in history"
 msgstr ""
 
-#: cd_ext.py:1699
+#: cd_ext.py:1743
+msgid "<Show \"name (path)\">"
+msgstr ""
+
+#: cd_ext.py:1744
+msgid "<Show \"path/name\">"
+msgstr ""
+
+#: cd_ext.py:1745
+msgid "<Sort by path>"
+msgstr ""
+
+#: cd_ext.py:1746
+msgid "<Sort by name>"
+msgstr ""
+
+#: cd_ext.py:1747
+msgid "<Sort by time>"
+msgstr ""
+
+#: cd_ext.py:1767
 msgid "Mask(s) for filename (\"*\" - all files; \"*.txt *.bat\" - two masks)"
 msgstr ""
 
-#: cd_ext.py:1716
+#: cd_ext.py:1784
 msgid "Open {} file(s) from {} folder(s)?{}"
 msgstr ""
 
-#: cd_ext.py:1732
+#: cd_ext.py:1800
 msgid "Command is for Windows only."
 msgstr ""
 
-#: cd_ext.py:1734
+#: cd_ext.py:1802
 msgid "No file to open. "
 msgstr ""
 
-#: cd_ext.py:1736
+#: cd_ext.py:1804
 msgid ""
 "Text is modified!\n"
 "Command will use file content from disk.\n"
@@ -245,23 +289,23 @@ msgid ""
 "Continue?"
 msgstr ""
 
-#: cd_ext.py:1745
+#: cd_ext.py:1813
 msgid "Error: "
 msgstr ""
 
-#: cd_ext.py:1796
+#: cd_ext.py:1864
 msgid "Removed characters: {}"
 msgstr ""
 
-#: cd_ext.py:1804
+#: cd_ext.py:1872
 msgid "No tags"
 msgstr ""
 
-#: cd_ext.py:1811
+#: cd_ext.py:1879
 msgid "Stripping is done. Removed tags: {}"
 msgstr ""
 
-#: cd_ext.py:1813
+#: cd_ext.py:1881
 msgid "Stripping is done. Removed comments: {}, removed tags: {}"
 msgstr ""
 
@@ -272,143 +316,137 @@ msgstr ""
 #: cd_ext_find_repl.py:34
 msgid ""
 "\n"
-"• Search \"in Lines\" starts on Enter or Shift+Enter or immediately (if \"Instant search\" is tuned on).\n"
+"• Search \"in Lines\" starts immediately (if focus in the left edit) or on Enter or Shift+Enter (if focus in the right edit).\n"
 "• A found fragment after first caret will be selected.\n"
 "• All found fragments are remembered and dialog can jump over them by [Shift+]Enter or by menu commands.\n"
+"• Ctlr+Right (or Alt+Right) copies text from the left edit to the right.\n"
+"• Ctlr+Left (or Alt+Left) copies text from the right edit to the left.\n"
 "• Option \".*\" (regular expression) allows to use Python reg.ex. See \"docs.python.org/3/library/re.html\".\n"
 "• Option \"w\" (whole words) is ignored if entered string contains not a word.\n"
 "• If option \"Instant search\" (in menu) is tuned on, search result will be updated on start and after each change of pattern.\n"
 "• Command \"Restore initial selection\" (Shift+Esc) restores only first of initial carets.\n"
-"• Ctrl+F (or Ctrl+R) to call appication dialog Find (or Replace).\n"
+"• Ctrl+F (or Ctrl+R) calls appication dialog Find (or Replace).\n"
 "    "
 msgstr ""
 
-#: cd_ext_find_repl.py:69
-msgid "Type {} character(s) to find"
+#: cd_ext_find_repl.py:73
+msgid "To find: >{} signs in the left, ENTER for the right"
 msgstr ""
 
-#: cd_ext_find_repl.py:70
-msgid "ENTER to find"
-msgstr ""
-
-#: cd_ext_find_repl.py:135 cd_ext_tree.py:311
+#: cd_ext_find_repl.py:143 cd_ext_tree.py:311
 msgid "Regular expression"
 msgstr ""
 
-#: cd_ext_find_repl.py:136 cd_ext_tree.py:312
+#: cd_ext_find_repl.py:144 cd_ext_tree.py:312
 msgid "Case sensitive"
 msgstr ""
 
-#: cd_ext_find_repl.py:137 cd_ext_tree.py:313
+#: cd_ext_find_repl.py:145 cd_ext_tree.py:313
 msgid "Whole words"
 msgstr ""
 
-#: cd_ext_find_repl.py:258
+#: cd_ext_find_repl.py:275
 msgid "Instant search - minimal length"
 msgstr ""
 
-#: cd_ext_find_repl.py:280
-msgid "Instant search &min length: {}..."
+#: cd_ext_find_repl.py:296
+msgid "Left &minimum signs to find: {}..."
 msgstr ""
 
-#: cd_ext_find_repl.py:283
+#: cd_ext_find_repl.py:299
 msgid "Hide dialog &="
 msgstr ""
 
-#: cd_ext_find_repl.py:284
+#: cd_ext_find_repl.py:300
 msgid "Hi&de dialog and restore selection"
 msgstr ""
 
-#: cd_ext_find_repl.py:285 cd_ext_tree.py:206
+#: cd_ext_find_repl.py:301 cd_ext_tree.py:206
 msgid "&Help..."
 msgstr ""
 
-#: cd_ext_find_repl.py:287 cd_ext_tree.py:208
+#: cd_ext_find_repl.py:303 cd_ext_tree.py:208
 msgid "Find &previous"
 msgstr ""
 
-#: cd_ext_find_repl.py:288 cd_ext_tree.py:209
+#: cd_ext_find_repl.py:304 cd_ext_tree.py:209
 msgid "F&ind next"
 msgstr ""
 
-#: cd_ext_find_repl.py:290
+#: cd_ext_find_repl.py:306
 msgid "Move to app &Find dialog"
 msgstr ""
 
-#: cd_ext_find_repl.py:291
+#: cd_ext_find_repl.py:307
 msgid "Move to app &Replace dialog"
 msgstr ""
 
-#: cd_ext_find_repl.py:293
-msgid "=== Options. ==="
+#: cd_ext_find_repl.py:309
+msgid "=== Options ==="
 msgstr ""
 
-#: cd_ext_find_repl.py:294
+#: cd_ext_find_repl.py:310
 msgid "Use &selection from document"
 msgstr ""
 
-#: cd_ext_find_repl.py:295
+#: cd_ext_find_repl.py:311
 msgid "Do not hide on &ESC (close dialog)"
 msgstr ""
 
-#: cd_ext_find_repl.py:297
+#: cd_ext_find_repl.py:314
 msgid "Dock to window &top (close dialog)"
 msgstr ""
 
-#: cd_ext_find_repl.py:298
+#: cd_ext_find_repl.py:315
 msgid "Dock to window &bottom (close dialog)"
 msgstr ""
 
-#: cd_ext_find_repl.py:300
-msgid "Inst&ant search (close dialog)"
-msgstr ""
-
-#: cd_ext_find_repl.py:407
+#: cd_ext_find_repl.py:433
 msgid "No selected text to replace"
 msgstr ""
 
-#: cd_ext_find_repl.py:409
+#: cd_ext_find_repl.py:435
 msgid "No clipped text to replace"
 msgstr ""
 
-#: cd_ext_find_repl.py:448 cd_ext_find_repl.py:515 cd_ext_find_repl.py:757
+#: cd_ext_find_repl.py:474 cd_ext_find_repl.py:541 cd_ext_find_repl.py:783
 msgid "{} works with multiline selection"
 msgstr ""
 
-#: cd_ext_find_repl.py:459
+#: cd_ext_find_repl.py:485
 msgid "Converted to column block"
 msgstr ""
 
-#: cd_ext_find_repl.py:489
+#: cd_ext_find_repl.py:515
 msgid "Make selection first"
 msgstr ""
 
-#: cd_ext_find_repl.py:491
+#: cd_ext_find_repl.py:517
 msgid "Reversed 1 fragment"
 msgstr ""
 
-#: cd_ext_find_repl.py:493
+#: cd_ext_find_repl.py:519
 msgid "Reversed {} fragments"
 msgstr ""
 
-#: cd_ext_find_repl.py:516
+#: cd_ext_find_repl.py:542
 msgid "Enter separator string"
 msgstr ""
 
-#: cd_ext_find_repl.py:525
+#: cd_ext_find_repl.py:551
 msgid "No separator '{}' in selected lines"
 msgstr ""
 
-#: cd_ext_find_repl.py:530
+#: cd_ext_find_repl.py:556
 msgid "Text change not needed"
 msgstr ""
 
-#: cd_ext_find_repl.py:542 cd_ext_find_repl.py:747 cd_ext_find_repl.py:770
-#: cd_ext_find_repl.py:857 cd_ext_find_repl.py:882 cd_ext_find_repl.py:948
+#: cd_ext_find_repl.py:568 cd_ext_find_repl.py:773 cd_ext_find_repl.py:796
+#: cd_ext_find_repl.py:883 cd_ext_find_repl.py:908 cd_ext_find_repl.py:974
 msgid "Need update application"
 msgstr ""
 
-#: cd_ext_find_repl.py:559
+#: cd_ext_find_repl.py:585
 msgid ""
 "\n"
 "To specify two/four/eight blanks enter\n"
@@ -421,91 +459,91 @@ msgid ""
 "                  "
 msgstr ""
 
-#: cd_ext_find_repl.py:579
+#: cd_ext_find_repl.py:605
 msgid ""
 "Fill \"Old step\".\n"
 "\n"
 msgstr ""
 
-#: cd_ext_find_repl.py:582
+#: cd_ext_find_repl.py:608
 msgid ""
 "Fill \"New step\".\n"
 "\n"
 msgstr ""
 
-#: cd_ext_find_repl.py:588
+#: cd_ext_find_repl.py:614
 msgid "Reindent selected lines ({})"
 msgstr ""
 
-#: cd_ext_find_repl.py:593
+#: cd_ext_find_repl.py:619
 msgid "&Old indent step:"
 msgstr ""
 
-#: cd_ext_find_repl.py:595
+#: cd_ext_find_repl.py:621
 msgid "&New indent step:"
 msgstr ""
 
-#: cd_ext_find_repl.py:609
+#: cd_ext_find_repl.py:635
 msgid "Reindent skipped"
 msgstr ""
 
-#: cd_ext_find_repl.py:639
+#: cd_ext_find_repl.py:665
 msgid "Need selected lines"
 msgstr ""
 
-#: cd_ext_find_repl.py:644
+#: cd_ext_find_repl.py:670
 msgid "Need more than one selected lines"
 msgstr ""
 
-#: cd_ext_find_repl.py:665
+#: cd_ext_find_repl.py:691
 msgid "Required normal selection(s)"
 msgstr ""
 
-#: cd_ext_find_repl.py:705
+#: cd_ext_find_repl.py:731
 msgid "Aligned selection for {} of {} caret(s)"
 msgstr ""
 
-#: cd_ext_find_repl.py:708
+#: cd_ext_find_repl.py:734
 msgid "Nothing to align"
 msgstr ""
 
-#: cd_ext_find_repl.py:715
+#: cd_ext_find_repl.py:741
 msgid "Fail to use Tab to align"
 msgstr ""
 
-#: cd_ext_find_repl.py:781 cd_ext_find_repl.py:787
+#: cd_ext_find_repl.py:807 cd_ext_find_repl.py:813
 msgid "No duplicate spaces"
 msgstr ""
 
-#: cd_ext_find_repl.py:784 cd_ext_find_repl.py:792
+#: cd_ext_find_repl.py:810 cd_ext_find_repl.py:818
 msgid "Deleted spaces: {}"
 msgstr ""
 
-#: cd_ext_find_repl.py:860
+#: cd_ext_find_repl.py:886
 msgid "Need lexer active"
 msgstr ""
 
-#: cd_ext_find_repl.py:862
+#: cd_ext_find_repl.py:888
 msgid "Need lexer with line-comment chars"
 msgstr ""
 
-#: cd_ext_find_repl.py:867
+#: cd_ext_find_repl.py:893
 msgid "Current line is not line-comment"
 msgstr ""
 
-#: cd_ext_find_repl.py:887
+#: cd_ext_find_repl.py:913
 msgid "Re-wrap lines"
 msgstr ""
 
-#: cd_ext_find_repl.py:889
+#: cd_ext_find_repl.py:915
 msgid "&Margin:"
 msgstr ""
 
-#: cd_ext_find_repl.py:891
+#: cd_ext_find_repl.py:917
 msgid "&Comment sign:"
 msgstr ""
 
-#: cd_ext_find_repl.py:893
+#: cd_ext_find_repl.py:919
 msgid "&Keep indent"
 msgstr ""
 
