@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.7.11 2019-09-09'
+    '1.7.12 2019-12-10'
 ToDo: (see end of file)
 '''
 
@@ -13,10 +13,12 @@ from            cudatext        import ed
 from            cudatext_keys   import *
 import          cudatext_cmd        as cmds
 import          cudax_lib           as apx
-try:    from    cuda_kv_base    import *    # as separated plugin
-except: from     .cd_kv_base    import *    # as part of this plugin
-try:    from    cuda_kv_dlg     import *    # as separated plugin
-except: from     .cd_kv_dlg     import *    # as part of this plugin
+from            .cd_kv_base     import *        # as part of this plugin
+from            .cd_kv_dlg      import *        # as part of this plugin
+#try:    from    cuda_kv_base    import *    # as separated plugin
+#except: from     .cd_kv_base    import *    # as part of this plugin
+#try:    from    cuda_kv_dlg     import *    # as separated plugin
+#except: from     .cd_kv_dlg     import *    # as part of this plugin
 
 try:# I18N
     _   = get_translation(__file__)
@@ -247,12 +249,26 @@ def _activate_near_tab(gap):
    #def _activate_near_tab
 
 
-def move_tab():
+def move_tab(how=''):
+    group   = ed.get_prop(app.PROP_INDEX_GROUP)
+    gr_cnt = 0
+    for h in app.ed_handles():
+        edH = app.Editor(h)
+        if (group  == edH.get_prop(app.PROP_INDEX_GROUP)
+        and gr_cnt < edH.get_prop(app.PROP_INDEX_TAB)):
+            gr_cnt = edH.get_prop(app.PROP_INDEX_TAB)
+    gr_cnt += 1
     old_pos = ed.get_prop(app.PROP_INDEX_TAB)
-    new_pos = app.dlg_input('New position', str(old_pos+1))
-    if new_pos is None: return
-    new_pos = max(1, int(new_pos))
-    ed.set_prop(app.PROP_INDEX_TAB, str(new_pos-1))
+    new_pos = None
+    if how=='':
+        new_pos = app.dlg_input(_(f'New position (max={gr_cnt})'), str(old_pos+1))
+        if new_pos is None: return
+        new_pos = max(0, min(gr_cnt, int(new_pos)-1))
+    else:
+        step = -1 if how=='l' else 1
+        new_pos = (old_pos + step) % gr_cnt
+    if new_pos==old_pos:    return 
+    ed.set_prop(app.PROP_INDEX_TAB, str(new_pos))
    #def move_tab
 
 

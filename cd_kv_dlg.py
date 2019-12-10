@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '0.9.01 2019-03-28'
+    '1.1.01 2019-07-01'
 Content
     See github.com/kvichans/cuda_kv_dlg/wiki
 ToDo: (see end of file)
@@ -11,24 +11,25 @@ ToDo: (see end of file)
 import  sys, os, tempfile, json, re
 from    time        import perf_counter
 
-import          cudatext        as app
-from            cudatext    import ed
-import          cudax_lib       as apx
-try:    from    cuda_kv_base    import *    # as separated plugin
-except: from     .cd_kv_base    import *    # as part of this plugin
+import      cudatext        as app
+from        cudatext    import ed
+import      cudax_lib       as apx
+from        .cd_kv_base import *         # as part of this plugin
 
 VERSION     = re.split('Version:', __doc__)[1].split("'")[1]
 VERSION_V,  \
 VERSION_D   = VERSION.split(' ')
 
-def version():  return VERSION_V
+version     = lambda: VERSION_V
 
 _       = None
 try:
     _   = get_translation(__file__) # I18N
 except:pass
 
-pass;                           _log4mod = LOG_FREE             # Order log in the module
+pass;                           _log4mod = -1 #LOG_FREE             # Order log in the module
+pass;                           from pprint import pformat
+pass;                           pfw=lambda d,w=150:pformat(d,width=w)
     
 _TYPE_ABBRS  = {
      'labl': 'label'
@@ -83,6 +84,7 @@ _TYPE_WITH_VALUE  = {
     ,'tabs'
     ,'filter_listbox'
     ,'filter_listview'
+    ,'pages'
 #   ,'grop'
 #   ,'splt'
 #   ,'pags'
@@ -92,20 +94,20 @@ _TYPE_WITH_VALUE  = {
 #   ,'btex'
     }
 _ATTR_ABBRS  = {
-     'cols': 'columns'
-    ,'au'  : 'autosize'
-    ,'ali' : 'align'
-    ,'sto' : 'tab_stop'
-    ,'tor' : 'tab_order'
+     'cols' : 'columns'
+    ,'au'   : 'autosize'
+    ,'ali'  : 'align'
+    ,'sto'  : 'tab_stop'
+    ,'tor'  : 'tab_order'
+    ,'thint': 'texthint'
     }
 _ATTR_TP_ABBRS  = {**_ATTR_ABBRS, 'tp':'type'}
 #_ATTR_TP_ABBRS  = upd_dict(_ATTR_ABBRS, {'tp':'type'})
 _LIVE_ATTRS     = {'r', 'b', 'x', 'y', 'w', 'h', 'val', 'columns', 'cols', 'cols_ws', 'items'}
 _LIVE_CALC_ATTRS= {'r', 'b'}
 
-CB_HIDE = lambda ag,name,d='':None                              # Control callback to hide dlg
-def CBP_WODATA(cb_user):                                        # Callback-proxy to skip data
-    return lambda ag,name,d='':cb_user(ag,name)
+CB_HIDE     = lambda ag,name,d='':None                              # Control callback to hide dlg
+CBP_WODATA  = lambda cb_user: lambda ag,name,d='':cb_user(ag,name)  # Callback-proxy to skip data
 
 ALI_CL  = app.ALIGN_CLIENT
 ALI_LF  = app.ALIGN_LEFT
@@ -114,6 +116,8 @@ ALI_TP  = app.ALIGN_TOP
 ALI_BT  = app.ALIGN_BOTTOM
 
 SCROLL_W= app.app_proc(app.PROC_GET_GUI_HEIGHT, 'scrollbar')
+
+pair_list_to_dict = lambda pair_lst: {p[0]:p[1] for p in pair_lst if p}
 
 class DlgAg:
     # See github.com/kvichans/cuda_kv_dlg/wiki
@@ -138,6 +142,7 @@ class DlgAg:
         self._modal = None                                      # State of form
         self._onetime   = False                                 # Free form data on hide
         self._skip_free = False                                 # To ban to free form data
+        self.locks  = 0                                         # Lock counter to batch updates
 
         self.opts   = opts.copy() if opts else {}
         ctrl_to_meta= self.opts.get('ctrl_to_meta', 'by_os')
@@ -165,7 +170,7 @@ class DlgAg:
                 vals        Last live val properties of all controls
         """
         pass;                   log4fun=0                       # Order log in the function
-        pass;                   log__('modal, self._dockto, onetime, ed={}', (modal, self._dockto, onetime, ed)      ,__=(log4fun,_log4mod))
+        pass;                   log__('modal, self._dockto, onetime, ed={}', (modal, self._dockto, onetime, ed)      ,__=(log4fun,)) if _log4mod>=0 else 0
         if not self.did:
             raise ValueError('Dialog data is already destroyed (see "onetime" parameter)')
         
@@ -177,10 +182,11 @@ class DlgAg:
         ed_caller   = ed    if self._modal else None
 
         def when_close():
-            pass;               log__("self.fattr('p')={}",self.fattr('p')      ,__=(log4fun,_log4mod))
+            pass;               log__("self.fattr('p')={}",self.fattr('p')      ,__=(log4fun,)) if _log4mod>=0 else 0
             if not self.fattr('p'):         # Not docked
                 _form_acts('save', did=self.did
-                          ,key4store=self.opts.get('form data key'))
+                          ,key4store=self.opts.get('form data key')) \
+                    if self.opts.get('restore_position', True) else 0
             for cid in self.opts.get('store_col_widths', []):
                 self._cols_serv('save-ws', cid=cid)
             if callable(on_exit):
@@ -197,7 +203,7 @@ class DlgAg:
                 self.did    = 0
         
             ed_to_focus = self.opts.get('on_exit_focus_to_ed', ed_caller)
-            pass;               log__('ed_to_focus={}',ed_to_focus      ,__=(log4fun,_log4mod))
+            pass;               log__('ed_to_focus={}',ed_to_focus      ,__=(log4fun,)) if _log4mod>=0 else 0
             if ed_to_focus:
                 ed_to_focus.focus()
             elif not self._modal:
@@ -208,7 +214,7 @@ class DlgAg:
            #def when_close
 
         if self._modal:
-            pass;               log__('as modal'      ,__=(log4fun,_log4mod))
+            pass;               log__('as modal'      ,__=(log4fun,)) if _log4mod>=0 else 0
 #           self._modal = True
             app.dlg_proc(self.did, app.DLG_SHOW_MODAL)
             return   when_close()
@@ -216,7 +222,7 @@ class DlgAg:
         app.dlg_proc(self.did, app.DLG_PROP_SET
                     ,prop=dict(on_close=lambda idd, idc=0, data='':
                      when_close()))
-        pass;                   log__('as nonmodal'      ,__=(log4fun,_log4mod))
+        pass;                   log__('as nonmodal'      ,__=(log4fun,)) if _log4mod>=0 else 0
 #       self._modal = False
         app.dlg_proc(self.did, app.DLG_SHOW_NONMODAL)
         self.activate()
@@ -280,7 +286,7 @@ class DlgAg:
             If no the attribute return defv.
             Take attribute value from screen (live) or from last settings (not live).
         """
-        if name not in self.ctrls:  raise ValueError(f('Unknown name: {}', name))
+        if name not in self.ctrls:  raise ValueError(f'Unknown name: {name}')
         if attr=='cols_ws':
             return self._cols_serv('get-ws', name, live=live)
         attr_   = _ATTR_TP_ABBRS.get(attr, attr)
@@ -300,16 +306,14 @@ class DlgAg:
     def cattrs(self, name, attrs=None, live=True):
         """ Return the control attributes """
         pass;                   log4fun=1                       # Order log in the function
-        if name not in self.ctrls:  raise ValueError(f('Unknown name: {}', name))
+        if name not in self.ctrls:  raise ValueError(f'Unknown name: {name}')
         mpr     = self.ctrls[name]
         if not live:
             attrs   = attrs if attrs else mpr
-            return  odct([(attr
-                          ,self.cattr(name, attr, live=live) if attr=='cols_ws' else 
-                           mpr.get(attr)
-                          ) 
-                            for attr in attrs
-                         ])
+            return  {attr: self.cattr(name, attr, live=live) if attr=='cols_ws' else 
+                                    mpr.get(attr)
+                        for attr in attrs
+                    }
         elif attrs:# and live
             # Are all attrs not changable? - return mem-values (if is)
             rsp_attrs   = {}
@@ -324,16 +328,14 @@ class DlgAg:
                     break#for
             pass;              #log("rsp_attrs={}",(rsp_attrs))
             if rsp_attrs:
-                return odct([(attr, mpr.get(rsp_attrs[attr])) for attr in rsp_attrs])
+                return {attr: mpr.get(rsp_attrs[attr]) for attr in rsp_attrs}
         
         lpr     = _dlg_proc(self.did, app.DLG_CTL_PROP_GET, name=name)
         attrs   = attrs if attrs else list(lpr.keys())
-        return      odct([(attr
-                          ,self.cattr(name, attr, live=live) if attr=='cols_ws' else 
+        return      {attr: self.cattr(name, attr, live=live) if attr=='cols_ws' else 
                            self._cattr(lpr, name, attr)
-                          )
                             for attr in attrs
-                         ])
+                    }
        #def cattrs
        
     def val(self, name, live=True):
@@ -347,8 +349,8 @@ class DlgAg:
                     if names else \
                   [cid  for (cid,cfg) in self.ctrls.items() 
                         if cfg['type'] in _TYPE_WITH_VALUE]
-        return  odct([(cid, self.cattr(cid, 'val', defv=None, live=live))
-                        for cid in names])
+        return  {cid:       self.cattr(cid, 'val', defv=None, live=live)
+                        for cid in names}
     
 
     ###############
@@ -357,7 +359,8 @@ class DlgAg:
     def reset(self, ctrls, form, vals=None, fid=None, opts=None):
         pass;                   log4fun=0                       # Order log in the function
         _form_acts('save', did=self.did
-                  ,key4store=self.opts.get('form data key'))
+                  ,key4store=self.opts.get('form data key')) \
+            if self.opts.get('restore_position', True) else 0
         app.dlg_proc(self.did, app.DLG_CTL_DELETE_ALL)
         
         self.opts   = opts.copy() if opts else {}
@@ -365,7 +368,27 @@ class DlgAg:
         return []
        #def reset
     
-    def update(self, upds, retval=None, opts=None):
+    
+    def _lock(self, how):
+        pass;                  #print(f'_lock: how={how} self.locks={self.locks}')
+        pass;                  #return 
+        if False:pass
+        elif how=='+':
+            if self.locks==0:
+                app.dlg_proc(self.did, app.DLG_LOCK)
+            self.locks += 1
+        elif how=='-':
+            self.locks = max(0, self.locks-1)
+            if self.locks==0:
+                app.dlg_proc(self.did, app.DLG_UNLOCK)
+        elif how=='.':
+            if self.locks >0:
+                app.dlg_proc(self.did, app.DLG_UNLOCK)
+            self.locks = 0
+       #def _lock
+    
+    
+    def update(self, upds=None, ctrls=[], form={}, vals={}, fid='', retval=None, opts=None):
         """ Update most of dlg props
                 upds        dict(ctrls=, form=, vals=, fid=) 
                     ctrls   [(name, {k:v})] or {name:{k:v}}
@@ -376,12 +399,16 @@ class DlgAg:
                 retval      Value to "show()" return if form will be hidden during the update
         """
         pass;                   log4fun=0                       # Order log in the function
-        pass;                   log__("upds, retval, opts={}",(upds, retval, opts)      ,__=(log4fun,_log4mod))
+        if upds is None and (ctrls or form or vals or fid):
+            upds    = dict(ctrls=ctrls.copy(), form=form.copy(), vals=vals.copy())
+            if fid:
+                upds['fid'] = fid
+        pass;                   log__("upds, retval, opts={}",(upds, retval, opts)      ,__=(log4fun,)) if _log4mod>=0 else 0
 #       if self._hidden:
-#           pass;               log__('skip as hidden'      ,__=(log4fun,_log4mod))
+#           pass;               log__('skip as hidden'      ,__=(log4fun,)) if _log4mod>=0 else 0
 #           return 
         if upds is None:                                        # To hide/close
-            pass;              #log__('to hide'      ,__=(log4fun,_log4mod))
+            pass;              #log__('to hide'      ,__=(log4fun,)) if _log4mod>=0 else 0
             if retval is not None and self._retval is None:
                 self._retval = retval
             if  self._skip_free:
@@ -391,18 +418,24 @@ class DlgAg:
             self._hidden = True
             return
         if upds is False:
-            pass;              #log__('to stop ev'      ,__=(log4fun,_log4mod))
+            pass;              #log__('to stop ev'      ,__=(log4fun,)) if _log4mod>=0 else 0
             return False                                        # False to cancel the current event
+        if upds in ([], {}):
+            return 
         if likeslist(upds):                                     # Allow to use list of upd data
-            pass;              #log__('many upds'      ,__=(log4fun,_log4mod))
+            pass;              #log__('many upds'      ,__=(log4fun,)) if _log4mod>=0 else 0
             shown   = not self._hidden
+            self._lock('+')
             for upd in upds:
-                self.update(upd, retval, opts=opts)
+                self.update(upd, retval=retval, opts=opts)
                 if shown and self._hidden:    break             # hide is called on update
+            self._lock('-')
             return
+        
+        self._lock('+')
         cupds   = upds.get('ctrls',  [])
-        cupds   = odct(cupds)       if likeslist(cupds)                                     else cupds
-        pass;                   log__('cupds={}',(cupds)      ,__=(log4fun,_log4mod))
+        cupds   = pair_list_to_dict(cupds)    if likeslist(cupds)     else cupds
+        pass;                   log__('cupds={}',(cupds)      ,__=(log4fun,)) if _log4mod>=0 else 0
         vals    = upds.get('vals', {})
         form    = upds.get('form', {})
 
@@ -434,15 +467,15 @@ class DlgAg:
 
         if cupds:
             for cid, new_cfg in cupds.items():
-                pass;          #log__('cid, new_cfg={}',(cid, new_cfg)      ,__=(log4fun,_log4mod))
+                pass;          #log__('cid, new_cfg={}',(cid, new_cfg)      ,__=(log4fun,)) if _log4mod>=0 else 0
                 
                 cfg     = self.ctrls[cid]
-                pass;          #log__('cfg={}',(cfg)      ,__=(log4fun,_log4mod))
+                pass;          #log__('cfg={}',(cfg)      ,__=(log4fun,)) if _log4mod>=0 else 0
                 cfg.update(new_cfg)     if not skip_ctrls_upd else 0
-                pass;          #log__('cfg={}',(cfg)      ,__=(log4fun,_log4mod))
+                pass;          #log__('cfg={}',(cfg)      ,__=(log4fun,)) if _log4mod>=0 else 0
                 c_prop  = self._prepare_control_prop(cid, new_cfg, {'ctrls':cupds})
                 pass;          #log('c_prop={}',(c_prop)) if new_ctrl['type']=='listview' else None
-                pass;           log__('c_prop={}',(c_prop)      ,__=(log4fun,_log4mod))
+                pass;           log__('c_prop={}',(c_prop)      ,__=(log4fun,)) if _log4mod>=0 else 0
                 _dlg_proc(self.did, app.DLG_CTL_PROP_SET
                          ,name=cid
                          ,prop=c_prop
@@ -453,25 +486,27 @@ class DlgAg:
             self.form['fid']= fid
             app.dlg_proc(self.did, app.DLG_CTL_FOCUS
                         ,name=fid)
+        self._lock('-')
        #def update
-       
+    
+    
     @staticmethod
     def _check_data(mem_ctrls, ctrls, form, vals, fid):
         # Check cid/tid/fid in (ctrls, form, vals, fid) to exist into mem_ctrls
         if 'skip checks'!='skip checks':    return
         
         if likeslist(ctrls):
-            cids    = [cid_cnt[0] for cid_cnt in ctrls]
+            cids    = [cid_cnt[0] for cid_cnt in ctrls if cid_cnt]
             cids_d  = [cid for cid in cids if cids.count(cid)>1]
             if cids_d:
-                raise ValueError(f('Repeated names: {}', set(cids_d)))
+                raise ValueError(f'Repeated names: {set(cids_d)}')
         
         no_tids = {cnt['tid'] 
                     for cnt in ctrls 
-                    if 'tid' in cnt and 
+                    if  cnt and 'tid' in cnt and 
                         cnt['tid'] not in mem_ctrls}
         if no_tids:
-            raise ValueError(f('No name for tid: {}', no_tids))
+            raise ValueError(f'No name for tid: {no_tids}')
 
         if 'fid' in form and form['fid'] not in mem_ctrls:
             raise ValueError(f('No name for form[fid]: {}', form['fid']))
@@ -480,10 +515,10 @@ class DlgAg:
                     for cid in vals 
                     if cid not in mem_ctrls} if vals else None
         if no_vals:
-            raise ValueError(f('No name for val: {}', no_vals))
+            raise ValueError(f'No name for val: {no_vals}')
         
         if fid is not None and fid not in mem_ctrls:
-            raise ValueError(f('No name for fid: {}', fid))
+            raise ValueError(f'No name for fid: {fid}')
        #def _check_data
        
     def _setup(self, ctrls, form, vals=None, fid=None):
@@ -498,7 +533,7 @@ class DlgAg:
         """
         pass;                   log4fun=0                       # Order log in the function
         #NOTE: DlgAg init
-        self.ctrls  = odct(ctrls)   if likeslist(ctrls)                                     else ctrls.copy()
+        self.ctrls  = pair_list_to_dict(ctrls)   if likeslist(ctrls)     else ctrls.copy()
         self.form   = form.copy()
         fid         = fid           if fid else form.get('fid', form.get('focused'))    # focused?
         
@@ -512,7 +547,7 @@ class DlgAg:
         for cid, ccfg in self.ctrls.items():
             tp      = ccfg.get('tp',  ccfg.get('type'))
             if not tp:
-                raise ValueError(f('No type/tp for name: {}', cid))
+                raise ValueError(f'No type/tp for name: {cid}')
             ccfg['tp']      = tp
             ccfg['type']    = _TYPE_ABBRS.get(tp, tp)
             pass;              #log("tp,type={}",(tp,ccfg['type']))
@@ -537,6 +572,9 @@ class DlgAg:
                 upds    = u_callbk(self, key, data)
                 if event=='on_close_query':                     # No upd, only bool about form close
                     return upds
+#               rsp     = self.update(upds)                     # :(
+#               self._lock('.')                                  # :(
+#               return rsp                                      # :(
                 return self.update(upds)
             return form_callbk
             
@@ -613,7 +651,8 @@ class DlgAg:
         
         # Restore prev pos/sizes
         fpr     = _form_acts('move', fprs=fpr                   # Move and (maybe) resize
-                            , key4store=self.opts.get('form data key'))
+                            , key4store=self.opts.get('form data key')) \
+                    if self.opts.get('restore_position', True) else fpr
         pass;                  #log("fpr['on_resize']={}",(fpr['on_resize']))
         pass;                  #log("fpr={}",(fpr))
         if      'on_resize' in fpr and (fpr['w'],fpr['h']) != (w0,h0):
@@ -628,24 +667,24 @@ class DlgAg:
     def _prepare_control_prop(self, cid, ccfg, opts={}):
         pass;                   log4fun=0                       # Order log in the function
         Self    = self.__class__
-        pass;                   log__('cid, ccfg={}',(cid, ccfg)      ,__=(log4fun,_log4mod))
+        pass;                   log__('cid, ccfg={}',(cid, ccfg)      ,__=(log4fun,)) if _log4mod>=0 else 0
         EXTRA_C_ATTRS   = ['tp','r','b','tid','a','aid']
         tp      = ccfg['type']
-        pass;                   log__('cid, ccfg={}',(cid, ccfg)      ,__=(log4fun,_log4mod))
+        pass;                   log__('cid, ccfg={}',(cid, ccfg)      ,__=(log4fun,)) if _log4mod>=0 else 0
         Self._preprocessor(ccfg, tp)                            # sto -> tab_stop,...   EXTRA_C_ATTRS
-        pass;                   log__('cid, ccfg={}',(cid, ccfg)      ,__=(log4fun,_log4mod))
+        pass;                   log__('cid, ccfg={}',(cid, ccfg)      ,__=(log4fun,)) if _log4mod>=0 else 0
         c_pr    = {k:v for (k,v) in ccfg.items()
                     if k not in ['items', 'val', 'columns', 'cols', 'cols_ws']
                                +EXTRA_C_ATTRS and 
                        (k[:3]!='on_' or k=='on')}
         c_pr['name'] = cid
-        pass;                   log__('cid, ccfg={}',(cid, ccfg)      ,__=(log4fun,_log4mod))
+        pass;                   log__('cid, ccfg={}',(cid, ccfg)      ,__=(log4fun,)) if _log4mod>=0 else 0
         c_pr    = self._prepare_vl_it_cl(c_pr, ccfg, cid, opts) #if k     in ['items', 'val', 'cols']
         
         c_pr.update(
             self._prep_pos_attrs(ccfg, cid, opts.get('ctrls'))  # r,b,tid -> x,y,w,h
         ) 
-        pass;                   log__('c_pr={}',(c_pr)      ,__=(log4fun,_log4mod))
+        pass;                   log__('c_pr={}',(c_pr)      ,__=(log4fun,)) if _log4mod>=0 else 0
         # Remove deprecated
         for attr in ('props',):
             c_pr.pop(attr, None)
@@ -665,7 +704,10 @@ class DlgAg:
                     if event_val!=data[0]:
                         app.dlg_proc(          idd, app.DLG_CTL_PROP_SET, index=idc, prop={'val':data[0]})
                 upds    = u_callbk(self, cid, data)
-                return self.update(upds, cid)
+                rsp     =  self.update(upds, retval=cid)
+                self._lock('.')
+                return rsp
+#               return self.update(upds, retval=cid)
                #def ctrl_callbk
             return ctrl_callbk
            #def get_proxy_cb
@@ -683,7 +725,7 @@ class DlgAg:
         pass;                   log4fun=0                       # Order log in the function
         ctrls4cid = ctrls4cid if ctrls4cid else self.ctrls
         reflect  = self.opts.get('negative_coords_reflect', False)
-        pass;                   log__('cid, reflect, cnt={}',(cid, reflect, cnt)      ,__=(log4fun,_log4mod))
+        pass;                   log__('cid, reflect, cnt={}',(cid, reflect, cnt)      ,__=(log4fun,)) if _log4mod>=0 else 0
         prP     =  {}
 
         cnt_ty  = ctrls4cid[cid].get('tp', ctrls4cid[cid].get('type'))
@@ -711,23 +753,31 @@ class DlgAg:
             t           = bas_cnt.get('y', 0) + _fit_top_by_env(cnt_ty, bas_ty)
             cnt['y']    = t                                     # 'tid' kills 'y'
         
-        if reflect: #NOTE: reflect
+        if reflect and (
+            cnt.get('x', 0)<0 or
+            cnt.get('r', 0)<0 or
+            cnt.get('y', 0)<0 or
+            cnt.get('b', 0)<0   ): #NOTE: reflect
             def do_reflect(cnt_, k, pval):
                 if 0>cnt_.get(k, 0):
-                    pass;       log__('cid, k, pval, cnt_={}',(cid, k, pval, cnt_)      ,__=(log4fun,_log4mod))
+                    pass;       log__('cid, k, pval, cnt_={}',(cid, k, pval, cnt_)      ,__=(log4fun,)) if _log4mod>=0 else 0
                     cnt_[k]    = pval + cnt_[k]
-                    pass;       log__('cnt_={}',(cnt_)      ,__=(log4fun,_log4mod))
+                    pass;       log__('cnt_={}',(cnt_)      ,__=(log4fun,)) if _log4mod>=0 else 0
+            pass;              #log('cid,cnt={}',(cid,cnt))
             prnt    = cnt.get('p', self.form)
-            prnt_w  = prnt.get('w', 0) 
-            prnt_h  = prnt.get('h', 0)
-            pass;               log__('prnt={}',(prnt)      ,__=(log4fun,_log4mod))
-            pass;               log__('prnt_w,prnt_h={}',(prnt_w,prnt_h)      ,__=(log4fun,_log4mod))
-            pass;               log__('cnt={}',(cnt)      ,__=(log4fun,_log4mod))
+            prnt    = self.ctrls[prnt] if likesstr(prnt) else prnt  ##?? Only form/[panel/]ctrl
+            prnt_w  = prnt.get('w', self.form.get('w', 0))          ##?? Only form/[panel/]ctrl
+            prnt_h  = prnt.get('h', self.form.get('h', 0))          ##?? Only form/[panel/]ctrl
+            pass;               log__('prnt={}',(prnt)      ,__=(log4fun,)) if _log4mod>=0 else 0
+            pass;               log__('prnt_w,prnt_h={}',(prnt_w,prnt_h)      ,__=(log4fun,)) if _log4mod>=0 else 0
+            pass;               log__('cnt={}',(cnt)      ,__=(log4fun,)) if _log4mod>=0 else 0
+            pass;              #log('cnt={}',({k:v for k,v in cnt.items() if k in [('x','r','w')]}))
             do_reflect(cnt, 'x', prnt_w)
             do_reflect(cnt, 'r', prnt_w)
             do_reflect(cnt, 'y', prnt_h)
             do_reflect(cnt, 'b', prnt_h)
-            pass;               log__('cnt={}',(cnt)      ,__=(log4fun,_log4mod))
+            pass;              #log('cnt={}',({k:v for k,v in cnt.items() if k in [('x','r','w')]}))
+            pass;               log__('cnt={}',(cnt)      ,__=(log4fun,)) if _log4mod>=0 else 0
 
         def calt_third(kasx, kasr, kasw, src, trg):
             # Use d[kasw] = d[kasr] - d[kasx]
@@ -738,7 +788,7 @@ class DlgAg:
                 trg[kasx]   = src[kasx]
                 trg[kasw]   = src[kasw]
             elif kasr in src and kasw in src:                   # r,w or b,h to calc
-                trg[kasx]   = src[kasw] - src[kasr]
+                trg[kasx]   = src[kasr] - src[kasw]
                 trg[kasw]   = src[kasw]
             elif kasx in src and kasr in src:                   # x,r or y,b to calc
                 trg[kasx]   = src[kasx]
@@ -746,17 +796,20 @@ class DlgAg:
             return trg
            #def calt_third
         
+        pass;                  #log('cnt={}',cnt)#({k:cnt[k] for k in cnt if k in [('x','r','w')]}))
+        pass;                  #log('prP={}',prP)#({k:prP[k] for k in prP if k in [('x','r','w')]}))
         prP = calt_third('x', 'r', 'w', cnt, prP)
         prP = calt_third('y', 'b', 'h', cnt, prP)
-        pass;                  #log__('cid, prP={}',(cid, prP)      ,__=(log4fun,_log4mod))
+        pass;                  #log('prP={}',prP)#({k:prP[k] for k in prP if k in [('x','r','w')]}))
+        pass;                  #log__('cid, prP={}',(cid, prP)      ,__=(log4fun,)) if _log4mod>=0 else 0
         return prP
        #def _prep_pos_attrs
 
     def _prepare_vl_it_cl(self, c_pr, cfg_ctrl, cid, opts={}):
         pass;                   log4fun=0                       # Order log in the function
-        pass;                   log__('c_pr={}',(c_pr)      ,__=(log4fun,_log4mod))
-        pass;                   log__('cfg_ctrl={}',(cfg_ctrl)      ,__=(log4fun,_log4mod))
-        pass;                   log__('opts={}',(opts)      ,__=(log4fun,_log4mod))
+        pass;                   log__('c_pr={}',(c_pr)      ,__=(log4fun,)) if _log4mod>=0 else 0
+        pass;                   log__('cfg_ctrl={}',(cfg_ctrl)      ,__=(log4fun,)) if _log4mod>=0 else 0
+        pass;                   log__('opts={}',(opts)      ,__=(log4fun,)) if _log4mod>=0 else 0
         tp      = cfg_ctrl['type']
 
         if 'val' in cfg_ctrl        and opts.get('prepare val', True):
@@ -767,23 +820,26 @@ class DlgAg:
             if False:pass
             elif tp=='memo':
                 # For memo: "\t"-separated lines (in lines "\t" must be replaced to chr(3)) 
-                pass;           log__("tp,in_val={}",(tp,in_val)      ,__=(log4fun,_log4mod))
+                pass;           log__("tp,in_val={}",(tp,in_val)      ,__=(log4fun,)) if _log4mod>=0 else 0
                 if likeslist(in_val):
                     in_val = '\t'.join([v.replace('\t', chr(3)) for v in in_val])
                 else:
                     in_val = in_val.replace('\t', chr(3)).replace('\r\n','\n').replace('\r','\n').replace('\n','\t')
-                pass;           log__("tp,in_val={}",(tp,in_val)      ,__=(log4fun,_log4mod))
+                pass;           log__("tp,in_val={}",(tp,in_val)      ,__=(log4fun,)) if _log4mod>=0 else 0
             elif tp=='checkgroup' and likeslist(in_val):
                 # For checkgroup: ","-separated checks (values "0"/"1") 
-                in_val = ','.join(list_to_list01(in_val))
+                in_val  = ','.join(list_to_list01(in_val))
             elif tp in ['checklistbox', 'checklistview'] and likeslist(in_val):
                 # For checklistbox, checklistview: index+";"+checks 
-                in_val = ';'.join( (str(in_val[0]), ','.join(list_to_list01(in_val[1])) ) )
+                in_val  = ';'.join( (str(in_val[0]), ','.join(list_to_list01(in_val[1])) ) )
+            elif tp in ['listbox', 'combo_ro'] and 'ivals' in cfg_ctrl and cfg_ctrl['ivals']:
+                ivals   = cfg_ctrl['ivals']
+                in_val  = ivals.index(in_val) if in_val in ivals else -1
             c_pr['val']     = in_val
 
         if 'items' in cfg_ctrl        and opts.get('prepare items', True):
             items   = cfg_ctrl['items']
-            pass;               log__("tp,items={}",(tp,items)      ,__=(log4fun,_log4mod))
+            pass;               log__("tp,items={}",(tp,items)      ,__=(log4fun,)) if _log4mod>=0 else 0
             if likesstr(items):
                 pass
             elif tp in ['listview', 'checklistview']:
@@ -797,7 +853,7 @@ class DlgAg:
             else:
                 # For combo, combo_ro, listbox, checkgroup, radiogroup, checklistbox: "\t"-separated lines
                 items   = '\t'.join(items)
-            pass;               log__("items={}",(items)      ,__=(log4fun,_log4mod))
+            pass;               log__("items={}",(items)      ,__=(log4fun,)) if _log4mod>=0 else 0
             c_pr['items']   = items
 
         if ('cols' in cfg_ctrl or 'columns' in cfg_ctrl or 'cols_ws' in cfg_ctrl)   and opts.get('prepare cols', True):
@@ -810,7 +866,7 @@ class DlgAg:
                 if 'cols_ws' in cfg_ctrl:
                     cols_ws  = cfg_ctrl['cols_ws']
                     pass;      #log("cols_ws={}",(cols_ws))
-                    if len(cols_ws)!=len(cols): raise ValueError(f('Inconsistent attribures: cols/columns and cols_ws'))
+                    if len(cols_ws)!=len(cols): raise ValueError('Inconsistent attribures: cols/columns and cols_ws')
                     for n,w in enumerate(cols_ws):
                         cols[n]['wd']   = w
                 # For listview, checklistview: 
@@ -837,10 +893,12 @@ class DlgAg:
 
     def _take_val(self, name, liv_val, defv=None):
         pass;                   log4fun=0                       # Order log in the function
-        pass;                   log__("name, liv_val={}",(name, liv_val)      ,__=(log4fun,_log4mod))
+        pass;                   log__("name, liv_val={}",(name, liv_val)      ,__=(log4fun,)) if _log4mod>=0 else 0
         tp      = self.ctrls[name]['type']
         old_val = self.ctrls[name].get('val', defv)
         new_val = liv_val
+        ivals   = self.ctrls[name].get('ivals')
+
         if False:pass
         elif tp=='memo':
             # For memo: "\t"-separated lines (in lines "\t" must be replaced to chr(3)) 
@@ -860,6 +918,9 @@ class DlgAg:
             new_val = liv_val.split(';')
             new_val = (new_val[0], new_val[1].split(','))
            #liv_val = ';'.join(old_val[0], ','.join(old_val[1]))
+        elif tp in ['listbox', 'combo_ro'] and ivals:
+            new_val = int(new_val)
+            new_val = ivals[new_val] if 0<=new_val<len(ivals) else None
         elif isinstance(old_val, bool): 
             new_val = liv_val=='1'
         elif tp=='listview':
@@ -903,13 +964,13 @@ class DlgAg:
             new_val= [ci.split('\r')      for ci in new_val.split('\t')]
             pass;              #log('new_val={}',repr(new_val))
             int_sc = lambda s: _os_scale('unscale', {'w':int(s)})['w']
-            new_val= [odct(('hd',       ci[0])
-                          ,('wd',int_sc(ci[1]))
-                          ,('mi',int_sc(ci[2]))
-                          ,('ma',int_sc(ci[3]))
-                          ,('al',       ci[4])
-                          ,('au','1'==  ci[5])
-                          ,('vi','1'==  ci[6])
+            new_val= [ dict(hd=       ci[0]
+                           ,wd=int_sc(ci[1])
+                           ,mi=int_sc(ci[2])
+                           ,ma=int_sc(ci[3])
+                           ,al=       ci[4]
+                           ,au='1'==  ci[5]
+                           ,vi='1'==  ci[6]
                           ) for ci in new_val]
             pass;              #log('new_val={}',(new_val))
         
@@ -919,7 +980,7 @@ class DlgAg:
     @staticmethod
     def _preprocessor(cnt, tp):
         pass;                   log4fun=0                       # Order log in the function
-        pass;                   log__('tp,cnt={}',(tp,cnt)      ,__=(log4fun,_log4mod))
+        pass;                   log__('tp,cnt={}',(tp,cnt)      ,__=(log4fun,)) if _log4mod>=0 else 0
         # on -> on_???
         if 'on' in cnt:
             if False:pass
@@ -943,7 +1004,7 @@ class DlgAg:
         for attr in _ATTR_ABBRS:
             if attr in cnt:
                 cnt[_ATTR_ABBRS[attr]] = cnt[attr]                      # ali -> align, au -> autosize, ...
-        pass;                  #log__('tp,cnt={}',(tp,cnt)      ,__=(log4fun,_log4mod))
+        pass;                  #log__('tp,cnt={}',(tp,cnt)      ,__=(log4fun,)) if _log4mod>=0 else 0
         # Copy smth to props
         if 'props' in cnt:
             pass
@@ -972,8 +1033,9 @@ class DlgAg:
         lsPr = cnt.get('props', '')
         lsPr = lsPr if type(lsPr)==str else '1' if lsPr else '0'
         lsPr = lsPr.split(',')
-        pass;                   log__('lsPr={}',(lsPr)      ,__=(log4fun,_log4mod))
+        pass;                   log__('lsPr={}',(lsPr)      ,__=(log4fun,)) if _log4mod>=0 else 0
         if False:pass
+        elif 'ex0' in cnt:pass                              # exN wins others
         elif tp=='button'       and 0<len(lsPr):
             cnt['ex0']  = '1'==lsPr[0]                      #bool: default for Enter key
         elif tp in ('edit', 'memo') \
@@ -1059,7 +1121,7 @@ class DlgAg:
             cnt['ex2']  = '1'==lsPr[2]                      #bool: auto snap to edge
             cnt['ex3']  =  int(lsPr[3])                     #int:  min size
 
-        pass;                   log__('cnt={}',(cnt)      ,__=(log4fun,_log4mod))
+        pass;                   log__('cnt={}',(cnt)      ,__=(log4fun,)) if _log4mod>=0 else 0
        #def _preprocessor
 
     def _prepare_anchors(self):
@@ -1147,7 +1209,7 @@ class DlgAg:
 
     def _cols_serv(self, what, cid=None, live=True, data=None):
         pass;                   log4fun=0                       # Order log in the function
-        pass;                   log__('what, cid, live, data={}',(what, cid, live, data)      ,__=(log4fun,_log4mod))
+        pass;                   log__('what, cid, live, data={}',(what, cid, live, data)      ,__=(log4fun,)) if _log4mod>=0 else 0
 
         if what=='get-ws':                                      # Return col widths [w1, w2, ...] for the control
             if live:
@@ -1169,9 +1231,9 @@ class DlgAg:
             fm_key  = _gen_form_key(self.form)
             ws      = get_hist([fm_key, cid+COL_WS_SUFFIX])
             if not ws:  return 
-            pass;               log__('fm_key, ws={}',(fm_key, ws)      ,__=(log4fun,_log4mod))
+            pass;               log__('fm_key, ws={}',(fm_key, ws)      ,__=(log4fun,)) if _log4mod>=0 else 0
             cols    = self.cattr(cid, 'cols')
-            pass;              #log__('cols={}',(cols)      ,__=(log4fun,_log4mod))
+            pass;              #log__('cols={}',(cols)      ,__=(log4fun,)) if _log4mod>=0 else 0
             if len(ws)!=len(cols):  return 
             for n,w in enumerate(ws):
                 cols[n]['wd']   = w
@@ -1181,7 +1243,7 @@ class DlgAg:
         if what=='save-ws':                                     # Store live col widths for the control
             ws      = self._cols_serv('get-ws', cid)
             fm_key  = _gen_form_key(self.form)
-            pass;               log__('fm_key, ws={}',(fm_key, ws)      ,__=(log4fun,_log4mod))
+            pass;               log__('fm_key, ws={}',(fm_key, ws)      ,__=(log4fun,)) if _log4mod>=0 else 0
             set_hist([fm_key, cid+COL_WS_SUFFIX], ws)
             return 
        #def _cols_serv
@@ -1227,12 +1289,12 @@ class DlgAg:
         pass;                   log4fun=0
         undock  = undock if side        else True               # to use only side
         side    = side   if not undock  else ''                 # to use only side
-        pass;                   log__("side, undock, ag_parent={}",(side, undock, ag_parent)      ,__=(log4fun,_log4mod))
+        pass;                   log__("side, undock, ag_parent={}",(side, undock, ag_parent)      ,__=(log4fun,)) if _log4mod>=0 else 0
         if side==self._dockto:
-            pass;               log__("skip as already"      ,__=(log4fun,_log4mod))
+            pass;               log__("skip as already"      ,__=(log4fun,)) if _log4mod>=0 else 0
             return 
         if side and self._modal is True:
-            pass;               log__("skip as modal"      ,__=(log4fun,_log4mod))
+            pass;               log__("skip as modal"      ,__=(log4fun,)) if _log4mod>=0 else 0
             return 
         self._dockto= side
         if not side:
@@ -1240,12 +1302,14 @@ class DlgAg:
             if not self._hidden:
                 fpr     = {k:v for k,v in self.form.items() if k in ('border', 'cap')}
                 fpr     = _form_acts('move', fprs=fpr               # Move and (maybe) resize
-                                    , key4store=self.opts.get('form data key'))
+                                    , key4store=self.opts.get('form data key')) \
+                            if self.opts.get('restore_position', True) else fpr
                 _dlg_proc(self.did, app.DLG_PROP_SET, prop=fpr)     # Push to live
         else:
             if not self._hidden:
                 _form_acts('save', did=self.did
-                          ,key4store=self.opts.get('form data key'))
+                          ,key4store=self.opts.get('form data key')) \
+                    if self.opts.get('restore_position', True) else 0
             side    = side.upper() if side in ('l', 'r', 't', 'b') else 'B'
             self.form['border'] = self.fattr('border')              # Save to use on undock
             app.dlg_proc(self.did, app.DLG_DOCK
@@ -1295,23 +1359,51 @@ class DlgAg:
         x, y    =  pr['x']+(pr['w']         if '+w' in where else 0) \
                 ,  pr['y']+(pr['h']         if '+h' in where else 0)
         x, y    = (pr['x']+dx, pr['y']+dy)  if where=='dxdy' else (x, y)
-        pass;                  #log('(x, y), (dx, dy), pr={}',((x, y), (dx, dy), pr))
-        prXY    = _os_scale('scale', {'x':x, 'y':y})
-        x, y    = prXY['x'], prXY['y']
-        pass;                  #log('x, y={}',(x, y))
+#       pass;                   log('(x, y), (dx, dy), pr={}',((x, y), (dx, dy), pr))
+#       prXY    = _os_scale('scale', {'x':x, 'y':y})
+#       x, y    = prXY['x'], prXY['y']
+#       pass;                   log('x, y={}',(x, y))
         x, y    = app.dlg_proc(self.did, app.DLG_COORD_LOCAL_TO_SCREEN, index=x, index2=y)
         pass;                  #log('x, y={}',(x, y))
         
         return show_menu(mn_content, x, y, self, repro_to_file, opts=dict(c2m=self._c2m))
        #def show_menu
 
+    def fit_statusbar(self, cid, opts):
+        stproc  = app.statusbar_proc
+        stbr    = self.chandle(cid)
+        for tag, ops in opts.items():
+            stproc(     stbr, app.STATUSBAR_ADD_CELL            , tag=tag)
+            if   ops.get('a', ''):
+                stproc( stbr, app.STATUSBAR_SET_CELL_ALIGN      , tag=tag, value=ops['a'])
+            if   ops.get('h', ''):
+                stproc( stbr, app.STATUSBAR_SET_CELL_HINT       , tag=tag, value=ops['h'])
+            if   ops.get('t', ''):
+                stproc( stbr, app.STATUSBAR_SET_CELL_TEXT       , tag=tag, value=ops['t'])
+            if   ops.get('f_nm', 0):
+                stproc( stbr, app.STATUSBAR_SET_CELL_FONT_NAME  , tag=tag, value=ops['f_nm'])
+            if   ops.get('f_sz', 0):
+                stproc( stbr, app.STATUSBAR_SET_CELL_FONT_SIZE  , tag=tag, value=ops['f_sz'])
+            if   ops.get('c') is not None:
+                clr = ops['c']
+                clr = apx.html_color_to_int(clr) if likesstr(clr) else clr
+                stproc( stbr, app.STATUSBAR_SET_CELL_COLOR_FONT , tag=tag, value=clr)
+            if   ops.get('asz', False):
+                stproc( stbr, app.STATUSBAR_SET_CELL_AUTOSIZE   , tag=tag, value=True)
+            elif ops.get('sz', 0):
+                stproc( stbr, app.STATUSBAR_SET_CELL_SIZE       , tag=tag, value=ops['sz'])
+            else:
+                stproc( stbr, app.STATUSBAR_SET_CELL_AUTOSTRETCH, tag=tag, value=True)
+        return stbr
+       #def fit_statusbar
+
     def gen_repro_code(self, rtf=None):
         # Make repro-code has only core API calls
         pass;                   log4fun=0                       # Order  log in the function
         rtf     = self.opts.get('gen_repro_to_file', False) if rtf is None else rtf
-        if not rtf: return 
+        if not rtf: return self
         rerpo_fn= tempfile.gettempdir()+os.sep+(rtf if likesstr(rtf) else 'repro_dlg_proc.py')
-        print(f(r'exec(open(r"{}", encoding="UTF-8").read())', rerpo_fn))
+        print(f'exec(open(r"{rerpo_fn}", encoding="UTF-8").read())')
 
         l       = '\n'
         cattrs  = [  ('type', 'tag', 'act')
@@ -1340,11 +1432,11 @@ class DlgAg:
             if apr:
                 out     += afix + repr(apr).strip('{}') 
             for k in pr:
-                out     += afix + f('"{}":(lambda idd,idc,data:print("{}"))', k, k)
+                out     += afix + f'"{k}":(lambda idd,idc,data:print("{k}"))'
             out         += '}'
             return out
-        srp     =    ''
-        srp    +=    'idd=dlg_proc(0, DLG_CREATE)'
+        srp     = f'# >>> exec(open(r"{rerpo_fn}", encoding="UTF-8").read())'
+        srp    += l+ 'idd=dlg_proc(0, DLG_CREATE)'
         srp    += l
         cids    = []
         for idC in range(app.dlg_proc(self.did, app.DLG_CTL_COUNT)):
@@ -1381,8 +1473,8 @@ class DlgAg:
         fid     = prD.get('fid', prD['focused'])
         if fid not in cids:
             prD.pop('focused')
-        srp    +=l+f('dlg_proc(idd, DLG_PROP_SET, prop={})', out_attrs(prD, fattrs))
-        srp    +=l+(f('dlg_proc(idd, DLG_CTL_FOCUS, name="{}")', fid) if fid in cids else '')
+        srp    +=l+f'dlg_proc(idd, DLG_PROP_SET, prop={out_attrs(prD, fattrs)})'
+        srp    +=l+(f'dlg_proc(idd, DLG_CTL_FOCUS, name="{fid}")' if fid in cids else '')
         srp    +=l+  'dlg_proc(idd, DLG_SHOW_MODAL)'
         srp    +=l+  'dlg_proc(idd, DLG_FREE)'
         open(rerpo_fn, 'w', encoding='UTF-8').write(srp)
@@ -1422,7 +1514,7 @@ def show_menu(mn_content, x, y, ag=None, cmd4all=None, repro_to_file=None, opts=
     c2m     = opts.get('c2m', False)
     
     rfn     = tempfile.gettempdir()+os.sep+repro_to_file            if repro_to_file else None
-    print(f(r'exec(open(r"{}", encoding="UTF-8").read())', rfn))    if rfn else 0
+    print(f'exec(open(r"{rfn}", encoding="UTF-8").read())')         if rfn else 0
     repro   = lambda line,*args,mod='a':(
                 open(rfn, mod).write(line.format(*args)+'\n')       if rfn else 0)
     repro('import  cudatext as app', mod='w')                   # To sync conf- and repro-code
@@ -1435,6 +1527,7 @@ def show_menu(mn_content, x, y, ag=None, cmd4all=None, repro_to_file=None, opts=
             
     def fill_mn(mid_prn, its):
         for it in its:
+            if not it:  continue
             if it['cap']=='-':
                 app.menu_proc(  mid_prn, app.MENU_ADD, caption='-')
                 repro("app.menu_proc(m{},app.MENU_ADD, caption='-')", mid_prn)
@@ -1467,7 +1560,7 @@ def show_menu(mn_content, x, y, ag=None, cmd4all=None, repro_to_file=None, opts=
     mid_top = app.menu_proc(    0,       app.MENU_CREATE)
     repro("m{}=app.menu_proc(0,          app.MENU_CREATE)", mid_top)
     fill_mn(mid_top, mn_content)
-    app.menu_proc(              mid_top, app.MENU_SHOW                  , command=f('{},{}', x, y))
+    app.menu_proc(              mid_top, app.MENU_SHOW                  , command=f'{x},{y}')
     repro("app.menu_proc(       m{},     app.MENU_SHOW                  , command='{},{}')", mid_top, x, y)
     return []
    #def show_menu
@@ -1596,6 +1689,28 @@ def _os_scale(id_action, prop=None, index=-1, index2=-1, name=''):
     return prop
    #def _os_scale
 
+_gui_width_cache= {}
+def get_gui_autosize_width(ctrl_def):
+    ctrl_str    = str(ctrl_def)
+    wd  = _gui_width_cache.get(ctrl_str, 0)
+    if wd==0:
+        prc     = {**dict(autosize='1',x=0, y=0), **ctrl_def}
+        tp      = prc.get('tp', prc.get('type'))
+        tp      = _TYPE_ABBRS.get(tp, tp)
+        idd=app.dlg_proc(   0,   app.DLG_CREATE)
+        idc=app.dlg_proc(   idd, app.DLG_CTL_ADD, tp)
+        app.dlg_proc(       idd, app.DLG_CTL_PROP_SET, index=idc, prop=prc)
+        app.dlg_proc(       idd, app.DLG_PROP_SET, prop={'x':-1000, 'y':-1000, 'w':100, 'h':100})
+        app.dlg_proc(       idd, app.DLG_SHOW_NONMODAL)
+        prc = app.dlg_proc( idd, app.DLG_CTL_PROP_GET, index=idc)
+        app.dlg_proc(       idd, app.DLG_FREE)
+        wd      = prc['w']
+        _gui_width_cache[ctrl_str]  = wd
+    return wd
+    
+def get_gui_height(ctrl_tp):
+    return _get_gui_height(_TYPE_ABBRS.get(ctrl_tp, ctrl_tp))
+    
 _gui_height_cache= { 
     'button'            :0
   , 'label'             :0
@@ -1626,12 +1741,12 @@ def _get_gui_height(ctrl_type):
     if 0 == _gui_height_cache['button']:
         for tpc in _gui_height_cache:
             _gui_height_cache[tpc]   = app.app_proc(app.PROC_GET_GUI_HEIGHT, tpc)
-        pass;                  #log__('_gui_height_cache={}',(_gui_height_cache)      ,__=(log4fun,_log4mod))
+        pass;                  #log__('_gui_height_cache={}',(_gui_height_cache)      ,__=(log4fun,)) if _log4mod>=0 else 0
         idd=app.dlg_proc(         0,    app.DLG_CREATE)
         for tpc in _gui_height_cache:
             idc=app.dlg_proc(   idd,    app.DLG_CTL_ADD, tpc)
             if idc is None: raise ValueError('Unknown type='+tpc)
-            pass;              #log__('tpc,idc={}',(tpc,idc)      ,__=(log4fun,_log4mod))
+            pass;              #log__('tpc,idc={}',(tpc,idc)      ,__=(log4fun,)) if _log4mod>=0 else 0
             prc = {'name':tpc, 'x':0, 'y':0, 'w':1, 'cap':tpc
                 , 'h':_gui_height_cache[tpc]}
             if tpc in ('combo' 'combo_ro'):
@@ -1651,10 +1766,10 @@ def _get_gui_height(ctrl_type):
 
         for tpc in _gui_height_cache:
             prc = app.dlg_proc( idd,    app.DLG_CTL_PROP_GET, name=tpc)
-            pass;              #log__('prc={}',(prc)      ,__=(log4fun,_log4mod))
+            pass;              #log__('prc={}',(prc)      ,__=(log4fun,)) if _log4mod>=0 else 0
             _gui_height_cache[tpc]   = prc['h']
         app.dlg_proc(           idd,    app.DLG_FREE)
-        pass;                  #log__('_gui_height_cache={}',(_gui_height_cache)      ,__=(log4fun,_log4mod))
+        pass;                  #log__('_gui_height_cache={}',(_gui_height_cache)      ,__=(log4fun,)) if _log4mod>=0 else 0
     
     return _gui_height_cache.get(ctrl_type, app.app_proc(app.PROC_GET_GUI_HEIGHT, ctrl_type))
    #def _get_gui_height
@@ -1667,7 +1782,7 @@ def _dlg_proc(id_dialog, id_action, prop='', index=-1, index2=-1, name=''):
     if id_action==app.DLG_SCALE:
         return
     pass;                       log4fun=0                       # Order log in the function
-    pass;                       log__('id_a={}({}), ind,ind2,n={}, prop={}',id_action, get_const_name(id_action,'DLG_'), (index, index2, name), prop      ,__=(log4fun,_log4mod))
+    pass;                       log__('id_a={}({}), ind,ind2,n={}, prop={}',id_action, get_const_name(id_action,'DLG_'), (index, index2, name), prop      ,__=(log4fun,)) if _log4mod>=0 else 0
     if id_action==DLG_CTL_ADD_SET:  # Join ADD and SET for a control
         ctl_ind = app.dlg_proc( id_dialog, app.DLG_CTL_ADD, name, -1, -1, '')       # type in name
         if ctl_ind is None: raise ValueError('Unknown type='+name)
@@ -1692,22 +1807,22 @@ def _gen_form_key(fprs):                                        # Gen key from f
 def _form_acts(act, fprs=None, did=None, key4store=None):
     """ Save/Restore pos of form """
     pass;                       log4fun=0                       # Order log in the function
-    pass;                       log__('act, fprs, did={}',(act, fprs, did)      ,__=(log4fun,_log4mod))
+    pass;                       log__('act, fprs, did={}',(act, fprs, did)      ,__=(log4fun,)) if _log4mod>=0 else 0
 
     fprs    = _dlg_proc(did, app.DLG_PROP_GET)  if act=='save' and did else fprs
     fm_key  = key4store if key4store else _gen_form_key(fprs)
-    pass;                       log__('fm_key, fprs={}',(fm_key, fprs)      ,__=(log4fun,_log4mod))
+    pass;                       log__('fm_key, fprs={}',(fm_key, fprs)      ,__=(log4fun,)) if _log4mod>=0 else 0
     if False:pass
     elif act=='move' and fprs:
         prev    = get_hist(fm_key)
-        pass;                   log__('prev={}',(prev)      ,__=(log4fun,_log4mod))
+        pass;                  #log__('prev={}',(prev)      ,__=(log4fun,)) if _log4mod>=0 else 0
         if not prev:    return fprs
 #       if not fprs.get('resize', False):
         if 'resize' not in fprs.get('frame', ''):
             prev.pop('w', None)
             prev.pop('h', None)
         fprs.update(prev)
-        pass;                   log__('!upd fprs={}',(fprs)      ,__=(log4fun,_log4mod))
+        pass;                   log__('!upd fprs={}',(fprs)      ,__=(log4fun,)) if _log4mod>=0 else 0
         return fprs
     elif act=='save' and did:
         for (k,v) in {k:v for k,v in fprs.items() if k in ('x','y','w','h')}.items():
@@ -1766,7 +1881,7 @@ def dlg_tuning_valigns():
     seqeq   = '================='
     sbl44   = ' 4444444444444444'
     n4444   = 444444444
-    sped_pr = f('0,{},1', n4444)
+    sped_pr = f'0,{n4444},1'
     cs      = CTRLS
     cnts    = [0
     ,('lb1' ,dict(tp='labl' ,y= 10              ,x=   5 ,w=110  ,cap=cs[0]+sbleq))
@@ -1823,6 +1938,75 @@ def dlg_tuning_valigns():
     ag.show()    #NOTE: dlg_valign
     return changed
    #def tuning_valigns
+
+######################################
+#NOTE: Ready dialogs
+######################################
+
+def dlg_list_input(title, choices, val=None, vals=None, label=None, opts={}):
+    """ Shows modal dialog to select one of choices value. 
+        Params
+            title   Caption of dialog
+            label   Label over combobox (if is)
+            choices List of visible string to select
+            val     Start selection (index for choices or item from vals)
+            vals    List of values.
+                    If is input/output val must/will be in the list
+            opts    Misc options
+                        'w'     width of combobox
+        Return        
+                    Value from vals (if is)
+                    Index of choices
+                    None if cancelled.
+    """
+    d       = dict
+    w       = opts.get('w', 200)
+    wlbl    = bool(label)
+    label   = str(label)
+    dh      = 28 if wlbl else 0
+    ret,vls = DlgAg(
+                 ctrls  =[
+    ('labl',d(tp='labl'     ,y= 5   ,x=  5      ,w=w    ,cap=label      ,vis=wlbl   ,a='r>')),
+    ('cmbr',d(tp='cmbr'     ,y= 5+dh,x=  5      ,w=w    ,items=choices
+                                                        ,ivals=vals     ,val=val    ,a='r>')),
+    ('okok',d(tp='bttn'     ,y=35+dh,x=-65      ,w=60   ,cap='OK'       ,def_bt=True    
+                                                                        ,on=CB_HIDE ,a='>>')),
+               ],form   =d(  h=65+dh,h_max=65+dh,w=w+10 ,cap=title                  ,frame='resize')
+                ,fid    ='cmbr'
+                ,opts   =d(negative_coords_reflect=True)
+                ).show()
+    return vls['cmbr']  if ret else None
+   #def dlg_list_input
+
+
+#_tabid2eds    = {}
+#def get_ed_by_id(tab_id):
+#   """ Editor object for tab_id.
+#       Not re-create object to same tab_id (cached).
+#       Return 
+#           None    if no tab with the tab_id
+#           Editor  if tab exists
+#   """
+#   global _tabid2eds
+#   live_hs = {h    for h in app.ed_handles()}
+#   died_hs = {e.h  for e in _tabid2eds.values() if e.h not in live_hs}
+#   if live_hs != cchd_hs:
+#       _tabid2eds  = {tid:e for tid,e in _tabid2eds.items() 
+#                       if e.h not in died_hs}
+#   try_ed  = None
+#   for h in app.ed_handles(): 
+#       try_ed  = app.Editor(h)
+#       if int(tab_id) == try_ed.get_prop(app.PROP_TAB_ID, ''):
+#           break
+#   else:#for                                   # Not live
+#       _tabid2eds.pop(tab_id, None)            # Forget
+#       return None
+#   if tab_id not in _tabid2eds:
+#       _tabid2eds[tab_id]  = try_ed            # New
+#   return _tabid2eds[tab_id]
+#  #def get_ed_by_id
+#
+
 
 if __name__ == '__main__' :
     # To start the tests run in Console

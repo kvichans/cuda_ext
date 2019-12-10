@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.7.08 2019-08-26'
+    '1.7.12 2019-12-10'
 ToDo: (see end of file)
 '''
 
@@ -13,10 +13,13 @@ from            cudatext        import ed
 from            cudatext_keys   import *
 import          cudatext_cmd        as cmds
 import          cudax_lib           as apx
-try:    from    cuda_kv_base    import *    # as separated plugin
-except: from     .cd_kv_base    import *    # as part of this plugin
-try:    from    cuda_kv_dlg     import *    # as separated plugin
-except: from     .cd_kv_dlg     import *    # as part of this plugin
+
+from            .cd_kv_base     import *        # as part of this plugin
+from            .cd_kv_dlg      import *        # as part of this plugin
+#try:    from    cuda_kv_base    import *    # as separated plugin
+#except: from     .cd_kv_base    import *    # as part of this plugin
+#try:    from    cuda_kv_dlg     import *    # as separated plugin
+#except: from     .cd_kv_dlg     import *    # as part of this plugin
 
 try:# I18N
     _   = get_translation(__file__)
@@ -175,14 +178,15 @@ class FiL:
 
     def do_find(self, ag, aid, data=''):
         pass;                   log4fun=0                       # Order log in the function
-        pass;                   log__('aid, data={}',(aid, data)  ,__=(log4fun,_log4mod))
+        pass;                   log__('aid, data, fid={}',(aid, data, ag.focused())  ,__=(log4fun,_log4mod))
         # What/how will search
         prnx    = 'prev' if aid=='prev' else 'next'
         crt     = ed.get_carets()[0][:]                         # Current first caret (col,row, col?,row?)
         min_rc  = (crt[1], crt[0])  if crt[2]==-1 else  min((crt[1], crt[0]), (crt[3], crt[2]))
         max_rc  = (crt[1], crt[0])  if crt[2]==-1 else  max((crt[1], crt[0]), (crt[3], crt[2]))
 
-        awht    = data if data else 'whti' if ag.focused()=='whti' else 'what'
+        awht    = data if data else 'whti' if aid=='whti' else 'what'
+#       awht    = data if data else 'whti' if ag.focused()=='whti' else 'what'
         FiL.last_awht   = awht
         what    = ag.val(awht)
 

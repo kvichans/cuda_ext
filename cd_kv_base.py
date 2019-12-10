@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '0.9.01 2019-03-28'
+    '0.9.02 2019-07-22'
 Content
     log                 Logger with timing and code location
     _                   i18n
@@ -22,25 +22,12 @@ VERSION     = re.split('Version:', __doc__)[1].split("'")[1]
 VERSION_V,  \
 VERSION_D   = VERSION.split(' ')
 
-def version():  return VERSION_V
+version     = lambda: VERSION_V
 
 T,F,N       = True, False, None
 C13,C10,C9  = chr(13),chr(10),chr(9)
-def f(     s, *args, **kwargs): return       s.format(*args, **kwargs)
-def printf(s, *args, **kwargs): return print(s.format(*args, **kwargs))
-
-odict       = collections.OrderedDict
-class odct(collections.OrderedDict):
-    def __init__(self, *args, **kwargs):
-        pass;                  #print('args=',args)
-        if     args: super().__init__( *args) \
-            if 1==len(args) else \
-                     super().__init__(  args)
-        elif kwargs: super().__init__(kwargs.items())
-    def __str__(self):
-        return '{%s}' % (', '.join("'%s': %r" % (k,v) for k,v in self.items()))
-    def __repr__(self):
-        return self.__str__()
+f           = lambda s_, *args, **kwargs: s_.format(*args, **kwargs)
+printf      = lambda s_, *args, **kwargs: print(s_.format(*args, **kwargs))
 
 class dcta(dict):
     def __getattr__(self, name):
@@ -59,6 +46,8 @@ LOG_NEED    = 2                                                 # Required all
 LOG_FORBID  = -1                                                # Forbidden all
 def iflog(*log_levels):
     " Get permission to log on multiple orders"
+    if 1==len(log_levels):
+        return log_levels[0] in (LOG_ALLOW, LOG_NEED)
     if 2==len(log_levels):
         l1,l2   = log_levels
         if      l1==LOG_FORBID  or l2==LOG_FORBID:      return False  # If at least one is FORBID
@@ -128,6 +117,7 @@ class Tr :
         self.tm     = perf_counter()                            # Start tick for whole log
 
         if log_to_file:
+            pass;              #print('to file=',log_to_file)
             logging.basicConfig( filename=log_to_file
                                 ,filemode='w'
                                 ,level=logging.DEBUG
@@ -135,6 +125,7 @@ class Tr :
                                 ,datefmt='%H:%M:%S'
                                 ,style='%')
         else: # to stdout
+            pass;              #print('to stdout')
             logging.basicConfig( stream=sys.stdout
                                 ,level=logging.DEBUG
                                 ,format='%(message)s'
@@ -349,26 +340,43 @@ MAX_HIST= apx.get_opt('ui_max_history_edits', 20)
 
 def add_to_history(val:str, lst:list, max_len=MAX_HIST, unicase=True)->list:
     """ Add/Move val to list head. """
-    pass;                  #LOG and log('val, lst={}',(val, lst))
+    pass;                      #log('val, lst={}',(val, lst))
     lst_u = [ s.upper() for s in lst] if unicase else lst
     val_u = val.upper()               if unicase else val
     if val_u in lst_u:
         if 0 == lst_u.index(val_u):   return lst
         del lst[lst_u.index(val_u)]
     lst.insert(0, val)
-    pass;                  #LOG and log('lst={}',lst)
+    pass;                      #log('lst={}',lst)
     if len(lst)>max_len:
         del lst[max_len:]
-    pass;                  #LOG and log('lst={}',lst)
+    pass;                      #log('lst={}',lst)
     return lst
    #def add_to_history
+
+
+def append_to_history(val, lst:list, max_len=MAX_HIST)->list:
+    """ Add/Move val to list end. """
+    pass;                      #log('val, lst={}',(val, lst))
+    pass;                      #import rpdb;rpdb.Rpdb().set_trace() if lst else 0
+    if val in lst:
+        pos = lst.index(val)
+        if pos == (len(lst)-1):  return lst
+        del lst[pos]
+    lst.append(val)
+    pass;                      #log('lst={}',lst)
+    if len(lst)>max_len:
+        del lst[0]
+    pass;                      #log('lst={}',lst)
+    return lst
+   #def append_to_history
 
 
 ######################################
 #NOTE: plugins history
 ######################################
 PLING_HISTORY_JSON  = app.app_path(app.APP_DIR_SETTINGS)+os.sep+'plugin history.json'
-def get_hist(key_or_path, default=None, module_name='_auto_detect', to_file=PLING_HISTORY_JSON):
+def get_hist(key_or_path, default=None, module_name='_auto_detect', to_file=PLING_HISTORY_JSON, **json_kwargs):
     """ Read from "plugin history.json" one value by string key or path (list of keys).
         Parameters
             key_or_path     Key(s) to navigate in json tree
@@ -378,6 +386,7 @@ def get_hist(key_or_path, default=None, module_name='_auto_detect', to_file=PLIN
                             If it is '_auto_detect' then name of caller module is used.
                             If it is None then it is skipped (see examples).
             to_file         Name of file to read. APP_DIR_SETTING will be joined if no full path.
+            json_kwargs     Keys for json.loads
         
         Return              Found value or default
             
@@ -396,15 +405,19 @@ def get_hist(key_or_path, default=None, module_name='_auto_detect', to_file=PLIN
                 get_hist('q', 0, None)          returns {'n':4}
                 get_hist(['q','n'], 0, None)    returns 4
     """
-    pass;                       log4fun=0                       # Order log in the function
-    pass;                       log__('key,def,mod,to_f={}',(key_or_path,default,module_name,to_file)      ,__=(log4fun,_log4mod))
+    pass;                       log4fun=1                       # Order log in the function
+    pass;                      #log__('key,def,mod,to_f={}',(key_or_path,default,module_name,to_file)      ,__=(log4fun,_log4mod))
     to_file = to_file   if os.sep in to_file else   app.app_path(app.APP_DIR_SETTINGS)+os.sep+to_file
     if not os.path.exists(to_file):
         pass;                  #log('not exists',())
         return default
     data    = None
     try:
-        data    = json.loads(open(to_file).read())
+        body_s  = open(to_file).read()
+        body_s  = re.sub(r',\s+}', '}', body_s)
+        json_kw = json_kwargs if json_kwargs else {}
+        data    = json.loads(body_s, **json_kw)
+        pass;                  #log__('data={}',(data)      ,__=(log4fun,_log4mod))
     except:
         pass;                   log('not load: {}',sys.exc_info())
         return default
@@ -412,19 +425,23 @@ def get_hist(key_or_path, default=None, module_name='_auto_detect', to_file=PLIN
         caller_globals  = inspect.stack()[1].frame.f_globals
         module_name = inspect.getmodulename(caller_globals['__file__']) \
                         if '__file__' in caller_globals else None
+    pass;                      #log__('module_name={}',(module_name)      ,__=(log4fun,_log4mod))
     keys    = [key_or_path] if type(key_or_path)==str   else key_or_path
     keys    = keys          if module_name is None      else [module_name]+keys
     parents,\
     key     = keys[:-1], keys[-1]
+    pass;                      #log__('keys,parents,key={}',(keys,parents,key)      ,__=(log4fun,_log4mod))
     for parent in parents:
         data= data.get(parent)
-        if type(data)!=dict:
+        pass;                  #log__('data,likesdict(data)={}',(data,likesdict(data))      ,__=(log4fun,_log4mod))
+        if not likesdict(data):
             pass;              #log('not dict parent={}',(parent))
             return default
+    pass;                      #log__('data,key={}',(data,key)      ,__=(log4fun,_log4mod))
     return data.get(key, default)
    #def get_hist
 
-def set_hist(key_or_path, value=None, module_name='_auto_detect', kill=False, to_file=PLING_HISTORY_JSON):
+def set_hist(key_or_path, value=None, module_name='_auto_detect', kill=False, to_file=PLING_HISTORY_JSON, **json_kwargs):
     """ Write to "plugin history.json" one value by key or path (list of keys).
         If any of node doesnot exist it will be added.
         Or remove (if kill) one key+value pair (if suitable key exists).
@@ -438,6 +455,7 @@ def set_hist(key_or_path, value=None, module_name='_auto_detect', kill=False, to
             kill            Need to remove node in tree.
                             if kill==True parm value is ignored
             to_file         Name of file to write. APP_DIR_SETTING will be joined if no full path.
+            json_kwargs     Keys for json.loads
         
         Return              value (param)   if !kill and modification is successful
                             value (killed)  if  kill and modification is successful
@@ -473,9 +491,12 @@ def set_hist(key_or_path, value=None, module_name='_auto_detect', kill=False, to
     pass;                       log4fun=0                       # Order log in the function
     pass;                      #log__('key,val,mod,kill,to_f={}',(key_or_path, value, module_name, kill, to_file)      ,__=(log4fun,_log4mod))
     to_file = to_file   if os.sep in to_file else   app.app_path(app.APP_DIR_SETTINGS)+os.sep+to_file
-    body    = json.loads(open(to_file).read(), object_pairs_hook=odict) \
-                if os.path.exists(to_file) and os.path.getsize(to_file) != 0 else \
-              odict()
+    body    = dict()
+    if os.path.exists(to_file) and os.path.getsize(to_file) != 0:
+        body_s  = open(to_file).read()
+        body_s  = re.sub(r',\s+}', '}', body_s)
+        json_kw = json_kwargs if json_kwargs else {}
+        body    = json.loads(body_s, **json_kw)
 
     if module_name=='_auto_detect':
         caller_globals  = inspect.stack()[1].frame.f_globals
@@ -491,8 +512,8 @@ def set_hist(key_or_path, value=None, module_name='_auto_detect', kill=False, to
     for parent in parents:
         if kill and parent not in data:
             return None
-        data= data.setdefault(parent, odict())
-        if type(data)!=odict:
+        data= data.setdefault(parent, dict())
+        if not likesdict(data):
             raise KeyError()
     if kill:
         if key not in data:
@@ -511,7 +532,8 @@ class Command:
             return app.msg_status(_('Fail. Use only for python file.'))
         ed.save()
         app.app_log(app.LOG_CONSOLE_CLEAR, 'm')
-        cmd = f(r'exec(open(r"{}", encoding="UTF-8").read().lstrip("\uFEFF"))', fn)
+        cmd = r'exec(open(r"{fn}", encoding="UTF-8").read().lstrip("\uFEFF"))'
+#       cmd = f(r'exec(open(r"{}", encoding="UTF-8").read().lstrip("\uFEFF"))', fn)
         pass;                  #log('cmd={!r}',(cmd))
         ans     = app.app_proc(app.PROC_EXEC_PYTHON, cmd)
         print('>>> run {!r}'.format(fn))
@@ -523,7 +545,7 @@ class Command:
 #NOTE: misc for CudaText
 ######################################
 
-RE_CONST_NAME   = re.compile(r'(\w+)\s*=')
+#RE_CONST_NAME   = re.compile(r'(\w+)\s*=')
 _const_name_vals= {}                        # {module:{name:val}}
 def get_const_name(val, prefix='', module=app):
     """ Name of constant from the module starts with the prefix and has the value.
@@ -532,12 +554,14 @@ def get_const_name(val, prefix='', module=app):
     """
     mod_consts  = _const_name_vals.setdefault(module, {})
     if not mod_consts:
-        with open(module.__file__) as f:
-            for line in f:
-                mtName = RE_CONST_NAME.match(line)
-                if mtName:
-                    nm  = mtName.group(1)
-                    mod_consts[nm]  = getattr(module, nm)
+        mod_consts  = {cnm:module.__getattribute__(cnm) for cnm in dir(module)
+                        if not callable(module.__getattribute__(cnm))}
+#       with open(module.__file__) as f:
+#           for line in f:
+#               mtName = RE_CONST_NAME.match(line)
+#               if mtName:
+#                   nm  = mtName.group(1)
+#                   mod_consts[nm]  = getattr(module, nm)
     nms = [nm   for nm, vl in mod_consts.items()
                 if  nm.startswith(prefix) and vl==val]
     return ','.join(nms) \
@@ -553,6 +577,7 @@ def rgb_to_int(r,g,b):
 
 def set_all_for_tree(tree, sub_key, key, val):
     for node in tree:
+        if not node:    continue
         if sub_key in node:
             set_all_for_tree(node[sub_key], sub_key, key, val)
         else:
@@ -560,8 +585,8 @@ def set_all_for_tree(tree, sub_key, key, val):
     return tree
    #def set_all_for_tree
 
-def upd_dict(d1, d2):
-    rsp = d1.copy()
+def upd_dict(d1, d2, upd_d1=False):
+    rsp = d1 if upd_d1 else d1.copy() 
     rsp.update(d2)
     return rsp
    #def upd_dict

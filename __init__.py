@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.7.11 2019-09-09'
+    '1.7.12 2019-12-10'
 '''
 
 from    .cd_ext import Command as CommandRLS
@@ -145,6 +145,8 @@ class Command:
     def to_prev_tab(self):                      return cd_ext_tabs._activate_near_tab(-1)
     def to_tab_ask_num(self):                   return cd_ext_tabs.to_tab_ask_num()
     def move_tab(self):                         return cd_ext_tabs.move_tab()
+    def move_tab_left(self):                    return cd_ext_tabs.move_tab('l')
+    def move_tab_right(self):                   return cd_ext_tabs.move_tab('r')
     def find_tab(self):                         return cd_ext_tabs.find_tab()
     def close_tab_from_next_group(self):        return cd_ext_tabs.close_tab_from_other_group('next')
     def close_tab_from_prev_group(self):        return cd_ext_tabs.close_tab_from_other_group('prev')

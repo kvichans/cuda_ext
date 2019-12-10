@@ -425,28 +425,41 @@ method=nav_by_console_err
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Tabs_cmds
-[item170]
+[item160]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Choose tab/panel to switch to
 hotkey=Ctrl+P
 method=go_back_dlg
-[item171]
+menu=0
+[item161]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate previously active tab (go &back)
 hotkey=Ctrl+[
 method=go_back
 
-[item172]
+[item162]
 section=commands
 caption=Cuda&-Ext\Ta&bs\-
 hotkey=
 method=_
 
-[item173]
+[item163]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Move tab to &position...
 hotkey=
 method=move_tab
+
+[item164]
+section=commands
+caption=Cuda&-Ext\Ta&bs\Move tab left
+hotkey=
+method=move_tab_left
+
+[item165]
+section=commands
+caption=Cuda&-Ext\Ta&bs\Move tab right
+hotkey=
+method=move_tab_right
 
 [item174]
 section=commands

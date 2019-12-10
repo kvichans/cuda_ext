@@ -1,3 +1,7 @@
+1.7.12 (2019-12-10)
+added: Commands "Move tab left/right" 
+fixed: instant search in dock mode 
+
 1.7.11 (2019-09-09)
 added: Command "Save/Restore groups and panels layout" in submenu "Splitters" 
 
