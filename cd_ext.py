@@ -15,10 +15,12 @@ from            cudatext_keys   import *
 import          cudatext_cmd        as cmds
 import          cudax_lib           as apx
 
-try:    from    cuda_kv_base    import *    # as separated plugin
-except: from     .cd_kv_base    import *    # as part of this plugin
-try:    from    cuda_kv_dlg     import *    # as separated plugin
-except: from     .cd_kv_dlg     import *    # as part of this plugin
+from            .cd_kv_base     import *        # as part of this plugin
+from            .cd_kv_dlg      import *        # as part of this plugin
+#try:    from    cuda_kv_base    import *    # as separated plugin
+#except: from     .cd_kv_base    import *    # as part of this plugin
+#try:    from    cuda_kv_dlg     import *    # as separated plugin
+#except: from     .cd_kv_dlg     import *    # as part of this plugin
 try:
     _   = get_translation(__file__)
 except:
