@@ -112,19 +112,25 @@ method=convert_reverse_selection
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Insert_cmds
-[item41]
+[item31]
 section=commands
 caption=Cuda&-Ext\&Insert\Add indented line abo&ve
 hotkey=
 method=add_indented_line_above
 
-[item42]
+[item32]
 section=commands
 caption=Cuda&-Ext\&Insert\Add indented line &below
 hotkey=Ctrl+Enter
-method=add_indented_line_below
+method=indent_and_surround_curl_brackets
 
-[item43]
+[item33]
+section=commands
+caption=Cuda&-Ext\&Insert\Add indent and surround selection with { }
+hotkey=Ctrl+Enter
+method=indent_and_surround_curl_brackets
+
+[item34]
 section=commands
 caption=Cuda&-Ext\&Insert\-
 hotkey=

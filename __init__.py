@@ -33,6 +33,7 @@ class Command:
     # Insert_cmds
     def add_indented_line_above(self):          return RLS.add_indented_line_above()
     def add_indented_line_below(self):          return RLS.add_indented_line_below()
+    def indent_and_surround_curl_brackets(self):return RLS.indent_and_surround('{', '}')
     def paste_to_1st_col(self):                 return RLS.paste_to_1st_col()
     def paste_with_indent_above(self):          return RLS.paste_with_indent('above')
     def paste_with_indent_below(self):          return RLS.paste_with_indent('below')

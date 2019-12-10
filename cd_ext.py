@@ -1157,6 +1157,45 @@ class Insert_cmds:
        #def add_indented_line_below
 
     @staticmethod
+    def indent_and_surround(str_bfr, str_aft):
+        """ Algo by Alexey Torgashin  """
+
+        def str_get_indent(s):
+        	n = 0
+        	while (n<len(s)) and (s[n] in [' ', '\t']):
+        		n += 1
+        	return s[:n]
+    
+        def str_indented(s, indent_add):
+            if s:
+                s = indent_add + s
+            return s
+  
+        n1, n2 = ed.get_sel_lines()
+        if n1<0:
+            app.msg_status(_('No text selected'))
+            return
+            
+        lines = [ed.get_text_line(i) for i in range(n1, n2+1)]
+        if not lines: return
+        
+        indent = str_get_indent(lines[0])
+        tab_spaces = ed.get_prop(app.PROP_TAB_SPACES)
+        tab_size = ed.get_prop(app.PROP_TAB_SIZE)
+        eol = '\n'
+        indent_add = ' '*tab_size if tab_spaces else '\t'
+        
+        lines = [str_indented(s, indent_add) for s in lines]
+        lines = [indent + str_bfr] + lines + [indent + str_aft]
+        newtext = eol.join(lines) + eol
+        
+        ed.set_caret(0, n1)
+        ed.replace_lines(n1, n2, lines)
+        app.msg_status(_(f'Indented {n2-n1+1} lines'))
+       #def indent_and_surround
+
+
+    @staticmethod
     def paste_to_1st_col():
         ''' Paste from clipboard without replacement caret/selection
                 but only insert before current line
@@ -1891,6 +1930,7 @@ class Command:
     
     def add_indented_line_above(self):          return Insert_cmds.add_indented_line_above()
     def add_indented_line_below(self):          return Insert_cmds.add_indented_line_below()
+    def indent_and_surround(self, bfr, aft):    return Insert_cmds.indent_and_surround(bfr, aft)
     def paste_to_1st_col(self):                 return Insert_cmds.paste_to_1st_col()
     def paste_with_indent(self, where='above'): return Insert_cmds.paste_with_indent(where)
     def paste_trimmed(self):                    return Insert_cmds.paste_trimmed()
