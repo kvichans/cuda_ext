@@ -525,7 +525,7 @@ class DlgAg:
         """ Arrange and fill all: controls attrs, form attrs, focus.
             Params
                 ctrls   [(name, {k:v})] or {name:{k:v}} 
-                            NB! Only from 5.7 Python saves key sequence for dict.
+                            NB! Only from 3.7 Python saves key sequence for dict.
                                 The sequence is important for tab-order of controls.
                 form    {k:v}
                 vals    {name:v}

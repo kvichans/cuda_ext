@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.7.12 2019-12-10'
+    '1.7.13 2020-05-07'
 ToDo: (see end of file)
 '''
 
@@ -103,6 +103,7 @@ class FiL:
                     ,   inst=False,insm=3
                     ,   pfid='what')                            # Default options
         FiL.opts.update(get_hist('find.find_in_lines', FiL.opts))
+        pass;                  #log("FiL.opts={}",(FiL.opts))
 
         FiL.ag      = FiL.ag if (FiL.ag and FiL.ag.islived()) else None
         pass;                   log__("FiL.what={}",(FiL.what)  ,__=(log4fun,_log4mod))
@@ -185,7 +186,11 @@ class FiL:
         min_rc  = (crt[1], crt[0])  if crt[2]==-1 else  min((crt[1], crt[0]), (crt[3], crt[2]))
         max_rc  = (crt[1], crt[0])  if crt[2]==-1 else  max((crt[1], crt[0]), (crt[3], crt[2]))
 
-        awht    = data if data else 'whti' if aid=='whti' else 'what'
+#       awht    = data if data else 'whti' if aid=='whti' else 'what'
+        awht    = data          if data                             else \
+                  ag.focused()  if ag.focused() in ('whti', 'what') else \
+                  'whti'        if aid=='whti'                      else \
+                  'what'
 #       awht    = data if data else 'whti' if ag.focused()=='whti' else 'what'
         FiL.last_awht   = awht
         what    = ag.val(awht)
@@ -328,6 +333,7 @@ class FiL:
     def on_exit(self, ag):
         pass;                   log__("FiL.ag={}",(FiL.ag)  ,__=(_log4mod,))
         FiL.opts['pfid']    = ag.focused()
+        pass;                  #log("FiL.opts={}",(FiL.opts))
         set_hist('find.find_in_lines', {**FiL.opts, **ag.vals(['reex','case','word'])})
 
 
@@ -423,6 +429,8 @@ def find_cb_by_cmd(updn):
         +[find_opt]
     ))
     if app.app_api_version()>='1.0.248':
+        fpr['find']     = clip
+        fpr['find_d']   = clip
         app.app_proc(app.PROC_SET_FINDER_PROP, fpr)
     else:
         app.app_proc(app.PROC_SET_FIND_OPTIONS, user_opt)       # Deprecated

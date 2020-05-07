@@ -1,3 +1,7 @@
+1.7.13 (2020-05-07)
+fixed: "find, next" doesnt continue search after "Find clipbrd: next"
+fixed: FindInLines: editor looses focus on Enter
+
 1.7.12 (2019-12-10)
 added: Commands "Move tab left/right" 
 added: Command "Add indent and surround selection with { }" 
