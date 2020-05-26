@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.7.13 2020-05-07'
+    '1.7.14 2020-05-26'
 ToDo: (see end of file)
 '''
 
@@ -179,7 +179,8 @@ class FiL:
 
     def do_find(self, ag, aid, data=''):
         pass;                   log4fun=0                       # Order log in the function
-        pass;                   log__('aid, data, fid={}',(aid, data, ag.focused())  ,__=(log4fun,_log4mod))
+        fid     = ag.focused()
+        pass;                   log__('aid, data, fid={}',(aid, data, fid)  ,__=(log4fun,_log4mod))
         # What/how will search
         prnx    = 'prev' if aid=='prev' else 'next'
         crt     = ed.get_carets()[0][:]                         # Current first caret (col,row, col?,row?)
@@ -187,10 +188,12 @@ class FiL:
         max_rc  = (crt[1], crt[0])  if crt[2]==-1 else  max((crt[1], crt[0]), (crt[3], crt[2]))
 
 #       awht    = data if data else 'whti' if aid=='whti' else 'what'
-        awht    = data          if data                             else \
-                  ag.focused()  if ag.focused() in ('whti', 'what') else \
-                  'whti'        if aid=='whti'                      else \
+        awht    =(data      if data                             else 
+                  'whti'    if aid=='whti' and FiL.opts['dock'] else    # fix to core bug: fid is not correct for docked form
+                  fid       if fid in ('whti', 'what')          else 
+                  'whti'    if aid=='whti'                      else 
                   'what'
+                 )
 #       awht    = data if data else 'whti' if ag.focused()=='whti' else 'what'
         FiL.last_awht   = awht
         what    = ag.val(awht)
@@ -302,7 +305,7 @@ class FiL:
                 return None
             return []
            #def wnen_menu
-        insm_c  = f(_('Left &minimum signs to find: {}...'), FiL.opts['insm'])
+        insm_c  = f(_('&Minimal length of instant-search (left) field: {}...'), FiL.opts['insm'])
         modl    = not (FiL.opts['nmdl'] or FiL.opts['dock'])
         ag.show_menu([(
     ),d(tag='hide'  ,cap=_('Hide dialog &=')                                ,key=('Esc' if modl else '')
@@ -317,7 +320,7 @@ class FiL:
     ),d(             cap='-'
     ),d(             cap=_('=== Options ===')                                           ,en=False
     ),d(tag='usel'  ,cap=_('Use &selection from document')          ,ch=FiL.opts['usel']
-    ),d(tag='nmdl.' ,cap=_('Do not hide on &ESC (close dialog)')    ,ch=FiL.opts['nmdl'],en=FiL.opts['dock']==''
+    ),d(tag='nmdl'  ,cap=_('Do not hide on &ESC (close dialog)')    ,ch=FiL.opts['nmdl'],en=FiL.opts['dock']==''
     ),d(tag='insm'  ,cap=insm_c
     ),d(             cap='-'
     ),d(tag='dckt.' ,cap=_('Dock to window &top (close dialog)')    ,ch=FiL.opts['dock']=='t'

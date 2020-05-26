@@ -1,3 +1,7 @@
+1.7.14 (2020-05-26)
+fixed: "Find in lines" instant search for docked mode
+fixed: "Find in lines" inside menu text
+
 1.7.13 (2020-05-07)
 fixed: "find, next" doesnt continue search after "Find clipbrd: next"
 fixed: FindInLines: editor looses focus on Enter
