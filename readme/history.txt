@@ -1,6 +1,11 @@
+1.7.15 (2020-06-03)
+added: "Find in Lines" Resize both input control on form resizing
+fixed: "Find in Lines" menu command name - "Work in non-modal mode"
+fixed: "Find in Lines" title prompt - "(Left input: at least N chars. Right input: ENTER.)"
+
 1.7.14 (2020-05-26)
-fixed: "Find in lines" instant search for docked mode
-fixed: "Find in lines" inside menu text
+fixed: "Find in Lines" instant search for docked mode
+fixed: "Find in Lines" inside menu text
 
 1.7.13 (2020-05-07)
 fixed: "find, next" doesnt continue search after "Find clipbrd: next"
@@ -18,7 +23,7 @@ added: Command "Save/Restore groups and panels layout" in submenu "Splitters"
 changed: Need Python 3.6. See CudaExt_py35 to work with old CudaText versions
 
 1.7.08 (2019-08-26)
-added: Dialog "Find in lines" have both visible input: to instant find and to save history
+added: Dialog "Find in Lines" have both visible input: to instant find and to save history
 
 1.7.06 (2019-07-17)
 added: Command "Tabs\Find tab by title..."
@@ -92,7 +97,7 @@ added: Commands "File \ Show in hex viewer" and "File \ Show in text editor"
 fixed: switcher
 
 1.5.19 (2018-08-28)
-fixed: layout for MacOS (Find in lines, Find in Tree)
+fixed: layout for MacOS (Find in Lines, Find in Tree)
 
 1.5.18 (2018-08-20)
 added: Command "File \ Save editors to a single file"
@@ -113,25 +118,25 @@ added: Command "Choose previously active tab". Dialog to switch to previously ac
 fixed: Allow only digit in dialog "Reindent selected lines"
 
 1.5.12 (2018-06-01)
-added: "Find in lines": Call native Find (or Replace) dialog
+added: "Find in Lines": Call native Find (or Replace) dialog
 
 1.5.11 (2018-05-29)
-added: "Find in lines": Instant search minimum input size to start
-added: "Find in lines": Shift+Esc to close and restore initial selection
+added: "Find in Lines": Instant search minimum input size to start
+added: "Find in Lines": Shift+Esc to close and restore initial selection
 added: "Code Tree: Find node": Shift+Esc to close and restore initial selection
 
 1.5.10 (2018-05-28)
-added: Instant search to dialog "Find in lines" (by option in local menu)
+added: Instant search to dialog "Find in Lines" (by option in local menu)
 
 1.5.09 (2018-05-28)
 changed: Command "File: Open recent file" stores data in "plugin history.json" (not in "user.json")
-changed: Command "Find in lines" stores data in "plugin history.json" (not in "user.json")
+changed: Command "Find in Lines" stores data in "plugin history.json" (not in "user.json")
 changed: Command "Code Tree: Find node" stores data in "plugin history.json" (not in "user.json")
 changed: Dialog "Code Tree: Find node" uses [Shift+]Enter to jump (buttons for Alt+ <>,. are deleted)
 added: Dialog "Code Tree: Find node" has new menu command "Restore starting selection"
 
 1.5.08 (2018-05-23)
-added: command "Find in lines" to light search in text
+added: command "Find in Lines" to light search in text
 
 1.5.07 (2018-05-22)
 changed: command "Code Tree / Find node" - allow to jump over found nodes

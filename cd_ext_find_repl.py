@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.7.14 2020-05-26'
+    '1.7.15 2020-06-03'
 ToDo: (see end of file)
 '''
 
@@ -16,10 +16,6 @@ import          cudax_lib           as apx
 
 from            .cd_kv_base     import *        # as part of this plugin
 from            .cd_kv_dlg      import *        # as part of this plugin
-#try:    from    cuda_kv_base    import *    # as separated plugin
-#except: from     .cd_kv_base    import *    # as part of this plugin
-#try:    from    cuda_kv_dlg     import *    # as separated plugin
-#except: from     .cd_kv_dlg     import *    # as part of this plugin
 
 try:# I18N
     _   = get_translation(__file__)
@@ -73,9 +69,7 @@ class FiL:
     def msg_(msg=None):
         msg =(msg                                                       if msg else
               f('{}/{}', 1+FiL.ready_p, len(FiL.ready_l))               if FiL.ready_l else
-              f(_('To find: >{} signs in the left, ENTER for the right'), FiL.opts['insm']-1)
-#             f(_('Type {} character(s) to find'), FiL.opts['insm'])    if FiL.opts['inst'] else
-#             _('ENTER to find')
+              f(_('Left input: at least {} chars. Right input: ENTER.'), FiL.opts['insm'])
              )
         msg = f('{}: {}' , FiL.FORM_C, msg)                             if FiL.opts['dock'] else \
               f('{} ({})', FiL.FORM_C, msg)
@@ -129,29 +123,31 @@ class FiL:
         
         pass;                  #log__('###',()  ,__=(log4fun,_log4mod))
 
-#       what_tp = 'edit'    if FiL.opts['inst'] else 'cmbx'
-#       what_on = m.do_find if FiL.opts['inst'] else None
         dock    = FiL.opts['dock']
-        wtwd    = FiL.opts['dock_ww']   if dock else 85
+        wtwd    = FiL.opts['dock_ww']   if dock else 105
         mswd    = 150                   if dock else 0
-        menx    = 5+114+5+85+5+wtwd+5
+        menx    = 5+114+5+wtwd+5+wtwd+5
+#       menx    = 5+114+5+105 +5+wtwd+5
         msg     = FiL.msg_()
         ag      = DlgAg(
-            form    =dict(cap=msg, w=5+114+5+85+5+wtwd+39+5+5
+            form    =dict(cap=msg, w=5+114+5+wtwd+5+wtwd+39+5+5
+#           form    =dict(cap=msg, w=5+114+5+105 +5+wtwd+39+5+5
                          ,h=35, h_max=35                        # Only horz resize
                          ,on_key_down=m.do_key_down
+                         ,on_resize=m.on_resize
                          ,frame='resize'
                          )
         ,   ctrls   =[0
-      ,('find',d(tp='bttn'  ,y=0        ,x=-99      ,w=11   ,cap=''     ,sto=False  ,def_bt='1'         ,on=m.do_find   ))  # Enter
-      ,('reex',d(tp='chbt'  ,tid='what' ,x=5        ,w=38   ,cap='&.*'  ,hint=_('Regular expression')   ,on=m.do_attr   ))  # &.
-      ,('case',d(tp='chbt'  ,tid='what' ,x=5+ 38    ,w=38   ,cap='&aA'  ,hint=_('Case sensitive')       ,on=m.do_attr   ))  # &a
-      ,('word',d(tp='chbt'  ,tid='what' ,x=5+ 76    ,w=38   ,cap='"&w"' ,hint=_('Whole words')          ,on=m.do_attr   ))  # &w
-      ,('whti',d(tp='edit'  ,tid='what' ,x=5+114+5  ,w=85                                               ,on=m.do_find   ))  # 
-      ,('what',d(tp='cmbx'  ,y  =5      ,x=5+114+95 ,w=wtwd ,items=FiL.opts['hist']                                     ,a=''   if dock else 'r>'   ))  # 
-#     ,('what',d(tp=what_tp ,y  =5      ,x=5+38*3+5 ,w=wtwd ,items=FiL.opts['hist']                     ,on=what_on     ,a=''   if dock else 'r>'   ))  # 
-      ,('menu',d(tp='bttn'  ,tid='what' ,x=menx     ,w=38   ,cap='&='               ,on_menu=m.do_menu  ,on=m.do_menu   ,a=''   if dock else '>>'   ))  # &=
-      ,('mess',d(tp='labl'  ,tid='what' ,x=menx+39+5,w=mswd ,cap=msg                                                    ,a='r>' if dock else ''     ))  # 
+      ,('find',d(tp='bttn'  ,y=0        ,x=-99          ,w=11   ,cap=''     ,sto=False  ,def_bt='1'         ,on=m.do_find   ))  # Enter
+      ,('reex',d(tp='chbt'  ,tid='what' ,x=5            ,w=38   ,cap='&.*'  ,hint=_('Regular expression')   ,on=m.do_attr   ))  # &.
+      ,('case',d(tp='chbt'  ,tid='what' ,x=5+ 38        ,w=38   ,cap='&aA'  ,hint=_('Case sensitive')       ,on=m.do_attr   ))  # &a
+      ,('word',d(tp='chbt'  ,tid='what' ,x=5+ 76        ,w=38   ,cap='"&w"' ,hint=_('Whole words')          ,on=m.do_attr   ))  # &w
+      ,('whti',d(tp='edit'  ,tid='what' ,x=5+114+5      ,w=wtwd                                             ,on=m.do_find   ))  # 
+#     ,('whti',d(tp='edit'  ,tid='what' ,x=5+114+5      ,w=105                                              ,on=m.do_find   ))  # 
+      ,('what',d(tp='cmbx'  ,y  =5      ,x=5+114+10+wtwd,w=wtwd ,items=FiL.opts['hist']                                     ,_a=''   if dock else 'r>'   ))  # 
+#     ,('what',d(tp='cmbx'  ,y  =5      ,x=5+114+115    ,w=wtwd ,items=FiL.opts['hist']                                     ,_a=''   if dock else 'r>'   ))  # 
+      ,('menu',d(tp='bttn'  ,tid='what' ,x=menx         ,w=38   ,cap='&='               ,on_menu=m.do_menu  ,on=m.do_menu   ,a=''   if dock else '>>'   ))  # &=
+      ,('mess',d(tp='labl'  ,tid='what' ,x=menx+39+5    ,w=mswd ,cap=msg                                                    ,a='r>' if dock else ''     ))  # 
                     ][1:]
         ,   fid     =FiL.opts['pfid']
 #       ,   fid     ='what'
@@ -175,6 +171,15 @@ class FiL:
                 ,modal=not (FiL.opts['nmdl'] or FiL.opts['dock'])
                 )
        #def show
+
+
+    def on_resize(self, ag, key, data=''):
+        xi, xm  = ag.cattr('whti', 'x'), ag.cattr('menu', 'x')
+        w2      = (xm - xi - 10) // 2
+        FiL.opts['dock_ww'] = w2
+        return d(ctrls=d(whti=d(x=xi     , w=w2),
+                         what=d(x=xi+w2+5, r=xm-5)))
+       #def on_resize
 
 
     def do_find(self, ag, aid, data=''):
@@ -320,9 +325,10 @@ class FiL:
     ),d(             cap='-'
     ),d(             cap=_('=== Options ===')                                           ,en=False
     ),d(tag='usel'  ,cap=_('Use &selection from document')          ,ch=FiL.opts['usel']
-    ),d(tag='nmdl'  ,cap=_('Do not hide on &ESC (close dialog)')    ,ch=FiL.opts['nmdl'],en=FiL.opts['dock']==''
     ),d(tag='insm'  ,cap=insm_c
     ),d(             cap='-'
+    ),d(tag='nmdl'  ,cap=_('Work in non-modal mod&e (close dialog)'),ch=FiL.opts['nmdl'],en=FiL.opts['dock']==''
+#   ),d(tag='nmdl'  ,cap=_('Do not hide on &ESC (close dialog)')    ,ch=FiL.opts['nmdl'],en=FiL.opts['dock']==''
     ),d(tag='dckt.' ,cap=_('Dock to window &top (close dialog)')    ,ch=FiL.opts['dock']=='t'
     ),d(tag='dckb.' ,cap=_('Dock to window &bottom (close dialog)') ,ch=FiL.opts['dock']=='b'
                     )][1:]

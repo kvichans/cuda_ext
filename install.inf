@@ -121,13 +121,13 @@ method=add_indented_line_above
 [item32]
 section=commands
 caption=Cuda&-Ext\&Insert\Add indented line &below
-hotkey=Ctrl+Enter
-method=indent_and_surround_curl_brackets
+hotkey=
+method=add_indented_line_below
 
 [item33]
 section=commands
 caption=Cuda&-Ext\&Insert\Add indent and surround selection with { }
-hotkey=Ctrl+Enter
+hotkey=
 method=indent_and_surround_curl_brackets
 
 [item34]
