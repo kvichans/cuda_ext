@@ -1,8 +1,9 @@
-﻿''' Plugin for CudaText editor
+''' Plugin for CudaText editor
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
+    Alexey Torgashin (CudaText)
 Version:
-    '1.7.15 2020-06-03'
+    '1.7.16 2020-06-08'
 ToDo: (see end of file)
 '''
 
@@ -800,8 +801,21 @@ def join_lines():
     (rSelB, cSelB), \
     (rSelE, cSelE)  = apx.minmax((rCrt, cCrt), (rEnd, cEnd))
     rSelE           = rSelE - (1 if 0==cSelE else 0)
+
+    #no selection? do like Sublime: join with next line
     if rEnd==-1 or rEnd==rCrt or rSelB==rSelE:
-        return app.msg_status(_("{} works with multiline selection").format(_('Command')))
+        y = rCrt
+        if y >= ed.get_line_count()-1: return #last line
+        s1 = ed.get_text_line(y)
+        x = len(s1)
+        s2 = ed.get_text_line(y+1)
+        if s2: #add space only for non-blank line
+            s1 += ' '+s2
+            x += 1
+        ed.replace_lines(y, y+1, [s1])
+        ed.set_caret(x, y)
+        return    
+        
     first_ln= ed.get_text_line(rSelB)
     last_ln = ed.get_text_line(rSelE)
     lines   = [first_ln.rstrip()] \

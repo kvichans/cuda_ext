@@ -893,7 +893,7 @@ method=_
 
 [item316]
 section=commands
-caption=Cuda&-Ext\&Align\Join selected lines
+caption=Cuda&-Ext\&Align\Join lines
 hotkey=
 method=join_lines
 

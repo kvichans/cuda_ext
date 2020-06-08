@@ -1,3 +1,7 @@
+1.7.16 (2020-06-08)
+fixed: renamed "Join selected lines" to "Join lines"
+added: "Join lines" works now even without selection, joins next line to current one
+
 1.7.15 (2020-06-03)
 added: "Find in Lines" Resize both input control on form resizing
 fixed: "Find in Lines" menu command name - "Work in non-modal mode"
