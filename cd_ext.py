@@ -1305,7 +1305,7 @@ class Insert_cmds:
     def paste_trimmed():
         clip = app.app_proc(app.PROC_GET_CLIP, '')
         if not clip.strip():
-            return msg_status(_('Clipboard has no text'))
+            return app.msg_status(_('Clipboard has no text'))
         clip = '\n'.join(l.strip() for l in clip.splitlines())
         
         crts = ed.get_carets()
@@ -1332,7 +1332,7 @@ class Insert_cmds:
     
         x1, y1, x2, y2 = crts[0]
         if y2<0:
-            return msg_status('Need selection')
+            return app.msg_status('Need selection')
         
         if (y1, x1)>(y2, x2):
             x1, y1, x2, y2 = x2, y2, x1, y1
