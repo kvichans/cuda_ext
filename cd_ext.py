@@ -1,9 +1,9 @@
-﻿''' Plugin for CudaText editor
+''' Plugin for CudaText editor
 Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.11 2019-09-09'
+    '1.7.12 2020-06-08'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata
@@ -1390,28 +1390,27 @@ class Insert_cmds:
 
     @staticmethod
     def insert_char_by_hex():
-        hexcode = app.dlg_input('Unicode hex code:     0xhhhh  or  hhhh  or  hh', '')
+        hexcode = app.dlg_input(_('Character hex code, optional 0x prefix:'), '')
         if not hexcode:
             return
-        if not (len(hexcode) in (2, 4, 6) and
-                re.search(r'(0x)?[\dabcdef]+', hexcode)
-               ):
-            app.msg_status('Not valid hex code: ' + hexcode)
+        if not re.search(r'(0x)?[\da-f]{1,4}', hexcode):
+            app.msg_status(_('Not valid hex code: ') + hexcode)
             return
 
         hexcode = hexcode.upper()
         hexcode = hexcode[2:]   if hexcode.startswith('0X') else hexcode
-        hexcode = '00'+hexcode  if len(hexcode)==2          else hexcode
+        while len(hexcode)<4:
+            hexcode = '0'+hexcode #to show nice status
 
         try:
             text = chr(int(hexcode, 16))
         except:
-            app.msg_status('Not valid hex code: ' + hexcode)
+            app.msg_status(_('Not valid hex code: ') + hexcode)
             return
 
         #this supports multi-carets on insert
         ed.cmd(cmds.cCommand_TextInsert, text)
-        app.msg_status('Char inserted: U+' + hexcode)
+        app.msg_status(_('Character inserted: U+') + hexcode)
        #def insert_char_by_hex
     
    #class Insert_cmds
