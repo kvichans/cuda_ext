@@ -328,10 +328,9 @@ class FiL:
     ),d(tag='usel'  ,cap=_('Use &selection from document')          ,ch=FiL.opts['usel']
     ),d(tag='insm'  ,cap=insm_c
     ),d(             cap='-'
-    ),d(tag='nmdl'  ,cap=_('Work in non-modal mod&e (close dialog)'),ch=FiL.opts['nmdl'],en=FiL.opts['dock']==''
-#   ),d(tag='nmdl'  ,cap=_('Do not hide on &ESC (close dialog)')    ,ch=FiL.opts['nmdl'],en=FiL.opts['dock']==''
-    ),d(tag='dckt.' ,cap=_('Dock to window &top (close dialog)')    ,ch=FiL.opts['dock']=='t'
-    ),d(tag='dckb.' ,cap=_('Dock to window &bottom (close dialog)') ,ch=FiL.opts['dock']=='b'
+    ),d(tag='nmdl.' ,cap=_('Work in non-modal mod&e (close dialog)'),ch=FiL.opts['nmdl'],en=FiL.opts['dock']==''    # '.' to hide
+    ),d(tag='dckt.' ,cap=_('Dock to window &top (close dialog)')    ,ch=FiL.opts['dock']=='t'                       # '.' to hide
+    ),d(tag='dckb.' ,cap=_('Dock to window &bottom (close dialog)') ,ch=FiL.opts['dock']=='b'                       # '.' to hide
                     )][1:]
         ,   aid
         ,   cmd4all=wnen_menu                               # Set cmd=wnen_menu for all nodes
@@ -945,12 +944,12 @@ def rewrap_sel_by_margin():
     lex     = ed.get_prop(app.PROP_LEXER_FILE, '')
     cmt_sgn = app.lexer_proc(app.LEXER_GET_PROP, lex)['c_line']     if lex else ''
 
-    ag  = DlgAg(form=d(cap=_('Re-wrap lines'), w=5+165+5, h=5+120+5)
+    ag  = DlgAg(form=d(cap=_('Re-wrap lines')       ,w=5+165+5, h=5+120+5)
                ,ctrls=[0
-        ,('mar_',d(tp='labl',tid='marg' ,x=5        ,w=120  ,cap=_('&Margin:')      )) # &m
-        ,('marg',d(tp='edit',y=5        ,x=5+120    ,w=45                           )) # 
-        ,('csg_',d(tp='labl',tid='csgn' ,x=5        ,w=120  ,cap=_('&Comment sign:'))) # &c
-        ,('csgn',d(tp='edit',y=5+30     ,x=5+120    ,w=45                           ))
+        ,('mar_',d(tp='labl',tid='marg' ,x=5        ,w=110  ,cap=_('&Margin:')      )) # &m
+        ,('marg',d(tp='edit',y=5        ,x=5+105    ,w=60                           )) # 
+        ,('csg_',d(tp='labl',tid='csgn' ,x=5        ,w=110  ,cap=_('&Comment sign:'))) # &c
+        ,('csgn',d(tp='edit',y=5+30     ,x=5+105    ,w=60                           ))
         ,('svbl',d(tp='chck',y=5+60     ,x=5        ,w=165  ,cap=_('&Keep indent')  )) # &s
         ,('okok',d(tp='bttn',y=5+120-28 ,x=5        ,w=80   ,cap=_('OK'), def_bt='1',on=CB_HIDE)) #
         ,('cncl',d(tp='bttn',y=5+120-28 ,x=5+80+5   ,w=80   ,cap=_('Cancel')        ,on=CB_HIDE))
