@@ -761,6 +761,9 @@ def align_sel_by_margin(how):
     if not apx.get_opt('tab_spaces', False):
         return app.msg_status(_('Fail to use Tab to align'))
     mrgn    = apx.get_opt('margin', 0)
+    mrgn    = app.dlg_input(_('Use the margin to aling'), str(mrgn))
+    if not mrgn or 0==int(mrgn): return 
+    mrgn    = int(mrgn)
     pass;                      #log__('mrgn={}',(mrgn)  ,__=(log4fun,_log4mod))
     def align_line(line):
         strpd   = line.strip()
