@@ -50,43 +50,43 @@ caption=Cuda&-Ext\&Find/Replace\-
 hotkey=
 method=_
 
-[item15]
+[item16]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\&Copy word or [string] or 'string' (no selection)
 hotkey=
 method=copy_term
 
-[item16]
+[item17]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\&Replace word or [string] or 'string' with clipbrd (no selection)
 hotkey=
 method=replace_term
 
-[item17]
+[item18]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\E&xpand selection to word or "string" or (string)
 hotkey=Alt+'
 method=expand_sel
 
-[item18]
+[item19]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\Expand and Cop&y selection to word or "string" or (string)
 hotkey=Shift+Alt+'
 method=expand_sel_copy
 
-[item19]
+[item20]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\-
 hotkey=
 method=_
 
-[item20]
+[item21]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\Remove all ASCII chars 0..31 (excluding 9,10,13)
 hotkey=
 method=remove_unprinted
 
-[item21]
+[item22]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\Strip HTML tags
 hotkey=
@@ -923,13 +923,13 @@ method=rewrap_cmt_at_caret
 
 [item321]
 section=commands
-caption=Cuda&-Ext\&Align\Align in lines to center by margin
+caption=Cuda&-Ext\&Align\Align in lines to center by margin...
 hotkey=
 method=align_sel_to_center_by_margin
 
 [item322]
 section=commands
-caption=Cuda&-Ext\&Align\Align in lines to right by margin
+caption=Cuda&-Ext\&Align\Align in lines to right by margin...
 hotkey=
 method=align_sel_to_right_by_margin
 

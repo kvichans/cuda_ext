@@ -26,8 +26,12 @@ except:
 pass;                           import cudatext_keys
 pass;                           _log4mod = LOG_FREE  # Order log in the module
 
-d       = dict
+#d       = dict
+d       = dcta      # To use keys as attrs: o=dcta(a=b); x=o.a; o.a=x
 C1      = chr(1)
+
+
+
 
 class FiL:
     FORM_C  =   _('Find in Lines')
@@ -85,7 +89,7 @@ class FiL:
         
 
     def show(self):
-        M,m     = self.__class__,self
+        M,m     = type(self),self
         pass;                   log4fun=0                       # Order log in the function
 
         FiL.ed_crts = ed.get_carets()                           # Carets at start/activate

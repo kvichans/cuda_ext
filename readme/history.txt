@@ -1,6 +1,9 @@
-1.7.16 (2020-06-08)
-fixed: renamed "Join selected lines" to "Join lines"
+1.7.17 (2020-06-16)
+added: ask user about margin for commands "Align in lines to center/right by margin"
 added: "Join lines" works now even without selection, joins next line to current one
+fixed: renamed "Join selected lines" to "Join lines"
+fixed: set dialog "Re-wrap lines" wider
+fixed: msg_status error
 
 1.7.15 (2020-06-03)
 added: "Find in Lines" Resize both input control on form resizing
