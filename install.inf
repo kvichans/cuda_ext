@@ -17,7 +17,7 @@ events=on_console_nav
 ; Find_repl_cmds
 [item9]
 section=commands
-caption=Cuda&-Ext\&Find/Replace\Find "in lines"...
+caption=Cuda&-Ext\&Find/Replace\Find in &Lines...
 hotkey=Shift+Ctrl+F
 method=dlg_find_in_lines
 
@@ -45,6 +45,12 @@ hotkey=Shift+Ctrl+A
 method=replace_all_sel_to_cb
 
 [item14]
+section=commands
+caption=Cuda&-Ext\&Find/Replace\Replace &all in Lines...
+hotkey=
+method=dlg_replace_in_lines
+
+[item15]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\-
 hotkey=
@@ -100,11 +106,17 @@ method=_
 
 [item26]
 section=commands
+caption=Cuda&-Ext\&Find/Replace\Add carets aligned as column...
+hotkey=
+method=add_carets_for_rect
+
+[item27]
+section=commands
 caption=Cuda&-Ext\&Find/Replace\Convert multi-line selection to column selection
 hotkey=
 method=convert_sel_to_column
 
-[item27]
+[item28]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\Reverse selection text, by lines
 hotkey=

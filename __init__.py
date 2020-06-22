@@ -48,9 +48,11 @@ class Command:
     
     # Find_repl_cmds
     def dlg_find_in_lines(self):                return cd_ext_find_repl.dlg_find_in_lines()
+    def dlg_replace_in_lines(self):             return cd_ext_find_repl.dlg_replace_in_lines()
     def find_cb_string_next(self):              return cd_ext_find_repl.find_cb_by_cmd('dn')
     def find_cb_string_prev(self):              return cd_ext_find_repl.find_cb_by_cmd('up')
     def replace_all_sel_to_cb(self):            return cd_ext_find_repl.replace_all_sel_to_cb()
+    def add_carets_for_rect(self):              return cd_ext_find_repl.add_carets_for_rect()
     def convert_sel_to_column(self):            return cd_ext_find_repl.convert_sel_to_column()
     def convert_reverse_selection(self):        return cd_ext_find_repl.convert_reverse_selection()
 

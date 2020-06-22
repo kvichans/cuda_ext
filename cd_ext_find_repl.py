@@ -1,9 +1,9 @@
-''' Plugin for CudaText editor
+﻿''' Plugin for CudaText editor
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
 Version:
-    '1.7.16 2020-06-08'
+    '1.7.19 2020-06-22'
 ToDo: (see end of file)
 '''
 
@@ -29,7 +29,673 @@ pass;                           _log4mod = LOG_FREE  # Order log in the module
 #d       = dict
 d       = dcta      # To use keys as attrs: o=dcta(a=b); x=o.a; o.a=x
 C1      = chr(1)
+def flatten(xs):
+    for x in xs:
+        if isinstance(x, (tuple, list)):
+            for xx in flatten(x):   yield xx
+        else:                       yield x
+msg_box     = lambda     tx, bts_ico=app.MB_OK: app.msg_box(       tx, bts_ico)
+msg_box_ex  = lambda cp, tx, bts=['OK'] :       app.msg_box_ex(cp, tx, bts, app.MB_ICONINFO)
 
+
+class RiL:
+    HIST_KEY= 'find.replace_in_lines'
+
+    FORM_CB = _('Replace all in Lines')                         # RaiL
+    FORM_C  = FORM_CB+' '+_('(Enter on upper input to find)')   # RaiL
+    HELP_TX = _('''
+• [Shift+]Enter into "Find" to search [previous] next fragment.
+• Ctlr+Down/Up to copy pattern down/upper.
+• Command "Restore initial selection" (Shift+Esc) tries to restore only first of initial carets.
+• RegExp as in the Find/Replace application dialogs. Names of found groups are $1, $2...
+    ''').strip()
+    REEX_H  = _('Regular expression'
+                '\rSyntax as app Find')
+    CASE_H  = _('Case sensitive')
+    WORD_H  = _('Whole words')
+    SETS_H  = _('Kit of pairs to replace'
+                '\rAlt+Left/Right - load previous/next pair'
+                '\rAlt+Shift+Left/Right - activate previous/next kit')
+    WHAT_H  = _('Pattern to search'
+                '\rEnter - to find next'
+                '\rShift+Enter - to find previous')
+    REPL_H  = _('Pattern to replace'
+                '\rRegExp found groups are $1, $2, ...')
+#   REPL_H  = _('Pattern to replace\rEnter - to replace next')
+    RPLA_H  = _('Replace all')
+    RPLS_H  = _('Replace all for all pairs from the active kit')
+    DEF_SET = _('<def>')
+
+    CL_WARN = apx.html_color_to_int('#A00000')
+    CL_INFO = apx.html_color_to_int('#808080')
+    _stus   = ''
+    @staticmethod
+    def msg_d(s,t='i',a=0):
+        RiL._stus = RiL._stus+s if a else s
+        return                                     d(cap=RiL._stus, font_color=RiL.CL_INFO if t=='i' else RiL.CL_WARN)
+#   msg_d   = lambda   s,t='i',a=0:                d(cap=s, font_color=RiL.CL_INFO if t=='i' else RiL.CL_WARN)
+    msg_s   = lambda   s,t='i',a=0:         d(stus=RiL.msg_d(s,t,a))
+    msg     = lambda   s,t='i',a=0: d(ctrls=RiL.msg_s(s,t,a)       )
+    msg_f   = lambda f,s,t='i',a=0: d(ctrls=RiL.msg_s(s,t,a), fid=f)
+
+    st2item = lambda n, st: f('&{}: {} (#{})', n+1, st.nm, len(st.ps))
+    st_pr_rc= lambda    pr: ( ('r' if pr.re else '')
+                            + ('c' if pr.cs else '')
+                            + ('w' if pr.wd else '') )
+    st_pr_cw= lambda    pr: ( ('[' if pr.re or pr.cs or pr.wd else '')
+                            + ('.' if pr.re else '')
+                            + ('c' if pr.cs else '')
+                            + ('w' if pr.wd else '')
+                            + ('] '  if pr.re or pr.cs or pr.wd else '') )
+    st_pr   = lambda    pr: f('{}"{}" -> "{}"'
+                            , RiL.st_pr_cw(pr)
+                            , pr.f, pr.r)
+    st_pr_n = lambda n, pr: f('{}: {}', n+1, RiL.st_pr(pr))
+    st_pr_mn= lambda n, pr: re.sub(r'^(\d*)(\d: )', r'\1&\2', RiL.st_pr_n(n, pr))
+    sets_items  = lambda sts: [RiL.st2item(n,st).replace('&', '') for n,st in enumerate(sts)]
+
+
+    def on_exit(self, ag):
+        M,m         = type(self),self
+        m.opts.pfid = ag.focused()
+        pass;                  #log("m.opts={}",(m.opts))
+        set_hist(M.HIST_KEY, deep_upd((m.opts, ag.vals(['reex','case','word','what','repl']), {'aset':ag.val('sets')})))
+       #def on_exit
+
+
+    def show(self):
+        M,m         = type(self),self
+        pass;                   log4fun=0                       # Order log in the function
+
+        m.ed_crts   = ed.get_carets()                           # Carets at start/activate
+        m.opts      = d(reex=False,case=False,word=False
+                    ,   what=''                                 # Last value  in "what"
+                    ,   whtl=[]                                 # List values in "what"
+                    ,   repl=''                                 # Last value  in "repl" 
+                    ,   rpll=[]                                 # List values in "repl"
+                    ,   sets=[d(nm=M.DEF_SET,ps=[])]            # ps=[d(f='a', r='b', re=False, cs=False, wd=False)]
+                    ,   aset=0                                  # Last active in "sets"
+                    ,   usel=False                              # Use ed sel
+                    ,   fitn=False                              # Autofit Replace pattern
+                    ,   anxt=False                              # Autoload next pair atfer ReplAll
+                    ,   pfid='what')                            # Last fid
+        m.opts.update(get_hist(M.HIST_KEY, m.opts, object_pairs_hook=dcta))
+        pass;                   log("m.opts={}",(m.opts)) if log4fun else 0
+
+        edsel       = ed.get_text_sel()
+        if m.opts.usel and edsel:
+            m.opts.what = edsel
+            if '\r' in m.opts.what or '\n' in m.opts.what:
+                m.opts.what = ''
+            elif m.opts.fitn:
+                repl    = m.work('offer_repl', m.opts.what)
+                pass;          #log("repl={}",(repl))
+                if repl:
+                    m.opts.repl = repl
+        
+        bttn_h  = get_gui_height('bttn')
+        
+        sits    = M.sets_items(m.opts.sets)
+        ctrls   = d(
+            reex=d(tp='chbt',tid='menu' ,x=80+38*0  ,w=38   ,cap='&.*'          ,hint=M.REEX_H          # Alt+.
+          ),case=d(tp='chbt',tid='menu' ,x=80+38*1  ,w=38   ,cap='&cC'          ,hint=M.CASE_H          # Alt+C
+          ),word=d(tp='chbt',tid='menu' ,x=80+38*2  ,w=38   ,cap='"&w"'         ,hint=M.WORD_H          # Alt+W
+          ),stu_=d(tp='bvel',y  = 5     ,x=80+38*3+5,r=-52+4,h=bttn_h           ,props='1'      ,a='r>'
+          ),stus=d(tp='labl',tid='menu' ,x=80+38*3+9,r=-52  ,cap=''                             ,a='r>'     
+          ),menu=d(tp='bttn',y  = 5     ,x=-5-38    ,w=38   ,cap='&='                           ,a='>>' # Alt+=
+          ),wha_=d(tp='labl',tid='what' ,x= 5       ,w=80-10,cap='>*'+_('&Find'),hint=M.WHAT_H          # Alt+F
+          ),what=d(tp='cmbx',y  =35     ,x=80       ,r=-48  ,items=m.opts.whtl                  ,a='r>' # 
+          ),rep_=d(tp='labl',tid='repl' ,x= 5       ,w=80-10,cap='>'+_('&Replace'),hint=M.REPL_H        # Alt+R
+          ),repl=d(tp='cmbx',y  =65     ,x=80       ,r=-48  ,items=m.opts.rpll                  ,a='r>' # 
+          ),rpla=d(tp='bttn',tid='repl' ,x=-5-38    ,w=38   ,cap=_('&All')      ,hint=M.RPLA_H  ,a='>>' # Alt+A
+          ),set_=d(tp='labl',tid='sets' ,x= 5       ,w=80-10,cap='>'+_('&Kits') ,hint=M.SETS_H          # Alt+K
+          ),sets=d(tp='cmbr',y  =95     ,x=80       ,r=-48  ,items=sits                         ,a='r>' # 
+          ),rpls=d(tp='bttn',tid='sets' ,x=-5-38    ,w=38   ,cap=_('A&LL')      ,hint=M.RPLS_H  ,a='>>' # Alt+L
+                    ))
+        ctrls.menu.on_menu  = m.do_menu
+        ctrls.menu.on       = m.do_menu
+        for ctrl in ctrls.values():
+            if  ctrl.tp not in ('cmbx', 'cmbr'):             # Tab stops only in these
+                ctrl.sto    = False
+            if  ctrl.tp in ('chbt', 'bttn', 'cmbr') and 'on' not in ctrl:
+                ctrl.on     = m.do_acts
+
+        ag      = DlgAg(
+            form    =d(cap=M.FORM_C, w=500, h=125, h_max=125      # Only horz resize
+                      ,on_key_down=m.do_keys
+                      ,frame='resize')
+        ,   ctrls   =ctrls
+        ,   fid     =m.opts.pfid
+        ,   vals    =d(**{k:m.opts[k] for k in ('reex','case','word')}
+                        , what=m.opts.what
+                        , repl=m.opts.repl
+                        , sets=m.opts.aset)
+        ,   opts    =d(negative_coords_reflect=True)
+        )
+        pass;                  #ag.gen_repro_code('repro_dlg_ril.py')
+
+        ag.show(on_exit=self.on_exit)
+       #def show
+
+
+    def do_menu(self, ag, aid, data=''):
+        M,m         = type(self),self
+        pass;                  #return []
+        sets    = m.opts.sets
+        cset    = sets[m.opts.aset]
+
+        nm_sets=[
+      d(                 cap=M.st2item(n, st)                   ,key=(f'Ctrl+{n+1}'       if n<9 else '')   ,sub=[(
+    ),d(tag=f'stAC{n}'  ,cap=f(_('Set kit "{}" active'),st.nm)  ,key=(f'Ctrl+{n+1}'       if n<9 else '')
+    ),d(tag=f'stRA{n}'  ,cap=M.RPLS_H+'...'                     ,key=(f'Ctrl+Shift+{n+1}' if n<9 else '')
+    ),d(             cap='-'
+    )][1:]+[
+      d(tag=f'stLP{n}_{np}'
+                        ,cap=M.st_pr_mn(np, pr))                                for np,pr in enumerate(st.ps)]
+      ) for n,st in enumerate(sets)
+                ]+[(
+    ),d(                 cap='-'
+    ),d(tag='stse'      ,cap=_('Edit kits...')                      ,keys='Ctrl+K'
+    ),d(                 cap=_('Rem&ove kit')           ,en=bool(sets)  ,sub=[
+      d(tag=f'stRM{n}',cap=M.st2item(n, st))                                    for n,st in enumerate(sets)]
+    ),d(tag='stsw'      ,cap=_('&Change kits order...') ,en=len(sets)>1
+    )][1:]
+        rpls_c  = f(_('Replace A&LL for all pairs (#{}) of kit...'), len(cset.ps))
+        ag.show_menu([(
+    ),d(tag='rpla'  ,cap=_('Replace &all')                          ,key='Alt+A'
+    ),d(tag='rpls'  ,cap=rpls_c                                     ,key='Alt+L'
+    ),d(             cap='-'
+    ),d(tag='stnw'  ,cap=_('Create &new kit...')                    ,key='Ctrl+N'
+    ),d(tag='prsv'  ,cap=_('&Save pattern pair to kit')             ,key='Ctrl+S'
+    ),d(tag='sted'  ,cap=_('&Edit kit...')                          ,key='Ctrl+E'
+    ),d(             cap=_('&Kits')                                     ,sub=nm_sets
+    ),d(             cap='-'
+    ),d(tag='prpr'  ,cap=_('Load previous kit pair')                ,key='Ctrl+Left'    ,en=len(cset.ps)>0
+    ),d(tag='prnx'  ,cap=_('Load next kit pair')                    ,key='Ctrl+Right'   ,en=len(cset.ps)>0
+    ),d(tag='stpr'  ,cap=_('Load previous kit')                     ,key='Ctrl+Shift+Left'
+    ),d(tag='stnx'  ,cap=_('Load next kit')                         ,key='Ctrl+Shift+Right'
+    ),d(             cap='-'
+    ),d(tag='hide'  ,cap=_('Hide dialog')                           ,key='Esc'
+    ),d(tag='rest'  ,cap=_('Hide dialog and restore selection &=')  ,key='Shift+Esc'
+    ),d(tag='help'  ,cap=_('&Help...')                              
+    ),d(             cap='-'
+    ),d(tag='fndp'  ,cap=_('Find &previous')                        ,key='Shift+Enter'
+    ),d(tag='fndn'  ,cap=_('F&ind next')                            ,key='Enter'
+#   ),d(tag='rprv'  ,cap=_('Replace previous')
+#   ),d(tag='rnxt'  ,cap=_('Replace next')     
+    ),d(             cap='-'
+    ),d(tag='cpdn'  ,cap=_('Copy down: Find to Replace')            ,key='Ctrl+Down'
+    ),d(tag='cpup'  ,cap=_('Copy up: Replace to Find')              ,key='Ctrl+Up'
+    ),d(             cap='-'
+    ),d(tag='fapp'  ,cap=_('Move to app Find dialog')               ,key='Ctrl+F'
+    ),d(tag='rapp'  ,cap=_('Move to app Replace dialog')            ,key='Ctrl+R'
+    ),d(             cap='-'
+    ),d(             cap=_('=== Options ===')                                           ,en=False
+    ),d(tag='usel'  ,cap=_('Use &selection from document')          ,ch=m.opts.usel
+    ),d(tag='fitn'  ,cap=_('Autofit Replace pattern on start and on Next pair')    ,ch=m.opts.fitn
+    ),d(tag='anxt'  ,cap=_('Load next pair after "Replace all"')    ,ch=m.opts.anxt
+                    )][1:]
+        ,   aid
+        ,   cmd4all=m.do_acts
+        )
+        return d(fid='what')
+       #def do_menu
+
+
+    def do_keys(self, ag, key, data=''):
+        pass;                   log4fun=-1
+        M,m     = type(self),self
+        scam    = data if data else ag.scam()
+        fid     = ag.focused()
+        ckey1   = str(int(chr(key))-1) if ord('1')<=key<=ord('9') else ''
+        skey    = (scam,key)
+        skef    = (scam,key,fid)
+        pass;              #log("scam,key={}",(scam,get_const_name(key, module=cudatext_keys)))
+        into    = lambda sk, scam, bgn, end: (scam, ord(bgn) if str==type(bgn) else bgn)<=sk<=(scam, ord(end) if str==type(end) else end)
+        upd     = {}
+        if 0:pass           #NOTE: do_keys
+        elif skey==    ( 's',VK_ESCAPE):        upd=m.do_acts(ag, 'rest')       # Shift+Esc
+        elif skey==    ( 'c',ord('F')):         upd=m.do_acts(ag, 'fapp')       # Ctrl+F
+        elif skey==    ( 'c',ord('R')):         upd=m.do_acts(ag, 'rapp')       # Ctrl+R
+        elif skey==    ( 'c',ord('S')):         upd=m.do_acts(ag, 'prsv')       # Ctrl+S
+        elif skey==    ( 'c',ord('Ы')):         upd=m.do_acts(ag, 'prsv')       # Ctrl+Ы (ru)
+        elif skey==    ( 'c',ord('E')):         upd=m.do_acts(ag, 'sted')       # Ctrl+E
+        elif skey==    ( 'c',ord('У')):         upd=m.do_acts(ag, 'sted')       # Ctrl+У (ru)
+        elif skey==    ( 'c',ord('K')):         upd=m.do_acts(ag, 'stse')       # Ctrl+K
+        elif skey==    ( 'c',ord('N')):         upd=m.do_acts(ag, 'stnw')       # Ctrl+N
+        elif skey==    ( 'c',ord('Т')):         upd=m.do_acts(ag, 'stnw')       # Ctrl+Т (ru)
+
+        elif into(skey,  'c', '1','9'):         upd=m.do_acts(ag, 'stAC'+ckey1) # Ctrl+1..9
+        elif into(skey, 'sc', '1','9'):         upd=m.do_acts(ag, 'stRA'+ckey1) # Ctrl+Shift+1..9
+
+        elif skey==    ( 'c',VK_UP):            upd=m.do_acts(ag, 'cpup')       # Ctrl+Up
+        elif skey==    ( 'c',VK_DOWN):          upd=m.do_acts(ag, 'cpdn')       # Ctrl+Dn
+        elif skey==    ( 'c',VK_RIGHT):         upd=m.do_acts(ag, 'prnx')       # Ctrl+RT
+        elif skey==    ( 'c',VK_LEFT):          upd=m.do_acts(ag, 'prpr')       # Ctrl+LF
+        elif skey==    ('sc',VK_RIGHT):         upd=m.do_acts(ag, 'stnx')       # Shift+Ctrl+RT
+        elif skey==    ('sc',VK_LEFT):          upd=m.do_acts(ag, 'stpr')       # Shift+Ctrl+LF
+
+        elif skef==    (  '',VK_ENTER,'what'):  upd=m.do_acts(ag, 'fndn')       # Enter         on what
+        elif skef==    ( 's',VK_ENTER,'what'):  upd=m.do_acts(ag, 'fndp')       # Shift+Enter   on what
+#       elif skef==    (  '',VK_ENTER,'repl'):  upd=m.do_acts(ag, 'rpln')       # Enter         on repl
+#       elif skef==    ( 's',VK_ENTER,'repl'):  upd=m.do_acts(ag, 'rplp')       # Shift+Enter   on repl
+
+        else:   return []
+        pass;                   log__('upd={}',(upd)            ,__=(log4fun,)) if _log4mod>=0 else 0
+        ag.update(upd)
+        pass;                   log__("break event",()          ,__=(log4fun,)) if _log4mod>=0 else 0
+        return False
+       #def do_keys
+        
+
+    def do_acts(self, ag, aid, data='', _recall=False, add_msg=False):
+        """ 
+            reex case word
+            fapp rapp 
+            rest hide help usel anxt
+            cpdn cpup
+            stRM stRN stAC stsw
+            sets stpr stnx prpr prnx sted stnw prsv
+            stRA stLP
+            rpla rpls
+        """
+        M,m     = type(self),self
+        pass;                   log4fun=0                       # Order log in the function
+        pass;                   log("aid, data={}",(aid, data)) if log4fun else 0
+
+        # Copy values from form to m.opts
+        if not _recall:
+            m.opts.update(ag.vals(['reex','case','word','what','repl']))
+            m.opts.aset = ag.val('sets')
+
+        ag.update(M.msg('')) if not add_msg else 0
+
+        if aid in ('reex','case','word'):  # Fit focus only
+            return d(fid='what')
+        
+        # Hide dlg
+        tag     = aid
+        if tag in ('fapp'
+                  ,'rapp'):
+            ag.opts['on_exit_focus_to_ed'] = None
+            app.app_proc(app.PROC_SET_FINDER_PROP, dict(
+                find_d      = ag.val('what')
+            ,   rep_d       = ag.val('repl')
+            ,   op_regex_d  = ag.val('reex')
+            ,   op_case_d   = ag.val('case')
+            ,   op_word_d   = ag.val('word')
+            ))
+            ag.hide()
+            ed.cmd(cmds.cmd_DialogFind if tag=='fapp' else cmds.cmd_DialogReplace)
+            return None
+        if tag=='rest':     return (ed.set_caret(*m.ed_crts[0])     , None)[1]
+        if tag=='hide':     return                                    None
+
+        # Help
+        if tag=='help':     return (msg_box_ex(M.FORM_CB, M.HELP_TX), [])[1]
+#       if tag=='help':     return (app.msg_box_ex(M.FORM_CB, M.HELP_TX, ['OK'], app.MB_ICONINFO), [])[1]
+        if tag in ('usel'
+                  ,'fitn'
+                  ,'anxt'): m.opts[tag] = not m.opts[tag];  return []
+        if tag=='cpdn' and \
+           ag.val('what'):  return d(ctrls=d(repl=d(val=ag.val('what'))))
+        if tag=='cpup'and \
+           ag.val('repl'):  return d(ctrls=d(what=d(val=ag.val('repl'))))
+        
+        # Change sets
+        sets    = m.opts.sets
+        st_desc = lambda st, sti: f('{}:"{}" (#{})', sti+1, st.nm if st.nm else M.DEF_SET, len(st.ps))
+        if tag[:4]=='stRM':     # Remove
+            sti = int(tag[4:])
+            st  = sets[sti]
+            if st.ps \
+            and app.ID_YES!=msg_box(f(_('Remove kit {}'), st_desc(st, sti))
+                                   , app.MB_YESNO+app.MB_ICONQUESTION):   return []
+            del sets[sti]
+            if not sets:
+                sets.append(d(nm=M.DEF_SET, ps=[]))
+            m.opts.aset = max(m.opts.aset-1, 0)
+            return d(ctrls=d(sets=d(items=M.sets_items(m.opts.sets), val=m.opts.aset)))
+        if tag=='stsw':         # Change positions
+            ostd= {st.nm:st for st in sets}
+            onms= [*ostd.keys()]
+            rt,vs   = DlgAg(
+                form    =d(cap=_('Change kits order'), h=300, w=155, frame='resize')
+            ,   ctrls   =d(
+                    me=d(tp='memo',y=  5,x= 5   ,r=-5 ,b=-35,val=onms       ,a='b.r>' ,ro_mono_brd='0,1,1'
+                  ),ok=d(tp='bttn',y=-30,x=-75  ,w= 70      ,cap=_('Save')  ,a='..--' ,on=CB_HIDE
+                ))
+            ,   opts    =d(negative_coords_reflect=True)).show()
+            if 'ok' != rt: return []
+            nnms = vs['me'][:-1]
+            pass;               log("onms={}",(onms))
+            pass;               log("nnms={}",(nnms))
+            if onms==nnms:              return []               # No changes
+            if set(onms)!=set(nnms):    return M.msg(_('Skip new order - kit names are not saved'))
+            nsets   = [ostd[nm] for nm in nnms]
+            naset   = nnms.index(sets[m.opts.aset].nm)
+            m.opts.sets = nsets
+            m.opts.aset = naset
+            return d(ctrls=d(sets=d(items=M.sets_items(m.opts.sets), val=m.opts.aset)
+                            ,stus=M.msg_d(_('Kits order changed'))))
+
+        if tag=='prsv':         # Add pair to set
+            if not m.opts.what: return M.msg_f('what', _('Set not empty Find pattern'), 'w')
+            st  = sets[m.opts.aset]
+            if [pr for pr in st.ps 
+                if  pr.re==m.opts.reex 
+                and pr.cs==m.opts.case 
+                and pr.wd==m.opts.word 
+                and pr.f ==m.opts.what 
+                and pr.r ==m.opts.repl]:  return M.msg(_('The pair is already in the kit'), a=add_msg)
+            st.ps.append(d(re=m.opts.reex, cs=m.opts.case, wd=m.opts.word, f=m.opts.what, r=m.opts.repl))
+            return d(ctrls=d(sets=d(items=M.sets_items(m.opts.sets), val=m.opts.aset)
+                            ,stus=M.msg_d(_('The pair saved'), a=add_msg)))
+        if(tag=='stnw'          # Create
+        or tag=='sted'):        # Edit name,rcw,pairs
+            mmv_list= lambda mmv: [] if ('\n'==mmv or ''==mmv) else [mmv] if str==type(mmv) else mmv[:-1]     # :-1 - memo BUG: it adds extra EOL
+            RCWS_H  = _('Type find options:\r  . - RegExp\r  c - Case sensitive\r  w - Whole word')
+            st      = d(nm='kit'+str(1+len(sets)), ps=[]) if tag=='stnw' else sets[m.opts.aset]
+            rcws    = [('.' if pr.re else '')+('c' if pr.cs else '')+('w' if pr.wd else '') 
+                            for pr in st.ps]
+            whts    = [pr.f for pr in st.ps]
+            rpls    = [pr.r for pr in st.ps]
+            def on_save(ag_,name,d_=''):
+                fs,rs   = map(mmv_list, ag_.vals(['whts', 'rpls']).values())
+                if not len(fs)==len(rs):
+                    return  M.msg_f('whts', _('Set equal count for Find/Replace patterns'), 'w')
+                if whts and rpls and '' in fs:
+                    return  M.msg_f('whts', _('Set not empty all Find patterns'), 'w')
+                if ag_.val('name') in [st_.nm for st_ in sets if st_!=st]:
+                    return                      M.msg_f('name', _('Set another name for kit'), 'w')
+                return None # Close dlg
+            fcap    = '['+M.FORM_CB+'] '+(_('New kit') if tag=='stnw' else f(_('Content of kit ({})'), 1+m.opts.aset))
+            ret,vals= DlgAg(
+                form    =d(cap=fcap
+                          ,h=260, w=700, w_max=700      # Only vert resize
+                          ,frame='resize')
+            ,   ctrls   =d(
+            rcw_=d(tp='labl',y= 5           ,x= 5       ,w= 80  ,cap=_('. c w') ,hint=RCWS_H
+          ),rcws=d(tp='memo',y=25   ,h=200  ,x= 5       ,w= 80  ,val=rcws                   ,a='b.' ,ro_mono_brd='0,1,1'
+          ),wha_=d(tp='labl',y= 5           ,x=10+80    ,w=300  ,cap=_('&Find patterns:')
+          ),whts=d(tp='memo',y=25   ,h=200  ,x=10+80    ,w=300  ,val=whts                   ,a='b.' ,ro_mono_brd='0,1,1'
+          ),rep_=d(tp='labl',y= 5           ,x=15+80+300,w=300  ,cap=('&Replace patterns:')
+          ),rpls=d(tp='memo',y=25   ,h=200  ,x=15+80+300,w=300  ,val=rpls                   ,a='b.' ,ro_mono_brd='0,1,1'
+          ),nam_=d(tp='labl',tid='okok'     ,x= 5       ,w= 80  ,cap='>'+_('&Name:')        ,a='..'    
+          ),name=d(tp='edit',tid='okok'     ,x= 10+80   ,w= 80  ,val=st.nm                  ,a='..'    
+          ),stus=d(tp='labl',tid='okok'     ,x= 20+80*2 ,r=-90  ,cap=''*100                 ,a='..'    
+          ),oko_=d(tp='bttn',y=-30          ,x=-65      ,w= 50  ,cap=_('&ы')                ,a='..' ,on=on_save ,sto=False
+          ),okok=d(tp='bttn',y=-30          ,x=-75      ,w= 70  ,cap=_('&Save')             ,a='..' ,on=on_save
+                    ))
+            ,   fid     ='name' if tag=='stnw' else 'whts'
+            ,   opts    =d(negative_coords_reflect=True)
+            ).show()
+            if ret is None: return []
+            ps,fs,rs,nm = vals.values()
+            ps,fs,rs= map(mmv_list, (ps,fs,rs))
+            ps      = ps[:-len(fs)] if len(ps)>len(fs) else ps+['']*(len(fs)-len(ps)) if len(ps)<len(fs) else ps
+            st.nm   = nm
+            st.ps   = [d(re=('.' in o), cs=('c' in o), wd=('w' in o), f=f, r=r) 
+                        for o,f,r in zip(ps, fs, rs)]
+            if tag=='stnw':
+                sets.append(st)
+                m.opts.aset = len(sets)-1
+            return d(ctrls=d(sets=d(items=M.sets_items(sets), val=m.opts.aset)))
+        if tag=='stse':         # Edit kits
+            on_help = lambda ag,name,d='':(msg_box(_(
+#           on_help = lambda ag,name,d='':(msg_box_ex(_('Edit kits help'), _(
+                  'Use 1+3k lines for each kit.'
+                '\r  First line for'
+                '\r    n:kit name.'
+                '\r  Three line for each kit pair'
+                '\r    a:attributes - "." "c" "w" - in any order,'
+                '\r    f:pattern Find,'
+                '\r    r:pattern Replace.'
+                '\r'
+                '\rFormat:'
+                '\r- The order of lines with "n:", "a:", "f:", "r:" fixed.'
+                '\r- Feel free to use empty lines and some blanks before "n:", "a:", "f:", "r:".'
+                '\r'
+                '\rRules:'
+                '\r- Empty name is correct.'
+                '\r- Names must not be repeated.'
+                '\r- Pattern Find must not be empty.'
+                )),[])[1]
+            WN,WA,WF,WR = 'n:','a:','f:','r:'
+            def on_save_new_sets(ag_, name, dt=''):
+                """ If dt=='' then do control before save.
+                    If dt!='' then build new sets
+                """
+                chk     = dt==''
+                kt_lns_n= (ag_.val('me') if chk else dt['me'])[:-1]
+                if not kt_lns_n:            return None if chk else []
+                if kt_lns_n==kt_lns_o:      return None if chk else sets
+                stsn    = []
+                wait,nms,st,pr   = [WN], set(), None, None
+                for nl,ln in enumerate(kt_lns_n):
+                    if not ln:  continue
+                    ww,ldt  = ln.lstrip()[:2], ln.lstrip()[2:]
+                    if   ww not in wait:    return M.msg_f('me', _('Error: order of lines - line ')+str(1+nl), 'w')
+                    if   False:pass
+                    elif ww==WN \
+                    and  ldt in nms:        return M.msg_f('me', _('Error: kit name repeated - ')+ldt, 'w')
+                    elif ww==WN:
+                        wait, st    = [WA],     d(nm=ldt, ps=[])
+                        nms.add(st.nm)
+                        stsn.append(st)
+                    elif ww==WA:
+                        wait, pr    = [WF],     d(re='.' in ldt, cs='c' in ldt, wd='w' in ldt, f='', r='')
+                        st.ps.append(pr)
+                    elif ww==WF \
+                    and not ldt:            return M.msg_f('me', _('Error: empty Find pattern for kit - ')+st.nm, 'w')
+                    elif ww==WF:
+                        wait, pr.f  = [WR],     ldt
+                    elif ww==WR:
+                        wait, pr.r  = [WA,WN],  ldt
+                if not pr.f:                return M.msg_f('me', _('Error: empty Find pattern for kit - ')+st.nm, 'w')
+                if wait==[WR]:              return M.msg_f('me', _('Error: no Replace pattern for kit - ')+st.nm, 'w')
+                return None if chk else stsn
+                
+            okts    = [ (WN+st.nm
+                        ,[(' '+WA+('.' if pr.re else '')+('c' if pr.cs else '')+('w' if pr.wd else '')
+                          ,' '+WF+pr.f
+                          ,' '+WR+pr.r,'') for pr in st.ps
+                         ],'')              for st in sets]
+            kt_lns_o= [*flatten(okts)]
+            rt,vs   = DlgAg(
+                form    =d(cap='['+M.FORM_CB+'] '+_('Edit kits'), h=400, w=400, frame='resize')
+            ,   ctrls   =d(
+                    me  =d(tp='memo',y=  5    ,x= 5 ,r=-5 ,b=-35,val=kt_lns_o   ,a='b.r>'   ,ro_mono_brd='0,1,1'
+                  ),stus=d(tp='labl',tid='ok' ,x= 5 ,r=-115     ,cap=''         ,a='..r>'
+                  ),ok  =d(tp='bttn',y=-30    ,r=-40,w= 70      ,cap=_('&Save') ,a='..>>'   ,on=on_save_new_sets
+                  ),hl  =d(tp='bttn',y=-30    ,r=-5 ,w= 30      ,cap=_('?')     ,a='..>>'   ,on=on_help
+                ))
+            ,   opts    =d(negative_coords_reflect=True)).show()
+            if 'ok' != rt:          return []
+            stsn    = on_save_new_sets(None, None, vs)
+            m.opts.sets = stsn if stsn else [d(nm=M.DEF_SET, ps=[])]
+            m.opts.aset = 0
+            return d(ctrls=d(sets=d(items=M.sets_items(m.opts.sets), val=m.opts.aset)))
+
+        # Use sets
+        if tag=='sets':         # Changed aset
+            return m.do_acts(ag, 'prnx', _recall=True)          # Auto-Load pair for loaded set
+        if tag=='stpr'\
+        or tag=='stnx':         # Prev/Next set
+            if 1==len(sets):    return []
+            m.opts.aset= (m.opts.aset + (1 if tag=='stnx' else -1)) % len(sets)
+            st  = sets[m.opts.aset]
+            return [m.do_acts(ag, 'prnx', _recall=True)         # Auto-Load pair for loaded set
+                   ,d(ctrls=d(sets=d(val=m.opts.aset)))]
+        if tag[:4]=='stAC':     # Activate by index
+            sti = int(tag[4:])
+            if not 0<=sti<len(sets):    return []
+            m.opts.aset = sti
+            return [m.do_acts(ag, 'prnx', _recall=True)         # Auto-Load pair for loaded set
+                   ,d(ctrls=d(sets=d(val=m.opts.aset)))]
+        
+        if tag[:4]=='stLP':     # Load set and pair
+            sti,pri = map(int, tag[4:].split('_'))
+            if not 0<=sti<len(m.opts.sets): return []
+            st  = sets[sti]
+            if not 0<=pri<len(st.ps):       return []
+            pr  = st.ps[pri]
+            m.opts.aset = sti
+            return d(ctrls=d(what=d(val=pr.f),repl=d(val=pr.r)
+                            ,reex=d(val=pr.re),case=d(val=pr.cs),word=d(val=pr.wd)
+                            ,sets=d(val=m.opts.aset)
+                            ,stus=M.msg_d(f(_('Loaded pair {}/{}'), pri+1, len(st.ps)), a=add_msg)
+                            ))
+        
+        if tag=='prpr'\
+        or tag=='prnx':         # Prev/Next pair
+            what, repl = ag.vals(['what', 'repl']).values()
+            st  = sets[m.opts.aset]
+            if 0==len(st.ps):    return []
+            pri, off = 0, 1 if tag=='prnx' else -1
+            for n,pr in enumerate(st.ps):
+                if pr.f==what:
+                    pri  = n            # If what       in pair then load repl
+                    if pr.r==repl:
+                        pri  = n+off    # If what+repl  in pair then load prev/next pair
+                        break#for n,pr
+            pri = pri % len(st.ps)
+            pr  = st.ps[pri]
+            return d(ctrls=d(what=d(val=pr.f),repl=d(val=pr.r)
+                            ,reex=d(val=pr.re),case=d(val=pr.cs),word=d(val=pr.wd)
+                            ,stus=M.msg_d(f(_('Loaded pair {}/{}'), pri+1, len(st.ps)), a=add_msg)
+                            ))
+
+        if(tag    =='rpls'      # Replace all from active kit
+        or tag[:4]=='stRA'):    # Replace all for n-kit
+            return m.work(tag, ag)
+
+        if(tag=='fndn' or tag=='fndp'
+#       or tag=='rpln' or tag=='rplp'
+        or tag=='rpla'
+        ):                      # Prev/Next find/replace, replace all
+            add_to_hist(m.opts.what, m.opts.whtl)   # Save as use
+            add_to_hist(m.opts.repl, m.opts.rpll)   # Save as use
+            return [m.work(tag, ag)
+                   ,d(ctrls=d(what=d(items=m.opts.whtl)
+                             ,repl=d(items=m.opts.rpll)))]
+        return []
+       #def do_acts
+        
+
+    def work(self, task, par=None):
+        """ offer_repl fnda_locs
+            stRA fndn fndp rpla rpls 
+        """
+        M,m         = type(self),self
+        pass;                   log4fun= 0
+        if task=='offer_repl':
+            what    = par
+            st      = m.opts.sets[m.opts.aset]
+            for pr in st.ps:
+                if pr.f.startswith(what):
+                    return pr.r
+            return None
+
+        ag  = par
+
+        if( task    =='rpls'    # Replace all from active kit
+        or  task[:4]=='stRA'):  # Replace all for n-kit
+            sti = m.opts.aset if task=='rpls' else int(task[4:])
+            if not 0<=sti<len(m.opts.sets): return []
+            st      = m.opts.sets[sti]
+            if not st.ps:    return M.msg(f(_('No pairs in kit "{}"'), st.nm))
+            
+            rpta,cntf   = [], 0
+            for np,pr in enumerate(st.ps):
+                frgs= ed.action(app.EDACTION_FIND_ALL
+                            , param1=pr.f
+                            , param2='af' + M.st_pr_rc(pr))   # a - wrap, f - from caret
+                rpta.append(f(_('{}: {} fragments={}\n   {}\n   {}'), 1+np, M.st_pr_cw(pr).ljust(5), len(frgs), pr.f, pr.r))
+                cntf+= len(frgs)
+            if not cntf:    return M.msg(f(_('No fragments to replace in kit "{}"'), st.nm))
+
+            ag_ = DlgAg(
+                form    =d(cap=f(_('Replace ALL for kit ("{}")'), st.nm), h=300, w=300, frame='resize')
+            ,   ctrls   =d(
+                    ok=d(tp='bttn',y=-30,x=-130 ,w= 60      ,cap=_('Yes')   ,a='..>>' ,on=CB_HIDE   ,def_bt=True
+                  ),ca=d(tp='bttn',y=-30,x=-65  ,w= 60      ,cap=_('No')    ,a='..>>' ,on=CB_HIDE
+                  ),me=d(tp='memo',y=  5,x= 5   ,r=-5 ,b=-35,val=rpta       ,a='b.r>' ,ro_mono_brd='1,1,0'
+                ))
+            ,   opts    =d(negative_coords_reflect=True))
+            if 'ok' != ag_.show(onetime=False)[0]: return []
+                    
+            rpta    = []
+            for np,pr in enumerate(st.ps):
+                cntr= ed.action(app.EDACTION_REPLACE_ALL
+                            , param1=pr.f
+                            , param2=pr.r
+                            , param3='af' + M.st_pr_rc(pr))   # a - wrap, f - from caret
+                rpta.append(f(_('{}: {} replaces={}\n   {}\n   {}'), 1+np, M.st_pr_cw(pr).ljust(5), cntr, pr.f, pr.r))
+            ag_.update(form =d(cap=f(_('Results for kit ("{}")'), st.nm))
+                    ,  ctrls=d(ok=d(vis=False)
+                              ,ca=d(cap=_('Close'))
+                              ,me=d(val=rpta)))
+            ag_.show()
+            return []
+
+        if not m.opts.what: return []
+        
+        fops    = 'af' \
+                + ('r' if m.opts.reex else '') \
+                + ('c' if m.opts.case else '') \
+                + ('w' if m.opts.word else '')    # a - wrap, f - from caret
+
+        if task=='fnda_locs':
+            fnda= ed.action(app.EDACTION_FIND_ALL, param1=m.opts.what, param2=fops)
+            return fnda
+        
+        fnda    = m.work('fnda_locs', par)
+
+        if not fnda and task=='rpla' and m.opts.anxt:
+            return [M.msg(_('Not found. '))
+                   ,m.do_acts(ag, 'prnx', _recall=True, add_msg=True)]
+        elif not fnda:
+            return M.msg(_('Not found'))
+        
+        fact    = None
+        pars    = None
+        if False:pass
+        elif task=='fndn' \
+        or   task=='fndp':
+            fact= app.EDACTION_FIND_ONE
+            pars= d(param1=m.opts.what
+                   ,param2=fops+('b' if task=='fndp' else ''))
+        elif task=='rpla':
+            fact= app.EDACTION_REPLACE_ALL
+            pars= d(param1=m.opts.what, param2=m.opts.repl
+                   ,param3=fops)
+
+        pass;                   log(f"fact={fact} pars={pars}") if log4fun else 0
+        rsp     = ed.action(fact, **pars)
+        pass;                   log(f"rsp={rsp}") if log4fun else 0
+        
+        if False:pass
+        elif (task=='fndn' or    task=='fndp' 
+#       or    task=='rpln' or    task=='rplp'
+        ):
+            ed.set_caret(*rsp)
+            fpos= fnda.index(rsp)
+            return M.msg(f'{fpos+1}({len(fnda)})')
+            return []
+        elif task=='rpla' and m.opts.anxt:
+            return [M.msg(f(_('Replaces made: {}. '), len(fnda)))
+                   ,m.do_acts(ag, 'prnx', _recall=True, add_msg=True)]
+        elif task=='rpla': # and not m.opts.anxt
+            return  M.msg(f(_('Replaces made: {}'), len(fnda)))
+       #def work
+
+   #class RiL
+theRiL          = RiL()                                         # Single obj
+
+def dlg_replace_in_lines():                                     #NOTE: dlg_replace_in_lines
+    theRiL.show()   # new!
+   #def dlg_replace_in_lines
 
 
 
@@ -284,7 +950,7 @@ class FiL:
     def do_menu(self, ag, aid, data=''):
         def wnen_menu(ag, tag):
             # Commands
-            if tag=='help':             return (app.msg_box(FiL.HELP_C, app.MB_OK)  , [])[1]
+            if tag=='help':             return (msg_box(FiL.HELP_C)                 , [])[1]
             if tag in ('prev','next'):  return self.do_find(ag, tag, FiL.last_awht)
             if tag=='natf':             return (self.switch_to_dlg(ag, 'find')      , None)[1]
             if tag=='natr':             return (self.switch_to_dlg(ag, 'repl')      , None)[1]
@@ -487,6 +1153,44 @@ def replace_all_sel_to_cb():
    #def replace_all_sel_to_cb
 
 
+def add_carets_for_rect():
+    c, r, c1, r1 = ed.get_carets()[0]
+    rsp, vals   = DlgAg(
+        form    =d(cap =_('Set carets aligned as column'), w=215, h=180)
+    ,   ctrls   =d(
+      lin_=d(tp='labl',tid='line'   ,x=5  ,w=120  ,cap='>'+_('At &line:')           # &L
+    ),line=d(tp='sped',y  =  5      ,x=5+120+5  ,w= 80  ,val=r+1    ,min_max_inc=f'1,{ed.get_line_count()},1'
+    ),col_=d(tp='labl',tid='colm'   ,x=5  ,w=120  ,cap='>'+_('At &column:')         # &C
+    ),colm=d(tp='sped',y  = 35      ,x=5+120+5  ,w= 80  ,val=c+1    ,min_max_inc=f'1,200,1'
+    ),heh_=d(tp='labl',tid='heht'   ,x=5  ,w=120  ,cap='>'+_('&Height in lines:')   # &H
+    ),heht=d(tp='sped',y  = 65      ,x=5+120+5  ,w= 80  ,val=2      ,min_max_inc=f'1,{ed.get_line_count()},1'
+    ),wid_=d(tp='labl',tid='widt'   ,x=5  ,w=120  ,cap='>'+_('&Width of selection:')# &W
+    ),widt=d(tp='sped',y  = 95      ,x=5+120+5  ,w= 80  ,val=0      ,min_max_inc=f'0,200,1'
+    ),apnd=d(tp='chck',y  =125      ,x=5+120+5  ,w= 80  ,val=False  ,cap=_('&Append')   # &D
+
+    ),okok=d(tp='bttn',y=-30        ,r=-5       ,w= 80  ,cap=_('OK'),def_bt='1' ,on=CB_HIDE #   
+            ))
+        ,   fid     = 'heht'
+    ,   opts    =d(negative_coords_reflect=True)
+        ).show()
+    if rsp!='okok':   return 
+    x = vals['colm'] - 1
+    y = vals['line'] - 1
+    w = vals['widt']
+    h = vals['heht']
+    clear = not vals['apnd']
+
+    if clear:
+        ed.set_caret(0, 0, 0, 0, app.CARET_DELETE_ALL)
+    for i in range(h):
+        if w:   ed.set_caret(x+w, y+i, x, y+i, app.CARET_ADD)
+        else:   ed.set_caret(x,   y+i, -1, -1, app.CARET_ADD)
+
+    ed.action(app.EDACTION_UPDATE)
+    app.msg_status(f(_('Added {} caret(s)'), h))
+   #def add_carets_for_rect
+
+
 def convert_sel_to_column():
     '''
     Convert single multi-line selection to column selection
@@ -627,10 +1331,10 @@ To specify TAB enter "t".
     def acts(ag, cid, data=''):
         vals    = ag.vals()
         if ''==vals['olds'] or vals['olds'][0] not in ' .t2345678':
-            app.msg_box(_('Fill "Old step".\n\n')+fill_h, app.MB_OK)
+            msg_box(_('Fill "Old step".\n\n')+fill_h)
             return d(fid='olds')
         if ''==vals['news'] or vals['news'][0] not in ' .t2345678':
-            app.msg_box(_('Fill "New step".\n\n')+fill_h, app.MB_OK)
+            msg_box(_('Fill "New step".\n\n')+fill_h)
             return d(fid='news')
         ag.hide(cid)
        #def acts
@@ -821,7 +1525,7 @@ def join_lines():
         ed.replace_lines(y, y+1, [s1])
         ed.set_caret(x, y)
         return    
-        
+
     first_ln= ed.get_text_line(rSelB)
     last_ln = ed.get_text_line(rSelE)
     lines   = [first_ln.rstrip()] \
@@ -969,7 +1673,7 @@ def rewrap_sel_by_margin():
     aid,vals    = ag.show()
     if aid!='okok': return 
 
-    if not vals['marg'].isdigit(): return app.msg_status('Not digit margin')
+    if not vals['marg'].isdigit(): return app.msg_status(_('Not digit margin'))
     margin  = int(vals['marg'])
     cmt_sgn =     vals['csgn']
     save_bl =     vals['svbl']
