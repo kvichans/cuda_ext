@@ -1166,7 +1166,7 @@ def add_carets_for_rect():
     ),heht=d(tp='sped',y  = 65      ,x=5+120+5  ,w= 80  ,val=2      ,min_max_inc=f'1,{ed.get_line_count()},1'
     ),wid_=d(tp='labl',tid='widt'   ,x=5  ,w=120  ,cap='>'+_('&Width of selection:')# &W
     ),widt=d(tp='sped',y  = 95      ,x=5+120+5  ,w= 80  ,val=0      ,min_max_inc=f'0,200,1'
-    ),apnd=d(tp='chck',y  =125      ,x=5+120+5  ,w= 80  ,val=False  ,cap=_('&Append')   # &D
+    ),apnd=d(tp='chck',y  =125      ,x=5  ,w= 200       ,val=False  ,cap=_('&Keep existing caret(s)')   # &K
 
     ),okok=d(tp='bttn',y=-30        ,r=-5       ,w= 80  ,cap=_('OK'),def_bt='1' ,on=CB_HIDE #   
             ))
