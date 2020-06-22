@@ -106,7 +106,7 @@ method=_
 
 [item26]
 section=commands
-caption=Cuda&-Ext\&Find/Replace\Add carets aligned as column...
+caption=Cuda&-Ext\&Find/Replace\Set carets aligned as column...
 hotkey=
 method=add_carets_for_rect
 

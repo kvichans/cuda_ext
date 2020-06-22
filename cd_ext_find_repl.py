@@ -1156,19 +1156,20 @@ def replace_all_sel_to_cb():
 def add_carets_for_rect():
     c, r, c1, r1 = ed.get_carets()[0]
     rsp, vals   = DlgAg(
-        form    =d(cap =_('Set carets aligned as column'), w=215, h=180)
+        form    =d(cap =_('Set carets aligned as column'), w=235, h=210)
     ,   ctrls   =d(
-      lin_=d(tp='labl',tid='line'   ,x=5  ,w=120  ,cap='>'+_('At &line:')           # &L
-    ),line=d(tp='sped',y  =  5      ,x=5+120+5  ,w= 80  ,val=r+1    ,min_max_inc=f'1,{ed.get_line_count()},1'
-    ),col_=d(tp='labl',tid='colm'   ,x=5  ,w=120  ,cap='>'+_('At &column:')         # &C
-    ),colm=d(tp='sped',y  = 35      ,x=5+120+5  ,w= 80  ,val=c+1    ,min_max_inc=f'1,200,1'
-    ),heh_=d(tp='labl',tid='heht'   ,x=5  ,w=120  ,cap='>'+_('&Height in lines:')   # &H
-    ),heht=d(tp='sped',y  = 65      ,x=5+120+5  ,w= 80  ,val=2      ,min_max_inc=f'1,{ed.get_line_count()},1'
-    ),wid_=d(tp='labl',tid='widt'   ,x=5  ,w=120  ,cap='>'+_('&Width of selection:')# &W
-    ),widt=d(tp='sped',y  = 95      ,x=5+120+5  ,w= 80  ,val=0      ,min_max_inc=f'0,200,1'
-    ),apnd=d(tp='chck',y  =125      ,x=5  ,w= 200       ,val=False  ,cap=_('&Keep existing caret(s)')   # &K
+      lin_=d(tp='labl',tid='line'   ,x=5  ,w=140  ,cap='>'+_('At &line:')           # &L
+    ),line=d(tp='sped',y  =  5      ,x=5+140+5  ,w= 80  ,val=r+1    ,min_max_inc=f'1,{ed.get_line_count()},1'
+    ),col_=d(tp='labl',tid='colm'   ,x=5  ,w=140  ,cap='>'+_('At &column:')         # &C
+    ),colm=d(tp='sped',y  = 40      ,x=5+140+5  ,w= 80  ,val=c+1    ,min_max_inc=f'1,200,1'
+    ),heh_=d(tp='labl',tid='heht'   ,x=5  ,w=140  ,cap='>'+_('&Height in lines:')   # &H
+    ),heht=d(tp='sped',y  = 75      ,x=5+140+5  ,w= 80  ,val=2      ,min_max_inc=f'1,{ed.get_line_count()},1'
+    ),wid_=d(tp='labl',tid='widt'   ,x=5  ,w=140  ,cap='>'+_('&Width of selection:')# &W
+    ),widt=d(tp='sped',y  =115      ,x=5+140+5  ,w= 80  ,val=0      ,min_max_inc=f'0,200,1'
+    ),apnd=d(tp='chck',y  =145      ,x=5  ,w= 200       ,val=False  ,cap=_('&Keep existing caret(s)')   # &K
 
-    ),okok=d(tp='bttn',y=-30        ,r=-5       ,w= 80  ,cap=_('OK'),def_bt='1' ,on=CB_HIDE #   
+    ),cncl=d(tp='bttn',y=-35        ,r=-5-80-5  ,w= 80  ,cap=_('Cancel')        ,on=CB_HIDE #   
+    ),okok=d(tp='bttn',y=-35        ,r=-5       ,w= 80  ,cap=_('OK'),def_bt='1' ,on=CB_HIDE #   
             ))
         ,   fid     = 'heht'
     ,   opts    =d(negative_coords_reflect=True)
