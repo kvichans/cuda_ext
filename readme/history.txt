@@ -1,5 +1,8 @@
+1.7.20 (2020-06-29)
+fixed: used new API to improve commands "Show in hex viewer", "Show in text editor", so they now don't close+open file tab
+
 1.7.19 (2020-06-22)
-added: "Add carets aligned as column..."
+added: "Set carets aligned as column..."
 
 1.7.18 (2020-06-18)
 added: "Replace all in Lines" to batch replacements

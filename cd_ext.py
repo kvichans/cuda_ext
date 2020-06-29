@@ -1,9 +1,9 @@
-''' Plugin for CudaText editor
+﻿''' Plugin for CudaText editor
 Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.12 2020-06-08'
+    '1.7.20 2020-06-29'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata
@@ -1087,7 +1087,10 @@ class Nav_cmds:
     def nav_by_console_err():
         if app.app_api_version()<FROM_API_VERSION:  return app.msg_status(NEED_UPDATE)
         cons_out= '\n'.join(app.app_log(app.LOG_CONSOLE_GET_MEMO_LINES, ''))
-#       cons_out= app.app_log(app.LOG_CONSOLE_GET_LOG, '')
+        if 'The above exception was the direct cause' in cons_out:
+            cons_out= cons_out[:cons_out.find('The above exception was the direct cause')]
+           #app.app_log(app.LOG_CONSOLE_CLEAR)
+            print(cons_out)
         fn      = _get_filename(ed)
         if not fn:      return app.msg_status(_('Only for saved file'))
         fn_ln_re= f('File "{}", line ', fn).replace('\\','\\\\')+'(\d+)'
@@ -1332,7 +1335,7 @@ class Insert_cmds:
     
         x1, y1, x2, y2 = crts[0]
         if y2<0:
-            return app.msg_status('Need selection')
+            return app.msg_status(_('Need selection'))
         
         if (y1, x1)>(y2, x2):
             x1, y1, x2, y2 = x2, y2, x1, y1
@@ -1356,7 +1359,7 @@ class Insert_cmds:
     def fill_by_str():
         crts    = ed.get_carets()
         if all(-1==cEnd for cCrt, rCrt, cEnd, rEnd in crts):    return
-        str2fill    = app.dlg_input('Enter string to fill selection', '')
+        str2fill    = app.dlg_input(_('Enter string to fill selection'), '')
         if not str2fill:    return
         cnt = 0
         for cCrt, rCrt, cEnd, rEnd in crts:
@@ -1726,7 +1729,7 @@ class Command:
         if not fn or ed.get_prop(app.PROP_MODIFIED):
             return app.msg_status(_('Save file first'))
         
-        if app.app_api_version()<'1.0.238':
+        if app.app_api_version()<'1.0.340':
             return app.msg_status(NEED_UPDATE)
         kind_f  = ed.get_prop(app.PROP_KIND)
         kind_v  = ed.get_prop(app.PROP_V_MODE)
@@ -1734,13 +1737,11 @@ class Command:
         or how=='hex'  and kind_f=='bin'  and kind_v==app.VMODE_HEX:
             return app.msg_status(_('No need to do anything'))
             
-        ed.cmd(cmds.cmd_FileClose)
-        if 0:pass
-        elif how=='text':
-            app.file_open(fn)
+        if how=='text':
+            ed.set_prop(app.PROP_V_MODE, app.VMODE_NONE)
             app.msg_status(_('Reopened in text editor'))
         elif how=='hex':
-            app.file_open(fn, options='/view-hex')
+            ed.set_prop(app.PROP_V_MODE, app.VMODE_HEX)
             app.msg_status(_('Reopened in hex viewer'))
        #def reopen_as
 

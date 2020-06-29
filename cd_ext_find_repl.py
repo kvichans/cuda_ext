@@ -63,7 +63,7 @@ class RiL:
                 '\rRegExp found groups are $1, $2, ...')
 #   REPL_H  = _('Pattern to replace\rEnter - to replace next')
     RPLA_H  = _('Replace all')
-    RPLS_H  = _('Replace all for all pairs from the active kit')
+    RPLS_H  = _('Replace all for all pairs from the kit')
     DEF_SET = _('<def>')
 
     CL_WARN = apx.html_color_to_int('#A00000')
@@ -200,10 +200,12 @@ class RiL:
       d(tag=f'stRM{n}',cap=M.st2item(n, st))                                    for n,st in enumerate(sets)]
     ),d(tag='stsw'      ,cap=_('&Change kits order...') ,en=len(sets)>1
     )][1:]
-        rpls_c  = f(_('Replace A&LL for all pairs (#{}) of kit...'), len(cset.ps))
+        rpls_c      = f(_('Replace A&LL for all pairs (#{}) of the kit...'), len(cset.ps))
+        rpls_sel_c  =   _('Replace A&LL for all pairs of a selected kit ...')
         ag.show_menu([(
     ),d(tag='rpla'  ,cap=_('Replace &all')                          ,key='Alt+A'
     ),d(tag='rpls'  ,cap=rpls_c                                     ,key='Alt+L'
+    ),d(tag='arps'  ,cap=rpls_sel_c                                 ,key='Ctrl+Shift+L'
     ),d(             cap='-'
     ),d(tag='stnw'  ,cap=_('Create &new kit...')                    ,key='Ctrl+N'
     ),d(tag='prsv'  ,cap=_('&Save pattern pair to kit')             ,key='Ctrl+S'
@@ -264,6 +266,8 @@ class RiL:
         elif skey==    ( 'c',ord('K')):         upd=m.do_acts(ag, 'stse')       # Ctrl+K
         elif skey==    ( 'c',ord('N')):         upd=m.do_acts(ag, 'stnw')       # Ctrl+N
         elif skey==    ( 'c',ord('Т')):         upd=m.do_acts(ag, 'stnw')       # Ctrl+Т (ru)
+        elif skey==    ('sc',ord('L')):         upd=m.do_acts(ag, 'arps')       # Shift+Ctrl+L
+        elif skey==    ('sc',ord('Д')):         upd=m.do_acts(ag, 'arps')       # Shift+Ctrl+Д (ru)
 
         elif into(skey,  'c', '1','9'):         upd=m.do_acts(ag, 'stAC'+ckey1) # Ctrl+1..9
         elif into(skey, 'sc', '1','9'):         upd=m.do_acts(ag, 'stRA'+ckey1) # Ctrl+Shift+1..9
@@ -566,6 +570,13 @@ class RiL:
                             ,stus=M.msg_d(f(_('Loaded pair {}/{}'), pri+1, len(st.ps)), a=add_msg)
                             ))
 
+        if tag    =='arps':     # Select kit to ALL
+            ikit= app.dlg_menu(app.MENU_LIST, '\n'.join([
+                    st.nm for st in sets
+                ]), caption=_('Select kit to Replace ALL'))
+            if ikit is None: return []
+            return m.do_acts(ag, f'stRA{ikit}', _recall=True)
+        
         if(tag    =='rpls'      # Replace all from active kit
         or tag[:4]=='stRA'):    # Replace all for n-kit
             return m.work(tag, ag)
