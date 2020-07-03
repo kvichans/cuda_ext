@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
 Version:
-    '1.7.19 2020-06-22'
+    '1.7.20 2020-07-03'
 ToDo: (see end of file)
 '''
 
@@ -220,6 +220,7 @@ class RiL:
     ),d(tag='hide'  ,cap=_('Hide dialog')                           ,key='Esc'
     ),d(tag='rest'  ,cap=_('Hide dialog and restore selection &=')  ,key='Shift+Esc'
     ),d(tag='help'  ,cap=_('&Help...')                              
+    ),d(tag='guid'  ,cap=_('&Show guide')                              
     ),d(             cap='-'
     ),d(tag='fndp'  ,cap=_('Find &previous')                        ,key='Shift+Enter'
     ),d(tag='fndn'  ,cap=_('F&ind next')                            ,key='Enter'
@@ -336,8 +337,8 @@ class RiL:
         if tag=='hide':     return                                    None
 
         # Help
+        if tag=='guid':     return (os.system(os.path.dirname(__file__)+os.sep+'readme/batch_replacements.html'), [])[1]
         if tag=='help':     return (msg_box_ex(M.FORM_CB, M.HELP_TX), [])[1]
-#       if tag=='help':     return (app.msg_box_ex(M.FORM_CB, M.HELP_TX, ['OK'], app.MB_ICONINFO), [])[1]
         if tag in ('usel'
                   ,'fitn'
                   ,'anxt'): m.opts[tag] = not m.opts[tag];  return []
