@@ -1,3 +1,6 @@
+1.7.20 (2020-07-03)
+added: "Replace all in Lines" shows guide (in brawser) by menu commans "=/Show guide"
+
 1.7.20 (2020-06-29)
 fixed: used new API to improve commands "Show in hex viewer", "Show in text editor", so they now don't close+open file tab
 

@@ -1,0 +1,55 @@
+<html>
+<body>
+<h1>Feature of CudaExt plugin: batch replacements</h1>
+
+<p>To use it call <code>Commands</code> item</p>
+<img src="bat_commands.png"/>
+<p>or main menu <code>Plugins</code> subitem</p>
+<img src="bat_menuitem.png" />
+<p>Start dialog is like this</p>
+<img src="bat_dlg_init.png" />
+<p>Basic features:</p>
+<ul>
+<li>By setting <code>Find</code> and pressing <code>Enter</code> you can view fragments (as by <code>FindInLines</code>). The number of the fragment and overall number of fragments are shown in statusbar.<br>
+<img src="bat_dlg_basic.png" />
+<br>
+<br>
+<li>By switching <code>.*</code>-<code>cC</code>-<code>"w"</code>, filling <code>Find</code> and <code>Replace</code> and pressing <code>All</code> you will replace all fragments in the current tab (just as by using core <code>Replace</code> dialog).</li>
+<br>
+<li>(<strong>Note</strong>) To execute multiple replacements at once set multiple <code>.*</code>-<code>cC</code>-<code>"w"</code>, <code>Find</code>, <code>Replace</code> (<em>kit</em>) and press <code>ALL</code>.</li>
+<br>
+<li>Kit (multiple sets of  <code>.*</code>-<code>cC</code>-<code>"w"</code> + <code>Find</code> + <code>Replace</code>) can have a name (even empty one). Current one is shown in the bottom combo as <code>&lt;number&gt;:&lt;name&gt; (#&lt;number of elements&gt;)</code>.</li>
+<br>
+<li>To set a kit press <code>Ctrl+E</code> to edit current one or <code>Ctrl+N</code> to create new one.<br>
+<img src="bat_dlg_kit.png" />
+<br>
+<br>
+<li>(<strong>Note</strong>) Command <code>ALL</code> will show the number of times <code>Find</code> (in the kit) are found in the tab and ask to confirm replacement.<br>
+<img src="bat_dlg_kit_rep.png"/>
+<br>Afterwards the report will be shown<br>
+<img src="bat_dlg_kit_res.png"/>
+<br>
+<br>
+<li>The dialog's menu looks like the list of commands and their hotkeys<br>
+<img src="bat_menu=.png"/>
+<br>
+<br>
+<li>The special menu command <code>=\Kits\Edit kits...</code> allows to view/edit all kits content at once and can be used to import/export data via clipboard.<br>
+<img src="bat_dlg_kit_edit.png"/>
+</ul>
+<hr>
+
+
+Current release is an expansion of API
+<br>
+<code>ed.action(EDACTION_FIND_ONE/EDACTION_FIND_ALL/EDACTION_REPLACE_ALL, ...)</code>
+<br>
+So
+
+<ul>
+<li> RegularExpressions are the same as in core Find dialog.
+<li> Reports of the RegularExpressions problems are unclear.
+</ul>
+
+</body>
+</html>
