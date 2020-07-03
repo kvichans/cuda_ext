@@ -1,4 +1,4 @@
-﻿''' Plugin for CudaText editor
+''' Plugin for CudaText editor
 Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
@@ -1059,6 +1059,7 @@ class Nav_cmds:
         op_ed   = _file_open(op_file)
         op_ed.focus()
         op_ed.set_caret(0, op_line)
+        op_ed.set_prop(app.PROP_LINE_TOP, max(0, op_line-5)) #scroll to caret
        #def on_console_nav
 
     @staticmethod
