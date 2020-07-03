@@ -7,7 +7,7 @@ Version:
 ToDo: (see end of file)
 '''
 
-import  re, os, sys
+import  re, os, sys, webbrowser
 
 import          cudatext            as app
 from            cudatext        import ed
@@ -337,7 +337,7 @@ class RiL:
         if tag=='hide':     return                                    None
 
         # Help
-        if tag=='guid':     return (os.system(os.path.dirname(__file__)+os.sep+'readme/batch_replacements.html'), [])[1]
+        if tag=='guid':     return (webbrowser.open_new_tab(os.path.dirname(__file__)+os.sep+'readme/batch_replacements.html'), [])[1]
         if tag=='help':     return (msg_box_ex(M.FORM_CB, M.HELP_TX), [])[1]
         if tag in ('usel'
                   ,'fitn'
