@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
 Version:
-    '1.7.21 2020-07-03'
+    '1.7.22 2020-07-06'
 ToDo: (see end of file)
 '''
 
@@ -136,6 +136,8 @@ class RiL:
         bttn_h  = get_gui_height('bttn')
         
         sits    = M.sets_items(m.opts.sets)
+        WIN_MAC = (get_desktop_environment() in ('win', 'mac'))
+        YG      = 0 if WIN_MAC else 3
         ctrls   = d(
             reex=d(tp='chbt',tid='menu' ,x=80+38*0  ,w=38   ,cap='&.*'          ,hint=M.REEX_H          # Alt+.
           ),case=d(tp='chbt',tid='menu' ,x=80+38*1  ,w=38   ,cap='&cC'          ,hint=M.CASE_H          # Alt+C
@@ -144,12 +146,12 @@ class RiL:
           ),stus=d(tp='labl',tid='menu' ,x=80+38*3+9,r=-52  ,cap=''                             ,a='r>'     
           ),menu=d(tp='bttn',y  = 5     ,x=-5-38    ,w=38   ,cap='&='                           ,a='>>' # Alt+=
           ),wha_=d(tp='labl',tid='what' ,x= 5       ,w=80-10,cap='>*'+_('&Find'),hint=M.WHAT_H          # Alt+F
-          ),what=d(tp='cmbx',y  =35     ,x=80       ,r=-48  ,items=m.opts.whtl                  ,a='r>' # 
+          ),what=d(tp='cmbx',y  =35+YG*1,x=80       ,r=-48  ,items=m.opts.whtl                  ,a='r>' # 
           ),rep_=d(tp='labl',tid='repl' ,x= 5       ,w=80-10,cap='>'+_('&Replace'),hint=M.REPL_H        # Alt+R
-          ),repl=d(tp='cmbx',y  =65     ,x=80       ,r=-48  ,items=m.opts.rpll                  ,a='r>' # 
+          ),repl=d(tp='cmbx',y  =65+YG*2,x=80       ,r=-48  ,items=m.opts.rpll                  ,a='r>' # 
           ),rpla=d(tp='bttn',tid='repl' ,x=-5-38    ,w=38   ,cap=_('&All')      ,hint=M.RPLA_H  ,a='>>' # Alt+A
           ),set_=d(tp='labl',tid='sets' ,x= 5       ,w=80-10,cap='>'+_('&Kits') ,hint=M.SETS_H          # Alt+K
-          ),sets=d(tp='cmbr',y  =95     ,x=80       ,r=-48  ,items=sits                         ,a='r>' # 
+          ),sets=d(tp='cmbr',y  =95+YG*3,x=80       ,r=-48  ,items=sits                         ,a='r>' # 
           ),rpls=d(tp='bttn',tid='sets' ,x=-5-38    ,w=38   ,cap=_('A&LL')      ,hint=M.RPLS_H  ,a='>>' # Alt+L
                     ))
         ctrls.menu.on_menu  = m.do_menu
@@ -161,7 +163,7 @@ class RiL:
                 ctrl.on     = m.do_acts
 
         ag      = DlgAg(
-            form    =d(cap=M.FORM_C, w=500, h=125, h_max=125      # Only horz resize
+            form    =d(cap=M.FORM_C, w=500, h=125+YG*3, h_max=125+YG*3      # Only horz resize
                       ,on_key_down=m.do_keys
                       ,frame='resize')
         ,   ctrls   =ctrls
