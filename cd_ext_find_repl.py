@@ -817,7 +817,7 @@ class FiL:
         ag      = DlgAg(
             form    =dict(cap=msg, w=5+114+5+wtwd+5+wtwd+39+5+5
 #           form    =dict(cap=msg, w=5+114+5+105 +5+wtwd+39+5+5
-                         ,h=35, h_max=35                        # Only horz resize
+                         ,h=38, h_max=38                        # Only horz resize
                          ,on_key_down=m.do_key_down
                          ,on_resize=m.on_resize
                          ,frame='resize'
