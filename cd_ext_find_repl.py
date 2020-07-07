@@ -1,4 +1,4 @@
-﻿''' Plugin for CudaText editor
+''' Plugin for CudaText editor
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
@@ -42,15 +42,15 @@ class RiL:
     HIST_KEY= 'find.replace_in_lines'
 
     FORM_CB = _('Replace all in Lines')                         # RaiL
-    FORM_C  = FORM_CB+' '+_('(Enter on upper input to find)')   # RaiL
+    FORM_C  = FORM_CB+' '+_('(Enter in first field to find)')   # RaiL
     HELP_TX = _('''
-• [Shift+]Enter into "Find" to search [previous] next fragment.
-• Ctlr+Down/Up to copy pattern down/upper.
+• [Shift+]Enter in "Find" field to search [previous] next fragment.
+• Ctlr+Down/Up to copy pattern lower/upper.
 • Command "Restore initial selection" (Shift+Esc) tries to restore only first of initial carets.
-• RegExp as in the Find/Replace application dialogs. Names of found groups are $1, $2...
+• RegExp engine from CudaText is used. Names of RegEx sub-groups are $1, $2...
     ''').strip()
     REEX_H  = _('Regular expression'
-                '\rSyntax as app Find')
+                '\rRegEx engine from CudaText is used')
     CASE_H  = _('Case sensitive')
     WORD_H  = _('Whole words')
     SETS_H  = _('Kit of pairs to replace'
@@ -60,7 +60,7 @@ class RiL:
                 '\rEnter - to find next'
                 '\rShift+Enter - to find previous')
     REPL_H  = _('Pattern to replace'
-                '\rRegExp found groups are $1, $2, ...')
+                '\rRegExp sub-groups are $1, $2, ...')
 #   REPL_H  = _('Pattern to replace\rEnter - to replace next')
     RPLA_H  = _('Replace all')
     RPLS_H  = _('Replace all for all pairs from the kit')
@@ -188,7 +188,7 @@ class RiL:
 
         nm_sets=[
       d(                 cap=M.st2item(n, st)                   ,key=(f'Ctrl+{n+1}'       if n<9 else '')   ,sub=[(
-    ),d(tag=f'stAC{n}'  ,cap=f(_('Set kit "{}" active'),st.nm)  ,key=(f'Ctrl+{n+1}'       if n<9 else '')
+    ),d(tag=f'stAC{n}'  ,cap=f(_('Activate kit "{}"'),st.nm)  ,key=(f'Ctrl+{n+1}'       if n<9 else '')
     ),d(tag=f'stRA{n}'  ,cap=M.RPLS_H+'...'                     ,key=(f'Ctrl+Shift+{n+1}' if n<9 else '')
     ),d(             cap='-'
     )][1:]+[
@@ -203,7 +203,7 @@ class RiL:
     ),d(tag='stsw'      ,cap=_('&Change kits order...') ,en=len(sets)>1
     )][1:]
         rpls_c      = f(_('Replace A&LL for all pairs (#{}) of the kit...'), len(cset.ps))
-        rpls_sel_c  =   _('Replace A&LL for all pairs of a selected kit ...')
+        rpls_sel_c  =   _('Replace A&LL for all pairs of a selected kit...')
         ag.show_menu([(
     ),d(tag='rpla'  ,cap=_('Replace &all')                          ,key='Alt+A'
     ),d(tag='rpls'  ,cap=rpls_c                                     ,key='Alt+L'
@@ -222,22 +222,22 @@ class RiL:
     ),d(tag='hide'  ,cap=_('Hide dialog')                           ,key='Esc'
     ),d(tag='rest'  ,cap=_('Hide dialog and restore selection &=')  ,key='Shift+Esc'
     ),d(tag='help'  ,cap=_('&Help...')                              
-    ),d(tag='guid'  ,cap=_('&Show guide')                              
+    ),d(tag='guid'  ,cap=_('Help - &show guide in browser')                              
     ),d(             cap='-'
     ),d(tag='fndp'  ,cap=_('Find &previous')                        ,key='Shift+Enter'
     ),d(tag='fndn'  ,cap=_('F&ind next')                            ,key='Enter'
 #   ),d(tag='rprv'  ,cap=_('Replace previous')
 #   ),d(tag='rnxt'  ,cap=_('Replace next')     
     ),d(             cap='-'
-    ),d(tag='cpdn'  ,cap=_('Copy down: Find to Replace')            ,key='Ctrl+Down'
-    ),d(tag='cpup'  ,cap=_('Copy up: Replace to Find')              ,key='Ctrl+Up'
+    ),d(tag='cpdn'  ,cap=_('Copy down: Find->Replace')            ,key='Ctrl+Down'
+    ),d(tag='cpup'  ,cap=_('Copy up: Replace->Find')              ,key='Ctrl+Up'
     ),d(             cap='-'
     ),d(tag='fapp'  ,cap=_('Move to app Find dialog')               ,key='Ctrl+F'
     ),d(tag='rapp'  ,cap=_('Move to app Replace dialog')            ,key='Ctrl+R'
     ),d(             cap='-'
     ),d(             cap=_('=== Options ===')                                           ,en=False
     ),d(tag='usel'  ,cap=_('Use &selection from document')          ,ch=m.opts.usel
-    ),d(tag='fitn'  ,cap=_('Autofit Replace pattern on start and on Next pair')    ,ch=m.opts.fitn
+    ),d(tag='fitn'  ,cap=_('Auto-fit Replace pattern on start and on Next pair')    ,ch=m.opts.fitn
     ),d(tag='anxt'  ,cap=_('Load next pair after "Replace all"')    ,ch=m.opts.anxt
                     )][1:]
         ,   aid
@@ -367,7 +367,7 @@ class RiL:
             ostd= {st.nm:st for st in sets}
             onms= [*ostd.keys()]
             rt,vs   = DlgAg(
-                form    =d(cap=_('Change kits order'), h=300, w=155, frame='resize')
+                form    =d(cap=_('Re-order kits'), h=300, w=155, frame='resize')
             ,   ctrls   =d(
                     me=d(tp='memo',y=  5,x= 5   ,r=-5 ,b=-35,val=onms       ,a='b.r>' ,ro_mono_brd='0,1,1'
                   ),ok=d(tp='bttn',y=-30,x=-75  ,w= 70      ,cap=_('Save')  ,a='..--' ,on=CB_HIDE
@@ -378,16 +378,16 @@ class RiL:
             pass;               log("onms={}",(onms))
             pass;               log("nnms={}",(nnms))
             if onms==nnms:              return []               # No changes
-            if set(onms)!=set(nnms):    return M.msg(_('Skip new order - kit names are not saved'))
+            if set(onms)!=set(nnms):    return M.msg(_('Skip new order - kit names were not saved'))
             nsets   = [ostd[nm] for nm in nnms]
             naset   = nnms.index(sets[m.opts.aset].nm)
             m.opts.sets = nsets
             m.opts.aset = naset
             return d(ctrls=d(sets=d(items=M.sets_items(m.opts.sets), val=m.opts.aset)
-                            ,stus=M.msg_d(_('Kits order changed'))))
+                            ,stus=M.msg_d(_('Kits order was changed'))))
 
         if tag=='prsv':         # Add pair to set
-            if not m.opts.what: return M.msg_f('what', _('Set not empty Find pattern'), 'w')
+            if not m.opts.what: return M.msg_f('what', _('Enter a non-empty Find pattern'), 'w')
             st  = sets[m.opts.aset]
             if [pr for pr in st.ps 
                 if  pr.re==m.opts.reex 
@@ -397,11 +397,11 @@ class RiL:
                 and pr.r ==m.opts.repl]:  return M.msg(_('The pair is already in the kit'), a=add_msg)
             st.ps.append(d(re=m.opts.reex, cs=m.opts.case, wd=m.opts.word, f=m.opts.what, r=m.opts.repl))
             return d(ctrls=d(sets=d(items=M.sets_items(m.opts.sets), val=m.opts.aset)
-                            ,stus=M.msg_d(_('The pair saved'), a=add_msg)))
+                            ,stus=M.msg_d(_('The pair was saved'), a=add_msg)))
         if(tag=='stnw'          # Create
         or tag=='sted'):        # Edit name,rcw,pairs
             mmv_list= lambda mmv: [] if ('\n'==mmv or ''==mmv) else [mmv] if str==type(mmv) else mmv[:-1]     # :-1 - memo BUG: it adds extra EOL
-            RCWS_H  = _('Type find options:\r  . - RegExp\r  c - Case sensitive\r  w - Whole word')
+            RCWS_H  = _('Search options as a string:\r  . - RegExp\r  c - Case sensitive\r  w - Whole word')
             st      = d(nm='kit'+str(1+len(sets)), ps=[]) if tag=='stnw' else sets[m.opts.aset]
             rcws    = [('.' if pr.re else '')+('c' if pr.cs else '')+('w' if pr.wd else '') 
                             for pr in st.ps]
@@ -410,9 +410,9 @@ class RiL:
             def on_save(ag_,name,d_=''):
                 fs,rs   = map(mmv_list, ag_.vals(['whts', 'rpls']).values())
                 if not len(fs)==len(rs):
-                    return  M.msg_f('whts', _('Set equal count for Find/Replace patterns'), 'w')
+                    return  M.msg_f('whts', _('Set equal number of Find/Replace patterns'), 'w')
                 if whts and rpls and '' in fs:
-                    return  M.msg_f('whts', _('Set not empty all Find patterns'), 'w')
+                    return  M.msg_f('whts', _('Enter all non-empty Find patterns'), 'w')
                 if ag_.val('name') in [st_.nm for st_ in sets if st_!=st]:
                     return                      M.msg_f('name', _('Set another name for kit'), 'w')
                 return None # Close dlg
@@ -451,16 +451,16 @@ class RiL:
         if tag=='stse':         # Edit kits
             on_help = lambda ag,name,d='':(msg_box(_(
 #           on_help = lambda ag,name,d='':(msg_box_ex(_('Edit kits help'), _(
-                  'Use 1+3k lines for each kit.'
+                  'Use 1+3*n lines for each kit.'
                 '\r  First line for'
                 '\r    n:kit name.'
-                '\r  Three line for each kit pair'
+                '\r  Three lines for each kit pair'
                 '\r    a:attributes - "." "c" "w" - in any order,'
                 '\r    f:pattern Find,'
                 '\r    r:pattern Replace.'
                 '\r'
                 '\rFormat:'
-                '\r- The order of lines with "n:", "a:", "f:", "r:" fixed.'
+                '\r- The order of lines with "n:", "a:", "f:", "r:" is fixed.'
                 '\r- Feel free to use empty lines and some blanks before "n:", "a:", "f:", "r:".'
                 '\r'
                 '\rRules:'
