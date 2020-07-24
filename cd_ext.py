@@ -1,9 +1,9 @@
-''' Plugin for CudaText editor
+﻿''' Plugin for CudaText editor
 Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.20 2020-06-29'
+    '1.7.23 2020-07-24'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata
@@ -62,6 +62,17 @@ def _file_open(op_file):
             return op_ed
     return None
    #def _file_open
+
+def dlg_menu(how, its='', sel=0, cap='', clip=0, w=0, h=0):
+    api = app.app_api_version()
+#   if api<='1.0.193':  #  list/tuple, focused(?), caption
+#   if api<='1.0.233':  #  MENU_NO_FUZZY, MENU_NO_FULLFILTER
+#   if api<='1.0.275':  #  MENU_CENTERED
+    if api<='1.0.334':  #  clip, w, h
+        return  app.dlg_menu(how, its, focused=sel, caption=cap)
+#   if api<='1.0.346':  #  MENU_EDITORFONT
+    return      app.dlg_menu(how, its, focused=sel, caption=cap, clip=clip, w=w, h=h)
+   #def dlg_menu
 
 #############################################################
 class SCBs:
@@ -699,7 +710,9 @@ class Jumps_cmds:
     @staticmethod
     def dlg_bms_in_tab():
         bm_lns  = ed.bookmark(app.BOOKMARK_GET_LIST, 0)
+        bm_lns  = [bm for bm in bm_lns if ed.bookmark(app.BOOKMARK_GET_PROP, bm)]   # Skip hidden
         if not bm_lns:  return app.msg_status(_('No bookmarks'))
+        pass;                  #log("bm_lns={}",(bm_lns))
         tab_sps = ' '*ed.get_prop(app.PROP_TAB_SIZE)
         bms     = [ (line_num                                               # line number
                     ,ed.get_text_line(line_num).replace('\t', tab_sps)      # line string
@@ -709,13 +722,16 @@ class Jumps_cmds:
         rCrt    = ed.get_carets()[0][1]
         near    = min([(abs(line_n-rCrt), ind)
                         for ind, (line_n, line_s, bm_kind) in enumerate(bms)])[1]
-        ans = app.dlg_menu(app.MENU_LIST, '\n'.join([
+        ans = dlg_menu(app.MENU_LIST+app.MENU_EDITORFONT+app.MENU_NO_FUZZY+app.MENU_CENTERED
+            , cap=f(_('Tab bookmarks: {}'), len(bms)), w=1000
+            , sel=near
+            , its=[
                 f('{}\t{}{}'
                  , line_s
                  , f('[{}] ', bm_kind-1) if bm_kind!=1 else ''
                  , 1+line_n
                  ) for line_n, line_s, bm_kind in bms
-                ]), near)
+                ])
         if ans is None: return
         line_n, line_s, bm_kind    = bms[ans]
         ed.set_caret(0, line_n)
@@ -747,7 +763,8 @@ class Jumps_cmds:
                         ,tab_info                                               # src tab '(group:num) title'
                         ,tab_id                                                 # src tab ID
                         )   for line_num in bm_lns
-                            if what=='a' or 1<ted.bookmark(app.BOOKMARK_GET_PROP, line_num)['kind']<10
+                            if                 ted.bookmark(app.BOOKMARK_GET_PROP, line_num) and        # Skip hidden
+                               (what=='a' or 1<ted.bookmark(app.BOOKMARK_GET_PROP, line_num)['kind']<10)
                       ]
            #for h_tab
         if not tbms:    return app.msg_status(_('No numbered bookmarks in tabs') if what=='n' else _('No bookmarks in tabs'))
@@ -755,23 +772,25 @@ class Jumps_cmds:
         rCrt    = ed.get_carets()[0][1]
         near    = min([(abs(line_n-rCrt) if tid==tab_id else 0xFFFFFF, ind)
                     for ind, (line_n, line_s, bm_kind, tab_info, tab_id) in enumerate(tbms)])[1]
-        ans     = app.dlg_menu(app.MENU_LIST, '\n'.join([
-                        f('{}\t{}:{}{}'
+        lst     = [     f('{}\t{}:{}{}'
                          , line_s
                          , tab_info
                          , f('[{}]', bm_kind-1) if bm_kind!=1 else ''
                          , 1+line_n
                          ) for line_n, line_s, bm_kind, tab_info, tab_id in tbms
-                    ]), near) \
+                  ] \
                                 if what=='a' else \
-                  app.dlg_menu(app.MENU_LIST_ALT, '\n'.join([
-                        f('{}: {} {}\t{}'
+                  [     f('{}: {} {}\t{}'
                          , tab_info
                          , f('[{}] ', bm_kind-1) if bm_kind!=1 else ''
                          , 1+line_n
                          , line_s
                          ) for line_n, line_s, bm_kind, tab_info, tab_id in tbms
-                    ]), near)
+                  ]
+        ans     = dlg_menu((app.MENU_LIST if what=='a' else app.MENU_LIST_ALT)+app.MENU_EDITORFONT+app.MENU_CENTERED
+                , cap=f(_('All tabs bookmarks: {}'), len(tbms)), w=1000
+                , its=lst
+                , sel=near)
         if ans is None: return
         line_n, line_s, bm_kind, tab_info, tab_id    = tbms[ans]
         ted     = apx.get_tab_by_id(tab_id)
@@ -1464,7 +1483,7 @@ class Command:
                 lt  = lts[nm]
             else:
                 cap     = _('Remove layout?') if what=='remove' else _('Restore layout?')
-                ans     = app.dlg_menu(app.MENU_LIST, '\n'.join([nm for nm in lts]), caption=cap)
+                ans     = app.dlg_menu(app.MENU_LIST, [nm for nm in lts], caption=cap)
                 if ans is None: return 
                 nm      = list(lts.keys())[ans]
                 if what=='remove':
@@ -1765,9 +1784,11 @@ class Command:
         hist_fts    = [(f.replace(home_s, '~'), os.path.getmtime(f))
                         for f in hist_fs if os.path.exists(f)]
         sort_as     = get_hist([           'open-recent','sort_as'],
-                      apx.get_opt('cuda_ext.open-recent.sort_as',    't'))
+                      apx.get_opt('cuda_ext.open-recent.sort_as'    , 't'))
         show_as     = get_hist([           'open-recent','show_as'],
-                      apx.get_opt('cuda_ext.open-recent.show_as',    'n'))
+                      apx.get_opt('cuda_ext.open-recent.show_as'    , 'n'))
+        w           = get_hist([           'open-recent','w']       , 800)
+        h           = get_hist([           'open-recent','w']       , 600)
         while True:
             hist_fts    = sorted(hist_fts
                                 , key=lambda ft:(ft[1]          if sort_as=='t' else
@@ -1775,7 +1796,10 @@ class Command:
                                                  os.path.basename(ft[0]).upper()
                                                 )
                                 , reverse=(sort_as=='t'))
-            ans         = app.dlg_menu(app.MENU_LIST, '\n'.join([
+            ans         = dlg_menu(app.MENU_LIST+app.MENU_EDITORFONT+app.MENU_NO_FUZZY
+                        , clip=app.CLIP_MIDDLE, w=w, h=h
+                        , cap=f(_('Recent files: {}'), len(hist_fts))
+                        , its=[
                             (fn if show_as=='p' else
                              f('{} ({})', os.path.basename(fn), os.path.dirname(fn)))
                             + '\t'
@@ -1787,7 +1811,6 @@ class Command:
                           +[_('<Sort by path>')         if sort_as=='t' and show_as=='p' else
                             _('<Sort by name>')         if sort_as=='t' and show_as=='n' else
                             _('<Sort by time>')]
-                                                               )
                                       )
             if ans is None: return
             if ans==(0+len(hist_fts)):

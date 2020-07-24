@@ -1,5 +1,9 @@
+1.7.23 (2020-07-24)
+fixed: Set monowidth font for lists: Tab[s] bookmarks, Recent files, Code Tree Symbols
+
 1.7.22 (2020-07-06)
-added: "Replace all in Lines" adjusts vertical spaces
+fixed: "Replace all in Lines" adjusts vertical spaces
+fixed: "Find in Lines" adjusts vertical spaces
 
 1.7.21 (2020-07-03)
 added: "Replace all in Lines" shows guide (in browser) by menu command "=/Show guide"

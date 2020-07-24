@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.7.02 2019-06-11'
+    '1.7.23 2020-07-24'
 ToDo: (see end of file)
 '''
 
@@ -29,6 +29,18 @@ pass;                           _log4mod = LOG_FREE  # Order log in the module
 
 d       = dict
 first_true  = lambda iterable, default=False, pred=None: next(filter(pred, iterable), default)  # 10.1.2. Itertools Recipes
+
+def dlg_menu(how, its='', sel=0, cap='', clip=0, w=0, h=0):
+    api = app.app_api_version()
+#   if api<='1.0.193':  #  list/tuple, focused(?), caption
+#   if api<='1.0.233':  #  MENU_NO_FUZZY, MENU_NO_FULLFILTER
+#   if api<='1.0.275':  #  MENU_CENTERED
+    if api<='1.0.334':  #  clip, w, h
+        return  app.dlg_menu(how, its, focused=sel, caption=cap)
+#   if api<='1.0.346':  #  MENU_EDITORFONT
+    return      app.dlg_menu(how, its, focused=sel, caption=cap, clip=clip, w=w, h=h)
+   #def dlg_menu
+
 
 
 def symbol_menu():
@@ -66,6 +78,8 @@ def symbol_menu_levels(levels=0):
        #def tree_items_to_list
     
     old_api     = app.app_api_version() < '1.0.277'
+    w           = get_hist('symbols.w', 600)
+    h           = get_hist('symbols.h', 900)
     while True:
         props = tree_items_to_list(more_levels=(levels-1 if levels else 1000))
         if not props:
@@ -79,18 +93,19 @@ def symbol_menu_levels(levels=0):
         covers      = [(p['rng'][3]-p['rng'][1], n) for n,p in enumerate(props) 
                         if p['rng'][1] <= crt_row <= p['rng'][3]]
         start_item  = min(covers)[1] if covers else 0
-        res = app.dlg_menu(app.MENU_LIST+app.MENU_NO_FULLFILTER
-                        , items 
-                        + ([_('<Update Code Tree>')] if old_api else [])
-                        + [_('              <All levels>')]
-                        + [_('              <Only 1 up level>')]
-                        + [_('              <Only 2 up levels>')]
-                        + [_('              <Only 3 up levels>')]
-                        , focused=start_item
-                        , caption=_('Code Tree symbols')
-                                 + f(' ({})'    , len(items))
-                                 +(f(' (up {})' , levels    ) if levels else '')
-                        )
+        res = dlg_menu(app.MENU_LIST+app.MENU_NO_FULLFILTER+app.MENU_EDITORFONT
+            , w=w, h=h
+            , sel=start_item
+            , cap=_('Code Tree symbols')
+                     + f(' ({})'    , len(items))
+                     +(f(' (up {})' , levels    ) if levels else '')
+            , its=items 
+            + ([_('<Update Code Tree>')] if old_api else [])
+            + [_('              <All levels>')]
+            + [_('              <Only 1 up level>')]
+            + [_('              <Only 2 up levels>')]
+            + [_('              <Only 3 up levels>')]
+            )
         if res is None: return
         if res==len(props) and old_api:
             ed.cmd(cmds.cmd_TreeUpdate)
