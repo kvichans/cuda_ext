@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
 Version:
-    '1.7.22 2020-07-06'
+    '1.7.24 2020-07-26'
 ToDo: (see end of file)
 '''
 
@@ -188,7 +188,7 @@ class RiL:
 
         nm_sets=[
       d(                 cap=M.st2item(n, st)                   ,key=(f'Ctrl+{n+1}'       if n<9 else '')   ,sub=[(
-    ),d(tag=f'stAC{n}'  ,cap=f(_('Activate kit "{}"'),st.nm)  ,key=(f'Ctrl+{n+1}'       if n<9 else '')
+    ),d(tag=f'stAC{n}'  ,cap=f(_('Activate kit "{}"'),st.nm)    ,key=(f'Ctrl+{n+1}'       if n<9 else '')
     ),d(tag=f'stRA{n}'  ,cap=M.RPLS_H+'...'                     ,key=(f'Ctrl+Shift+{n+1}' if n<9 else '')
     ),d(             cap='-'
     )][1:]+[
@@ -198,6 +198,7 @@ class RiL:
                 ]+[(
     ),d(                 cap='-'
     ),d(tag='stse'      ,cap=_('Edit kits...')                      ,keys='Ctrl+K'
+    ),d(tag='impt'      ,cap=_('&Import from Replace history...') ,en=app.app_api_version()>='1.0.347'
     ),d(                 cap=_('Rem&ove kit')           ,en=bool(sets)  ,sub=[
       d(tag=f'stRM{n}',cap=M.st2item(n, st))                                    for n,st in enumerate(sets)]
     ),d(tag='stsw'      ,cap=_('&Change kits order...') ,en=len(sets)>1
@@ -294,6 +295,14 @@ class RiL:
         return False
        #def do_keys
         
+    @staticmethod
+    def core_hist_ps():
+        if app.app_api_version()<'1.0.347': return []
+        fnd_props   = app.app_proc(app.PROC_GET_FINDER_PROP, '') 
+        f_hist      = fnd_props.get('find_h', [])
+        r_hist      = fnd_props.get('rep_h' , [])
+        return [d(f=f, r=r, re=fnd_props['op_regex_d'], cs=fnd_props['op_case_d'], wd=fnd_props['op_word_d'])
+                for f,r in zip(f_hist, r_hist)]
 
     def do_acts(self, ag, aid, data='', _recall=False, add_msg=False):
         """ 
@@ -302,7 +311,7 @@ class RiL:
             rest hide help usel anxt
             cpdn cpup
             stRM stRN stAC stsw
-            sets stpr stnx prpr prnx sted stnw prsv
+            sets stpr stnx prpr prnx sted stnw prsv impt
             stRA stLP
             rpla rpls
         """
@@ -398,11 +407,16 @@ class RiL:
             st.ps.append(d(re=m.opts.reex, cs=m.opts.case, wd=m.opts.word, f=m.opts.what, r=m.opts.repl))
             return d(ctrls=d(sets=d(items=M.sets_items(m.opts.sets), val=m.opts.aset)
                             ,stus=M.msg_d(_('The pair was saved'), a=add_msg)))
-        if(tag=='stnw'          # Create
+        if(tag=='impt'          # Import 
+        or tag=='stnw'          # Create
         or tag=='sted'):        # Edit name,rcw,pairs
             mmv_list= lambda mmv: [] if ('\n'==mmv or ''==mmv) else [mmv] if str==type(mmv) else mmv[:-1]     # :-1 - memo BUG: it adds extra EOL
             RCWS_H  = _('Search options as a string:\r  . - RegExp\r  c - Case sensitive\r  w - Whole word')
-            st      = d(nm='kit'+str(1+len(sets)), ps=[]) if tag=='stnw' else sets[m.opts.aset]
+            st      = d(nm='kit'+str(1+len(sets)), ps=M.core_hist_ps()) \
+                        if tag=='impt' else \
+                      d(nm='kit'+str(1+len(sets)), ps=[]) \
+                        if tag=='stnw' else \
+                      sets[m.opts.aset]
             rcws    = [('.' if pr.re else '')+('c' if pr.cs else '')+('w' if pr.wd else '') 
                             for pr in st.ps]
             whts    = [pr.f for pr in st.ps]
@@ -416,7 +430,8 @@ class RiL:
                 if ag_.val('name') in [st_.nm for st_ in sets if st_!=st]:
                     return                      M.msg_f('name', _('Set another name for kit'), 'w')
                 return None # Close dlg
-            fcap    = '['+M.FORM_CB+'] '+(_('New kit') if tag=='stnw' else f(_('Content of kit ({})'), 1+m.opts.aset))
+            fcap    = '['+M.FORM_CB+'] '+(_('New kit') if tag in ('stnw', 'impt') else 
+                                        f(_('Content of kit ({})'), 1+m.opts.aset))
             ret,vals= DlgAg(
                 form    =d(cap=fcap
                           ,h=260, w=700, w_max=700      # Only vert resize
@@ -434,7 +449,7 @@ class RiL:
           ),oko_=d(tp='bttn',y=-30          ,x=-65      ,w= 50  ,cap=_('&ы')                ,a='..' ,on=on_save ,sto=False
           ),okok=d(tp='bttn',y=-30          ,x=-75      ,w= 70  ,cap=_('&Save')             ,a='..' ,on=on_save
                     ))
-            ,   fid     ='name' if tag=='stnw' else 'whts'
+            ,   fid     ='name' if tag in ('stnw', 'impt') else 'whts'
             ,   opts    =d(negative_coords_reflect=True)
             ).show()
             if ret is None: return []
@@ -444,7 +459,7 @@ class RiL:
             st.nm   = nm
             st.ps   = [d(re=('.' in o), cs=('c' in o), wd=('w' in o), f=f, r=r) 
                         for o,f,r in zip(ps, fs, rs)]
-            if tag=='stnw':
+            if tag in ('stnw', 'impt'):
                 sets.append(st)
                 m.opts.aset = len(sets)-1
             return d(ctrls=d(sets=d(items=M.sets_items(sets), val=m.opts.aset)))
