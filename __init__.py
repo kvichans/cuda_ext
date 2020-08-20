@@ -49,6 +49,7 @@ class Command:
     # Find_repl_cmds
     def dlg_find_in_lines(self):                return cd_ext_find_repl.dlg_find_in_lines()
     def dlg_replace_in_lines(self):             return cd_ext_find_repl.dlg_replace_in_lines()
+    def kit_replace_in_lines(self):             return cd_ext_find_repl.kit_replace_in_lines()
     def find_cb_string_next(self):              return cd_ext_find_repl.find_cb_by_cmd('dn')
     def find_cb_string_prev(self):              return cd_ext_find_repl.find_cb_by_cmd('up')
     def replace_all_sel_to_cb(self):            return cd_ext_find_repl.replace_all_sel_to_cb()

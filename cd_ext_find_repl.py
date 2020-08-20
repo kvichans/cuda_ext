@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
 Version:
-    '1.7.24 2020-07-26'
+    '1.7.26 2020-08-20'
 ToDo: (see end of file)
 '''
 
@@ -95,15 +95,7 @@ class RiL:
     sets_items  = lambda sts: [RiL.st2item(n,st).replace('&', '') for n,st in enumerate(sts)]
 
 
-    def on_exit(self, ag):
-        M,m         = type(self),self
-        m.opts.pfid = ag.focused()
-        pass;                  #log("m.opts={}",(m.opts))
-        set_hist(M.HIST_KEY, deep_upd((m.opts, ag.vals(['reex','case','word','what','repl']), {'aset':ag.val('sets')})))
-       #def on_exit
-
-
-    def show(self):
+    def __init__(self):
         M,m         = type(self),self
         pass;                   log4fun=0                       # Order log in the function
 
@@ -121,6 +113,35 @@ class RiL:
                     ,   pfid='what')                            # Last fid
         m.opts.update(get_hist(M.HIST_KEY, m.opts, object_pairs_hook=dcta))
         pass;                   log("m.opts={}",(m.opts)) if log4fun else 0
+       #def __init__
+    
+    
+    def on_exit(self, ag):
+        M,m         = type(self),self
+        m.opts.pfid = ag.focused()
+        pass;                  #log("m.opts={}",(m.opts))
+        set_hist(M.HIST_KEY, deep_upd((m.opts, ag.vals(['reex','case','word','what','repl']), {'aset':ag.val('sets')})))
+       #def on_exit
+
+
+    def show(self):
+        M,m         = type(self),self
+        pass;                   log4fun=0                       # Order log in the function
+
+#       m.ed_crts   = ed.get_carets()                           # Carets at start/activate
+#       m.opts      = d(reex=False,case=False,word=False
+#                   ,   what=''                                 # Last value  in "what"
+#                   ,   whtl=[]                                 # List values in "what"
+#                   ,   repl=''                                 # Last value  in "repl" 
+#                   ,   rpll=[]                                 # List values in "repl"
+#                   ,   sets=[d(nm=M.DEF_SET,ps=[])]            # ps=[d(f='a', r='b', re=False, cs=False, wd=False)]
+#                   ,   aset=0                                  # Last active in "sets"
+#                   ,   usel=False                              # Use ed sel
+#                   ,   fitn=False                              # Autofit Replace pattern
+#                   ,   anxt=False                              # Autoload next pair atfer ReplAll
+#                   ,   pfid='what')                            # Last fid
+#       m.opts.update(get_hist(M.HIST_KEY, m.opts, object_pairs_hook=dcta))
+#       pass;                   log("m.opts={}",(m.opts)) if log4fun else 0
 
         edsel       = ed.get_text_sel()
         if m.opts.usel and edsel:
@@ -358,6 +379,17 @@ class RiL:
         if tag=='cpup'and \
            ag.val('repl'):  return d(ctrls=d(what=d(val=ag.val('repl'))))
         
+        if tag    =='arps':     # Select kit to ALL
+            ikit= app.dlg_menu(app.MENU_LIST, '\n'.join([
+                    st.nm for st in m.opts.sets
+                ]), caption=_('Select kit to Replace ALL'))
+            if ikit is None: return []
+            return m.do_acts(ag, f'stRA{ikit}', _recall=True, add_msg=True)
+        
+        if(tag    =='rpls'      # Replace all from active kit
+        or tag[:4]=='stRA'):    # Replace all for n-kit
+            return m.work(tag, ag)
+
         # Change sets
         sets    = m.opts.sets
         st_desc = lambda st, sti: f('{}:"{}" (#{})', sti+1, st.nm if st.nm else M.DEF_SET, len(st.ps))
@@ -383,7 +415,8 @@ class RiL:
                 ))
             ,   opts    =d(negative_coords_reflect=True)).show()
             if 'ok' != rt: return []
-            nnms = vs['me'][:-1]
+            nnms = vs['me']
+            nnms = nnms[:-1]  if app.API<349 else nnms    # :-1 - memo BUG: it adds extra EOL
             pass;               log("onms={}",(onms))
             pass;               log("nnms={}",(nnms))
             if onms==nnms:              return []               # No changes
@@ -410,8 +443,11 @@ class RiL:
         if(tag=='impt'          # Import 
         or tag=='stnw'          # Create
         or tag=='sted'):        # Edit name,rcw,pairs
-            mmv_list= lambda mmv: [] if ('\n'==mmv or ''==mmv) else [mmv] if str==type(mmv) else mmv[:-1]     # :-1 - memo BUG: it adds extra EOL
-            RCWS_H  = _('Search options as a string:\r  . - RegExp\r  c - Case sensitive\r  w - Whole word')
+            if app.API>=349:
+                mmv_list= lambda mmv: [] if ('\n'==mmv or ''==mmv) else [mmv] if str==type(mmv) else mmv
+            else:
+                mmv_list= lambda mmv: [] if ('\n'==mmv or ''==mmv) else [mmv] if str==type(mmv) else mmv[:-1]     # :-1 - memo BUG: it adds extra EOL
+            RCWS_H  = _('Search options as a string (any order):\r  . - RegExp\r  c - Case sensitive\r  w - Whole word')
             st      = d(nm='kit'+str(1+len(sets)), ps=M.core_hist_ps()) \
                         if tag=='impt' else \
                       d(nm='kit'+str(1+len(sets)), ps=[]) \
@@ -489,7 +525,8 @@ class RiL:
                     If dt!='' then build new sets
                 """
                 chk     = dt==''
-                kt_lns_n= (ag_.val('me') if chk else dt['me'])[:-1]
+                kt_lns_n= (ag_.val('me') if chk else dt['me'])
+                kt_lns_n= kt_lns_n[:-1] if app.API<349 else kt_lns_n    # :-1 - memo BUG: it adds extra EOL
                 if not kt_lns_n:            return None if chk else []
                 if kt_lns_n==kt_lns_o:      return None if chk else sets
                 stsn    = []
@@ -587,17 +624,6 @@ class RiL:
                             ,reex=d(val=pr.re),case=d(val=pr.cs),word=d(val=pr.wd)
                             ,stus=M.msg_d(f(_('Loaded pair {}/{}'), pri+1, len(st.ps)), a=add_msg)
                             ))
-
-        if tag    =='arps':     # Select kit to ALL
-            ikit= app.dlg_menu(app.MENU_LIST, '\n'.join([
-                    st.nm for st in sets
-                ]), caption=_('Select kit to Replace ALL'))
-            if ikit is None: return []
-            return m.do_acts(ag, f'stRA{ikit}', _recall=True)
-        
-        if(tag    =='rpls'      # Replace all from active kit
-        or tag[:4]=='stRA'):    # Replace all for n-kit
-            return m.work(tag, ag)
 
         if(tag=='fndn' or tag=='fndp'
 #       or tag=='rpln' or tag=='rplp'
@@ -725,6 +751,9 @@ theRiL          = RiL()                                         # Single obj
 def dlg_replace_in_lines():                                     #NOTE: dlg_replace_in_lines
     theRiL.show()   # new!
    #def dlg_replace_in_lines
+def kit_replace_in_lines():
+    theRiL.do_acts(None, 'arps', _recall=True, add_msg=True)
+   #def kit_replace_in_lines
 
 
 

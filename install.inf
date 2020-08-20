@@ -52,47 +52,53 @@ method=dlg_replace_in_lines
 
 [item15]
 section=commands
+caption=Cuda&-Ext\&Find/Replace\Replace &all in Lines with kit...
+hotkey=
+method=kit_replace_in_lines
+
+[item16]
+section=commands
 caption=Cuda&-Ext\&Find/Replace\-
 hotkey=
 method=_
 
-[item16]
+[item17]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\&Copy word or [string] or 'string' (no selection)
 hotkey=
 method=copy_term
 
-[item17]
+[item18]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\&Replace word or [string] or 'string' with clipbrd (no selection)
 hotkey=
 method=replace_term
 
-[item18]
+[item19]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\E&xpand selection to word or "string" or (string)
 hotkey=Alt+'
 method=expand_sel
 
-[item19]
+[item20]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\Expand and Cop&y selection to word or "string" or (string)
 hotkey=Shift+Alt+'
 method=expand_sel_copy
 
-[item20]
+[item21]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\-
 hotkey=
 method=_
 
-[item21]
+[item22]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\Remove all ASCII chars 0..31 (excluding 9,10,13)
 hotkey=
 method=remove_unprinted
 
-[item22]
+[item23]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\Strip HTML tags
 hotkey=
