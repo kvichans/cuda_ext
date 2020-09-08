@@ -72,6 +72,7 @@ class Command:
     def align_sel_to_right_by_margin(self):     return cd_ext_find_repl.align_sel_by_margin('r')
     def indent_sel_as_1st(self):                return cd_ext_find_repl.indent_sel_as_1st()
     def indent_sel_as_bgn(self):                return cd_ext_find_repl.indent_sel_as_bgn()
+    def align_sel_by_sep(self):                 return cd_ext_find_repl.align_sel_by_sep()
     
     # Jumps_cmds
     def scroll_to_center(self):                 return RLS.scroll_to('cen')

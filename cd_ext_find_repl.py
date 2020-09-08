@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
 Version:
-    '1.7.26 2020-08-20'
+    '1.7.27 2020-09-08'
 ToDo: (see end of file)
 '''
 
@@ -380,10 +380,14 @@ class RiL:
            ag.val('repl'):  return d(ctrls=d(what=d(val=ag.val('repl'))))
         
         if tag    =='arps':     # Select kit to ALL
+            ikit= get_hist(M.HIST_KEY+'.prev_kit_pos', -1)
             ikit= app.dlg_menu(app.MENU_LIST, '\n'.join([
                     st.nm for st in m.opts.sets
-                ]), caption=_('Select kit to Replace ALL'))
+                ])            , caption=_('Select kit to Replace ALL')
+                              , focused=ikit
+                              )
             if ikit is None: return []
+            set_hist(M.HIST_KEY+'.prev_kit_pos', ikit)
             return m.do_acts(ag, f'stRA{ikit}', _recall=True, add_msg=True)
         
         if(tag    =='rpls'      # Replace all from active kit
@@ -661,14 +665,16 @@ class RiL:
             st      = m.opts.sets[sti]
             if not st.ps:    return M.msg(f(_('No pairs in kit "{}"'), st.nm))
             
+            vtab    = lambda s:s.replace('\t', '→')
+            
             rpta,cntf   = [], 0
             for np,pr in enumerate(st.ps):
                 frgs= ed.action(app.EDACTION_FIND_ALL
                             , param1=pr.f
                             , param2='af' + M.st_pr_rc(pr))   # a - wrap, f - from caret
-                rpta.append(f(_('{}: {} fragments={}\n   {}\n   {}'), 1+np, M.st_pr_cw(pr).ljust(5), len(frgs), pr.f, pr.r))
+                rpta.append(f(_('{}? {}\n   {}\n   {}'), len(frgs), M.st_pr_cw(pr).ljust(5), vtab(pr.f), vtab(pr.r)))
                 cntf+= len(frgs)
-            if not cntf:    return M.msg(f(_('No fragments to replace in kit "{}"'), st.nm))
+            if not cntf:    return M.msg(f(_('No fragments to replace with kit "{}"'), st.nm))
 
             ag_ = DlgAg(
                 form    =d(cap=f(_('Replace ALL for kit ("{}")'), st.nm), h=300, w=300, frame='resize')
@@ -686,7 +692,7 @@ class RiL:
                             , param1=pr.f
                             , param2=pr.r
                             , param3='af' + M.st_pr_rc(pr))   # a - wrap, f - from caret
-                rpta.append(f(_('{}: {} replaces={}\n   {}\n   {}'), 1+np, M.st_pr_cw(pr).ljust(5), cntr, pr.f, pr.r))
+                rpta.append(f(_('{}! {}\n   {}\n   {}'), cntr, M.st_pr_cw(pr).ljust(5), vtab(pr.f), vtab(pr.r)))
             ag_.update(form =d(cap=f(_('Results for kit ("{}")'), st.nm))
                     ,  ctrls=d(ok=d(vis=False)
                               ,ca=d(cap=_('Close'))
@@ -1771,6 +1777,74 @@ def rewrap_sel_by_margin():
         _rewrap(margin, cmt_sgn, save_bl, rng[0], rng[1], True)
 #   _rewrap(    margin, cmt_sgn, save_bl, rTx1, rTx2, True)
    #def rewrap_sel_by_margin
+        
+
+def align_sel_by_sep():
+    pass;                      #log("ok")
+    strs = []
+    lens = []
+    col_cnt = 0
+    SEP = ','
+
+    def split_seps(s, sep):
+        res = []        
+        quote = False
+        item = ''
+        i = -1
+    
+        while True:
+            i += 1
+            if i>=len(s):
+                break
+            ch = s[i]
+            if not quote and ch==sep:
+                res.append(item.rstrip(' '))
+                item = ''
+                continue
+            item += ch
+            if quote and ch=='\\':
+                i += 1
+                if i<len(s):
+                    item += s[i]
+                continue
+            if ch in '\'"':
+                quote = not quote
+                continue
+        res.append(item.strip(' '))
+        return res
+                
+    lns = ed.get_sel_lines()
+    if lns[0]<0:
+        return app.msg_status(_('No selection'))
+        
+    text = ed.get_text_sel()
+    if not text:
+        return app.msg_status(_('No selection'))
+        
+    for s in text.split('\n'):
+        if s.strip(' '):
+            r = split_seps(s, SEP)
+            strs.append(r)
+            lens.append([len(i) for i in r])
+            col_cnt = max(col_cnt, len(r))
+                
+    cols = []
+    for i in range(col_cnt):
+        col = 0
+        for l in lens:
+            if i<len(l):
+                col = max(col, l[i])
+        cols.append(col)
+                    
+    pass;                      #log(cols)
+    def ch(r):
+        return SEP.join([s.ljust(cols[i]) for (i, s) in enumerate(r)])
+            
+    res = [ch(r) for r in strs]
+    pass;                      #log('\n'.join(res))
+    ed.replace_lines(lns[0], lns[1], res)
+    app.msg_status(f(_('Replaced {} line(s)'), len(strs)))
+   #def align_sel_by_sep
         
 
 def _replace_lines(_ed, r_bgn, r_end, newlines):

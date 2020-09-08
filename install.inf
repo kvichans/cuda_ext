@@ -951,6 +951,18 @@ caption=Cuda&-Ext\&Align\Align in lines to right by margin...
 hotkey=
 method=align_sel_to_right_by_margin
 
+[item323]
+section=commands
+caption=Cuda&-Ext\&Align\-
+hotkey=
+method=_
+
+[item324]
+section=commands
+caption=Cuda&-Ext\&Align\Align selected lines by separator
+hotkey=
+method=align_sel_by_sep
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; File_cmds
 [item341]

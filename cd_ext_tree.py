@@ -79,7 +79,7 @@ def symbol_menu_levels(levels=0):
     
     old_api     = app.app_api_version() < '1.0.277'
     w           = get_hist('symbols.w', 600)
-    h           = get_hist('symbols.h', 900)
+    h           = get_hist('symbols.h', 550)
     while True:
         props = tree_items_to_list(more_levels=(levels-1 if levels else 1000))
         if not props:
