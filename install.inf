@@ -905,63 +905,57 @@ method=align_in_lines_by_sep
 
 [item315]
 section=commands
+caption=Cuda&-Ext\&Align\Align comma-separated columns in selected lines
+hotkey=
+method=align_sel_by_sep
+
+[item316]
+section=commands
 caption=Cuda&-Ext\&Align\-
 hotkey=
 method=_
 
-[item316]
+[item317]
 section=commands
 caption=Cuda&-Ext\&Align\Join lines
 hotkey=
 method=join_lines
 
-[item317]
+[item318]
 section=commands
 caption=Cuda&-Ext\&Align\Delete duplicate spaces
 hotkey=
 method=del_more_spaces
 
-[item318]
+[item319]
 section=commands
 caption=Cuda&-Ext\&Align\-
 hotkey=
 method=_
 
-[item319]
+[item320]
 section=commands
 caption=Cuda&-Ext\&Align\Re-wrap/split lines by margin...
 hotkey=
 method=rewrap_sel_by_margin
 
-[item320]
+[item321]
 section=commands
 caption=Cuda&-Ext\&Align\Re-wrap/split comment at caret
 hotkey=
 method=rewrap_cmt_at_caret
 
-[item321]
+[item322]
 section=commands
 caption=Cuda&-Ext\&Align\Align in lines to center by margin...
 hotkey=
 method=align_sel_to_center_by_margin
 
-[item322]
+[item323]
 section=commands
 caption=Cuda&-Ext\&Align\Align in lines to right by margin...
 hotkey=
 method=align_sel_to_right_by_margin
-
-[item323]
-section=commands
-caption=Cuda&-Ext\&Align\-
-hotkey=
-method=_
-
-[item324]
-section=commands
-caption=Cuda&-Ext\&Align\Align selected lines by separator
-hotkey=
-method=align_sel_by_sep
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; File_cmds
