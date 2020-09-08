@@ -1,20 +1,20 @@
 1.7.27 (2020-09-08)
-added: "Align selected lines by separator" (PR from Alexey-T)
-added: "Replace all in Lines with kit": auto select prev used kit
-changed: "Replace all in Lines": show "12?"/"10!" in preview/report insteed "fragments=12"/"replaces=10"
+added: command "Align comma-separated columns in selected lines" (patch from Alexey-T)
+added: command "Replace all in Lines with kit": auto-select previous used kit
+changed: "Replace all in Lines": show "12?"/"10!" in preview/report instead of "fragments=12"/"replaces=10"
 fixed: Height of some dialogs
 
 1.7.26 (2020-08-20)
-fixed: "Replace all in Lines": cutting last lines from memo control (<== fixed core memo behav)
+fixed: "Replace all in Lines": cutting last lines from memo control (<== fixed CudaText code)
 
 1.7.25 (2020-08-04)
-added: New plugin command "Replace all in Lines with kit": select and apply kit (without dialog)
+added: command "Replace all in Lines with kit": select and apply kit (without dialog)
 
 1.7.24 (2020-07-26)
 added: "Replace all in Lines": new menu command to create kit from app replacement history - "Import from Replace history"
 
 1.7.23 (2020-07-24)
-fixed: Set monowidth font for lists: Tab[s] bookmarks, Recent files, Code Tree Symbols
+fixed: Use monospaced font for lists: Tab[s] bookmarks, Recent files, Code Tree Symbols
 
 1.7.22 (2020-07-06)
 fixed: "Replace all in Lines" adjusts vertical spaces
