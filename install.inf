@@ -485,17 +485,29 @@ caption=Cuda&-Ext\Ta&bs\Move tab right
 hotkey=
 method=move_tab_right
 
-[item174]
+[item172]
 section=commands
 caption=Cuda&-Ext\Ta&bs\&Find tab by title...
 hotkey=
 method=find_tab
 
-[item175]
+[item173]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab by &number...
 hotkey=
 method=to_tab_ask_num
+
+[item174]
+section=commands
+caption=Cuda&-Ext\Ta&bs\-
+hotkey=
+method=_
+
+[item175]
+section=commands
+caption=Cuda&-Ext\Ta&bs\Arrange tabs across groups
+hotkey=
+method=arrange_tabs_grps
 
 [item176]
 section=commands

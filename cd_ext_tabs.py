@@ -1,9 +1,9 @@
-''' Plugin for CudaText editor
+﻿''' Plugin for CudaText editor
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
 Version:
-    '1.7.14 2020-09-10'
+    '1.7.28 2020-09-10'
 ToDo: (see end of file)
 '''
 
@@ -280,7 +280,7 @@ def find_tab():
     res = app.dlg_menu(app.MENU_LIST, slist, caption=cap)
     if res is None: return
     ed_ = app.Editor(hlist[res])
-    ed_.focus()
+            ed_.focus()
    #def find_tab
 
 
