@@ -1,8 +1,9 @@
-﻿''' Plugin for CudaText editor
+''' Plugin for CudaText editor
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
+    Alexey Torgashin (CudaText)
 Version:
-    '1.7.12 2019-12-10'
+    '1.7.13 2020-09-10'
 ToDo: (see end of file)
 '''
 
@@ -273,14 +274,13 @@ def move_tab(how=''):
 
 
 def find_tab():
-    pttn = app.dlg_input('What to find in tab title', '')
-    if pttn is None: return
-    for h in app.ed_handles():
-        ed_ = app.Editor(h)
-        if pttn in ed_.get_prop(app.PROP_TAB_TITLE):
-            ed_.focus()
-            return 
-    app.msg_status(f(_('No tab with "{}" in title'), pttn))
+    hlist = app.ed_handles()
+    slist = [app.Editor(h).get_prop(app.PROP_TAB_TITLE) for h in hlist]
+    cap = _('Find tab by title')
+    res = app.dlg_menu(app.MENU_LIST, slist, caption=cap)
+    if res is None: return
+    ed_ = app.Editor(hlist[res])
+    ed_.focus()
    #def find_tab
 
 
