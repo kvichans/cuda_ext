@@ -5,7 +5,7 @@ added: reworked command "Find tab by title", now it shows menu-dialog with filte
 added: command "Align comma-separated columns in selected lines" (patch from Alexey-T)
 added: command "Replace all in Lines with kit": auto-select previous used kit
 changed: "Replace all in Lines": show "12?"/"10!" in preview/report instead of "fragments=12"/"replaces=10"
-fixed: Height of some dialogs
+fixed: too big height of some dialogs
 
 1.7.26 (2020-08-20)
 fixed: "Replace all in Lines": cutting last lines from memo control (<== fixed CudaText code)
