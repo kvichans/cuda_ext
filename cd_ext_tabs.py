@@ -280,7 +280,7 @@ def find_tab():
     res = app.dlg_menu(app.MENU_LIST, slist, caption=cap)
     if res is None: return
     ed_ = app.Editor(hlist[res])
-            ed_.focus()
+    ed_.focus()
    #def find_tab
 
 
