@@ -1,8 +1,9 @@
-﻿''' Plugin for CudaText editor
+''' Plugin for CudaText editor
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
+    Alexey Torgashin (CudaText)
 Version:
-    '1.7.12 2019-12-10'
+    '1.7.14 2020-09-10'
 ToDo: (see end of file)
 '''
 
@@ -273,20 +274,58 @@ def move_tab(how=''):
 
 
 def find_tab():
-    pttn = app.dlg_input('What to find in tab title', '')
-    if pttn is None: return
-    for h in app.ed_handles():
-        ed_ = app.Editor(h)
-        if pttn in ed_.get_prop(app.PROP_TAB_TITLE):
-            ed_.focus()
-            return 
-    app.msg_status(f(_('No tab with "{}" in title'), pttn))
+    hlist = app.ed_handles()
+    slist = [app.Editor(h).get_prop(app.PROP_TAB_TITLE) for h in hlist]
+    cap = _('Find tab by title')
+    res = app.dlg_menu(app.MENU_LIST, slist, caption=cap)
+    if res is None: return
+    ed_ = app.Editor(hlist[res])
+    ed_.focus()
    #def find_tab
 
 
+def arrange_tabs_grps():
+   
+    GMAP = {
+      app.GROUPS_ONE     : 1,
+      app.GROUPS_2VERT   : 2,
+      app.GROUPS_2HORZ   : 2,
+      app.GROUPS_3VERT   : 3,
+      app.GROUPS_3HORZ   : 3,
+      app.GROUPS_1P2VERT : 3,
+      app.GROUPS_1P2HORZ : 3,
+      app.GROUPS_4VERT   : 4,
+      app.GROUPS_4HORZ   : 4,
+      app.GROUPS_4GRID   : 4,
+      app.GROUPS_6VERT   : 6,
+      app.GROUPS_6HORZ   : 6,
+      app.GROUPS_6GRID   : 6,
+      }
+
+    hh = list(app.ed_handles())
+    hnum = len(hh)
+    gg = app.app_proc(app.PROC_GET_GROUPING, '')
+    gnum = GMAP.get(gg)
+    if gnum is None or gnum<2:
+        app.msg_status(_('Cannot arrange tabs with single group'))
+        return
+
+    hh = hh[:gnum]
+
+    for (i, h) in reversed(list(enumerate(hh))):
+        if i==0: break
+        h = app.Editor(h).get_prop(app.PROP_HANDLE_SELF)
+        app.Editor(h).set_prop(app.PROP_INDEX_GROUP, i)
+
+    hh = app.ed_handles()
+    app.Editor(hh[0]).focus()
+                
+    app.msg_status(_('Arranged %d tab(s) across %d group(s)')%(hnum, gnum))
+                    
+
 def to_tab_ask_num():
     while True:
-        grp_num = app.dlg_input('What tab number to activate? Input: [group:]number', '')
+        grp_num = app.dlg_input(_('What tab number to activate? Input: [group:]number'), '')
         if grp_num is None: return
         if re.match(r'(\d:)?\d+', grp_num):
             break
