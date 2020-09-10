@@ -1,3 +1,6 @@
+1.7.28 (2020-09-10)
+added: reworked command "Find tab by title", now it shows menu-dialog with filter field (from Alexey-T)
+
 1.7.27 (2020-09-08)
 added: command "Align comma-separated columns in selected lines" (patch from Alexey-T)
 added: command "Replace all in Lines with kit": auto-select previous used kit
