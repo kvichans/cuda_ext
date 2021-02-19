@@ -1037,5 +1037,5 @@ method=save_tabs_to_file
 section=commands
 caption=Cuda&-Ext\&Misc\&Execute selected text in console
 hotkey=
-method=exec_txt_in_cns
+method=exec_selected_in_console
 
