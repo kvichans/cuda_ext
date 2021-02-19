@@ -145,6 +145,8 @@ Menu items
 	- New file and save in current folder...
 	- Open all files from folder with sub-folders...
 	- Open current file in default application
+- Misc
+	- Execute selected text in console
 
 Author: Andrey Kvichanskiy (kvichans, at forum/github)
 License: MIT

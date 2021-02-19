@@ -124,6 +124,7 @@ class Command:
     def save_tabs_to_file(self):                return RLS.save_tabs_to_file()
     def remove_unprinted(self):                 return RLS.remove_unprinted()
     def remove_xml_tags(self):                  return RLS.remove_xml_tags()
+    def exec_txt_in_cns(self):                  return RLS.exec_txt_in_cns()
 
     # Tabs_cmds
     def to_tab_g1_t1(self):                     return cd_ext_tabs._activate_tab(0, 0)
