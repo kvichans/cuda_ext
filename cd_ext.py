@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.23 2020-07-24'
+    '1.7.29 2021-02-19'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata
