@@ -1946,6 +1946,27 @@ class Command:
             f(_('Stripping is done. Removed comments: {}, removed tags: {}'), len(cmts), len(tags))
         )
        #def remove_xml_tags
+       
+    @staticmethod
+    def exec_txt_in_cns():
+        cmd = None
+        if len(ed.get_carets()) == 1:
+            txt = ed.get_text_sel()
+
+            if txt:
+                if '\n' not in txt:
+                    cmd = txt
+            else:
+                caret = ed.get_carets()[0]
+                caret_x,caret_y = caret[0:2]
+                cmd = ed.get_text_line(caret_y).rstrip('\n')
+                ed.set_caret(caret_x, caret_y+1)
+                
+        if cmd:
+            print('>>> ' + cmd)
+            app.app_proc(app.PROC_EXEC_PYTHON, 'from cudatext import *')
+            app.app_proc(app.PROC_EXEC_PYTHON, cmd)
+       #def exec_txt_in_cns
     
     def on_console_nav(self, ed_self, text):    return Nav_cmds.on_console_nav(ed_self, text)
     def _open_file_near(self, where='right'):   return Nav_cmds._open_file_near(where)

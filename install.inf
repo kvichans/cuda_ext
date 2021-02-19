@@ -1031,3 +1031,11 @@ caption=Cuda&-Ext\Fi&le\Save editors to a single file...
 hotkey=
 method=save_tabs_to_file
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Misc_cmds
+[item360]
+section=commands
+caption=Cuda&-Ext\&Misc\&Execute selected text in console
+hotkey=
+method=exec_txt_in_cns
+
