@@ -1,3 +1,6 @@
+1.7.29 (2021-02-19)
+added: Command "Misc \ Execute selected text in console" (from halfbrained)
+
 1.7.28 (2020-09-10)
 added: reworked command "Find tab by title", now it shows menu-dialog with filter field (from Alexey-T)
 added: command "Arrange tabs across all groups" (from Alexey-T)

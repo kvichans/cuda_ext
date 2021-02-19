@@ -1959,8 +1959,9 @@ class Command:
             else:
                 caret = ed.get_carets()[0]
                 caret_x,caret_y = caret[0:2]
-                cmd = ed.get_text_line(caret_y).rstrip('\n')
-                ed.set_caret(caret_x, caret_y+1)
+                cmd = ed.get_text_line(caret_y)
+                if caret_y < ed.get_line_count()-1:
+                    ed.set_caret(caret_x, caret_y+1)
                 
         if cmd:
             print('>>> ' + cmd)
