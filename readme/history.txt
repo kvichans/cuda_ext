@@ -1,3 +1,8 @@
+1.7.30 (2021-02-23)
+added: several commands which show menu-dialog with monospaced font, now use new option in plugins.ini:
+  [ext]
+  monospaced_font=1
+
 1.7.29 (2021-02-19)
 added: Command "Misc \ Execute selected text in console" (from halfbrained)
 
