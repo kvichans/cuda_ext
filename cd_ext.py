@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.29 2021-02-19'
+    '1.7.30 2021-02-23'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata
@@ -15,6 +15,7 @@ from            cudatext_keys   import *
 import          cudatext_cmd        as cmds
 import          cudax_lib           as apx
 
+from            .cd_ext_tree  import menu_ed_font
 from            .cd_kv_base     import *        # as part of this plugin
 from            .cd_kv_dlg      import *        # as part of this plugin
 #try:    from    cuda_kv_base    import *    # as separated plugin
@@ -722,7 +723,7 @@ class Jumps_cmds:
         rCrt    = ed.get_carets()[0][1]
         near    = min([(abs(line_n-rCrt), ind)
                         for ind, (line_n, line_s, bm_kind) in enumerate(bms)])[1]
-        ans = dlg_menu(app.MENU_LIST+app.MENU_EDITORFONT+app.MENU_NO_FUZZY+app.MENU_CENTERED
+        ans = dlg_menu(app.MENU_LIST+app.MENU_NO_FUZZY+app.MENU_CENTERED+menu_ed_font()
             , cap=f(_('Tab bookmarks: {}'), len(bms)), w=1000
             , sel=near
             , its=[
@@ -787,7 +788,7 @@ class Jumps_cmds:
                          , line_s
                          ) for line_n, line_s, bm_kind, tab_info, tab_id in tbms
                   ]
-        ans     = dlg_menu((app.MENU_LIST if what=='a' else app.MENU_LIST_ALT)+app.MENU_EDITORFONT+app.MENU_CENTERED
+        ans     = dlg_menu((app.MENU_LIST if what=='a' else app.MENU_LIST_ALT)+app.MENU_CENTERED+menu_ed_font()
                 , cap=f(_('All tabs bookmarks: {}'), len(tbms)), w=1000
                 , its=lst
                 , sel=near)
@@ -1796,7 +1797,7 @@ class Command:
                                                  os.path.basename(ft[0]).upper()
                                                 )
                                 , reverse=(sort_as=='t'))
-            ans         = dlg_menu(app.MENU_LIST+app.MENU_EDITORFONT+app.MENU_NO_FUZZY
+            ans         = dlg_menu(app.MENU_LIST+app.MENU_NO_FUZZY+menu_ed_font()
                         , clip=app.CLIP_MIDDLE, w=w, h=h
                         , cap=f(_('Recent files: {}'), len(hist_fts))
                         , its=[

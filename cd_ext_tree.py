@@ -1,8 +1,9 @@
 ﻿''' Plugin for CudaText editor
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
+    Alexey (CudaText)
 Version:
-    '1.7.23 2020-07-24'
+    '1.7.24 2021-02-23'
 ToDo: (see end of file)
 '''
 
@@ -29,6 +30,12 @@ pass;                           _log4mod = LOG_FREE  # Order log in the module
 
 d       = dict
 first_true  = lambda iterable, default=False, pred=None: next(filter(pred, iterable), default)  # 10.1.2. Itertools Recipes
+
+def menu_ed_font():
+    if app.ini_read('plugins.ini', 'ext', 'monospaced_font', '1')=='1':
+        return app.MENU_EDITORFONT
+    else:
+        return 0
 
 def dlg_menu(how, its='', sel=0, cap='', clip=0, w=0, h=0):
     api = app.app_api_version()
@@ -93,7 +100,7 @@ def symbol_menu_levels(levels=0):
         covers      = [(p['rng'][3]-p['rng'][1], n) for n,p in enumerate(props) 
                         if p['rng'][1] <= crt_row <= p['rng'][3]]
         start_item  = min(covers)[1] if covers else 0
-        res = dlg_menu(app.MENU_LIST+app.MENU_NO_FULLFILTER+app.MENU_EDITORFONT
+        res = dlg_menu(app.MENU_LIST+app.MENU_NO_FULLFILTER+menu_ed_font()
             , w=w, h=h
             , sel=start_item
             , cap=_('Code Tree symbols')
