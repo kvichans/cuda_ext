@@ -262,7 +262,7 @@ def move_tab(how=''):
     old_pos = ed.get_prop(app.PROP_INDEX_TAB)
     new_pos = None
     if how=='':
-        new_pos = app.dlg_input(_(f'New position (max={gr_cnt})'), str(old_pos+1))
+        new_pos = app.dlg_input(f(_('New position (max={gr_cnt})'), gr_cnt=gr_cnt), str(old_pos+1))
         if new_pos is None: return
         new_pos = max(0, min(gr_cnt, int(new_pos)-1))
     else:
@@ -320,7 +320,7 @@ def arrange_tabs_grps():
     hh = app.ed_handles()
     app.Editor(hh[0]).focus()
                 
-    app.msg_status(_('Arranged %d tab(s) across %d group(s)')%(hnum, gnum))
+    app.msg_status(f(_('Arranged {} tab(s) across {} group(s)'), hnum, gnum))
                     
 
 def to_tab_ask_num():

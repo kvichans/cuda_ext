@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.29 2021-02-19'
+    '1.7.30 2021-03-03'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata
@@ -1454,7 +1454,7 @@ class Command:
                 nm  = app.dlg_input(_('Name to save splitters layout'), f'#{1+len(lts)}')
                 if not nm: return 
                 if nm not in lts:       break#while
-                qu  = f(_('Layout with name "{nm}" already exists. Replace?'), nm)
+                qu  = f(_('Layout with name "{nm}" already exists. Replace?'), nm=nm)
 #               qu  = _(f'Layout with name "{nm}" already exists. Replace?')
                 ans = app.msg_box(qu, app.MB_YESNOCANCEL+app.MB_ICONQUESTION)
                 if ans==app.ID_CANCEL:  return 
@@ -1884,15 +1884,15 @@ class Command:
         RES_SEP = 3
         RES_OK = 4
         
-        res = app.dlg_custom('Save editors to a single file',
+        res = app.dlg_custom(_('Save editors to a single file'),
             410, 175,
             '\n'.join([
-                'type=radio\1cap=Save all tabs (including not visible)\1pos=10,10,400,0\1val=1',    
-                'type=radio\1cap=Save visible editors in all groups\1pos=10,35,400,0',
-                'type=label\1cap=Separator line:\1pos=10,65,400,0',    
+                'type=radio\1cap='+_('Save all tabs (including not visible)')+'\1pos=10,10,400,0\1val=1',    
+                'type=radio\1cap='+_('Save visible editors in all groups')+'\1pos=10,35,400,0',
+                'type=label\1cap='+_('Separator line:')+'\1pos=10,65,400,0',    
                 'type=edit\1val=-----\1pos=10,90,400,0',
-                'type=button\1cap=&OK\1pos=100,140,200,0',    
-                'type=button\1cap=Cancel\1pos=210,140,310,0'    
+                'type=button\1cap='+_('&OK')+'\1pos=100,140,200,0',    
+                'type=button\1cap='+_('Cancel')+'\1pos=210,140,310,0'    
             ]),
             get_dict=True
             )
@@ -1909,14 +1909,14 @@ class Command:
             eds = [app.ed_group(i) for i in range(MAX_GROUPS)]
             eds = [i for i in eds if i]
         
-        fn = app.dlg_file(False, 'saved.txt', '', '')
+        fn = app.dlg_file(False, _('saved.txt'), '', '')
         if not fn:
             return 
             
         txt = ('\n'+res_sep+'\n').join([e.get_text_all() for e in eds])
         with open(fn, 'w', encoding='utf8') as f:
             f.write(txt)
-        app.msg_status('Saved: '+fn)
+        app.msg_status(_('Saved: ')+fn)
        #def save_tabs_to_file
     
     def remove_unprinted(self):
