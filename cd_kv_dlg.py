@@ -1008,7 +1008,7 @@ class DlgAg:
         # Copy smth to props
         if 'props' in cnt:
             pass
-        elif tp=='label' and cnt.get('cap', '').startswith('>'):        # cap='>smth' -> cap='smth', props='1' (r-align)
+        elif tp=='label' and cnt.get('cap', '').startswith('>'):        # cap='>smth' -> cap='smth', ex0='1' (r-align)
             cnt['cap']  = cnt['cap'][1:]
             cnt['props']= '1'
         elif tp=='label' and    cnt.get('ralign'):                      # ralign -> props

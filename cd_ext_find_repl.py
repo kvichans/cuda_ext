@@ -163,7 +163,7 @@ class RiL:
             reex=d(tp='chbt',tid='menu' ,x=80+38*0  ,w=38   ,cap='&.*'          ,hint=M.REEX_H          # Alt+.
           ),case=d(tp='chbt',tid='menu' ,x=80+38*1  ,w=38   ,cap='&cC'          ,hint=M.CASE_H          # Alt+C
           ),word=d(tp='chbt',tid='menu' ,x=80+38*2  ,w=38   ,cap='"&w"'         ,hint=M.WORD_H          # Alt+W
-          ),stu_=d(tp='bvel',y  = 5     ,x=80+38*3+5,r=-52+4,h=bttn_h           ,props='1'      ,a='r>'
+          ),stu_=d(tp='bvel',y  = 5     ,x=80+38*3+5,r=-52+4,h=bttn_h           ,ex0='1'      ,a='r>'
           ),stus=d(tp='labl',tid='menu' ,x=80+38*3+9,r=-52  ,cap=''                             ,a='r>'     
           ),menu=d(tp='bttn',y  = 5     ,x=-5-38    ,w=38   ,cap='&='                           ,a='>>' # Alt+=
           ),wha_=d(tp='labl',tid='what' ,x= 5       ,w=80-10,cap='>*'+_('&Find'),hint=M.WHAT_H          # Alt+F
@@ -481,7 +481,7 @@ class RiL:
           ),rcws=d(tp='memo',y=25   ,h=200  ,x= 5       ,w= 80  ,val=rcws                   ,a='b.' ,ro_mono_brd='0,1,1'
           ),wha_=d(tp='labl',y= 5           ,x=10+80    ,w=300  ,cap=_('&Find patterns:')
           ),whts=d(tp='memo',y=25   ,h=200  ,x=10+80    ,w=300  ,val=whts                   ,a='b.' ,ro_mono_brd='0,1,1'
-          ),rep_=d(tp='labl',y= 5           ,x=15+80+300,w=300  ,cap=('&Replace patterns:')
+          ),rep_=d(tp='labl',y= 5           ,x=15+80+300,w=300  ,cap=_('&Replace patterns:')
           ),rpls=d(tp='memo',y=25   ,h=200  ,x=15+80+300,w=300  ,val=rpls                   ,a='b.' ,ro_mono_brd='0,1,1'
           ),nam_=d(tp='labl',tid='okok'     ,x= 5       ,w= 80  ,cap='>'+_('&Name:')        ,a='..'    
           ),name=d(tp='edit',tid='okok'     ,x= 10+80   ,w= 80  ,val=st.nm                  ,a='..'    
