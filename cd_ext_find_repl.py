@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
 Version:
-    '1.7.27 2020-09-08'
+    '1.7.31 2021-05-03'
 ToDo: (see end of file)
 '''
 
@@ -97,7 +97,7 @@ class RiL:
 
     def __init__(self):
         M,m         = type(self),self
-        pass;                   log4fun=0                       # Order log in the function
+        pass;                   log4fun=2                       # Order log in the function
 
         m.ed_crts   = ed.get_carets()                           # Carets at start/activate
         m.opts      = d(reex=False,case=False,word=False
@@ -112,7 +112,8 @@ class RiL:
                     ,   anxt=False                              # Autoload next pair atfer ReplAll
                     ,   pfid='what')                            # Last fid
         m.opts.update(get_hist(M.HIST_KEY, m.opts, object_pairs_hook=dcta))
-        pass;                   log("m.opts={}",(m.opts)) if log4fun else 0
+        pass;                  #log("m.opts={}",(m.opts)) if log4fun else 0
+        pass;                  #log("m.opts.sets={}",len(m.opts.sets)) if log4fun else 0
        #def __init__
     
     
@@ -380,10 +381,21 @@ class RiL:
            ag.val('repl'):  return d(ctrls=d(what=d(val=ag.val('repl'))))
         
         if tag    =='arps':     # Select kit to ALL
+#           nms = [st.nm for st in m.opts.sets]
+#           pass;               log("ikit,nms={}",(ikit,nms))
+#           ikit= get_hist(M.HIST_KEY+'.prev_kit_pos', -1)
+#           ikit= app.dlg_menu(app.DMENU_LIST, '\n'.join([
+#                   st.nm for st in m.opts.sets
+#               ])            , caption=_('Select kit to Replace ALL')
+#                             , focused=ikit
+#                             )
             ikit= get_hist(M.HIST_KEY+'.prev_kit_pos', -1)
-            ikit= app.dlg_menu(app.MENU_LIST, '\n'.join([
-                    st.nm for st in m.opts.sets
-                ])            , caption=_('Select kit to Replace ALL')
+            ikit= -1 if ikit is None else ikit
+            nms = [st.nm for st in m.opts.sets]
+            pass;              #log("ikit,nms={}",(ikit,nms))
+            ikit= app.dlg_menu(app.DMENU_LIST
+                              , nms
+                              , caption=_('Select kit to Replace ALL')
                               , focused=ikit
                               )
             if ikit is None: return []

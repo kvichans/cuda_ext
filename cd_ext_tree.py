@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.7.23 2020-07-24'
+    '1.7.31 2021-05-03'
 ToDo: (see end of file)
 '''
 
@@ -42,6 +42,10 @@ def dlg_menu(how, its='', sel=0, cap='', clip=0, w=0, h=0):
    #def dlg_menu
 
 
+def get_cude_tree_id():
+    return app.app_proc(app.PROC_SIDEPANEL_GET_CONTROL, 'Code tree') \
+            if app.app_api_version() < '1.0.226' else \
+           app.app_proc(app.PROC_GET_CODETREE, '')
 
 def symbol_menu():
     symbol_menu_levels()
@@ -149,7 +153,8 @@ Search starts on Enter.
     opts    = d(reex=False,case=False,word=False,wrap=False,hist=[],clos=False,fpth=False)
     opts.update(get_hist('tree.find_node', opts))
     # Scan Tree
-    ID_TREE = app.app_proc(app.PROC_SIDEPANEL_GET_CONTROL, 'Code tree')
+    ID_TREE = get_cude_tree_id()
+#   ID_TREE = app.app_proc(app.PROC_SIDEPANEL_GET_CONTROL, 'Code tree')
     if not ID_TREE: return app.msg_status(_('No CodeTree'))
     if not app.tree_proc(ID_TREE, app.TREE_ITEM_ENUM, 0):   # 0 is root
         ed.cmd(cmds.cmd_TreeUpdate)                         # Try to build tree
@@ -348,7 +353,8 @@ def tree_path_to_status():
     pass;                  #log('?',())
     path_l, gap = _get_best_tree_path(ed.get_carets()[0][1])
     if not path_l:  return
-    ID_TREE = app.app_proc(app.PROC_SIDEPANEL_GET_CONTROL, 'Code tree')
+    ID_TREE = get_cude_tree_id()
+#   ID_TREE = app.app_proc(app.PROC_SIDEPANEL_GET_CONTROL, 'Code tree')
     if not ID_TREE: return
     id_sel  = app.tree_proc(ID_TREE, app.TREE_ITEM_GET_SELECTED)
     id_need = path_l[-1][0]
@@ -363,7 +369,8 @@ def tree_path_to_status():
 def set_nearest_tree_node():
     path_l, gap = _get_best_tree_path(ed.get_carets()[0][1])
     if not path_l:  return
-    ID_TREE = app.app_proc(app.PROC_SIDEPANEL_GET_CONTROL, 'Code tree')
+    ID_TREE = get_cude_tree_id()
+#   ID_TREE = app.app_proc(app.PROC_SIDEPANEL_GET_CONTROL, 'Code tree')
     if not ID_TREE: return
     app.tree_proc(ID_TREE, app.TREE_ITEM_SELECT, path_l[-1][0])
    #def set_nearest_tree_node
@@ -379,7 +386,8 @@ def _get_best_tree_path(row):
                      <0 if nearest node above
     """
     ed.cmd(cmds.cmd_TreeUpdate)
-    ID_TREE = app.app_proc(app.PROC_SIDEPANEL_GET_CONTROL, 'Code tree')
+    ID_TREE = get_cude_tree_id()
+#   ID_TREE = app.app_proc(app.PROC_SIDEPANEL_GET_CONTROL, 'Code tree')
     INF     = 0xFFFFFFFF
     if not ID_TREE: return [], INF
     NO_ID   = -1

@@ -1,3 +1,6 @@
+1.7.31 (2021-05-03)
+fixed: fix to core API changes
+
 1.7.30 (2021-03-03)
 fixed: i18n
 
