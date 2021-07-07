@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.30 2021-03-03'
+    '1.7.32 2021-07-07'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata
@@ -722,7 +722,7 @@ class Jumps_cmds:
         rCrt    = ed.get_carets()[0][1]
         near    = min([(abs(line_n-rCrt), ind)
                         for ind, (line_n, line_s, bm_kind) in enumerate(bms)])[1]
-        ans = dlg_menu(app.MENU_LIST+app.MENU_EDITORFONT+app.MENU_NO_FUZZY+app.MENU_CENTERED
+        ans = dlg_menu(app.DMENU_LIST+app.DMENU_EDITORFONT+app.DMENU_NO_FUZZY+app.DMENU_CENTERED
             , cap=f(_('Tab bookmarks: {}'), len(bms)), w=1000
             , sel=near
             , its=[
@@ -787,7 +787,7 @@ class Jumps_cmds:
                          , line_s
                          ) for line_n, line_s, bm_kind, tab_info, tab_id in tbms
                   ]
-        ans     = dlg_menu((app.MENU_LIST if what=='a' else app.MENU_LIST_ALT)+app.MENU_EDITORFONT+app.MENU_CENTERED
+        ans     = dlg_menu((app.DMENU_LIST if what=='a' else app.DMENU_LIST_ALT)+app.DMENU_EDITORFONT+app.DMENU_CENTERED
                 , cap=f(_('All tabs bookmarks: {}'), len(tbms)), w=1000
                 , its=lst
                 , sel=near)
@@ -1483,7 +1483,7 @@ class Command:
                 lt  = lts[nm]
             else:
                 cap     = _('Remove layout?') if what=='remove' else _('Restore layout?')
-                ans     = app.dlg_menu(app.MENU_LIST, [nm for nm in lts], caption=cap)
+                ans     = app.dlg_menu(app.DMENU_LIST, [nm for nm in lts], caption=cap)
                 if ans is None: return 
                 nm      = list(lts.keys())[ans]
                 if what=='remove':
@@ -1796,7 +1796,7 @@ class Command:
                                                  os.path.basename(ft[0]).upper()
                                                 )
                                 , reverse=(sort_as=='t'))
-            ans         = dlg_menu(app.MENU_LIST+app.MENU_EDITORFONT+app.MENU_NO_FUZZY
+            ans         = dlg_menu(app.DMENU_LIST+app.DMENU_EDITORFONT+app.DMENU_NO_FUZZY
                         , clip=app.CLIP_MIDDLE, w=w, h=h
                         , cap=f(_('Recent files: {}'), len(hist_fts))
                         , its=[

@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.7.31 2021-05-03'
+    '1.7.32 2021-07-07'
 ToDo: (see end of file)
 '''
 
@@ -97,7 +97,7 @@ def symbol_menu_levels(levels=0):
         covers      = [(p['rng'][3]-p['rng'][1], n) for n,p in enumerate(props) 
                         if p['rng'][1] <= crt_row <= p['rng'][3]]
         start_item  = min(covers)[1] if covers else 0
-        res = dlg_menu(app.MENU_LIST+app.MENU_NO_FULLFILTER+app.MENU_EDITORFONT
+        res = dlg_menu(app.DMENU_LIST+app.DMENU_NO_FULLFILTER+app.DMENU_EDITORFONT
             , w=w, h=h
             , sel=start_item
             , cap=_('Code Tree symbols')

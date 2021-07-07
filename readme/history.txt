@@ -1,3 +1,6 @@
+1.7.32 (2021-07-07)
+fixed: avoid deprecated menu actions MENU_*
+
 1.7.31 (2021-05-03)
 fixed: fix to core API changes
 

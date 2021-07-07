@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
 Version:
-    '1.7.28 2020-09-10'
+    '1.7.32 2021-07-07'
 ToDo: (see end of file)
 '''
 
@@ -277,7 +277,7 @@ def find_tab():
     hlist = app.ed_handles()
     slist = [app.Editor(h).get_prop(app.PROP_TAB_TITLE) for h in hlist]
     cap = _('Find tab by title')
-    res = app.dlg_menu(app.MENU_LIST, slist, caption=cap)
+    res = app.dlg_menu(app.DMENU_LIST, slist, caption=cap)
     if res is None: return
     ed_ = app.Editor(hlist[res])
     ed_.focus()
