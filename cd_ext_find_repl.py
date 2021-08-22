@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
 Version:
-    '1.7.31 2021-05-03'
+    '1.7.33 2021-08-22'
 ToDo: (see end of file)
 '''
 
@@ -660,6 +660,7 @@ class RiL:
         """
         M,m         = type(self),self
         pass;                   log4fun= 0
+        pass;                   log("task, par={}",(task, par)) if log4fun else 0
         if task=='offer_repl':
             what    = par
             st      = m.opts.sets[m.opts.aset]
@@ -675,6 +676,7 @@ class RiL:
             sti = m.opts.aset if task=='rpls' else int(task[4:])
             if not 0<=sti<len(m.opts.sets): return []
             st      = m.opts.sets[sti]
+            pass;               log("st={}",(st)) if log4fun else 0
             if not st.ps:    return M.msg(f(_('No pairs in kit "{}"'), st.nm))
             
             vtab    = lambda s:s.replace('\t', '→')
@@ -688,6 +690,8 @@ class RiL:
                 cntf+= len(frgs)
             if not cntf:    return M.msg(f(_('No fragments to replace with kit "{}"'), st.nm))
 
+            need_ask    = '##SKIP-ASK##' not in st.nm
+
             ag_ = DlgAg(
                 form    =d(cap=f(_('Replace ALL for kit ("{}")'), st.nm), h=300, w=300, frame='resize')
             ,   ctrls   =d(
@@ -696,7 +700,8 @@ class RiL:
                   ),me=d(tp='memo',y=  5,x= 5   ,r=-5 ,b=-35,val=rpta       ,a='b.r>' ,ro_mono_brd='1,1,0'
                 ))
             ,   opts    =d(negative_coords_reflect=True))
-            if 'ok' != ag_.show(onetime=False)[0]: return []
+            if need_ask and \
+               'ok' != ag_.show(onetime=False)[0]: return []
                     
             rpta    = []
             for np,pr in enumerate(st.ps):
@@ -709,7 +714,8 @@ class RiL:
                     ,  ctrls=d(ok=d(vis=False)
                               ,ca=d(cap=_('Close'))
                               ,me=d(val=rpta)))
-            ag_.show()
+            if need_ask:
+                ag_.show()
             return []
 
         if not m.opts.what: return []
@@ -1350,9 +1356,9 @@ def align_in_lines_by_sep():
     if not spr:
         return # Esc
     data4_align_in_lines_by_sep    = spr
-    ((rTx1, cTx1)
-    ,(rTx2, cTx2))  = apx.minmax((rCrt, cCrt), (rEnd, cEnd))
-    ls_txt  = ed.get_text_substr(0,rTx1, 0,rTx2+(0 if 0==cEnd else 1))
+    line1, line2 = ed.get_sel_lines() # Alexey: works good even if last line don't have EOL
+    line2len = len(ed.get_text_line(line2))
+    ls_txt  = ed.get_text_substr(0, line1, line2len, line2)
     if spr not in ls_txt:
         return app.msg_status(_("No separator '{}' in selected lines").format(spr))
     lines   = ls_txt.splitlines()
@@ -1364,9 +1370,8 @@ def align_in_lines_by_sep():
                ln[:pos]+' '*(max_pos-pos)+ln[pos:]
                for (ln,pos) in ln_poss
               ]
-    ed.delete(0,rTx1, 0,rTx2+(0 if 0==cEnd else 1))
-    ed.insert(0,rTx1, '\n'.join(nlines)+'\n')
-    ed.set_caret(0,rTx1+len(nlines), 0, rTx1)
+    ed.replace_lines(line1, line2, nlines)
+    ed.set_caret(line2len, line2, 0, line1)
    #def align_in_lines_by_sep
 
 
@@ -1796,7 +1801,11 @@ def align_sel_by_sep():
     strs = []
     lens = []
     col_cnt = 0
-    SEP = ','
+    
+    SEP = app.dlg_input(_('Separator char:'), ',')
+    if SEP is None: return
+    if len(SEP) != 1:
+        return app.msg_status(_('Wrong separator char')) 
 
     def split_seps(s, sep):
         res = []        

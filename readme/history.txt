@@ -1,3 +1,8 @@
+1.7.33 (2021-08-22)
+added: Command "Replace in lines" waits substring "##SKIP-ASK##" in replace pack name to skip dialog
+fixed: Command "Align in lines by separator" fixed to support last line without EOL
+changed: Command "Align comma-separated columns in selected lines" renamed/fixed to support any separator
+
 1.7.32 (2021-07-07)
 fixed: avoid deprecated menu actions MENU_*
 
