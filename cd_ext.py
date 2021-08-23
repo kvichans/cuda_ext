@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.32 2021-07-07'
+    '1.7.34 2021-08-23'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata
@@ -63,7 +63,16 @@ def _file_open(op_file):
     return None
    #def _file_open
 
-def dlg_menu(how, its='', sel=0, cap='', clip=0, w=0, h=0):
+def dlg_menu(how, its='', sel=0, cap='', clip=0, w=0, h=0, opts_key=''):
+    if opts_key:
+        def fit_bit(val, key, bit):
+            opt = apx.get_opt(key, None)
+            if opt is None: return val
+            if opt:         return val | bit
+            else:           return val & ~bit
+        how = fit_bit(how, f'{opts_key}.menu.no_fuzzy', app.DMENU_NO_FUZZY  )
+        how = fit_bit(how, f'{opts_key}.menu.centered', app.DMENU_CENTERED  )
+        how = fit_bit(how, f'{opts_key}.menu.monofont', app.DMENU_EDITORFONT)
     api = app.app_api_version()
 #   if api<='1.0.193':  #  list/tuple, focused(?), caption
 #   if api<='1.0.233':  #  MENU_NO_FUZZY, MENU_NO_FULLFILTER
@@ -723,6 +732,7 @@ class Jumps_cmds:
         near    = min([(abs(line_n-rCrt), ind)
                         for ind, (line_n, line_s, bm_kind) in enumerate(bms)])[1]
         ans = dlg_menu(app.DMENU_LIST+app.DMENU_EDITORFONT+app.DMENU_NO_FUZZY+app.DMENU_CENTERED
+            , opts_key='cuda_ext.tab_bookmark'
             , cap=f(_('Tab bookmarks: {}'), len(bms)), w=1000
             , sel=near
             , its=[
@@ -788,6 +798,7 @@ class Jumps_cmds:
                          ) for line_n, line_s, bm_kind, tab_info, tab_id in tbms
                   ]
         ans     = dlg_menu((app.DMENU_LIST if what=='a' else app.DMENU_LIST_ALT)+app.DMENU_EDITORFONT+app.DMENU_CENTERED
+                , opts_key='cuda_ext.tabs_bookmark'
                 , cap=f(_('All tabs bookmarks: {}'), len(tbms)), w=1000
                 , its=lst
                 , sel=near)
@@ -1483,7 +1494,7 @@ class Command:
                 lt  = lts[nm]
             else:
                 cap     = _('Remove layout?') if what=='remove' else _('Restore layout?')
-                ans     = app.dlg_menu(app.DMENU_LIST, [nm for nm in lts], caption=cap)
+                ans     = app.dlg_menu(app.DMENU_LIST, [nm for nm in lts], caption=cap, opts_key='cuda_ext.layouts')
                 if ans is None: return 
                 nm      = list(lts.keys())[ans]
                 if what=='remove':
@@ -1796,7 +1807,7 @@ class Command:
                                                  os.path.basename(ft[0]).upper()
                                                 )
                                 , reverse=(sort_as=='t'))
-            ans         = dlg_menu(app.DMENU_LIST+app.DMENU_EDITORFONT+app.DMENU_NO_FUZZY
+            ans         = dlg_menu(app.DMENU_LIST+app.DMENU_EDITORFONT+app.DMENU_NO_FUZZY, opts_key='cuda_ext.recents'
                         , clip=app.CLIP_MIDDLE, w=w, h=h
                         , cap=f(_('Recent files: {}'), len(hist_fts))
                         , its=[

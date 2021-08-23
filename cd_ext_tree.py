@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.7.32 2021-07-07'
+    '1.7.34 2021-08-23'
 ToDo: (see end of file)
 '''
 
@@ -30,7 +30,16 @@ pass;                           _log4mod = LOG_FREE  # Order log in the module
 d       = dict
 first_true  = lambda iterable, default=False, pred=None: next(filter(pred, iterable), default)  # 10.1.2. Itertools Recipes
 
-def dlg_menu(how, its='', sel=0, cap='', clip=0, w=0, h=0):
+def dlg_menu(how, its='', sel=0, cap='', clip=0, w=0, h=0, opts_key=''):
+    if opts_key:
+        def fit_bit(val, key, bit):
+            opt = apx.get_opt(key, None)
+            if opt is None: return val
+            if opt:         return val | bit
+            else:           return val & ~bit
+        how = fit_bit(how, f'{opts_key}.menu.no_fuzzy', app.DMENU_NO_FUZZY  )
+        how = fit_bit(how, f'{opts_key}.menu.centered', app.DMENU_CENTERED  )
+        how = fit_bit(how, f'{opts_key}.menu.monofont', app.DMENU_EDITORFONT)
     api = app.app_api_version()
 #   if api<='1.0.193':  #  list/tuple, focused(?), caption
 #   if api<='1.0.233':  #  MENU_NO_FUZZY, MENU_NO_FULLFILTER
@@ -97,7 +106,7 @@ def symbol_menu_levels(levels=0):
         covers      = [(p['rng'][3]-p['rng'][1], n) for n,p in enumerate(props) 
                         if p['rng'][1] <= crt_row <= p['rng'][3]]
         start_item  = min(covers)[1] if covers else 0
-        res = dlg_menu(app.DMENU_LIST+app.DMENU_NO_FULLFILTER+app.DMENU_EDITORFONT
+        res = dlg_menu(app.DMENU_LIST+app.DMENU_NO_FULLFILTER+app.DMENU_EDITORFONT, opts_key='cuda_ext.tree_symbols'
             , w=w, h=h
             , sel=start_item
             , cap=_('Code Tree symbols')

@@ -1,3 +1,13 @@
+1.7.34 (2021-08-23)
+added: New options for user.json: 
+    "cuda_ext.<command>.menu.<style>": <value>
+where 
+    command is one of (recents, tabs_bookmark, tab_bookmark, layouts, tree_symbols) 
+and
+    style is one of (monofont, no_fuzzy, centered)
+Set value to 0 or false to switch style off
+Set value to 1 or true to switch style on
+
 1.7.33 (2021-08-22)
 added: Command "Replace in lines" waits substring "##SKIP-ASK##" in replace pack name to skip dialog
 fixed: Command "Align in lines by separator" fixed to support last line without EOL
