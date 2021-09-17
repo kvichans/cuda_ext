@@ -1,5 +1,5 @@
 [info]
-version=1.7.11
+version=1.7.35
 title=CudaExt
 desc=Additional commands for CudaText in Commands dialog and Plugins menu
 type=cudatext-plugin
@@ -923,47 +923,53 @@ method=align_sel_by_sep
 
 [item316]
 section=commands
+caption=Cuda&-Ext\&Align\Align carets columns by inserting spaces
+hotkey=
+method=align_by_carets
+
+[item317]
+section=commands
 caption=Cuda&-Ext\&Align\-
 hotkey=
 method=_
 
-[item317]
+[item318]
 section=commands
 caption=Cuda&-Ext\&Align\Join lines
 hotkey=
 method=join_lines
 
-[item318]
+[item319]
 section=commands
 caption=Cuda&-Ext\&Align\Delete duplicate spaces
 hotkey=
 method=del_more_spaces
 
-[item319]
+[item320]
 section=commands
 caption=Cuda&-Ext\&Align\-
 hotkey=
 method=_
 
-[item320]
+[item321]
 section=commands
 caption=Cuda&-Ext\&Align\Re-wrap/split lines by margin...
 hotkey=
 method=rewrap_sel_by_margin
 
-[item321]
+[item322]
 section=commands
 caption=Cuda&-Ext\&Align\Re-wrap/split comment at caret
 hotkey=
 method=rewrap_cmt_at_caret
 
-[item322]
+[item323]
 section=commands
 caption=Cuda&-Ext\&Align\Align in lines to center by margin...
 hotkey=
 method=align_sel_to_center_by_margin
 
-[item323]
+[item324]
 section=commands
 caption=Cuda&-Ext\&Align\Align in lines to right by margin...
 hotkey=

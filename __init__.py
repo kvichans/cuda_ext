@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.7.12 2019-12-10'
+    '1.7.35 2021-09-17'
 '''
 
 from    .cd_ext import Command as CommandRLS
@@ -73,6 +73,7 @@ class Command:
     def indent_sel_as_1st(self):                return cd_ext_find_repl.indent_sel_as_1st()
     def indent_sel_as_bgn(self):                return cd_ext_find_repl.indent_sel_as_bgn()
     def align_sel_by_sep(self):                 return cd_ext_find_repl.align_sel_by_sep()
+    def align_by_carets(self):                  return cd_ext_find_repl.align_by_carets()
     
     # Jumps_cmds
     def scroll_to_center(self):                 return RLS.scroll_to('cen')

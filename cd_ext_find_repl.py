@@ -3,11 +3,12 @@ Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
 Version:
-    '1.7.33 2021-08-22'
+    '1.7.35 2021-09-17'
 ToDo: (see end of file)
 '''
 
 import  re, os, sys, webbrowser
+from            operator        import itemgetter
 
 import          cudatext            as app
 from            cudatext        import ed
@@ -1867,6 +1868,58 @@ def align_sel_by_sep():
     app.msg_status(f(_('Replaced {} line(s)'), len(strs)))
    #def align_sel_by_sep
         
+
+def align_by_carets():
+    # Ludger Ostrop-Lutterbeck, 2021
+    
+    crts = ed.get_carets()
+    if len(crts) <= 1:
+        return app.msg_status(_('Command does only work with multi-carets'))
+        
+    for (x, y, x1, y1) in crts:
+        if y1 >= 0:
+            return app.msg_status(_('This command cannot handle selection(s)'))    
+    
+    # Determine carets to be ignored with mulitple carets in one line 
+    # To_be_discussed: 
+    #   One posibility is to align at the rightmost carets position of multiple carets in a line.
+    #   The alternative is to do it the other way round and take the leftmost as the relevant one 
+    #       and ignore the carets further right.
+    #   I'm really not sure about what's being the better aproach. 
+    crts_to_ignore = []
+    
+    # Take rightmost caret and ignore all carets to the left in the same line 
+    for i in range(len(crts) - 1):
+        if crts[i][1] == crts[i + 1][1]:
+            crts_to_ignore.append(crts[i])
+ 
+    # As an alternative take the leftmost caret and ignore all carets to the right in the same line
+#   for i in reversed(range(len(crts))):
+#       if ((i - 1) >=0) and (crts[i][1] == crts[i - 1][1]):
+#           crts_to_ignore.append(crts[i])
+ 
+    crts_relevant = list(set(crts).difference(set(crts_to_ignore)))
+
+    # Get position of rightmost caret
+    max_pos_x = max(crts_relevant, key=itemgetter(0))[0]
+        
+    # Delete all carets 
+    ed.set_caret(-1, -1, -1, -1, id=app.CARET_DELETE_ALL, options=0)
+     
+    # Align content by carets at  position of rightmost caret, replace lines and restore rightmost carets of each line  
+    for (x, y, x1, y1) in crts_relevant:
+        len_line = len(ed.get_text_line(y))
+        
+        spaces = ' ' * (max_pos_x - x)
+        nline = ed.get_text_substr(0, y, x, y) + spaces + ed.get_text_substr(x, y, len_line, y) 
+        ed.replace(0, y, len_line, y, nline)
+        
+        ed.set_caret(x + len(spaces), y, -1, -1, id=app.CARET_ADD, options=0) 
+        # To_be_discussed: 
+        #   as an alternative the carets could be set not a the position of the alignment but at their former position
+        #   I prefer the solution above with carets being at the position of the alignment    
+#       ed.set_caret(x, y, -1, -1, id=app.CARET_ADD, options=0)
+   #align_by_carets
 
 def _replace_lines(_ed, r_bgn, r_end, newlines):
     """ Replace full lines in [r_bgn, r_end] to newlines """
