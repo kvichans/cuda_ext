@@ -1,9 +1,9 @@
-﻿''' Plugin for CudaText editor
+''' Plugin for CudaText editor
 Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.34 2021-08-23'
+    '1.7.35 2022-01-05'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata
@@ -1939,7 +1939,27 @@ class Command:
         ed.set_text_all(body)   if in_size != len(body) else None
         app.msg_status(f(_('Removed characters: {}'), in_size-len(body)))
        #def remove_unprinted
-    
+
+    def remove_lines_with(self):
+        s = app.dlg_input(_('Remove lines containing this text:'), '')
+        if not s: return # empty str not allowed
+        carets = ed.get_carets()
+        cnt = 0
+        for i in reversed(range(ed.get_line_count())):
+            l = ed.get_text_line(i)
+            if bool(l) and (s in l):
+                ed.delete(0, i, 0, i+1)
+                cnt += 1
+        if cnt:
+            app.msg_status(_('Removed {} line(s)').format(cnt))
+            if carets:
+                x, y, x1, y1 = carets[0]
+                y_max = ed.get_line_count()-1
+                if max(y, y1) > y_max:
+                    ed.set_caret(0, y_max)
+        else:
+            app.msg_status(_('No lines with "{}" were found').format(s))
+
     def remove_xml_tags(self):
         rxCmt   = re.compile('<!--.*?-->', re.DOTALL)
         rxTag   = re.compile('<.*?>', re.DOTALL)
