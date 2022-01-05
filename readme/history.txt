@@ -1,5 +1,6 @@
-1.7.36 (2022-01-05)
+1.7.37 (2022-01-05)
 added: Command "Delete lines containing text..." (by Alexey T.)
+added: Command "Strip HTML tags" has improved logic
 
 1.7.35 (2021-09-17)
 added: Command "Align carets columns by inserting spaces" - Aligns positions of multi-carets by inserting space-chars, so all carets go to the same column
