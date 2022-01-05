@@ -125,6 +125,7 @@ class Command:
     def save_tabs_to_file(self):                return RLS.save_tabs_to_file()
     def remove_unprinted(self):                 return RLS.remove_unprinted()
     def remove_xml_tags(self):                  return RLS.remove_xml_tags()
+    def remove_lines_with(self):                return RLS.remove_lines_with()
     def exec_selected_in_console(self):         return RLS.exec_selected_in_console()
 
     # Tabs_cmds
