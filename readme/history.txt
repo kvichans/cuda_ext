@@ -2,7 +2,7 @@
 added: Command "Delete lines containing text..." (by Alexey T.)
 
 1.7.35 (2021-09-17)
-added: Command "Align carets columns by inserting spaces"
+added: Command "Align carets columns by inserting spaces" - Aligns positions of multi-carets by inserting space-chars, so all carets go to the same column
 
 1.7.34 (2021-08-23)
 added: New options for user.json: 
