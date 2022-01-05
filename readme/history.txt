@@ -1,3 +1,6 @@
+1.7.36 (2022-01-05)
+added: Command "Delete lines containing text..." (by Alexey T.)
+
 1.7.35 (2021-09-17)
 added: Command "Align carets columns by inserting spaces"
 

@@ -104,6 +104,12 @@ caption=Cuda&-Ext\&Find/Replace\Strip HTML tags
 hotkey=
 method=remove_xml_tags
 
+[item24]
+section=commands
+caption=Cuda&-Ext\&Find/Replace\Remove lines containing text...
+hotkey=
+method=remove_lines_with
+
 [item25]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\-
