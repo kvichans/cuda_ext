@@ -100,7 +100,7 @@ method=remove_unprinted
 
 [item23]
 section=commands
-caption=Cuda&-Ext\&Find/Replace\Strip HTML tags
+caption=Cuda&-Ext\&Find/Replace\Strip HTML tags (without Undo)
 hotkey=
 method=remove_xml_tags
 
