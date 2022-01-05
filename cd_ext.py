@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.36 2022-01-05'
+    '1.7.37 2022-01-05'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata
@@ -1962,19 +1962,19 @@ class Command:
 
     def remove_xml_tags(self):
         rxCmt   = re.compile('<!--.*?-->', re.DOTALL)
-        rxTag   = re.compile('<.*?>', re.DOTALL)
+        rxTag   = re.compile('<\w+[^<>]*>', re.DOTALL)
         body    = ed.get_text_all()
         if not rxCmt.search(body) and not rxTag.search(body):
-            return app.msg_status(_('No tags'))
+            return app.msg_status(_('No tags were found'))
         cmts    = rxCmt.findall(body)
         body    = rxCmt.sub('', body)
         tags    = rxTag.findall(body)
         body    = rxTag.sub('', body)
         ed.set_text_all(body)
         app.msg_status(
-            f(_('Stripping is done. Removed tags: {}'), len(tags))
+            f(_('Removed {} tag(s)'), len(tags))
                 if not cmts else
-            f(_('Stripping is done. Removed comments: {}, removed tags: {}'), len(cmts), len(tags))
+            f(_('Removed {} comment(s), {} tag(s)'), len(cmts), len(tags))
         )
        #def remove_xml_tags
        
