@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.37 2022-01-05'
+    '1.7.38 2022-01-07'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata
@@ -1940,14 +1940,12 @@ class Command:
         app.msg_status(f(_('Removed characters: {}'), in_size-len(body)))
        #def remove_unprinted
 
-    def remove_lines_with(self):
-        s = app.dlg_input(_('Remove lines containing this text:'), '')
-        if not s: return # empty str not allowed
+    def remove_lines_by_callback(self, callback):
         carets = ed.get_carets()
         cnt = 0
         for i in reversed(range(ed.get_line_count())):
             l = ed.get_text_line(i)
-            if bool(l) and (s in l):
+            if bool(l) and callback(l):
                 ed.delete(0, i, 0, i+1)
                 cnt += 1
         if cnt:
@@ -1959,6 +1957,17 @@ class Command:
                     ed.set_caret(0, y_max)
         else:
             app.msg_status(_('No lines with "{}" were found').format(s))
+
+    def remove_lines_with(self):
+        s = app.dlg_input(_('Remove lines containing text:'), '')
+        if not s: return # empty str not allowed
+        self.remove_lines_by_callback(lambda l: s in l)
+        
+    def remove_lines_regex(self):
+        s = app.dlg_input(_('Remove lines containing RegEx:'), '')
+        if not s: return # empty str not allowed
+        s_re = re.compile(s, 0) 
+        self.remove_lines_by_callback(lambda l: len(s_re.findall(l))>0)
 
     def remove_xml_tags(self):
         rxCmt   = re.compile('<!--.*?-->', re.DOTALL)
