@@ -1968,7 +1968,7 @@ class Command:
         if not s: return # empty str not allowed
         try:
             s_re = re.compile(s, 0)
-            self.remove_lines_by_callback(lambda l: len(s_re.findall(l))>0)
+            self.remove_lines_by_callback(lambda l: s_re.search(l) is not None)
         except:
             app.msg_status(_('Incorrect RegEx: ')+s) 
 
