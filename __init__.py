@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.7.35 2021-09-17'
+    '1.7.36 2022-01-07'
 '''
 
 from    .cd_ext import Command as CommandRLS
@@ -126,6 +126,7 @@ class Command:
     def remove_unprinted(self):                 return RLS.remove_unprinted()
     def remove_xml_tags(self):                  return RLS.remove_xml_tags()
     def remove_lines_with(self):                return RLS.remove_lines_with()
+    def remove_lines_regex(self):               return RLS.remove_lines_regex()
     def exec_selected_in_console(self):         return RLS.exec_selected_in_console()
 
     # Tabs_cmds
