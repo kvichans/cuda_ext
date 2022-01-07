@@ -1966,8 +1966,11 @@ class Command:
     def remove_lines_regex(self):
         s = app.dlg_input(_('Remove lines containing RegEx:'), '')
         if not s: return # empty str not allowed
-        s_re = re.compile(s, 0) 
-        self.remove_lines_by_callback(lambda l: len(s_re.findall(l))>0)
+        try:
+            s_re = re.compile(s, 0)
+            self.remove_lines_by_callback(lambda l: len(s_re.findall(l))>0)
+        except:
+            app.msg_status(_('Incorrect RegEx: ')+s) 
 
     def remove_xml_tags(self):
         rxCmt   = re.compile('<!--.*?-->', re.DOTALL)
