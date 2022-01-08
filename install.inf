@@ -1,5 +1,5 @@
 [info]
-version=1.7.37
+version=1.7.38
 title=CudaExt
 desc=Additional commands for CudaText in Commands dialog and Plugins menu
 type=cudatext-plugin
@@ -109,6 +109,12 @@ section=commands
 caption=Cuda&-Ext\&Find/Replace\Remove lines containing text...
 hotkey=
 method=remove_lines_with
+
+[item24b]
+section=commands
+caption=Cuda&-Ext\&Find/Replace\Remove lines containing RegEx...
+hotkey=
+method=remove_lines_regex
 
 [item25]
 section=commands
