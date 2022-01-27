@@ -1713,8 +1713,19 @@ def _rewrap(margin, cmt_sgn, save_bl, rTx1, rTx2, sel_after):
 
 
 def rewrap_cmt_at_caret():
-    if app.app_api_version()<'1.0.187': return app.msg_status(_('Need update application'))
-    margin  = apx.get_opt('margin', 0)
+    if app.app_api_version()<'1.0.187':
+        return app.msg_status(_('Need update application'))
+
+    margin = apx.get_opt('margin', 0)
+    res = app.dlg_input(_('Margin value:'), str(margin))
+    if not res: return
+    try:
+        margin = int(res)
+        if margin<20:
+            raise ValueError('bad value')
+    except:
+        return app.msg_status(_('Incorrect margin value: ')+res)
+
     lex     = ed.get_prop(app.PROP_LEXER_FILE, '')
     if not lex: return app.msg_status(_('Need lexer active'))
     cmt_sgn = app.lexer_proc(app.LEXER_GET_PROP, lex)['c_line']     if lex else ''
@@ -1737,8 +1748,11 @@ def rewrap_cmt_at_caret():
 
 
 def rewrap_sel_by_margin():
-    if len(ed.get_carets())>1:          return app.msg_status(_("Command doesn't work with multi-carets"))
-    if app.app_api_version()<'1.0.187': return app.msg_status(_('Need update application'))
+    if len(ed.get_carets())>1:
+        return app.msg_status(_("Command doesn't work with multi-carets"))
+    if app.app_api_version()<'1.0.187':
+        return app.msg_status(_('Need update application'))
+
     margin  = apx.get_opt('margin', 0)
     lex     = ed.get_prop(app.PROP_LEXER_FILE, '')
     cmt_sgn = app.lexer_proc(app.LEXER_GET_PROP, lex)['c_line']     if lex else ''
