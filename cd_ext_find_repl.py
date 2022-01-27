@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
 Version:
-    '1.7.35 2021-09-17'
+    '1.7.36 2022-01-27'
 ToDo: (see end of file)
 '''
 
@@ -1702,8 +1702,13 @@ def _rewrap(margin, cmt_sgn, save_bl, rTx1, rTx2, sel_after):
     pass;                      #log__('fin text={}',('\n'+text)  ,__=(log4fun,_log4mod))
     # Modify ed
     _replace_lines(ed, rTx1, rTx2, text)
+    
     if sel_after:
-        ed.set_caret(0,rTx1+len(lines), 0,rTx1)
+        new_y = rTx1+len(lines)
+        if new_y >= ed.get_line_count():
+            ed.cmd(cmds.cCommand_ForceFinalEndOfLine, '')
+        ed.set_caret(0, new_y, 0, rTx1)
+        ed.set_prop(app.PROP_SCROLL_HORZ, 0)
    #def _rewrap
 
 
