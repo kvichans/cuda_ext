@@ -1,3 +1,7 @@
+1.7.39 (2022-01-27)
+added: command "Re-wrap/split comment at caret" shows dialog to enter margin value (by Alexey T.)
+fixed: command "Re-wrap/split lines by margin" gave bad state if handled last line without final EOL (by Alexey T.)
+
 1.7.38 (2022-01-07)
 added: Command "Delete lines containing text..." (by Alexey T.)
 added: Command "Delete lines containing RegEx..." (by Alexey T.)

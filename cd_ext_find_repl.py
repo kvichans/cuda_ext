@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
 Version:
-    '1.7.35 2021-09-17'
+    '1.7.36 2022-01-27'
 ToDo: (see end of file)
 '''
 
@@ -1702,14 +1702,30 @@ def _rewrap(margin, cmt_sgn, save_bl, rTx1, rTx2, sel_after):
     pass;                      #log__('fin text={}',('\n'+text)  ,__=(log4fun,_log4mod))
     # Modify ed
     _replace_lines(ed, rTx1, rTx2, text)
+    
     if sel_after:
-        ed.set_caret(0,rTx1+len(lines), 0,rTx1)
+        new_y = rTx1+len(lines)
+        if new_y >= ed.get_line_count():
+            ed.cmd(cmds.cCommand_ForceFinalEndOfLine, '')
+        ed.set_caret(0, new_y, 0, rTx1)
+        ed.set_prop(app.PROP_SCROLL_HORZ, 0)
    #def _rewrap
 
 
 def rewrap_cmt_at_caret():
-    if app.app_api_version()<'1.0.187': return app.msg_status(_('Need update application'))
-    margin  = apx.get_opt('margin', 0)
+    if app.app_api_version()<'1.0.187':
+        return app.msg_status(_('Need update application'))
+
+    margin = apx.get_opt('margin', 0)
+    res = app.dlg_input(_('Margin value:'), str(margin))
+    if not res: return
+    try:
+        margin = int(res)
+        if margin<20:
+            raise ValueError('bad value')
+    except:
+        return app.msg_status(_('Incorrect margin value: ')+res)
+
     lex     = ed.get_prop(app.PROP_LEXER_FILE, '')
     if not lex: return app.msg_status(_('Need lexer active'))
     cmt_sgn = app.lexer_proc(app.LEXER_GET_PROP, lex)['c_line']     if lex else ''
@@ -1732,8 +1748,11 @@ def rewrap_cmt_at_caret():
 
 
 def rewrap_sel_by_margin():
-    if len(ed.get_carets())>1:          return app.msg_status(_("Command doesn't work with multi-carets"))
-    if app.app_api_version()<'1.0.187': return app.msg_status(_('Need update application'))
+    if len(ed.get_carets())>1:
+        return app.msg_status(_("Command doesn't work with multi-carets"))
+    if app.app_api_version()<'1.0.187':
+        return app.msg_status(_('Need update application'))
+
     margin  = apx.get_opt('margin', 0)
     lex     = ed.get_prop(app.PROP_LEXER_FILE, '')
     cmt_sgn = app.lexer_proc(app.LEXER_GET_PROP, lex)['c_line']     if lex else ''
