@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
 Version:
-    '1.7.39 2022-01-28'
+    '1.7.40 2022-04-01'
 ToDo: (see end of file)
 '''
 
@@ -1692,9 +1692,10 @@ def _rewrap(margin, cmt_sgn, save_bl, rTx1, rTx2, sel_after):
         pass;              #LOG and log('last_pos, word[1]-last_pos, word={}',(last_pos, word[1]-last_pos, word))
         if word[1] - last_pos >= margin:
             line    = text[last_pos:word[0]]
-            if line[-1] == ' ':
-                line    = line[:-1]
-            lines  += [line]
+            if line:
+                if line[-1] == ' ':
+                    line    = line[:-1]
+                lines  += [line]
             last_pos= word[0]
     lines  += [text[last_pos:]]
     # Re-join
