@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.7.39 2022-05-22'
+    '1.7.41 2022-05-22'
 '''
 
 from    .cd_ext import Command as CommandRLS
