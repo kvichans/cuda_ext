@@ -1757,7 +1757,9 @@ def rewrap_sel_by_margin_def():
     if app.app_api_version()<'1.0.187':
         return app.msg_status(_('Need update application'))
 
-    margin  = apx.get_opt('margin', 0)
+    margin  = apx.get_opt('margin_right', 0)
+    if margin==0:
+        return app.msg_status(_('Set the margin via "Plugins / Cuda-Ext / Paragraph / Align: Configure..."'))
     margin  = min(max(margin, MARGIN_MIN), MARGIN_MAX)
     lex     = ed.get_prop(app.PROP_LEXER_FILE, '')
     cmt_sgn = app.lexer_proc(app.LEXER_GET_PROP, lex)['c_line']     if lex else ''
