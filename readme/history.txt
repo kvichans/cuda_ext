@@ -1,5 +1,5 @@
 1.7.41 (2022-05-22)
-added: command "Re-wrap/split lines by margin, with default", it uses limits for margin 40...160
+added: command "Re-wrap/split lines by margin, with defaults", it uses margin from dialog "Plugins / Cuda-Ext / Paragraph / Align: Configure..."
 
 1.7.39 (2022-01-27)
 added: command "Re-wrap/split comment at caret" shows dialog to enter margin value (by Alexey T.)
