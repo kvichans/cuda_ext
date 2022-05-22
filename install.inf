@@ -1,5 +1,5 @@
 [info]
-version=1.7.39
+version=1.7.41
 title=CudaExt
 desc=Additional commands for CudaText in Commands dialog and Plugins menu
 type=cudatext-plugin
