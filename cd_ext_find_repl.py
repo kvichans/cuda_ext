@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
 Version:
-    '1.7.40 2022-04-01'
+    '1.7.41 2022-05-22'
 ToDo: (see end of file)
 '''
 
@@ -1748,6 +1748,23 @@ def rewrap_cmt_at_caret():
    #def rewrap_cmt_at_caret
 
 
+def rewrap_sel_by_margin_def():
+    MARGIN_MIN = 40
+    MARGIN_MAX = 160
+    
+    if len(ed.get_carets())>1:
+        return app.msg_status(_("Command doesn't work with multi-carets"))
+    if app.app_api_version()<'1.0.187':
+        return app.msg_status(_('Need update application'))
+
+    margin  = apx.get_opt('margin', 0)
+    margin  = min(max(margin, MARGIN_MIN), MARGIN_MAX)
+    lex     = ed.get_prop(app.PROP_LEXER_FILE, '')
+    cmt_sgn = app.lexer_proc(app.LEXER_GET_PROP, lex)['c_line']     if lex else ''
+
+    rewrap_sel_by_margin_ex(margin, cmt_sgn, True)
+
+
 def rewrap_sel_by_margin():
     if len(ed.get_carets())>1:
         return app.msg_status(_("Command doesn't work with multi-carets"))
@@ -1780,7 +1797,11 @@ def rewrap_sel_by_margin():
     margin  = int(vals['marg'])
     cmt_sgn =     vals['csgn']
     save_bl =     vals['svbl']
-        
+    
+    rewrap_sel_by_margin_ex(margin, cmt_sgn, save_bl)
+
+
+def rewrap_sel_by_margin_ex(margin, cmt_sgn, save_bl):
     crts    = ed.get_carets()
     cCrt, rCrt, \
     cEnd, rEnd  = crts[0]
@@ -1791,7 +1812,7 @@ def rewrap_sel_by_margin():
     pass;                      #log__('rTx1, rTx2={}',(rTx1, rTx2)  ,__=(log4fun,_log4mod))
 
     def find_paragraphs_in_range(line1, line2):
-        " Author: github.com/Alexey-T "
+        """ Author: Alexey T. """
         rng = []
         n2 = line2
         while True:
@@ -1813,7 +1834,6 @@ def rewrap_sel_by_margin():
     ranges = find_paragraphs_in_range(rTx1, rTx2)
     for rng in reversed(ranges):
         _rewrap(margin, cmt_sgn, save_bl, rng[0], rng[1], True)
-#   _rewrap(    margin, cmt_sgn, save_bl, rTx1, rTx2, True)
    #def rewrap_sel_by_margin
         
 
