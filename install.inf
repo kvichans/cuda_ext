@@ -1,5 +1,5 @@
 [info]
-version=1.7.38
+version=1.7.39
 title=CudaExt
 desc=Additional commands for CudaText in Commands dialog and Plugins menu
 type=cudatext-plugin
@@ -968,6 +968,12 @@ section=commands
 caption=Cuda&-Ext\&Align\Re-wrap/split lines by margin...
 hotkey=
 method=rewrap_sel_by_margin
+
+[item321a]
+section=commands
+caption=Cuda&-Ext\&Align\Re-wrap/split lines by margin, with defaults
+hotkey=
+method=rewrap_sel_by_margin_def
 
 [item322]
 section=commands
