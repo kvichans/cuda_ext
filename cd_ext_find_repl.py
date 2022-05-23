@@ -1164,7 +1164,7 @@ def dlg_find_in_lines():                                        #NOTE: dlg_find_
 
 
 def find_cb_by_cmd(updn):
-    if app.app_api_version()<'1.0.182':  return app.msg_status(_("Need update CudaText"))
+    if app.app_api_version()<'1.0.182':  return app.msg_status(_("Need to update CudaText"))
     clip    = app.app_proc(app.PROC_GET_CLIP, '')
     if ''==clip:    return
     clip    = clip.replace('\r\n', '\n').replace('\r', '\n')    ##??
@@ -1200,7 +1200,7 @@ def find_cb_by_cmd(updn):
 
 
 def replace_all_sel_to_cb():
-    if app.app_api_version()<'1.0.182':  return app.msg_status(_("Need update CudaText"))
+    if app.app_api_version()<'1.0.182':  return app.msg_status(_("Need to update CudaText"))
     crts    = ed.get_carets()
     if len(crts)>1: return app.msg_status(_("{} doesn't work with multi-carets").format(_('Command')))
     seltext = ed.get_text_sel()
@@ -1377,7 +1377,7 @@ def align_in_lines_by_sep():
 
 
 def reindent():
-    if app.app_api_version()<'1.0.187': return app.msg_status(_('Need update application'))
+    if app.app_api_version()<'1.0.187': return app.msg_status(_('Need to update application'))
     crts    = ed.get_carets()
     if len(crts)>1:
         return app.msg_status(_("{} doesn't work with multi-carets").format(_('Command')))
@@ -1585,7 +1585,7 @@ def align_sel_by_margin(how):
 
 
 def join_lines():
-    if app.app_api_version()<'1.0.187': return app.msg_status(_('Need update application'))
+    if app.app_api_version()<'1.0.187': return app.msg_status(_('Need to update application'))
     crts    = ed.get_carets()
     if len(crts)>1:
         return app.msg_status(_("{} doesn't work with multi-carets").format(_('Command')))
@@ -1621,7 +1621,7 @@ def join_lines():
     
 
 def del_more_spaces():
-    if app.app_api_version()<'1.0.187': return app.msg_status(_('Need update application'))
+    if app.app_api_version()<'1.0.187': return app.msg_status(_('Need to update application'))
     crts    = ed.get_carets()
     if len(crts)>1:
         return app.msg_status(_("{} doesn't work with multi-carets").format(_('Command')))
@@ -1715,7 +1715,7 @@ def _rewrap(margin, cmt_sgn, save_bl, rTx1, rTx2, sel_after):
 
 def rewrap_cmt_at_caret():
     if app.app_api_version()<'1.0.187':
-        return app.msg_status(_('Need update application'))
+        return app.msg_status(_('Need to update application'))
 
     margin = apx.get_opt('margin', 0)
     res = app.dlg_input(_('Margin value:'), str(margin))
@@ -1755,7 +1755,7 @@ def rewrap_sel_by_margin_def():
     if len(ed.get_carets())>1:
         return app.msg_status(_("Command doesn't work with multi-carets"))
     if app.app_api_version()<'1.0.187':
-        return app.msg_status(_('Need update application'))
+        return app.msg_status(_('Need to update application'))
 
     margin  = apx.get_opt('margin_right', 0)
     if margin==0:
@@ -1771,7 +1771,7 @@ def rewrap_sel_by_margin():
     if len(ed.get_carets())>1:
         return app.msg_status(_("Command doesn't work with multi-carets"))
     if app.app_api_version()<'1.0.187':
-        return app.msg_status(_('Need update application'))
+        return app.msg_status(_('Need to update application'))
 
     margin  = apx.get_opt('margin', 0)
     lex     = ed.get_prop(app.PROP_LEXER_FILE, '')
@@ -1965,7 +1965,7 @@ def align_by_carets():
 
 def _replace_lines(_ed, r_bgn, r_end, newlines):
     """ Replace full lines in [r_bgn, r_end] to newlines """
-    if app.app_api_version()<'1.0.187': return app.msg_status(_('Need update application'))
+    if app.app_api_version()<'1.0.187': return app.msg_status(_('Need to update application'))
     lines_n     = _ed.get_line_count()
     pass;                      #log__('lines_n, r_bgn, r_end, newlines={}',(lines_n, r_bgn, r_end, newlines)  ,__=(log4fun,_log4mod))
     if r_end < lines_n-1:
