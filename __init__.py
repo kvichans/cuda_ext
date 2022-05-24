@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.7.36 2022-01-07'
+    '1.7.41 2022-05-22'
 '''
 
 from    .cd_ext import Command as CommandRLS
@@ -67,6 +67,7 @@ class Command:
     def join_lines(self):                       return cd_ext_find_repl.join_lines()
     def del_more_spaces(self):                  return cd_ext_find_repl.del_more_spaces()
     def rewrap_sel_by_margin(self):             return cd_ext_find_repl.rewrap_sel_by_margin()
+    def rewrap_sel_by_margin_def(self):         return cd_ext_find_repl.rewrap_sel_by_margin_def()
     def rewrap_cmt_at_caret(self):              return cd_ext_find_repl.rewrap_cmt_at_caret()
     def align_sel_to_center_by_margin(self):    return cd_ext_find_repl.align_sel_by_margin('c')
     def align_sel_to_right_by_margin(self):     return cd_ext_find_repl.align_sel_by_margin('r')

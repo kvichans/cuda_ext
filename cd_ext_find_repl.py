@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
 Version:
-    '1.7.40 2022-04-01'
+    '1.7.41 2022-05-22'
 ToDo: (see end of file)
 '''
 
@@ -1164,7 +1164,7 @@ def dlg_find_in_lines():                                        #NOTE: dlg_find_
 
 
 def find_cb_by_cmd(updn):
-    if app.app_api_version()<'1.0.182':  return app.msg_status(_("Need update CudaText"))
+    if app.app_api_version()<'1.0.182':  return app.msg_status(_("Need to update CudaText"))
     clip    = app.app_proc(app.PROC_GET_CLIP, '')
     if ''==clip:    return
     clip    = clip.replace('\r\n', '\n').replace('\r', '\n')    ##??
@@ -1200,7 +1200,7 @@ def find_cb_by_cmd(updn):
 
 
 def replace_all_sel_to_cb():
-    if app.app_api_version()<'1.0.182':  return app.msg_status(_("Need update CudaText"))
+    if app.app_api_version()<'1.0.182':  return app.msg_status(_("Need to update CudaText"))
     crts    = ed.get_carets()
     if len(crts)>1: return app.msg_status(_("{} doesn't work with multi-carets").format(_('Command')))
     seltext = ed.get_text_sel()
@@ -1377,7 +1377,7 @@ def align_in_lines_by_sep():
 
 
 def reindent():
-    if app.app_api_version()<'1.0.187': return app.msg_status(_('Need update application'))
+    if app.app_api_version()<'1.0.187': return app.msg_status(_('Need to update application'))
     crts    = ed.get_carets()
     if len(crts)>1:
         return app.msg_status(_("{} doesn't work with multi-carets").format(_('Command')))
@@ -1585,7 +1585,7 @@ def align_sel_by_margin(how):
 
 
 def join_lines():
-    if app.app_api_version()<'1.0.187': return app.msg_status(_('Need update application'))
+    if app.app_api_version()<'1.0.187': return app.msg_status(_('Need to update application'))
     crts    = ed.get_carets()
     if len(crts)>1:
         return app.msg_status(_("{} doesn't work with multi-carets").format(_('Command')))
@@ -1621,7 +1621,7 @@ def join_lines():
     
 
 def del_more_spaces():
-    if app.app_api_version()<'1.0.187': return app.msg_status(_('Need update application'))
+    if app.app_api_version()<'1.0.187': return app.msg_status(_('Need to update application'))
     crts    = ed.get_carets()
     if len(crts)>1:
         return app.msg_status(_("{} doesn't work with multi-carets").format(_('Command')))
@@ -1715,7 +1715,7 @@ def _rewrap(margin, cmt_sgn, save_bl, rTx1, rTx2, sel_after):
 
 def rewrap_cmt_at_caret():
     if app.app_api_version()<'1.0.187':
-        return app.msg_status(_('Need update application'))
+        return app.msg_status(_('Need to update application'))
 
     margin = apx.get_opt('margin', 0)
     res = app.dlg_input(_('Margin value:'), str(margin))
@@ -1748,11 +1748,30 @@ def rewrap_cmt_at_caret():
    #def rewrap_cmt_at_caret
 
 
+def rewrap_sel_by_margin_def():
+    MARGIN_MIN = 40
+    MARGIN_MAX = 160
+    
+    if len(ed.get_carets())>1:
+        return app.msg_status(_("Command doesn't work with multi-carets"))
+    if app.app_api_version()<'1.0.187':
+        return app.msg_status(_('Need to update application'))
+
+    margin  = apx.get_opt('margin_right', 0)
+    if margin==0:
+        return app.msg_status(_('Set the margin via "Plugins / Cuda-Ext / Paragraph / Align: Configure..."'))
+    margin  = min(max(margin, MARGIN_MIN), MARGIN_MAX)
+    lex     = ed.get_prop(app.PROP_LEXER_FILE, '')
+    cmt_sgn = app.lexer_proc(app.LEXER_GET_PROP, lex)['c_line']     if lex else ''
+
+    rewrap_sel_by_margin_ex(margin, cmt_sgn, True)
+
+
 def rewrap_sel_by_margin():
     if len(ed.get_carets())>1:
         return app.msg_status(_("Command doesn't work with multi-carets"))
     if app.app_api_version()<'1.0.187':
-        return app.msg_status(_('Need update application'))
+        return app.msg_status(_('Need to update application'))
 
     margin  = apx.get_opt('margin', 0)
     lex     = ed.get_prop(app.PROP_LEXER_FILE, '')
@@ -1780,7 +1799,11 @@ def rewrap_sel_by_margin():
     margin  = int(vals['marg'])
     cmt_sgn =     vals['csgn']
     save_bl =     vals['svbl']
-        
+    
+    rewrap_sel_by_margin_ex(margin, cmt_sgn, save_bl)
+
+
+def rewrap_sel_by_margin_ex(margin, cmt_sgn, save_bl):
     crts    = ed.get_carets()
     cCrt, rCrt, \
     cEnd, rEnd  = crts[0]
@@ -1791,7 +1814,7 @@ def rewrap_sel_by_margin():
     pass;                      #log__('rTx1, rTx2={}',(rTx1, rTx2)  ,__=(log4fun,_log4mod))
 
     def find_paragraphs_in_range(line1, line2):
-        " Author: github.com/Alexey-T "
+        """ Author: Alexey T. """
         rng = []
         n2 = line2
         while True:
@@ -1813,7 +1836,6 @@ def rewrap_sel_by_margin():
     ranges = find_paragraphs_in_range(rTx1, rTx2)
     for rng in reversed(ranges):
         _rewrap(margin, cmt_sgn, save_bl, rng[0], rng[1], True)
-#   _rewrap(    margin, cmt_sgn, save_bl, rTx1, rTx2, True)
    #def rewrap_sel_by_margin
         
 
@@ -1943,7 +1965,7 @@ def align_by_carets():
 
 def _replace_lines(_ed, r_bgn, r_end, newlines):
     """ Replace full lines in [r_bgn, r_end] to newlines """
-    if app.app_api_version()<'1.0.187': return app.msg_status(_('Need update application'))
+    if app.app_api_version()<'1.0.187': return app.msg_status(_('Need to update application'))
     lines_n     = _ed.get_line_count()
     pass;                      #log__('lines_n, r_bgn, r_end, newlines={}',(lines_n, r_bgn, r_end, newlines)  ,__=(log4fun,_log4mod))
     if r_end < lines_n-1:

@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.38 2022-01-07'
+    '1.7.41 2022-05-23'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata
@@ -35,7 +35,7 @@ ONLY_SINGLE_CRT     = _("{} doesn't work with multi-carets")
 ONLY_FOR_NO_SEL     = _("{} works when no selection")
 NO_PAIR_BRACKET     = _("Cannot find matching bracket for '{}'")
 NO_FILE_FOR_OPEN    = _("Cannot open: {}")
-NEED_UPDATE         = _("Need update CudaText")
+NEED_UPDATE         = _("Need to update CudaText")
 
 pass;                           # Logging
 pass;                           from pprint import pformat
