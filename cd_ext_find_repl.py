@@ -1749,9 +1749,6 @@ def rewrap_cmt_at_caret():
 
 
 def rewrap_sel_by_margin_def():
-    MARGIN_MIN = 40
-    MARGIN_MAX = 160
-    
     if len(ed.get_carets())>1:
         return app.msg_status(_("Command doesn't work with multi-carets"))
     if app.app_api_version()<'1.0.187':
@@ -1760,12 +1757,11 @@ def rewrap_sel_by_margin_def():
     margin  = apx.get_opt('margin_right', 0)
     if margin==0:
         return app.msg_status(_('Set the margin via "Plugins / Cuda-Ext / Paragraph / Align: Configure..."'))
-    margin  = min(max(margin, MARGIN_MIN), MARGIN_MAX)
     lex     = ed.get_prop(app.PROP_LEXER_FILE, '')
     cmt_sgn = app.lexer_proc(app.LEXER_GET_PROP, lex)['c_line']     if lex else ''
 
     rewrap_sel_by_margin_ex(margin, cmt_sgn, True)
-
+   #def rewrap_sel_by_margin_def
 
 def rewrap_sel_by_margin():
     if len(ed.get_carets())>1:
@@ -1801,6 +1797,7 @@ def rewrap_sel_by_margin():
     save_bl =     vals['svbl']
     
     rewrap_sel_by_margin_ex(margin, cmt_sgn, save_bl)
+   #def rewrap_sel_by_margin
 
 
 def rewrap_sel_by_margin_ex(margin, cmt_sgn, save_bl):
@@ -1836,7 +1833,7 @@ def rewrap_sel_by_margin_ex(margin, cmt_sgn, save_bl):
     ranges = find_paragraphs_in_range(rTx1, rTx2)
     for rng in reversed(ranges):
         _rewrap(margin, cmt_sgn, save_bl, rng[0], rng[1], True)
-   #def rewrap_sel_by_margin
+   #def rewrap_sel_by_margin_ex
         
 
 def align_sel_by_sep():
