@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.41 2022-05-23'
+    '1.7.42 2022-07-10'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata
@@ -1873,9 +1873,9 @@ class Command:
        #def open_all_with_subdir
     
     def open_with_defapp(self):
-        if not os.name=='nt':       return app.msg_status(_('Command is for Windows only.'))
-        cf_path     = _get_filename(ed)
-        if not cf_path:             return app.msg_status(_('No file to open. '))
+        fn = _get_filename(ed)
+        if not fn:
+            return app.msg_status(_('No file to open.'))
         if ed.get_prop(app.PROP_MODIFIED) and \
             app.msg_box(  _('Text is modified!'
                           '\nCommand will use file content from disk.'
@@ -1883,7 +1883,19 @@ class Command:
                            ,app.MB_YESNO+app.MB_ICONQUESTION
                            )!=app.ID_YES:   return
         try:
-            os.startfile(cf_path)
+            suffix = app.app_proc(app.PROC_GET_OS_SUFFIX, '')
+            if suffix=='':
+                #Windows
+                os.startfile(fn)
+            elif suffix=='__mac':
+                #macOS
+                os.system('open "'+fn+'"')
+            elif suffix=='__haiku':
+                #Haiku
+                app.msg_status('TODO: implement "Open in default app" for Haiku')
+            else:
+                #other Unixes
+                os.system('xdg-open "'+fn+'"')
         except Exception as ex:
             pass;               log(traceback.format_exc())
             return app.msg_status(_('Error: ')+ex)
