@@ -1,3 +1,6 @@
+1.7.42 (2022-07-10)
+added: command "Open current file in default application" supports Unixes/macOS (by Alexey T.)
+
 1.7.41 (2022-05-22)
 added: command "Re-wrap/split lines by margin, with defaults", it uses margin from dialog "Plugins / Cuda-Ext / Paragraph / Align: Configure..."
 
