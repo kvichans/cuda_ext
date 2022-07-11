@@ -1752,9 +1752,11 @@ class Command:
         ed.cmd(cmds.cmd_FileClose)
 
         os.replace(old_path, new_path)
-        EX2 = '.cuda-pic'
-        if os.path.isfile(old_path+EX2):
-            os.replace(old_path+EX2, new_path+EX2)
+        for ext in ('.cuda-pic', '.cuda-colortext'):
+            if os.path.isfile(old_path+ext):
+                if os.path.isfile(new_path+ext):
+                    os.remove(new_path+ext)
+                os.replace(old_path+ext, new_path+ext)
 
         app.file_open(new_path, group)
         ed.set_prop(app.PROP_INDEX_TAB, str(tab_pos))
