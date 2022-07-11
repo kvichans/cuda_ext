@@ -1754,8 +1754,6 @@ class Command:
         os.replace(old_path, new_path)
         for ext in ('.cuda-pic', '.cuda-colortext'):
             if os.path.isfile(old_path+ext):
-                if os.path.isfile(new_path+ext):
-                    os.remove(new_path+ext)
                 os.replace(old_path+ext, new_path+ext)
 
         app.file_open(new_path, group)
