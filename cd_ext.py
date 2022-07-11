@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.42 2022-07-10'
+    '1.7.43 2022-07-11'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata
@@ -1748,8 +1748,14 @@ class Command:
                 ed.set_prop(app.PROP_MODIFIED, '0')     #? Changes lose!
             if ans==app.ID_YES:
                 ed.save()
-        os.replace(old_path, new_path)
+
         ed.cmd(cmds.cmd_FileClose)
+
+        os.replace(old_path, new_path)
+        EX2 = '.cuda-pic'
+        if os.path.isfile(old_path+EX2):
+            os.replace(old_path+EX2, new_path+EX2)
+
         app.file_open(new_path, group)
         ed.set_prop(app.PROP_INDEX_TAB, str(tab_pos))
         ed.set_caret(*crt)
