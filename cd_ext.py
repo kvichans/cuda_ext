@@ -1795,13 +1795,14 @@ class Command:
     def open_recent(self):
         home_s      = os.path.expanduser('~')
         def full_fn(fn):
-            if fn.startswith('~/'):
-                fn = fn.replace('~/', home_s+'/', 1)
+            if fn.startswith('~'+os.sep):
+                fn = fn.replace('~'+os.sep, home_s+os.sep, 1)
             return fn
 
-        hist_fs     = app.app_path(app.APP_FILE_RECENTS).split('\n')
+        hist_fs     = app.app_path(app.APP_FILE_RECENTS).splitlines() # not split('\n') because Cud's APP_FILE_RECENTS has bug on Windows
         hist_fts    = [(f, os.path.getmtime(full_fn(f)))
-                        for f in hist_fs if os.path.exists(full_fn(f))]
+                        for f in hist_fs if os.path.isfile(full_fn(f))]
+        
         sort_as     = get_hist([           'open-recent','sort_as'],
                       apx.get_opt('cuda_ext.open-recent.sort_as'    , 't'))
         show_as     = get_hist([           'open-recent','show_as'],
