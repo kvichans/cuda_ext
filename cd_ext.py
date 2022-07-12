@@ -1841,7 +1841,11 @@ class Command:
                 sort_as     = 'p' if sort_as=='t' else 't'
                 set_hist(['open-recent','sort_as'], sort_as)
                 continue #while
-            return app.file_open(hist_fts[ans][0].replace('~', home_s))
+
+            fn = hist_fts[ans][0]
+            if fn.startswith('~'+os.sep):
+                fn = fn.replace('~'+os.sep, home_s+os.sep, 1)
+            return app.file_open(fn)
 #           break#while
            #while
        #def open_recent
