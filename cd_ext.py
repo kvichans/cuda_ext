@@ -1820,11 +1820,15 @@ class Command:
                                                      os.path.basename(ft[0]).upper()
                                                     )
                                     , reverse=(sort_as=='t'))
-            sorted_by = {'t':'time','p':'path','lc':'last closed'}[sort_as]
+            sorted_by = {
+                't': _('sorted by time'),
+                'p': _('sorted by path'),
+                'lc': _('sorted by last closed')
+                }[sort_as]
             if sort_as=='p' and show_as=='n': sorted_by = 'name'
             ans         = dlg_menu(app.DMENU_LIST+app.DMENU_EDITORFONT+app.DMENU_NO_FUZZY, opts_key='cuda_ext.recents'
                         , clip=app.CLIP_MIDDLE, w=w, h=h
-                        , cap=f(_('Recent files: {} (sorted by {})'), len(hist_fts), sorted_by)
+                        , cap=f(_('Recent files: {} ({})'), len(hist_fts), sorted_by)
                         , its=[
                             (fn if show_as=='p' else
                              f('{} ({})', os.path.basename(fn), os.path.dirname(fn)))
