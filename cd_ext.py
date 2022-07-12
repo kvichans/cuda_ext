@@ -1828,7 +1828,7 @@ class Command:
             if sort_as=='p' and show_as=='n': sorted_by = 'name'
             ans         = dlg_menu(app.DMENU_LIST+app.DMENU_EDITORFONT+app.DMENU_NO_FUZZY, opts_key='cuda_ext.recents'
                         , clip=app.CLIP_MIDDLE, w=w, h=h
-                        , cap=f(_('Recent files: {} ({})'), len(hist_fts), sorted_by)
+                        , cap=_('Recent files:')+f(' {} ({})', len(hist_fts), sorted_by)
                         , its=[
                             (fn if show_as=='p' else
                              f('{} ({})', os.path.basename(fn), os.path.dirname(fn)))
