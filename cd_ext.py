@@ -1829,7 +1829,7 @@ class Command:
                             (fn if show_as=='p' else
                              f('{} ({})', os.path.basename(fn), os.path.dirname(fn)))
                             + '\t'
-                            + time.strftime("%Y/%b/%d %H:%M", time.gmtime(tm))
+                            + time.strftime("%Y/%b/%d %H:%M", time.localtime(tm))
                             for fn,tm in hist_fts
                           ]
                           +[_('<Show "name (path)">')   if show_as=='p' else
