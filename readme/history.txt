@@ -1,4 +1,5 @@
-1.7.43 (2022-07-11)
+1.7.44 (2022-07-12)
+added: command "Open recent file" now uses API to get recent-list from app's memory; before it used disk file (by Alexey T.)
 added: command "Rename file" should also rename pair-files *.cuda-pic / *.cuda-colortext (by Alexey T.)
 added: command "Open current file in default application" supports Unixes/macOS (by Alexey T.)
 
