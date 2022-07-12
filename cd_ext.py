@@ -1798,7 +1798,7 @@ class Command:
         if not os.path.exists(hist_fs_f):   return app.msg_status(_('No files in history'))
         hist_full_js= json.loads(open(hist_fs_f, encoding='utf8').read())
         hist_fs     = [f.replace('|', os.sep) for f in hist_full_js]
-        hist_fts    = [(f.replace(home_s, '~'), os.path.getmtime(f))
+        hist_fts    = [(f.replace(home_s+'/', '~/', 1), os.path.getmtime(f))
                         for f in hist_fs if os.path.exists(f)]
         sort_as     = get_hist([           'open-recent','sort_as'],
                       apx.get_opt('cuda_ext.open-recent.sort_as'    , 't'))
