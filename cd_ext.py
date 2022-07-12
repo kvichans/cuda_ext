@@ -1842,9 +1842,7 @@ class Command:
                 set_hist(['open-recent','sort_as'], sort_as)
                 continue #while
 
-            fn = hist_fts[ans][0]
-            if fn.startswith('~'+os.sep):
-                fn = fn.replace('~'+os.sep, home_s+os.sep, 1)
+            fn = full_fn(hist_fts[ans][0])
             return app.file_open(fn)
 #           break#while
            #while
