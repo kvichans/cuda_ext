@@ -1802,7 +1802,8 @@ class Command:
         hist_fs     = app.app_path(app.APP_FILE_RECENTS).splitlines() # not split('\n') because Cud's APP_FILE_RECENTS has bug on Windows
         hist_fts    = [(f, os.path.getmtime(full_fn(f)))
                         for f in hist_fs if os.path.isfile(full_fn(f))]
-        
+        hist_fts_default_sorting = hist_fts
+
         sort_as     = get_hist([           'open-recent','sort_as'],
                       apx.get_opt('cuda_ext.open-recent.sort_as'    , 't'))
         show_as     = get_hist([           'open-recent','show_as'],
@@ -1810,15 +1811,20 @@ class Command:
         w           = get_hist([           'open-recent','w']       , 800)
         h           = get_hist([           'open-recent','w']       , 600)
         while True:
-            hist_fts    = sorted(hist_fts
-                                , key=lambda ft:(ft[1]          if sort_as=='t' else
-                                                 ft[0].upper()  if show_as=='p' else
-                                                 os.path.basename(ft[0]).upper()
-                                                )
-                                , reverse=(sort_as=='t'))
+            if sort_as == 'lc': # lc = last closed (default sort order)
+                hist_fts = hist_fts_default_sorting
+            else:
+                hist_fts    = sorted(hist_fts
+                                    , key=lambda ft:(ft[1]          if sort_as=='t' else
+                                                     ft[0].upper()  if show_as=='p' else
+                                                     os.path.basename(ft[0]).upper()
+                                                    )
+                                    , reverse=(sort_as=='t'))
+            sorted_by = {'t':'time','p':'path','lc':'last closed'}[sort_as]
+            if sort_as=='p' and show_as=='n': sorted_by = 'name'
             ans         = dlg_menu(app.DMENU_LIST+app.DMENU_EDITORFONT+app.DMENU_NO_FUZZY, opts_key='cuda_ext.recents'
                         , clip=app.CLIP_MIDDLE, w=w, h=h
-                        , cap=f(_('Recent files: {}'), len(hist_fts))
+                        , cap=f(_('Recent files: {} (sorted by {})'), len(hist_fts), sorted_by)
                         , its=[
                             (fn if show_as=='p' else
                              f('{} ({})', os.path.basename(fn), os.path.dirname(fn)))
@@ -1830,7 +1836,8 @@ class Command:
                             _('<Show "path/name">')]
                           +[_('<Sort by path>')         if sort_as=='t' and show_as=='p' else
                             _('<Sort by name>')         if sort_as=='t' and show_as=='n' else
-                            _('<Sort by time>')]
+                            _('<Sort by time>')         if sort_as=='lc' else
+                            _('<Sort by last closed>')]
                                       )
             if ans is None: return
             if ans==(0+len(hist_fts)):
@@ -1838,7 +1845,12 @@ class Command:
                 set_hist(['open-recent','show_as'], show_as)
                 continue #while
             if ans==(1+len(hist_fts)):
-                sort_as     = 'p' if sort_as=='t' else 't'
+                if sort_as=='t':
+                    sort_as          = 'p'
+                else:
+                    if sort_as=='p':
+                        sort_as      = 'lc'
+                    else: sort_as    = 't'
                 set_hist(['open-recent','sort_as'], sort_as)
                 continue #while
 
