@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.43 2022-07-11'
+    '1.7.44 2022-07-12'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata
@@ -1794,12 +1794,14 @@ class Command:
 
     def open_recent(self):
         home_s      = os.path.expanduser('~')
-        hist_fs_f   = app.app_path(app.APP_DIR_SETTINGS)+os.sep+'history files.json'
-        if not os.path.exists(hist_fs_f):   return app.msg_status(_('No files in history'))
-        hist_full_js= json.loads(open(hist_fs_f, encoding='utf8').read())
-        hist_fs     = [f.replace('|', os.sep) for f in hist_full_js]
-        hist_fts    = [(f.replace(home_s+'/', '~/', 1), os.path.getmtime(f))
-                        for f in hist_fs if os.path.exists(f)]
+        def full_fn(fn):
+            if fn.startswith('~/'):
+                fn = fn.replace('~/', home_s+'/', 1)
+            return fn
+
+        hist_fs     = app.app_path(app.APP_FILE_RECENTS).split('\n')
+        hist_fts    = [(f, os.path.getmtime(full_fn(f)))
+                        for f in hist_fs if os.path.exists(full_fn(f))]
         sort_as     = get_hist([           'open-recent','sort_as'],
                       apx.get_opt('cuda_ext.open-recent.sort_as'    , 't'))
         show_as     = get_hist([           'open-recent','show_as'],
