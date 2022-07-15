@@ -1825,7 +1825,8 @@ class Command:
                 'p': _('sorted by path'),
                 'lc': _('sorted by last closed')
                 }[sort_as]
-            if sort_as=='p' and show_as=='n': sorted_by = 'name'
+            if sort_as=='p' and show_as=='n':
+                sorted_by = _('sorted by name')
             ans         = dlg_menu(app.DMENU_LIST+app.DMENU_EDITORFONT+app.DMENU_NO_FUZZY, opts_key='cuda_ext.recents'
                         , clip=app.CLIP_MIDDLE, w=w, h=h
                         , cap=_('Recent files:')+f(' {} ({})', len(hist_fts), sorted_by)
