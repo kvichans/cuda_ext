@@ -1,3 +1,10 @@
+1.7.44 (2022-07-12)
+added: command "Open recent file" gives sort order "by last closed time" (by @veksha)
+fixed: command "Open recent file" shows GMT time, must be local time (by @veksha)
+added: command "Open recent file" now uses API to get recent-list from app's memory; before it used disk file (by Alexey T.)
+added: command "Rename file" should also rename pair-files *.cuda-pic / *.cuda-colortext (by Alexey T.)
+added: command "Open current file in default application" supports Unixes/macOS (by Alexey T.)
+
 1.7.41 (2022-05-22)
 added: command "Re-wrap/split lines by margin, with defaults", it uses margin from dialog "Plugins / Cuda-Ext / Paragraph / Align: Configure..."
 

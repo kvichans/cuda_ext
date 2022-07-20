@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.41 2022-05-23'
+    '1.7.44 2022-07-12'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata
@@ -1748,8 +1748,14 @@ class Command:
                 ed.set_prop(app.PROP_MODIFIED, '0')     #? Changes lose!
             if ans==app.ID_YES:
                 ed.save()
-        os.replace(old_path, new_path)
+
         ed.cmd(cmds.cmd_FileClose)
+
+        os.replace(old_path, new_path)
+        for ext in ('.cuda-pic', '.cuda-colortext'):
+            if os.path.isfile(old_path+ext):
+                os.replace(old_path+ext, new_path+ext)
+
         app.file_open(new_path, group)
         ed.set_prop(app.PROP_INDEX_TAB, str(tab_pos))
         ed.set_caret(*crt)
@@ -1788,12 +1794,16 @@ class Command:
 
     def open_recent(self):
         home_s      = os.path.expanduser('~')
-        hist_fs_f   = app.app_path(app.APP_DIR_SETTINGS)+os.sep+'history files.json'
-        if not os.path.exists(hist_fs_f):   return app.msg_status(_('No files in history'))
-        hist_full_js= json.loads(open(hist_fs_f, encoding='utf8').read())
-        hist_fs     = [f.replace('|', os.sep) for f in hist_full_js]
-        hist_fts    = [(f.replace(home_s, '~'), os.path.getmtime(f))
-                        for f in hist_fs if os.path.exists(f)]
+        def full_fn(fn):
+            if fn.startswith('~'+os.sep):
+                fn = fn.replace('~'+os.sep, home_s+os.sep, 1)
+            return fn
+
+        hist_fs     = app.app_path(app.APP_FILE_RECENTS).splitlines() # not split('\n') because Cud's APP_FILE_RECENTS has bug on Windows
+        hist_fts    = [(f, os.path.getmtime(full_fn(f)))
+                        for f in hist_fs if os.path.isfile(full_fn(f))]
+        hist_fts_default_sorting = hist_fts
+
         sort_as     = get_hist([           'open-recent','sort_as'],
                       apx.get_opt('cuda_ext.open-recent.sort_as'    , 't'))
         show_as     = get_hist([           'open-recent','show_as'],
@@ -1801,27 +1811,38 @@ class Command:
         w           = get_hist([           'open-recent','w']       , 800)
         h           = get_hist([           'open-recent','w']       , 600)
         while True:
-            hist_fts    = sorted(hist_fts
-                                , key=lambda ft:(ft[1]          if sort_as=='t' else
-                                                 ft[0].upper()  if show_as=='p' else
-                                                 os.path.basename(ft[0]).upper()
-                                                )
-                                , reverse=(sort_as=='t'))
+            if sort_as == 'lc': # lc = last closed (default sort order)
+                hist_fts = hist_fts_default_sorting
+            else:
+                hist_fts    = sorted(hist_fts
+                                    , key=lambda ft:(ft[1]          if sort_as=='t' else
+                                                     ft[0].upper()  if show_as=='p' else
+                                                     os.path.basename(ft[0]).upper()
+                                                    )
+                                    , reverse=(sort_as=='t'))
+            sorted_by = {
+                't': _('sorted by time'),
+                'p': _('sorted by path'),
+                'lc': _('sorted by last closed')
+                }[sort_as]
+            if sort_as=='p' and show_as=='n':
+                sorted_by = _('sorted by name')
             ans         = dlg_menu(app.DMENU_LIST+app.DMENU_EDITORFONT+app.DMENU_NO_FUZZY, opts_key='cuda_ext.recents'
                         , clip=app.CLIP_MIDDLE, w=w, h=h
-                        , cap=f(_('Recent files: {}'), len(hist_fts))
+                        , cap=_('Recent files:')+f(' {} ({})', len(hist_fts), sorted_by)
                         , its=[
                             (fn if show_as=='p' else
                              f('{} ({})', os.path.basename(fn), os.path.dirname(fn)))
                             + '\t'
-                            + time.strftime("%Y/%b/%d %H:%M", time.gmtime(tm))
+                            + time.strftime("%Y/%b/%d %H:%M", time.localtime(tm))
                             for fn,tm in hist_fts
                           ]
                           +[_('<Show "name (path)">')   if show_as=='p' else
                             _('<Show "path/name">')]
                           +[_('<Sort by path>')         if sort_as=='t' and show_as=='p' else
                             _('<Sort by name>')         if sort_as=='t' and show_as=='n' else
-                            _('<Sort by time>')]
+                            _('<Sort by time>')         if sort_as=='lc' else
+                            _('<Sort by last closed>')]
                                       )
             if ans is None: return
             if ans==(0+len(hist_fts)):
@@ -1829,10 +1850,17 @@ class Command:
                 set_hist(['open-recent','show_as'], show_as)
                 continue #while
             if ans==(1+len(hist_fts)):
-                sort_as     = 'p' if sort_as=='t' else 't'
+                if sort_as=='t':
+                    sort_as          = 'p'
+                else:
+                    if sort_as=='p':
+                        sort_as      = 'lc'
+                    else: sort_as    = 't'
                 set_hist(['open-recent','sort_as'], sort_as)
                 continue #while
-            return app.file_open(hist_fts[ans][0].replace('~', home_s))
+
+            fn = full_fn(hist_fts[ans][0])
+            return app.file_open(fn)
 #           break#while
            #while
        #def open_recent
@@ -1873,9 +1901,9 @@ class Command:
        #def open_all_with_subdir
     
     def open_with_defapp(self):
-        if not os.name=='nt':       return app.msg_status(_('Command is for Windows only.'))
-        cf_path     = _get_filename(ed)
-        if not cf_path:             return app.msg_status(_('No file to open. '))
+        fn = _get_filename(ed)
+        if not fn:
+            return app.msg_status(_('No file to open.'))
         if ed.get_prop(app.PROP_MODIFIED) and \
             app.msg_box(  _('Text is modified!'
                           '\nCommand will use file content from disk.'
@@ -1883,7 +1911,19 @@ class Command:
                            ,app.MB_YESNO+app.MB_ICONQUESTION
                            )!=app.ID_YES:   return
         try:
-            os.startfile(cf_path)
+            suffix = app.app_proc(app.PROC_GET_OS_SUFFIX, '')
+            if suffix=='':
+                #Windows
+                os.startfile(fn)
+            elif suffix=='__mac':
+                #macOS
+                os.system('open "'+fn+'"')
+            elif suffix=='__haiku':
+                #Haiku
+                app.msg_status('TODO: implement "Open in default app" for Haiku')
+            else:
+                #other Unixes
+                os.system('xdg-open "'+fn+'"')
         except Exception as ex:
             pass;               log(traceback.format_exc())
             return app.msg_status(_('Error: ')+ex)
