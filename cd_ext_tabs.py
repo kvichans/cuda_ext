@@ -57,8 +57,8 @@ def go_back_dlg():
     act_clr     = rgb_to_int(232,232,232)
     pss_clr     = rgb_to_int(216,216,216)
         
-    side_pns    = app.app_proc(app.PROC_SIDEPANEL_ENUM,   '').split('\n')
-    botm_pns    = app.app_proc(app.PROC_BOTTOMPANEL_ENUM, '').split('\n')
+    side_pns    = [item['cap'] for item in app.app_proc(app.PROC_SIDEPANEL_ENUM_ALL, '')]
+    botm_pns    = [item['cap'] for item in app.app_proc(app.PROC_BOTTOMPANEL_ENUM_ALL, '')]
     panels      = [((app.PROC_SIDEPANEL_ACTIVATE,  (pn,True)), pn)  for pn in side_pns] \
                 + [( None                                    , '')                    ] \
                 + [((app.PROC_BOTTOMPANEL_ACTIVATE,(pn,True)), pn)  for pn in botm_pns]
