@@ -46,7 +46,7 @@ def go_back_tab():
 
 def go_back_dlg():
     pass;                       log4fun=0                       # Order log in the function
-    if app.app_api_version()<'1.0.253':
+    if app.app_api_version()<'1.0.366':
         return app.msg_status(NEED_UPDATE)
     pass;                       log__("",( )      ,__=(log4fun,_log4mod))
 #   scam    = app.app_proc(app.PROC_GET_KEYSTATE, '')
