@@ -3,10 +3,10 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.44 2022-07-12'
+    '1.7.46 2022-10-10'
 ToDo: (see end of file)
 '''
-import  re, os, sys, json, time, traceback, unicodedata
+import  re, os, sys, json, time, traceback, unicodedata, urllib.parse
 from    fnmatch         import fnmatch
 
 import          cudatext            as app
@@ -1152,6 +1152,7 @@ class Nav_cmds:
             ,where) = get_word_or_quoted(line, cCrt)
         pass;                      #LOG and log('pointed={}',pointed)
         if not pointed: return
+        pointed = urllib.parse.unquote_plus(pointed)    # %20 to blank (and same cases)
         op_ed   = None
         for bs_dir in bs_dirs:
             op_file     = os.path.join(bs_dir, pointed)
