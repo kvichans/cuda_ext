@@ -1,3 +1,6 @@
+1.7.45 (2022-10-06)
+fixed: avoid deprecated PROC_SIDEPANEL_ENUM*
+
 1.7.44 (2022-07-12)
 added: command "Open recent file" gives sort order "by last closed time" (by @veksha)
 fixed: command "Open recent file" shows GMT time, must be local time (by @veksha)

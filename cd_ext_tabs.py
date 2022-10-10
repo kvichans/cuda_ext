@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
 Version:
-    '1.7.32 2021-07-07'
+    '1.7.45 2022-10-05'
 ToDo: (see end of file)
 '''
 
@@ -46,7 +46,7 @@ def go_back_tab():
 
 def go_back_dlg():
     pass;                       log4fun=0                       # Order log in the function
-    if app.app_api_version()<'1.0.253':
+    if app.app_api_version()<'1.0.366':
         return app.msg_status(NEED_UPDATE)
     pass;                       log__("",( )      ,__=(log4fun,_log4mod))
 #   scam    = app.app_proc(app.PROC_GET_KEYSTATE, '')
@@ -57,8 +57,8 @@ def go_back_dlg():
     act_clr     = rgb_to_int(232,232,232)
     pss_clr     = rgb_to_int(216,216,216)
         
-    side_pns    = app.app_proc(app.PROC_SIDEPANEL_ENUM,   '').split('\n')
-    botm_pns    = app.app_proc(app.PROC_BOTTOMPANEL_ENUM, '').split('\n')
+    side_pns    = app.app_proc(app.PROC_SIDEPANEL_ENUM_ALL,   '').split('\n')
+    botm_pns    = app.app_proc(app.PROC_BOTTOMPANEL_ENUM_ALL, '').split('\n')
     panels      = [((app.PROC_SIDEPANEL_ACTIVATE,  (pn,True)), pn)  for pn in side_pns] \
                 + [( None                                    , '')                    ] \
                 + [((app.PROC_BOTTOMPANEL_ACTIVATE,(pn,True)), pn)  for pn in botm_pns]
