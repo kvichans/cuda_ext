@@ -2083,14 +2083,14 @@ class Command:
         #print(y_ranges)
 
         cnt = 0
-        ed.folding(FOLDING_DELETE_ALL)
+        ed.folding(app.FOLDING_DELETE_ALL)
         for rng in y_ranges:
             if rng[1]-rng[0]<2:
                 continue
-            ed.folding(FOLDING_ADD, item_x=0, item_y=rng[0], item_y2=rng[1]-1, item_staple=False, item_hint=MY_HINT)
+            ed.folding(app.FOLDING_ADD, item_x=0, item_y=rng[0], item_y2=rng[1]-1, item_staple=False, item_hint=MY_HINT)
             cnt += 1
-        ed.folding(FOLDING_FOLD_ALL)
-        msg_status(_('Folded {} range(s)').format(cnt))
+        ed.folding(app.FOLDING_FOLD_ALL)
+        app.msg_status(_('Folded {} range(s)').format(cnt))
        #def fold_lines_wo_carets
 
     def on_console_nav(self, ed_self, text):    return Nav_cmds.on_console_nav(ed_self, text)
