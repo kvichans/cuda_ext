@@ -2050,7 +2050,49 @@ class Command:
             app.app_proc(app.PROC_EXEC_PYTHON, 'from cudatext import *')
             app.app_proc(app.PROC_EXEC_PYTHON, cmd)
        #def exec_selected_in_console
-    
+
+    @staticmethod
+    def fold_lines_wo_carets():
+        '''
+        Delete all folding ranges first.
+        Create folding ranges for all lines _not_ affected by carets
+        (and selections), then fold all these ranges.
+
+        Algo by Alexey Torgashin
+        '''
+        y_ranges = []
+        y_begin = 0
+        MY_HINT = '[...]'
+        
+        carets = ed.get_carets()
+        for caret in carets:
+            x, y, x1, y1 = caret
+            if y1<0:
+                x1 = x
+                y1 = y
+            if (y, x)>(y1, x1):
+                x, y, x1, y1 = x1, y1, x, y
+                
+            if y>y_begin:
+                y_ranges += [(y_begin, y)]
+            y_begin = y1+1
+                
+        y_max = ed.get_line_count()
+        if y_max>y_begin:
+            y_ranges += [(y_begin, y_max)]
+        #print(y_ranges)
+
+        cnt = 0
+        ed.folding(FOLDING_DELETE_ALL)
+        for rng in y_ranges:
+            if rng[1]-rng[0]<2:
+                continue
+            ed.folding(FOLDING_ADD, item_x=0, item_y=rng[0], item_y2=rng[1]-1, item_staple=False, item_hint=MY_HINT)
+            cnt += 1
+        ed.folding(FOLDING_FOLD_ALL)
+        msg_status(_('Folded {} range(s)').format(cnt))
+       #def fold_lines_wo_carets
+
     def on_console_nav(self, ed_self, text):    return Nav_cmds.on_console_nav(ed_self, text)
     def _open_file_near(self, where='right'):   return Nav_cmds._open_file_near(where)
     def open_selected(self):                    return Nav_cmds.open_selected()

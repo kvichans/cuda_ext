@@ -129,6 +129,7 @@ class Command:
     def remove_lines_with(self):                return RLS.remove_lines_with()
     def remove_lines_regex(self):               return RLS.remove_lines_regex()
     def exec_selected_in_console(self):         return RLS.exec_selected_in_console()
+    def fold_lines_wo_carets(self):             return RLS.fold_lines_wo_carets()
 
     # Tabs_cmds
     def to_tab_g1_t1(self):                     return cd_ext_tabs._activate_tab(0, 0)

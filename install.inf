@@ -1062,4 +1062,8 @@ section=commands
 caption=Cuda&-Ext\&Misc\&Execute selected text in console
 hotkey=
 method=exec_selected_in_console
-
+[item361]
+section=commands
+caption=Cuda&-Ext\&Misc\&Fold lines w/o carets
+hotkey=
+method=fold_lines_wo_carets

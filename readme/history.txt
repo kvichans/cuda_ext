@@ -1,5 +1,8 @@
+1.7.47 (2022-10-13)
+added: command "Misc \ Fold lines w/o carets" (by Alexey T.)
+
 1.7.46 (2022-10-10)
-added: command "Open file by selected name" convert %20 to blank (and same cases)
+added: command "Open file by selected name" now converts '%20' to spaces and supports other %-escapes
 
 1.7.45 (2022-10-06)
 fixed: avoid deprecated PROC_SIDEPANEL_ENUM*
