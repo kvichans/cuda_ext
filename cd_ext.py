@@ -1778,13 +1778,17 @@ class Command:
 
         if ed.get_prop(app.PROP_KIND, '') != 'text':
             group = ed.get_prop(app.PROP_INDEX_GROUP)
-            tab_pos = ed.get_prop(app.PROP_INDEX_TAB)
-            clr = ed.get_prop(app.PROP_TAB_COLOR)
+            index = ed.get_prop(app.PROP_INDEX_TAB)
+            color = ed.get_prop(app.PROP_TAB_COLOR)
+            pinned = ed.get_prop(app.PROP_TAB_PINNED)
+
             ed.cmd(cmds.cmd_FileClose)
             os.replace(old_path, new_path)
             app.file_open(new_path, group)
-            ed.set_prop(app.PROP_INDEX_TAB, tab_pos)
-            ed.set_prop(app.PROP_TAB_COLOR, clr)
+
+            ed.set_prop(app.PROP_INDEX_TAB, index)
+            ed.set_prop(app.PROP_TAB_COLOR, color)
+            ed.set_prop(app.PROP_TAB_PINNED, pinned)
             return
 
         if not ed.save(new_path):
