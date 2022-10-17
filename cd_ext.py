@@ -1705,9 +1705,6 @@ class Command:
             if new_path==old_path:
                 app.msg_box(_('Entered the same filename'), app.MB_OK+app.MB_ICONWARNING)
                 return []
-            if os.name=='nt' and new_path.upper()==old_path.upper(): 
-                app.msg_box(_('Entered the same filename, case-insensitive'), app.MB_OK+app.MB_ICONWARNING)
-                return []
             if os.sep in new_stem or os.sep in new_ext:
                 app.msg_box(_('Directory separator char is not allowed'), app.MB_OK+app.MB_ICONWARNING)
                 return []
@@ -1759,7 +1756,9 @@ class Command:
             app.msg_box(_('Could not save the file as:\n{}'.format(new_path)))
             return
 
-        os.remove(old_path)
+        allow_del = not (os.name=='nt' and new_path.upper()==old_path.upper())
+        if allow_del:
+            os.remove(old_path)
 
         # Rename helper files of plugins: "Colored Text", "Insert Pics"
         for ext in ('.cuda-pic', '.cuda-colortext'):
