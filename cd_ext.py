@@ -1773,17 +1773,19 @@ class Command:
         if rsp in (None, '-'): return
         new_path    = rsp
 
+        # Support plugin "Tab Icons"
+        copy_tab_icon(old_path, new_path)
+
         if ed.get_prop(app.PROP_KIND, '') != 'text':
             group = ed.get_prop(app.PROP_INDEX_GROUP)
             tab_pos = ed.get_prop(app.PROP_INDEX_TAB)
+            clr = ed.get_prop(app.PROP_TAB_COLOR)
             ed.cmd(cmds.cmd_FileClose)
             os.replace(old_path, new_path)
             app.file_open(new_path, group)
             ed.set_prop(app.PROP_INDEX_TAB, tab_pos)
+            ed.set_prop(app.PROP_TAB_COLOR, clr)
             return
-
-        # Support plugin "Tab Icons"
-        copy_tab_icon(old_path, new_path)
 
         if not ed.save(new_path):
             app.msg_box(_('Could not save the file as:\n{}'.format(new_path)))
