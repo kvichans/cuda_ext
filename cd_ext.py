@@ -1703,12 +1703,16 @@ class Command:
             new_path    = os.path.dirname(old_path) + os.sep + new_stem + ('.'+new_ext if new_ext else '')
             pass;              #log("new_path,old_path,os.path.isdir(new_path)={}",(new_path,old_path,os.path.isdir(new_path)))
             if new_path==old_path:
-               return ag.hide('')
+                app.msg_box(_('Entered the same filename'), app.MB_OK+app.MB_ICONWARNING)
+                return []
+            if os.sep in new_stem or os.sep in new_ext:
+                app.msg_box(_('Directory separator char is not allowed'), app.MB_OK+app.MB_ICONWARNING)
+                return []
             if os.path.isdir(new_path):
-                app.msg_box(f(_('There is directory with name:\n{}\n\nChoose another name.'), new_path), app.MB_OK)
+                app.msg_box(f(_('There is directory with name:\n{}\n\nChoose another name.'), new_path), app.MB_OK+app.MB_ICONWARNING)
                 return []
             if os.path.isfile(new_path):
-                if app.ID_YES!=app.msg_box(f(_('File\n{}\nalready exists.\n\nReplace?'), new_path), app.MB_YESNO):
+                if app.ID_YES!=app.msg_box(f(_('File\n{}\nalready exists.\n\nReplace?'), new_path), app.MB_YESNO+app.MB_ICONWARNING):
                     return []
             return ag.hide(new_path)
            #def do_ok
@@ -1752,7 +1756,9 @@ class Command:
             app.msg_box(_('Could not save the file as:\n{}'.format(new_path)))
             return
 
-        os.remove(old_path)
+        allow_del = not (os.name=='nt' and new_path.upper()==old_path.upper())
+        if allow_del:
+            os.remove(old_path)
 
         # Rename helper files of plugins: "Colored Text", "Insert Pics"
         for ext in ('.cuda-pic', '.cuda-colortext'):
