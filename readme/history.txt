@@ -1,3 +1,6 @@
+1.7.48 (2022-10-17)
+added: command "Rename file" keeps ui-tab states: pinned, ui-tab color, custom icon, etc
+
 1.7.47 (2022-10-13)
 added: command "Fold lines without carets" (by Alexey T.)
 fixed: wrong removing of deprecated APIs

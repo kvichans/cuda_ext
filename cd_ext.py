@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.47 2022-10-13'
+    '1.7.48 2022-10-17'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata, urllib.parse
@@ -1689,6 +1689,7 @@ class Command:
 
 
     def rename_file(self):
+
         old_path= _get_filename(ed)
         if not old_path:
             return ed.cmd(cmds.cmd_FileSaveAs)
@@ -1738,28 +1739,25 @@ class Command:
         if rsp in (None, '-'): return
         new_path    = rsp
 
-        group       = ed.get_prop(app.PROP_INDEX_GROUP)
-        tab_pos     = ed.get_prop(app.PROP_INDEX_TAB)
-        crt         = ed.get_carets()[0]
+        if ed.get_prop(app.PROP_KIND, '') != 'text':
+            group = ed.get_prop(app.PROP_INDEX_GROUP)
+            tab_pos = ed.get_prop(app.PROP_INDEX_TAB)
+            ed.cmd(cmds.cmd_FileClose)
+            os.replace(old_path, new_path)
+            app.file_open(new_path, group)
+            ed.set_prop(app.PROP_INDEX_TAB, tab_pos)
+            return
 
-        if ed.get_prop(app.PROP_MODIFIED):
-            ans     = app.msg_box(_('Text modified.\nSave it?\n\nYes - Save and rename\nNo - Lost and rename\nCancel - Nothing'), app.MB_YESNOCANCEL)
-            if ans==app.ID_CANCEL:  return
-            if ans==app.ID_NO:
-                ed.set_prop(app.PROP_MODIFIED, '0')     #? Changes lose!
-            if ans==app.ID_YES:
-                ed.save()
+        if not ed.save(new_path):
+            app.msg_box(_('Could not save the file as:\n{}'.format(new_path)))
+            return
 
-        ed.cmd(cmds.cmd_FileClose)
+        os.remove(old_path)
 
-        os.replace(old_path, new_path)
+        # Rename helper files of plugins: "Colored Text", "Insert Pics"
         for ext in ('.cuda-pic', '.cuda-colortext'):
             if os.path.isfile(old_path+ext):
                 os.replace(old_path+ext, new_path+ext)
-
-        app.file_open(new_path, group)
-        ed.set_prop(app.PROP_INDEX_TAB, str(tab_pos))
-        ed.set_caret(*crt)
        #def rename_file
 
     def reopen_as(self, how):
