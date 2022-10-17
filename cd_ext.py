@@ -1689,6 +1689,7 @@ class Command:
 
 
     def rename_file(self):
+
         old_path= _get_filename(ed)
         if not old_path:
             return ed.cmd(cmds.cmd_FileSaveAs)
@@ -1737,6 +1738,15 @@ class Command:
         rsp,vals    = ag.show()
         if rsp in (None, '-'): return
         new_path    = rsp
+
+        if ed.get_prop(app.PROP_KIND, '') != 'text':
+            group = ed.get_prop(app.PROP_INDEX_GROUP)
+            tab_pos = ed.get_prop(app.PROP_INDEX_TAB)
+            ed.cmd(cmds.cmd_FileClose)
+            os.replace(old_path, new_path)
+            app.file_open(new_path, group)
+            ed.set_prop(app.PROP_INDEX_TAB, tab_pos)
+            return
 
         if not ed.save(new_path):
             app.msg_box(_('Could not save the file as:\n{}'.format(new_path)))
