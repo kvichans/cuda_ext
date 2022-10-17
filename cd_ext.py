@@ -1705,6 +1705,9 @@ class Command:
             if new_path==old_path:
                 app.msg_box(_('Entered the same filename'), app.MB_OK+app.MB_ICONWARNING)
                 return []
+            if os.name=='nt' and new_path.upper()==old_path.upper(): 
+                app.msg_box(_('Entered the same filename, case-insensitive'), app.MB_OK+app.MB_ICONWARNING)
+                return []
             if os.sep in new_stem or os.sep in new_ext:
                 app.msg_box(_('Directory separator char is not allowed'), app.MB_OK+app.MB_ICONWARNING)
                 return []
