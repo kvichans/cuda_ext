@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.48 2022-10-17'
+    '1.7.49 2022-10-17'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata, urllib.parse
@@ -45,6 +45,36 @@ pass;                           ##!! waits correction
 
 #C1      = chr(1)
 GAP     = 5
+
+USER_DIR = os.path.expanduser('~')
+
+def collapse_path(path):
+    if (path + os.sep).startswith(USER_DIR + os.sep):
+        path = path.replace(USER_DIR, '~', 1)
+    return path
+
+def copy_tab_icon(fn_from, fn_to):
+    try:
+        import cuda_tab_icons
+    except ImportError:
+        return
+
+    icon_id = cuda_tab_icons.icon_map.get(fn_from)
+    if icon_id:
+        #del cuda_tab_icons.icon_map[fn_from]
+        cuda_tab_icons.icon_map[fn_to] = icon_id
+
+    cfg = {}
+    fn_config = os.path.join(app.app_path(app.APP_DIR_SETTINGS), 'cuda_tab_icons.json')
+    if os.path.isfile(fn_config):
+        with open(fn_config, 'r', encoding='utf-8') as f:
+            cfg = json.load(f)
+
+    cfg['custom_icons_map'] = {collapse_path(path):ic_name for path,ic_name in cuda_tab_icons.icon_map.items()}
+
+    with open(fn_config, 'w', encoding='utf-8') as f:
+        json.dump(cfg, f, indent=2)
+
 
 def _get_filename(_ed):
     fn  = _ed.get_filename()
@@ -1743,13 +1773,22 @@ class Command:
         if rsp in (None, '-'): return
         new_path    = rsp
 
+        # Support plugin "Tab Icons"
+        copy_tab_icon(old_path, new_path)
+
         if ed.get_prop(app.PROP_KIND, '') != 'text':
             group = ed.get_prop(app.PROP_INDEX_GROUP)
-            tab_pos = ed.get_prop(app.PROP_INDEX_TAB)
+            index = ed.get_prop(app.PROP_INDEX_TAB)
+            color = ed.get_prop(app.PROP_TAB_COLOR)
+            pinned = ed.get_prop(app.PROP_TAB_PINNED)
+
             ed.cmd(cmds.cmd_FileClose)
             os.replace(old_path, new_path)
             app.file_open(new_path, group)
-            ed.set_prop(app.PROP_INDEX_TAB, tab_pos)
+
+            ed.set_prop(app.PROP_INDEX_TAB, index)
+            ed.set_prop(app.PROP_TAB_COLOR, color)
+            ed.set_prop(app.PROP_TAB_PINNED, pinned)
             return
 
         if not ed.save(new_path):
@@ -1798,10 +1837,9 @@ class Command:
        #def new_file_save_as_near_cur
 
     def open_recent(self):
-        home_s      = os.path.expanduser('~')
         def full_fn(fn):
             if fn.startswith('~'+os.sep):
-                fn = fn.replace('~'+os.sep, home_s+os.sep, 1)
+                fn = fn.replace('~'+os.sep, USER_DIR+os.sep, 1)
             return fn
 
         hist_fs     = app.app_path(app.APP_FILE_RECENTS).splitlines() # not split('\n') because Cud's APP_FILE_RECENTS has bug on Windows
