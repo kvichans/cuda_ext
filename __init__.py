@@ -174,6 +174,7 @@ class Command:
     def view_last_tab_from_prev_group(self):    return cd_ext_tabs._activate_tab_other_group('last', 'prev')
     def go_back(self):                          return cd_ext_tabs.go_back_tab()
     def go_back_dlg(self):                      return cd_ext_tabs.go_back_dlg()
+    def close_all_untitled_wo_ask(self):        return cd_ext_tabs.close_all_untitled_wo_ask()
 
     # Paragraph_cmds
     def go_prgph_bgn(self):                     return RLS.go_prgph('bgn')

@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
 Version:
-    '1.7.45 2022-10-05'
+    '1.7.50 2022-10-20'
 ToDo: (see end of file)
 '''
 
@@ -381,3 +381,15 @@ def close_tab_from_other_group(what_grp='next'):
     me_ed.focus()
    #def close_tab_from_other_group
 
+def close_all_untitled_wo_ask():
+    cnt = 0
+    for h in reversed(app.ed_handles()):
+        e = app.Editor(h)
+        if e.get_filename('*')=="":
+            e.set_prop(app.PROP_MODIFIED, False)
+            e.focus()
+            e.cmd(cmds.cmd_FileClose)
+            cnt += 1
+    if cnt>0:
+        app.msg_status(_('Closed {} untitled tab(s)'.format(cnt)))
+   #close_all_untitled_wo_ask
