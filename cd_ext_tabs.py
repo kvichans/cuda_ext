@@ -403,7 +403,7 @@ def close_pair_and_reopen():
     b_ed = app.Editor(ed.get_prop(app.PROP_HANDLE_SECONDARY))
     a_file = a_ed.get_filename()
     b_file = b_ed.get_filename()
-    if a_file==b_file:
+    if not a_file or not b_file:
         app.msg_status(_('Not a paired ui-tab'))
         return
 
