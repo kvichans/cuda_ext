@@ -718,6 +718,12 @@ caption=Cuda&-Ext\Ta&bs\Close all untitled tabs without confirmation
 hotkey=
 method=close_all_untitled_wo_ask
 
+[item220]
+section=commands
+caption=Cuda&-Ext\Ta&bs\Close pair-tab, reopen 2 separate files
+hotkey=
+method=close_pair_and_reopen
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Move_sep_cmds
 [item221]

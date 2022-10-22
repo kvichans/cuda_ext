@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
 Version:
-    '1.7.50 2022-10-20'
+    '1.7.51 2022-10-22'
 ToDo: (see end of file)
 '''
 
@@ -392,4 +392,27 @@ def close_all_untitled_wo_ask():
             cnt += 1
     if cnt>0:
         app.msg_status(_('Closed {} untitled tab(s)'.format(cnt)))
-   #close_all_untitled_wo_ask
+   #def close_all_untitled_wo_ask
+
+def close_pair_and_reopen():
+    if ed.get_prop(app.PROP_EDITORS_LINKED):
+        app.msg_status(_('Not a paired ui-tab'))
+        return
+
+    a_ed = app.Editor(ed.get_prop(app.PROP_HANDLE_PRIMARY))
+    b_ed = app.Editor(ed.get_prop(app.PROP_HANDLE_SECONDARY))
+    a_file = a_ed.get_filename()
+    b_file = b_ed.get_filename()
+    if a_file==b_file:
+        app.msg_status(_('Not a paired ui-tab'))
+        return
+
+    if a_ed.get_prop(app.PROP_MODIFIED) or b_ed.get_prop(app.PROP_MODIFIED):
+        app.msg_status(_('Paired ui-tab has modified file(s)'))
+        return
+
+    grp = a_ed.get_prop(app.PROP_INDEX_GROUP)
+    a_ed.cmd(cmds.cmd_FileClose)
+    app.file_open(a_file, group=grp)
+    app.file_open(b_file, group=grp)
+   #def close_pair_and_reopen
