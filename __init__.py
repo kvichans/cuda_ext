@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.7.41 2022-05-22'
+    '1.7.51 2022-10-22'
 '''
 
 from    .cd_ext import Command as CommandRLS
@@ -174,6 +174,8 @@ class Command:
     def view_last_tab_from_prev_group(self):    return cd_ext_tabs._activate_tab_other_group('last', 'prev')
     def go_back(self):                          return cd_ext_tabs.go_back_tab()
     def go_back_dlg(self):                      return cd_ext_tabs.go_back_dlg()
+    def close_all_untitled_wo_ask(self):        return cd_ext_tabs.close_all_untitled_wo_ask()
+    def close_pair_and_reopen(self):            return cd_ext_tabs.close_pair_and_reopen()
 
     # Paragraph_cmds
     def go_prgph_bgn(self):                     return RLS.go_prgph('bgn')
