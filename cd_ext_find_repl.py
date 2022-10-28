@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
 Version:
-    '1.7.41 2022-05-22'
+    '1.7.52 2022-10-27'
 ToDo: (see end of file)
 '''
 
@@ -1660,7 +1660,9 @@ def _rewrap(margin, cmt_sgn, save_bl, rTx1, rTx2, sel_after):
         if not all(map(lambda l:l.startswith(cm_prfx), lines)):
             return app.msg_status('Re-wrap needs same positions of comments')
     pass;                      #log__('1 cm_prfx={}',repr(cm_prfx)  ,__=(log4fun,_log4mod))
-    # Can prefix is wider?
+
+    '''
+    # Add to prefix spaces, to make indent of 2nd and next lines the same as indent of 1st line
     if save_bl:
         for ext in range(1,100):
             if False:pass
@@ -1672,6 +1674,8 @@ def _rewrap(margin, cmt_sgn, save_bl, rTx1, rTx2, sel_after):
                 break#for ext
            #for ext
     pass;                      #log__('2 cm_prfx={}',repr(cm_prfx)  ,__=(log4fun,_log4mod))
+    '''
+
     if len(cm_prfx)+10>margin:
         return app.msg_status('No text to re-wrap')
     # Join
@@ -1832,7 +1836,8 @@ def rewrap_sel_by_margin_ex(margin, cmt_sgn, save_bl):
     # Must processs lines by paragraphs to keep blank-only lines
     ranges = find_paragraphs_in_range(rTx1, rTx2)
     for rng in reversed(ranges):
-        _rewrap(margin, cmt_sgn, save_bl, rng[0], rng[1], True)
+        for nline in reversed(range(rng[0], rng[1]+1)):
+            _rewrap(margin, cmt_sgn, save_bl, nline, nline, False)
    #def rewrap_sel_by_margin_ex
         
 
