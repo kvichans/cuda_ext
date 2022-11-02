@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.50 2022-10-20'
+    '1.7.53 2022-11-02'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata, urllib.parse
@@ -1212,12 +1212,12 @@ class Insert_cmds:
     @staticmethod
     def add_indented_line_above():  ##!!
         ed.cmd(cmds.cCommand_KeyUp)
-        ed.cmd(cmds.cCommand_KeyEnd)
+        ed.cmd(cmds.cCommand_GotoLineAbsEnd)
         ed.cmd(cmds.cCommand_KeyEnter)
        #def add_indented_line_above
     @staticmethod
     def add_indented_line_below():  ##!!
-        ed.cmd(cmds.cCommand_KeyEnd)
+        ed.cmd(cmds.cCommand_GotoLineAbsEnd)
         ed.cmd(cmds.cCommand_KeyEnter)
        #def add_indented_line_below
 
