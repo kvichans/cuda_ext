@@ -1916,7 +1916,7 @@ class Command:
         res = app.dlg_custom('CudaText', 500, 310, '\n'.join([
             c1.join(['type=label', 'cap='+_('Mask(s) for filename ("*" - all files; "*.txt *.bat" - two masks)'), 'pos=6,6,490,0']),
             c1.join(['type=edit', 'cap=*', 'pos=6,30,490,0']),
-            c1.join(['type=label', 'cap='+_('What to do for non-text files:'), 'pos=6,70,490,0']),
+            c1.join(['type=label', 'cap='+_('Non-text files:'), 'pos=6,70,490,0']),
             c1.join(['type=radio', 'cap='+_('View in &text mode'), 'pos=26,96,490,0', 'val=1']),
             c1.join(['type=radio', 'cap='+_('View in &binary mode'), 'pos=26,126,490,0']),
             c1.join(['type=radio', 'cap='+_('View in &hex mode'), 'pos=26,156,490,0']),
