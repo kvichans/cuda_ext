@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.53 2022-11-02'
+    '1.7.54 2022-11-24'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata, urllib.parse
@@ -1911,10 +1911,43 @@ class Command:
     def open_all_with_subdir(self):
         src_dir = app.dlg_dir(os.path.dirname(_get_filename(ed)))
         if not src_dir: return
-        masks   = app.dlg_input(_('Mask(s) for filename ("*" - all files; "*.txt *.bat" - two masks)'), '*')
+
+        c1 = chr(1)
+        res = app.dlg_custom('CudaText', 500, 310, '\n'.join([
+            c1.join(['type=label', 'cap='+_('Mask(s) for filename ("*" - all files; "*.txt *.bat" - two masks)'), 'pos=6,6,490,0']),
+            c1.join(['type=edit', 'cap=*', 'pos=6,30,490,0']),
+            c1.join(['type=label', 'cap='+_('What to do for non-text files:'), 'pos=6,70,490,0']),
+            c1.join(['type=radio', 'cap='+_('View in text mode'), 'pos=26,96,490,0', 'val=1']),
+            c1.join(['type=radio', 'cap='+_('View in binary mode'), 'pos=26,126,490,0']),
+            c1.join(['type=radio', 'cap='+_('View in hex mode'), 'pos=26,156,490,0']),
+            c1.join(['type=radio', 'cap='+_('View in unicode mode'), 'pos=26,186,490,0']),
+            c1.join(['type=radio', 'cap='+_('View in unicode/hex mode'), 'pos=26,216,490,0']),
+            c1.join(['type=radio', 'cap='+_('Do not open'), 'pos=26,246,490,0']),
+            c1.join(['type=button', 'cap='+_('OK'), 'pos=150,276,250,0', 'ex0=1']),
+            c1.join(['type=button', 'cap='+_('Cancel'), 'pos=256,276,356,0']),
+            ]),
+            focused=1,
+            get_dict=True)
+        if res is None:
+            return
+        if res['clicked'] != 9:
+            return
+
+        masks = res[1]
         if not masks: return
         masks   = re.sub(r'\s\s+', ' ', masks)
         masks   = masks.split(' ')
+
+        view_mode = \
+            '/nontext-view-text' if res[3]=='1' \
+            else '/nontext-view-binary' if res[4]=='1' \
+            else '/nontext-view-hex' if res[5]=='1' \
+            else '/nontext-view-unicode' if res[6]=='1' \
+            else '/nontext-view-uhex' if res[7]=='1' \
+            else '/nontext-cancel' if res[8]=='1' \
+            else ''
+        #app.msg_box('masks: '+masks+'\n'+'mode: '+mode, app.MB_OK)
+
         files   = []
         dirs    = set()
         for dirpath, dirnames, filenames in os.walk(src_dir):
@@ -1939,7 +1972,8 @@ class Command:
             if i%5 == 0:
                 app.app_idle()
             app.app_proc(app.PROC_PROGRESSBAR, i * 100 // len(files))
-            app.file_open(fn, options='/passive /nonear /nontext-view-binary')
+            app.file_open(fn, options='/passive /nonear '+view_mode)
+
         app.app_proc(app.PROC_PROGRESSBAR, -1)
        #def open_all_with_subdir
     
