@@ -1,3 +1,6 @@
+1.7.54 (2022-11-24)
+added: command "Open all files from folder with sub-folders" shows dialog with more options (by Alexey T.)
+
 1.7.53 (2022-11-02)
 fixed: commands "add_indented_line_above" and "add_indented_line_below"
 
