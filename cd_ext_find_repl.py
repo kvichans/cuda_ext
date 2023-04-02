@@ -1688,7 +1688,7 @@ def _rewrap(margin, cmt_sgn, save_bl, rTx1, rTx2, sel_after):
     margin -= (len(cm_prfx) + (tab_sz-1)*cm_prfx.count('\t'))
     pass;                      #log__('margin,tab_sz={}',(margin,tab_sz)  ,__=(log4fun,_log4mod))
     words   = [(m.start(), m.end(), m.group())
-                for m in re.finditer(r'\b\S+\b', text)]
+                for m in re.finditer(r'[\(\[]?\b\S+\b[\)\]]?', text)]
     pass;                      #log__('words={}',(words)  ,__=(log4fun,_log4mod))
     lines   = []
     last_pos= 0
