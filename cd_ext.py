@@ -607,7 +607,7 @@ class Jumps_cmds:
                   ,app.LINESTATE_ADDED  ]   if status=='wrk' else \
                   [app.LINESTATE_NORMAL ]
         step    = (-1 if nx_pr=='prev' else 1)
-        fini_r  = ( 0 if nx_pr=='prev' else ed.get_line_count()-1)
+        fini_r  = (-1 if nx_pr=='prev' else ed.get_line_count())
         init_r  = ed.get_carets()[0][1]                             # Start from upper caret (not selection)
         init_st = ed.get_prop(app.PROP_LINE_STATE, init_r)          # Start status
         pass;                  #LOG and log('step,init_r,fini_r,trg_sts={}',(step,init_r,fini_r,trg_sts))
@@ -615,9 +615,7 @@ class Jumps_cmds:
         trgt_r  = -1
         state   = 'to-free' if init_st in trg_sts else 'to-trgt'
         test_r  = init_r
-        while True:
-            test_r += step
-            if test_r==fini_r: break#while
+        for test_r in range(init_r, fini_r, step):
             test_st = ed.get_prop(app.PROP_LINE_STATE, test_r)
             pass;              #LOG and log('state,test_r,test_st={}',(state,test_r,test_st))
             if False:pass
