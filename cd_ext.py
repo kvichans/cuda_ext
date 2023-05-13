@@ -748,6 +748,7 @@ class Jumps_cmds:
     def jump_foldrange(what):
         if app.app_api_version()<'1.0.442':
             return app.msg_status(NEED_UPDATE)
+        NO_RANGES = _('No fold-ranges to jump to')
         crts = ed.get_carets()
         if len(crts)>1:
             return app.msg_status(ONLY_SINGLE_CRT.format(_('Command')))
@@ -758,7 +759,7 @@ class Jumps_cmds:
         ranges = [r for r in ranges if r[0]<r[1]]
         ranges = [r for r in ranges if (r[0]<rCrt) or (r[0]==rCrt and r[2]<=cCrt)]
         if not ranges:
-            return app.msg_status(_('No fold-ranges to jump to'))
+            return app.msg_status(NO_RANGES)
         if what=='begin':
             r = ranges[-1]
             new_y = r[0]
@@ -769,13 +770,13 @@ class Jumps_cmds:
             new_x = ed.get_line_len(new_y)
         elif what=='parent_begin':
             if len(ranges)<2:
-                return app.msg_status(_('No fold-ranges to jump to'))
+                return app.msg_status(NO_RANGES)
             r = ranges[-2]
             new_y = r[0]
             new_x = r[2]
         elif what=='parent_end':
             if len(ranges)<2:
-                return app.msg_status(_('No fold-ranges to jump to'))
+                return app.msg_status(NO_RANGES)
             r = ranges[-2]
             new_y = r[1]
             new_x = ed.get_line_len(new_y)
@@ -785,7 +786,7 @@ class Jumps_cmds:
             new_x = r[2]
             if (new_x == cCrt) and (new_y == rCrt):
                 if len(ranges)<2:
-                    return app.msg_status(_('No fold-ranges to jump to'))
+                    return app.msg_status(NO_RANGES)
                 r = ranges[-2]
                 new_y = r[0]
                 new_x = r[2]
@@ -796,7 +797,7 @@ class Jumps_cmds:
             while (new_x == cCrt) and (new_y == rCrt):
                 ranges.pop()
                 if not ranges:
-                    return app.msg_status(_('No fold-ranges to jump to'))
+                    return app.msg_status(NO_RANGES)
                 r = ranges[-1]
                 new_y = r[1]
                 new_x = ed.get_line_len(new_y)
