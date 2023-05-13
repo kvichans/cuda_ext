@@ -779,7 +779,7 @@ class Jumps_cmds:
             r = ranges[-2]
             new_y = r[1]
             new_x = ed.get_line_len(new_y)
-        if what=='combined_begin':
+        elif what=='combined_begin':
             r = ranges[-1]
             new_y = r[0]
             new_x = r[2]
