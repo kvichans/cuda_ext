@@ -32,7 +32,7 @@ FROM_API_VERSION    = '1.0.119'
 FROM_API_VERSION    = '1.0.182'     # PROC_SPLITTER_GET/SET, LOG_CONSOLE_GET_MEMO_LINES
 
 ONLY_SINGLE_CRT     = _("{} doesn't work with multi-carets")
-ONLY_FOR_NO_SEL     = _("{} works when no selection")
+ONLY_FOR_NO_SEL     = _("{} doesn't work with selection")
 NO_PAIR_BRACKET     = _("Cannot find matching bracket for '{}'")
 NO_FILE_FOR_OPEN    = _("Cannot open: {}")
 NEED_UPDATE         = _("Need to update CudaText")
