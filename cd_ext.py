@@ -746,6 +746,8 @@ class Jumps_cmds:
  
     @staticmethod
     def jump_foldrange(what):
+        if app.app_api_version()<'1.0.442':
+            return app.msg_status(NEED_UPDATE)
         crts = ed.get_carets()
         if len(crts)>1:
             return app.msg_status(ONLY_SINGLE_CRT.format(_('Command')))
