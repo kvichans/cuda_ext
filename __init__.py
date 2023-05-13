@@ -1,8 +1,9 @@
 ''' Plugin for CudaText editor
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
+    Alexey Torgashin (CudaText)
 Version:
-    '1.7.51 2022-10-22'
+    '1.7.52 2023-05-13'
 '''
 
 from    .cd_ext import Command as CommandRLS
