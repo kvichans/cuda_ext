@@ -745,6 +745,44 @@ class Jumps_cmds:
        #def jump_staple
  
     @staticmethod
+    def jump_foldrange(what):
+        crts = ed.get_carets()
+        if len(crts)>1:
+            return app.msg_status(ONLY_SINGLE_CRT.format(_('Command')))
+        (cCrt, rCrt, cEnd, rEnd) = crts[0]
+        if cEnd!=-1:
+            return app.msg_status(ONLY_FOR_NO_SEL.format(_('Command')))
+        ranges = ed.folding(app.FOLDING_GET_LIST_FILTERED, item_y=rCrt, item_y2=rCrt)
+        ranges = [r for r in ranges if r[0]<r[1]]
+        if not ranges:
+            return app.msg_status(_('No fold-ranges to jump to'))
+        if what=='begin':
+            r = ranges[-1]
+            new_y = r[0]
+            new_x = r[2]
+        elif what=='end':
+            r = ranges[-1]
+            new_y = r[1]
+            new_x = ed.get_line_len(new_y)
+        elif what=='parent_begin':
+            if len(ranges)<2:
+                return app.msg_status(_('No fold-ranges to jump to'))
+            r = ranges[-2]
+            new_y = r[0]
+            new_x = r[2]
+        elif what=='parent_end':
+            if len(ranges)<2:
+                return app.msg_status(_('No fold-ranges to jump to'))
+            r = ranges[-2]
+            new_y = r[1]
+            new_x = ed.get_line_len(new_y)
+        else:
+            print('ERROR: Wrong "what" param in CudaExt jump-to-fold-range: '+what)
+            return
+        ed.set_caret(new_x, new_y)
+       #jump_foldrange
+
+    @staticmethod
     def dlg_bms_in_tab():
         bm_lns  = ed.bookmark(app.BOOKMARK_GET_LIST, 0)
         bm_lns  = [bm for bm in bm_lns if ed.bookmark(app.BOOKMARK_GET_PROP, bm)]   # Skip hidden
@@ -2196,6 +2234,7 @@ class Command:
     def dlg_bms_in_tab(self):                               return Jumps_cmds.dlg_bms_in_tab()
     def dlg_bms_in_tabs(self, what='a'):                    return Jumps_cmds.dlg_bms_in_tabs(what)
     def jump_staple(self, what='end'):                      return Jumps_cmds.jump_staple(what)
+    def jump_foldrange(self, what):                         return Jumps_cmds.jump_foldrange(what)
     
     def go_prgph(self, what):                               return Prgph_cmds.go_prgph(what)
     def align_prgph(self, how):                             return Prgph_cmds.align_prgph(how)

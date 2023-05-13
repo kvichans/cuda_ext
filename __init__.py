@@ -99,6 +99,10 @@ class Command:
     def dlg_nbms_in_tabs(self):                 return RLS.dlg_bms_in_tabs('n')
     def jump_staple_start(self):                return RLS.jump_staple('bgn')
     def jump_staple_end(self):                  return RLS.jump_staple('end')
+    def jump_foldrange_begin(self):             return RLS.jump_foldrange('begin')
+    def jump_foldrange_end(self):               return RLS.jump_foldrange('end')
+    def jump_foldrange_parent_begin(self):      return RLS.jump_foldrange('parent_begin')
+    def jump_foldrange_parent_end(self):        return RLS.jump_foldrange('parent_end')
     
     # Move_sep_cmds
     def more_in_tab(self):                      return RLS._move_splitter('into', 1.05)

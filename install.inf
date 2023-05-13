@@ -383,6 +383,26 @@ caption=Cuda&-Ext\&Jump\To end of the nearest left staple
 hotkey=Shift+Ctrl+PgDn
 method=jump_staple_end
 
+[item93]
+section=commands
+caption=Cuda&-Ext\&Jump\To begin of the current fold-range
+method=jump_foldrange_begin
+
+[item94]
+section=commands
+caption=Cuda&-Ext\&Jump\To end of the current fold-range
+method=jump_foldrange_end
+
+[item95]
+section=commands
+caption=Cuda&-Ext\&Jump\To begin of the parent fold-range
+method=jump_foldrange_parent_begin
+
+[item96]
+section=commands
+caption=Cuda&-Ext\&Jump\To end of the parent fold-range
+method=jump_foldrange_parent_end
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Scroll_cmds
 [item111]
