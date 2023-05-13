@@ -756,6 +756,7 @@ class Jumps_cmds:
             return app.msg_status(ONLY_FOR_NO_SEL.format(_('Command')))
         ranges = ed.folding(app.FOLDING_GET_LIST_FILTERED, item_y=rCrt, item_y2=rCrt)
         ranges = [r for r in ranges if r[0]<r[1]]
+        ranges = [r for r in ranges if (r[0]<rCrt) or (r[0]==rCrt and r[2]<=cCrt)]
         if not ranges:
             return app.msg_status(_('No fold-ranges to jump to'))
         if what=='begin':
