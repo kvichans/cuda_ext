@@ -778,6 +778,16 @@ class Jumps_cmds:
             r = ranges[-2]
             new_y = r[1]
             new_x = ed.get_line_len(new_y)
+        if what=='combined_begin':
+            r = ranges[-1]
+            new_y = r[0]
+            new_x = r[2]
+            if (new_x == cCrt) and (new_y == rCrt):
+                if len(ranges)<2:
+                    return app.msg_status(_('No fold-ranges to jump to'))
+                r = ranges[-2]
+                new_y = r[0]
+                new_x = r[2]
         else:
             print('ERROR: Wrong "what" param in CudaExt jump-to-fold-range: '+what)
             return

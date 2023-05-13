@@ -104,6 +104,7 @@ class Command:
     def jump_foldrange_end(self):               return RLS.jump_foldrange('end')
     def jump_foldrange_parent_begin(self):      return RLS.jump_foldrange('parent_begin')
     def jump_foldrange_parent_end(self):        return RLS.jump_foldrange('parent_end')
+    def jump_foldrange_combined_begin(self):    return RLS.jump_foldrange('combined_begin')
     
     # Move_sep_cmds
     def more_in_tab(self):                      return RLS._move_splitter('into', 1.05)

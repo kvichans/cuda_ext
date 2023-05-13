@@ -403,6 +403,11 @@ section=commands
 caption=Cuda&-Ext\&Jump\To end of the parent fold-range
 method=jump_foldrange_parent_end
 
+[item97]
+section=commands
+caption=Cuda&-Ext\&Jump\To begin of the current/parent fold-range
+method=jump_foldrange_combined_begin
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Scroll_cmds
 [item111]

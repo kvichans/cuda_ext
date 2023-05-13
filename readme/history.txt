@@ -1,5 +1,5 @@
 1.7.57 (2023-05-13)
-added: 4 commands "Jump to begin/end of the current/parent fold-range" (by Alexey T.)
+added: 5 commands "Jump to begin/end of the current/parent fold-range" (by Alexey T.)
 
 1.7.56 (2023-04-13)
 fixed: commands "To next/previous working lines" (by @veksha)
