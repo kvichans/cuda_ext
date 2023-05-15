@@ -2170,9 +2170,7 @@ class Command:
        
     @staticmethod
     def exec_selected_in_console(): # halfbrained @github
-        cmd = None
-        txt = ed.get_text_sel()
-        cmd = txt
+        cmd = ed.get_text_sel()
 
         if cmd:
             print('>>> ' + cmd)
