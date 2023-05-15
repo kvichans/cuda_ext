@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.56 2023-04-13'
+    '1.7.57 2023-05-13'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata, urllib.parse
@@ -32,7 +32,7 @@ FROM_API_VERSION    = '1.0.119'
 FROM_API_VERSION    = '1.0.182'     # PROC_SPLITTER_GET/SET, LOG_CONSOLE_GET_MEMO_LINES
 
 ONLY_SINGLE_CRT     = _("{} doesn't work with multi-carets")
-ONLY_FOR_NO_SEL     = _("{} works when no selection")
+ONLY_FOR_NO_SEL     = _("{} doesn't work with selection")
 NO_PAIR_BRACKET     = _("Cannot find matching bracket for '{}'")
 NO_FILE_FOR_OPEN    = _("Cannot open: {}")
 NEED_UPDATE         = _("Need to update CudaText")
@@ -744,6 +744,69 @@ class Jumps_cmds:
         ed.set_caret(new_x, new_r)
        #def jump_staple
  
+    @staticmethod
+    def jump_foldrange(what):
+        if app.app_api_version()<'1.0.442':
+            return app.msg_status(NEED_UPDATE)
+        NO_RANGES = _('No fold-ranges to jump to')
+        crts = ed.get_carets()
+        if len(crts)>1:
+            return app.msg_status(ONLY_SINGLE_CRT.format(_('Command')))
+        (cCrt, rCrt, cEnd, rEnd) = crts[0]
+        if cEnd!=-1:
+            return app.msg_status(ONLY_FOR_NO_SEL.format(_('Command')))
+        ranges = ed.folding(app.FOLDING_GET_LIST_FILTERED, item_y=rCrt, item_y2=rCrt)
+        ranges = [r for r in ranges if r[0]<r[1]]
+        ranges = [r for r in ranges if (r[0]<rCrt) or (r[0]==rCrt and r[2]<=cCrt)]
+        if not ranges:
+            return app.msg_status(NO_RANGES)
+        if what=='begin':
+            r = ranges[-1]
+            new_y = r[0]
+            new_x = r[2]
+        elif what=='end':
+            r = ranges[-1]
+            new_y = r[1]
+            new_x = ed.get_line_len(new_y)
+        elif what=='parent_begin':
+            if len(ranges)<2:
+                return app.msg_status(NO_RANGES)
+            r = ranges[-2]
+            new_y = r[0]
+            new_x = r[2]
+        elif what=='parent_end':
+            if len(ranges)<2:
+                return app.msg_status(NO_RANGES)
+            r = ranges[-2]
+            new_y = r[1]
+            new_x = ed.get_line_len(new_y)
+        elif what=='combined_begin':
+            r = ranges[-1]
+            new_y = r[0]
+            new_x = r[2]
+            if (new_x == cCrt) and (new_y == rCrt):
+                if len(ranges)<2:
+                    return app.msg_status(NO_RANGES)
+                r = ranges[-2]
+                new_y = r[0]
+                new_x = r[2]
+        elif what=='combined_end':
+            r = ranges[-1]
+            new_y = r[1]
+            new_x = ed.get_line_len(new_y)
+            while (new_x == cCrt) and (new_y == rCrt):
+                ranges.pop()
+                if not ranges:
+                    return app.msg_status(NO_RANGES)
+                r = ranges[-1]
+                new_y = r[1]
+                new_x = ed.get_line_len(new_y)
+        else:
+            print('ERROR: Wrong "what" param in CudaExt jump-to-fold-range: '+what)
+            return
+        ed.set_caret(new_x, new_y)
+       #jump_foldrange
+
     @staticmethod
     def dlg_bms_in_tab():
         bm_lns  = ed.bookmark(app.BOOKMARK_GET_LIST, 0)
@@ -2188,6 +2251,7 @@ class Command:
     def dlg_bms_in_tab(self):                               return Jumps_cmds.dlg_bms_in_tab()
     def dlg_bms_in_tabs(self, what='a'):                    return Jumps_cmds.dlg_bms_in_tabs(what)
     def jump_staple(self, what='end'):                      return Jumps_cmds.jump_staple(what)
+    def jump_foldrange(self, what):                         return Jumps_cmds.jump_foldrange(what)
     
     def go_prgph(self, what):                               return Prgph_cmds.go_prgph(what)
     def align_prgph(self, how):                             return Prgph_cmds.align_prgph(how)
