@@ -2039,9 +2039,18 @@ def align_line_comments():
             # support leading tab-chars
             (exp_column, exp_line) = ed.convert(app.CONVERT_CHAR_TO_COL, npos, nline)
             nspaces = need_column - exp_column
-            if nspaces <= 0:
+            if nspaces>0:
+                # shift comment to right
+                ed.insert(npos, nline, ' '*nspaces)
+            elif nspaces<0:
+                # shift comment to left
+                s = line[npos+nspaces:npos]
+                if s.isspace():
+                    ed.delete(npos+nspaces, nline, npos, nline)
+                else:
+                    continue
+            else:
                 continue
-            ed.insert(npos, nline, ' '*nspaces)
             ncount += 1
             break
 
