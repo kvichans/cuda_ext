@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
 Version:
-    '1.7.55 2023-03-30'
+    '1.7.56 2023-11-08'
 ToDo: (see end of file)
 '''
 
@@ -1994,3 +1994,54 @@ def add_to_hist(val, lst):
     return lst
    #def add_to_hist
 
+def align_line_comments():
+    '''
+    Alexey:
+    Command don't support sub-lexer ranges yet. Todo? Use ed.get_sublexer_ranges().
+    '''
+    lex = ed.get_prop(app.PROP_LEXER_FILE, '')
+    if not lex:
+        return app.msg_status(_('Need lexer active'))
+    sign = app.lexer_proc(app.LEXER_GET_PROP, lex)['c_line']
+    if not sign:
+        return app.msg_status(_('Need lexer with line-comment chars'))
+    
+    s = app.dlg_input(_('Align by margin value:'), str(ed.get_prop(app.PROP_MARGIN)))
+    if not s:
+        return
+    try:
+        need_column = int(s)
+    except:
+        return app.msg_status('Incorrect number: '+s)
+
+    ncount = 0
+    for nline in range(ed.get_line_count()):
+        line = ed.get_text_line(nline)
+        if not line.strip():
+            continue
+        indent = len(line)-len(line.lstrip())
+        npos = -1
+        while True:
+            npos = line.find(sign, npos+1)
+            if npos<0:
+                break
+            # skip comment if it's leading in line
+            if npos==indent:
+                continue
+            token = ed.get_token(app.TOKEN_GET_KIND, npos, nline)
+            # skip pos if it's not "comment" token
+            if token!='c':
+                continue
+            if npos>0:
+                token_prev = ed.get_token(app.TOKEN_GET_KIND, npos-1, nline)
+                if token_prev=='c':
+                    continue
+            # support leading tab-chars
+            (exp_column, exp_line) = ed.convert(app.CONVERT_CHAR_TO_COL, npos, nline)
+            nspaces = need_column - exp_column
+            if nspaces <= 0:
+                continue
+            ed.insert(npos, nline, ' '*nspaces)
+            ncount += 1
+
+    app.msg_status('Aligned comments: '+str(ncount))

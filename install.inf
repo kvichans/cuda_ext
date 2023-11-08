@@ -1035,6 +1035,12 @@ caption=Cuda&-Ext\&Align\Align in lines to right by margin...
 hotkey=
 method=align_sel_to_right_by_margin
 
+[item325]
+section=commands
+caption=Cuda&-Ext\&Align\Align line-comments to a certain column...
+hotkey=
+method=align_line_comments
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; File_cmds
 [item341]
