@@ -130,14 +130,17 @@ Menu items
 	- Reindent selected lines...
 	- Indent lines like the first selected
 	- Align in lines by separator...
+	- Align comma-separated columns in selected lines
+	- Align multi-carets under first caret, by inserting spaces
 	-
-	- Join selected lines
+	- Join lines
 	- Delete duplicate spaces
 	-
 	- Re-wrap/split lines by margin
 	- Re-wrap/split comment at caret
 	- Align in lines to center by margin
 	- Align in lines to right by margin
+	- Align line-comments to a certain column
 - File
 	- Open recent file...
 	-
