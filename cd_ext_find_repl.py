@@ -2043,5 +2043,6 @@ def align_line_comments():
                 continue
             ed.insert(npos, nline, ' '*nspaces)
             ncount += 1
+            break
 
     app.msg_status('Aligned comments: '+str(ncount))
