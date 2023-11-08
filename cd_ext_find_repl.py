@@ -2037,7 +2037,7 @@ def align_line_comments():
                 if token_prev=='c':
                     continue
             # support leading tab-chars
-            (exp_column, exp_line) = ed.convert(app.CONVERT_CHAR_TO_COL, npos, nline)
+            exp_column, exp_line = ed.convert(app.CONVERT_CHAR_TO_COL, npos, nline)
             nspaces = need_column - exp_column
             if nspaces>0:
                 # shift comment to right
