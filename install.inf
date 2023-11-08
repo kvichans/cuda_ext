@@ -977,7 +977,7 @@ method=align_sel_by_sep
 
 [item316]
 section=commands
-caption=Cuda&-Ext\&Align\Align multi-carets under first caret, by inserting spaces
+caption=Cuda&-Ext\&Align\Align carets under rightmost caret, by inserting spaces
 hotkey=
 method=align_by_carets
 

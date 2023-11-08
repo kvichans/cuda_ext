@@ -131,7 +131,7 @@ Menu items
 	- Indent lines like the first selected
 	- Align in lines by separator...
 	- Align comma-separated columns in selected lines
-	- Align multi-carets under first caret, by inserting spaces
+	- Align carets under rightmost caret, by inserting spaces
 	-
 	- Join lines
 	- Delete duplicate spaces
