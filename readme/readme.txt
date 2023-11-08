@@ -130,23 +130,33 @@ Menu items
 	- Reindent selected lines...
 	- Indent lines like the first selected
 	- Align in lines by separator...
+	- Align comma-separated columns in selected lines
+	- Align carets to rightmost caret by inserting spaces
 	-
-	- Join selected lines
+	- Join lines
 	- Delete duplicate spaces
 	-
-	- Re-wrap/split lines by margin
+	- Re-wrap/split lines by margin...
 	- Re-wrap/split comment at caret
 	- Align in lines to center by margin
 	- Align in lines to right by margin
+	- Align line-comments to a certain column...
 - File
 	- Open recent file...
 	-
 	- Rename file...
+	- Show in hex viewer
+	- Show in text editor
+	-
 	- New file and save in current folder...
 	- Open all files from folder with sub-folders...
 	- Open current file in default application
+	- Save editors to a single file...
 - Misc
 	- Execute selected text in console
+	- Fold lines without carets
 
-Author: Andrey Kvichanskiy (kvichans, at forum/github)
+Authors:
+  Andrey Kvichanskiy (kvichans, at forum/GitHub)
+  Alexey Torgashin (CudaText)
 License: MIT

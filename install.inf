@@ -1,5 +1,5 @@
 [info]
-version=1.7.41
+version=1.7.58
 title=CudaExt
 desc=Additional commands for CudaText in Commands dialog and Plugins menu
 type=cudatext-plugin
@@ -977,7 +977,7 @@ method=align_sel_by_sep
 
 [item316]
 section=commands
-caption=Cuda&-Ext\&Align\Align carets columns by inserting spaces
+caption=Cuda&-Ext\&Align\Align carets to rightmost caret by inserting spaces
 hotkey=
 method=align_by_carets
 
@@ -1034,6 +1034,12 @@ section=commands
 caption=Cuda&-Ext\&Align\Align in lines to right by margin...
 hotkey=
 method=align_sel_to_right_by_margin
+
+[item325]
+section=commands
+caption=Cuda&-Ext\&Align\Align line-comments to a certain column...
+hotkey=
+method=align_line_comments
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; File_cmds
