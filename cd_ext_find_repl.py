@@ -2012,7 +2012,7 @@ def align_line_comments():
     try:
         need_column = int(s)
     except:
-        return app.msg_status('Incorrect number: '+s)
+        return app.msg_status(_('Incorrect number: ')+s)
 
     ncount = 0
     for nline in range(ed.get_line_count()):
@@ -2054,4 +2054,4 @@ def align_line_comments():
             ncount += 1
             break
 
-    app.msg_status('Aligned comments: '+str(ncount))
+    app.msg_status(_('Aligned comments: ')+str(ncount))
