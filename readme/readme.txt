@@ -4,27 +4,44 @@ Additional commands for CudaText in Commands dialog and Plugins menu
 Menu items
 
 - Find/Replace
-	- Find clipbrd: next
-	- Find clipbrd: previous
-	- Replace all occurrences of selected string with clipbrd
+	- Find in Lines...
+	- Find clipboard: next
+	- Find clipboard: previous
+	- Replace all occurrences of selected string with clipboard
+	- Replace all in Lines...
+	- Replace all in Lines with kit...
 	-
 	- Copy word or [string] or 'string' (no selection)
-	- Replace word or [string] or 'string' with clipbrd (no selection)
+	- Replace word or [string] or 'string' with clipboard (no selection)
 	- Expand selection to word or "string" or (string)
 	- Expand and Copy selection to word or "string" or (string)
 	-
 	- Remove all ASCII chars 0..31 (excluding 9,10,13)
+	- Strip HTML tags (without Undo)
+	- Remove lines containing text...
+	- Remove lines containing RegEx...
+	-
+	- Set carets aligned as column...
+	- Convert multi-line selection to column selection
+	- Reverse selection text, by lines
 - Insert
 	- Add indented line above
 	- Add indented line below
+	- Add indent and surround selection with { }
 	-
 	- Paste to first column
 	- Paste with indent above
 	- Paste with indent below
-	- Paste like Lazarus IDE
+	-
+	- Paste trimmed text
+	- Trim spaces in selection, left
+	- Trim spaces in selection, right
+	- Trim spaces in selection, all
 	-
 	- Fill selection by string...
-	- Insert unicode char
+	-
+	- Copy Unicode char name
+	- Insert Unicode char
 - Jump
 	- To matching bracket
 	-
@@ -35,16 +52,25 @@ Menu items
 	- To next working lines
 	- To previous working lines
 	-
-	- To line with number in clipbrd
+	- To line with number in clipboard
 	-
 	- Left into CamelCase/snake_case
 	- Right into CamelCase/snake_case
 	- Left into CamelCase/snake_case and select
 	- Right into CamelCase/snake_case and select
 	-
-	- Bookmark list for current tab
-	- Bookmark list for all tabs
-	- Numbered bookmark list for all tabs
+	- Bookmark list for current tab...
+	- Bookmark list for all tabs...
+	- Numbered bookmark list for all tabs...
+	-
+	- To start of the nearest left staple
+	- To end of the nearest left staple
+	- To begin of the current fold-range
+	- To end of the current fold-range
+	- To begin of the parent fold-range
+	- To end of the parent fold-range
+	- To begin of the current/parent fold-range
+	- To end of the current/parent fold-range
 - Scroll
 	- Current line to screen center
 	- Current line to screen top
@@ -60,9 +86,16 @@ Menu items
 	-
 	- Navigate by error in console
 -Tabs
+	- Choose tab/panel to switch to
 	- Activate previously active tab (go back)
 	-
 	- Move tab to position...
+	- Move tab left
+	- Move tab right
+	- Find tab by title...
+	- Activate tab by number...
+	-
+	- Arrange tabs across groups
 	-
 	- Activate tab #1 in group #1
 	- Activate tab #2 in group #1
@@ -88,8 +121,8 @@ Menu items
 	- Activate previous tab (global loop)
 	-
 	- Other group
-		- Close active tab in next group
-		- Close active tab in previous group
+		- Close tab in next group
+		- Close tab in previous group
 		-
 		- Switch tab to next in next group
 		- Switch tab to next in previous group
@@ -100,18 +133,25 @@ Menu items
 		- Switch tab to first in previous group
 		- Switch tab to last in next group
 		- Switch tab to last in previous group
+	-
+	- Close all untitled tabs without confirmation
+	- Close pair-tab, reopen 2 separate files
 - Splitters
 	- Expand side panel
-	- Narrow side panel
+	- Shrink side panel
 	-
 	- Expand bottom panel
-	- Narrow bottom panel
+	- Shrink bottom panel
 	-
 	- Expand top-left group
-	- Narrow top-left group
+	- Shrink top-left group
 	-
 	- Expand active group
-	- Narrow active group
+	- Shrink active group
+	-
+	- Remove group/panel layout...
+	- Save group/panel layout...
+	- Restore group/panel layout...
 - Paragraph
 	- Go to beginning
 	- Go to end
@@ -124,8 +164,13 @@ Menu items
 	- Align: Center justify 
 	- Align: Fully justify 
 - Code Tree
+	- Symbols list...
+	- Symbols list (only 1 up level)...
+	- Symbols list (only 2 up level)...
+	-
 	- Show current path in statusbar
 	- Set active node, nearest to caret
+	- Find node...
 - Align
 	- Reindent selected lines...
 	- Indent lines like the first selected
@@ -137,9 +182,10 @@ Menu items
 	- Delete duplicate spaces
 	-
 	- Re-wrap/split lines by margin...
+	- Re-wrap/split lines by margin, with defaults
 	- Re-wrap/split comment at caret
-	- Align in lines to center by margin
-	- Align in lines to right by margin
+	- Align in lines to center by margin...
+	- Align in lines to right by margin...
 	- Align line-comments to a certain column...
 - File
 	- Open recent file...
