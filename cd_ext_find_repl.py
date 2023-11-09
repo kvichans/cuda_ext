@@ -2006,7 +2006,10 @@ def align_line_comments():
     if not sign:
         return app.msg_status(_('Need lexer with line-comment chars'))
     
-    s = app.dlg_input(_('Align by margin value:'), str(ed.get_prop(app.PROP_MARGIN)))
+    col = ed.get_prop(app.PROP_MARGIN)
+    if col>=500:
+        col = 100
+    s = app.dlg_input(_('Align by margin value:'), str(col))
     if not s:
         return
     try:
