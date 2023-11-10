@@ -2006,13 +2006,20 @@ def align_line_comments():
     if not sign:
         return app.msg_status(_('Need lexer with line-comment chars'))
     
-    s = app.dlg_input(_('Align by margin value:'), str(ed.get_prop(app.PROP_MARGIN)))
+    col = ed.get_prop(app.PROP_MARGIN)
+    if col>=500:
+        col = 100
+    s = app.dlg_input_ex(2, 'Align comments',
+        _('Align by margin value:'), str(col),
+        _('Minimal allowed column pos:'), str(20)
+        )
     if not s:
         return
     try:
-        need_column = int(s)
+        need_column = int(s[0])
+        min_column = int(s[1])
     except:
-        return app.msg_status(_('Incorrect number: ')+s)
+        return app.msg_status(_('Incorrect number(s) entered: ')+s[0]+', '+s[1])
 
     ncount = 0
     for nline in range(ed.get_line_count()):
@@ -2038,6 +2045,8 @@ def align_line_comments():
                     continue
             # support leading tab-chars
             exp_column, exp_line = ed.convert(app.CONVERT_CHAR_TO_COL, npos, nline)
+            if exp_column<=min_column:
+                continue
             nspaces = need_column - exp_column
             if nspaces>0:
                 # shift comment to right

@@ -29,18 +29,18 @@ method=_
 
 [item11]
 section=commands
-caption=Cuda&-Ext\&Find/Replace\Find clipbrd: &next
+caption=Cuda&-Ext\&Find/Replace\Find clipboard: &next
 hotkey=Alt+PgDn
 method=find_cb_string_next
 [item12]
 section=commands
-caption=Cuda&-Ext\&Find/Replace\Find clipbrd: &previous
+caption=Cuda&-Ext\&Find/Replace\Find clipboard: &previous
 hotkey=Alt+PgUp
 method=find_cb_string_prev
 
 [item13]
 section=commands
-caption=Cuda&-Ext\&Find/Replace\Replace &all occurrences of selected string with clipbrd
+caption=Cuda&-Ext\&Find/Replace\Replace &all occurrences of selected string with clipboard
 hotkey=Shift+Ctrl+A
 method=replace_all_sel_to_cb
 
@@ -70,7 +70,7 @@ method=copy_term
 
 [item18]
 section=commands
-caption=Cuda&-Ext\&Find/Replace\&Replace word or [string] or 'string' with clipbrd (no selection)
+caption=Cuda&-Ext\&Find/Replace\&Replace word or [string] or 'string' with clipboard (no selection)
 hotkey=
 method=replace_term
 
@@ -188,7 +188,7 @@ method=paste_with_indent_below
 ;section=commands
 ;caption=Cuda&-Ext\&Insert\Paste like La&zarus IDE
 ;hotkey=
-method=paste_as_lazarus
+;method=paste_as_lazarus
 
 [item48]
 section=commands
@@ -239,13 +239,13 @@ method=_
 
 [item56]
 section=commands
-caption=Cuda&-Ext\&Insert\Copy unicode char name
+caption=Cuda&-Ext\&Insert\Copy Unicode char name
 hotkey=
 method=copy_unicode_char_name
 
 [item57]
 section=commands
-caption=Cuda&-Ext\&Insert\Insert &unicode char...
+caption=Cuda&-Ext\&Insert\Insert &Unicode char...
 hotkey=
 method=insert_char_by_hex
 
@@ -307,7 +307,7 @@ method=_
 
 [item80]
 section=commands
-caption=Cuda&-Ext\&Jump\To line with number in clipbrd
+caption=Cuda&-Ext\&Jump\To line with number in clipboard
 hotkey=
 method=jump_to_line_by_cb
 
