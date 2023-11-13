@@ -2009,7 +2009,7 @@ def align_line_comments():
     col = ed.get_prop(app.PROP_MARGIN)
     if col>=500:
         col = 100
-    s = app.dlg_input_ex(2, 'Align comments',
+    s = app.dlg_input_ex(2, _('Align comments'),
         _('Align by margin value:'), str(col),
         _('Minimal allowed column pos:'), str(20)
         )
