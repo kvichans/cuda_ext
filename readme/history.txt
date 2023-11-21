@@ -1,3 +1,7 @@
+1.7.59 (2023-11-21)
+added: command "Close all unmodified tabs" (by Alexey T.)
+added: command "Sort tabs by title" (by Alexey T.)
+
 1.7.58 (2023-11-08)
 added: Command "Align line-comments to a certain column" (by Alexey T.)
 

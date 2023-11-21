@@ -1,5 +1,5 @@
 [info]
-version=1.7.58
+version=1.7.59
 title=CudaExt
 desc=Additional commands for CudaText in Commands dialog and Plugins menu
 type=cudatext-plugin
@@ -753,6 +753,18 @@ section=commands
 caption=Cuda&-Ext\Ta&bs\Close pair-tab, reopen 2 separate files
 hotkey=
 method=close_pair_and_reopen
+
+[item220_1]
+section=commands
+caption=Cuda&-Ext\Ta&bs\Close all unmodified tabs
+hotkey=
+method=close_saved
+
+[item220_2]
+section=commands
+caption=Cuda&-Ext\Ta&bs\Sort tabs by title
+hotkey=
+method=sort_tabs_by_title
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Move_sep_cmds

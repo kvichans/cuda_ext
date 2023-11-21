@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
 Version:
-    '1.7.53 2023-11-08'
+    '1.7.59 2023-11-21'
 '''
 
 from    .cd_ext import Command as CommandRLS
@@ -184,6 +184,8 @@ class Command:
     def go_back_dlg(self):                      return cd_ext_tabs.go_back_dlg()
     def close_all_untitled_wo_ask(self):        return cd_ext_tabs.close_all_untitled_wo_ask()
     def close_pair_and_reopen(self):            return cd_ext_tabs.close_pair_and_reopen()
+    def close_saved(self):                      return cd_ext_tabs.close_saved()
+    def sort_tabs_by_title(self):               return cd_ext_tabs.sort_by_title()
 
     # Paragraph_cmds
     def go_prgph_bgn(self):                     return RLS.go_prgph('bgn')
