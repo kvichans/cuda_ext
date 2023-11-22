@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
 Version:
-    '1.7.51 2022-10-22'
+    '1.7.59 2023-11-21'
 ToDo: (see end of file)
 '''
 
@@ -416,3 +416,37 @@ def close_pair_and_reopen():
     app.file_open(a_file, group=grp)
     app.file_open(b_file, group=grp)
    #def close_pair_and_reopen
+
+def close_saved():
+
+    for h in reversed(app.ed_handles()):
+        e = app.Editor(h)
+        if not e.get_prop(app.PROP_MODIFIED):
+            e.cmd(cmds.cmd_FileClose)
+   #def close_saved
+
+def sort_by_title():
+    
+    hlist = app.ed_handles()
+    hlist = [app.Editor(h).get_prop(app.PROP_HANDLE_SELF) for h in hlist]
+    tablist_init = [(h, app.Editor(h).get_prop(app.PROP_TAB_TITLE)) for h in hlist]
+    
+    h_focused = ed.get_prop(app.PROP_HANDLE_SELF)
+
+    grp_count = 0
+    # totally app has 6+3=9 groups
+    for index_group in range(9):
+        tablist = [tab for tab in tablist_init if app.Editor(tab[0]).get_prop(app.PROP_INDEX_GROUP)==index_group]
+        if not tablist:
+            continue
+        grp_count += 1
+        tablist = sorted(tablist, key=lambda s: s[1])
+        #print(tablist)
+        for (index, tab) in enumerate(tablist):
+            e = app.Editor(tab[0])
+            e.set_prop(app.PROP_INDEX_TAB, index)
+
+    app.Editor(h_focused).focus()
+    #msg_status('Sorted UI-tabs in %d group(s)'%grp_count)
+   #def sort_by_title
+ 
