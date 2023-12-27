@@ -290,16 +290,18 @@ def find_tab(alt=''):
             max_line_len = 50
             line_count = e.get_line_count()
             preview_count = min(line_count, max_line_count)
-            preview = e.get_text_line(0)
+            preview = e.get_text_line(0).strip()
             if len(preview) > max_line_len:
-                preview = preview[0:max_line_len] + '... '
+                preview = preview[0:max_line_len] + '...'
             else:
                 preview = ''
                 for i in range(preview_count - 1):
                     if len(preview) < max_line_len:
-                        preview = preview + ' ' + e.get_text_line(i)
+                        preview = preview + ' ' + e.get_text_line(i).strip()
+                preview += '...'
             if preview:
-                preview = preview.replace("\n", '') + '...'
+                preview = ' '.join(preview.split())
+                preview = preview.replace("\n", '')
             title = '[' + str(index_) + '] ' + e.get_prop(app.PROP_TAB_TITLE)
             slist.append(title + "\t" + preview)
         res = app.dlg_menu(app.DMENU_LIST_ALT, slist, caption=cap)
