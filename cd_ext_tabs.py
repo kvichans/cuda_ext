@@ -284,22 +284,23 @@ def find_tab(alt=''):
         index_ = 0
         for h in hlist:
             index_ += 1
-            item = app.Editor(h).get_filename()
+            e = app.Editor(h)
             preview = ''
             max_line_count = 5
             max_line_len = 50
-            line_count = app.Editor(h).get_line_count()
+            line_count = e.get_line_count()
             preview_count = min(line_count, max_line_count)
-            preview = app.Editor(h).get_text_line(0)
+            preview = e.get_text_line(0)
             if len(preview) > max_line_len:
                 preview = preview[0:max_line_len] + '... '
             else:
                 preview = ''
                 for i in range(preview_count - 1):
                     if len(preview) < max_line_len:
-                        preview = preview + ' ' + app.Editor(h).get_text_line(i)
-            preview = preview.replace("\n", '') + '...'
-            title = '[' + str(index_) + '] ' + app.Editor(h).get_prop(app.PROP_TAB_TITLE)
+                        preview = preview + ' ' + e.get_text_line(i)
+            if preview:
+                preview = preview.replace("\n", '') + '...'
+            title = '[' + str(index_) + '] ' + e.get_prop(app.PROP_TAB_TITLE)
             slist.append(title + "\t" + preview)
         res = app.dlg_menu(app.DMENU_LIST_ALT, slist, caption=cap)
     if res is None: return
