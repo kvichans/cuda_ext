@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.57 2023-05-13'
+    '1.7.60 2023-12-27'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata, urllib.parse
@@ -712,17 +712,14 @@ class Jumps_cmds:
         (cCrt, rCrt, cEnd, rEnd)    = crts[0]
         if cEnd!=-1:        return app.msg_status(ONLY_FOR_NO_SEL.format(_('Command')))
             
-        folds   = ed.folding(app.FOLDING_GET_LIST) \
-                    if app.app_api_version() < '1.0.265' else \
-                  ed.folding(app.FOLDING_GET_LIST_FILTERED, item_y=rCrt, item_y2=rCrt)
+        folds   = ed.folding(app.FOLDING_ENUM, item_y=rCrt, item_y2=rCrt) # with filtering
         if not folds:       return app.msg_status(_('No staple to jump'))
         crt_r, crt_x, crt_c = rCrt, cCrt, ed.convert(app.CONVERT_CHAR_TO_COL, cCrt, rCrt)[0]
         pass;                  #log('what, crt_r, crt_x, crt_c={}', (what,crt_r, crt_x, crt_c))
         pass;                  #log('folds={}', (folds))
-        folds   = [(y, y2, x) for (y, y2, x, staple, folded) 
-                    in folds 
-                    if  staple and not folded
-                    and y<=crt_r<=y2
+        folds   = [(i['y'], i['y2'], i['x']) for i in folds 
+                    if i['staple'] and not i['folded']
+                    # and y<=crt_r<=y2
                   ]
         pass;                  #log('folds={}', (folds))
         if not folds:       return app.msg_status(_('No staple to jump'))
