@@ -533,6 +533,12 @@ caption=Cuda&-Ext\Ta&bs\&Find tab by title...
 hotkey=
 method=find_tab
 
+[item172_2]
+section=commands
+caption=Cuda&-Ext\Ta&bs\&Find tab by title (show first lines)...
+hotkey=
+method=find_tab_alt
+
 [item173]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Activate tab by &number...
@@ -889,25 +895,25 @@ method=align_prgph_cfg
 
 [item251]
 section=commands
-caption=Cuda&-Ext\Para&graph\Align: Left justify 
+caption=Cuda&-Ext\Para&graph\Align: Left justify
 hotkey=
 method=align_prgph_l
 
 [item252]
 section=commands
-caption=Cuda&-Ext\Para&graph\Align: Right justify 
+caption=Cuda&-Ext\Para&graph\Align: Right justify
 hotkey=
 method=align_prgph_r
 
 [item253]
 section=commands
-caption=Cuda&-Ext\Para&graph\Align: Center justify 
+caption=Cuda&-Ext\Para&graph\Align: Center justify
 hotkey=
 method=align_prgph_c
 
 [item254]
 section=commands
-caption=Cuda&-Ext\Para&graph\Align: Fully justify 
+caption=Cuda&-Ext\Para&graph\Align: Fully justify
 hotkey=
 method=align_prgph_f
 

@@ -167,6 +167,7 @@ class Command:
     def move_tab_left(self):                    return cd_ext_tabs.move_tab('l')
     def move_tab_right(self):                   return cd_ext_tabs.move_tab('r')
     def find_tab(self):                         return cd_ext_tabs.find_tab()
+    def find_tab_alt(self):                     return cd_ext_tabs.find_tab('alt')
     def arrange_tabs_grps(self):                return cd_ext_tabs.arrange_tabs_grps()
     def close_tab_from_next_group(self):        return cd_ext_tabs.close_tab_from_other_group('next')
     def close_tab_from_prev_group(self):        return cd_ext_tabs.close_tab_from_other_group('prev')
