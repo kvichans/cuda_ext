@@ -303,7 +303,8 @@ def find_tab(alt=''):
             if preview:
                 preview = ' '.join(preview.split())
                 preview = preview.replace("\n", '')
-            title = '[' + str(index_) + '] ' + e.get_prop(app.PROP_TAB_TITLE)
+            path = (' | ' if (e.get_prop(app.PROP_TAB_TITLE) and e.get_prop(app.PROP_TAB_TITLE) != ' ') else '') + e.get_filename().replace(os.path.expanduser('~'), '~', 1) if e.get_filename() else ''
+            title = '[' + str(index_) + '] ' + e.get_prop(app.PROP_TAB_TITLE) + path
             if len(title) > max_line_len:
                 title = title[0:max_line_len] + '...'
             slist.append(title + "\t" + preview)
