@@ -1,5 +1,4 @@
 [info]
-version=1.7.59
 title=CudaExt
 desc=Additional commands for CudaText in Commands dialog and Plugins menu
 type=cudatext-plugin
@@ -10,8 +9,6 @@ api=1.0.299
 [item1]
 section=events
 events=on_console_nav
-;events=on_console_nav,on_focus
-;events=on_console_nav,on_key_up,on_focus
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Find_repl_cmds
