@@ -1,4 +1,4 @@
-1.7.60 (2023-12-27)
+1.7.61 (2023-12-28)
 fixed: removed usage of deprecated API (old since CudaText 1.197) (by Alexey T.)
 
 1.7.59 (2023-11-21)

@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.60 2023-12-27'
+    '1.7.61 2023-12-28'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata, urllib.parse
@@ -752,51 +752,51 @@ class Jumps_cmds:
         (cCrt, rCrt, cEnd, rEnd) = crts[0]
         if cEnd!=-1:
             return app.msg_status(ONLY_FOR_NO_SEL.format(_('Command')))
-        ranges = ed.folding(app.FOLDING_GET_LIST_FILTERED, item_y=rCrt, item_y2=rCrt)
-        ranges = [r for r in ranges if r[0]<r[1]]
-        ranges = [r for r in ranges if (r[0]<rCrt) or (r[0]==rCrt and r[2]<=cCrt)]
+        ranges = ed.folding(app.FOLDING_ENUM, item_y=rCrt, item_y2=rCrt)
+        ranges = [r for r in ranges if r['y']<r['y2']]
+        ranges = [r for r in ranges if (r['y']<rCrt) or (r['y']==rCrt and r['x']<=cCrt)]
         if not ranges:
             return app.msg_status(NO_RANGES)
         if what=='begin':
             r = ranges[-1]
-            new_y = r[0]
-            new_x = r[2]
+            new_y = r['y']
+            new_x = r['x']
         elif what=='end':
             r = ranges[-1]
-            new_y = r[1]
+            new_y = r['y2']
             new_x = ed.get_line_len(new_y)
         elif what=='parent_begin':
             if len(ranges)<2:
                 return app.msg_status(NO_RANGES)
             r = ranges[-2]
-            new_y = r[0]
-            new_x = r[2]
+            new_y = r['y']
+            new_x = r['x']
         elif what=='parent_end':
             if len(ranges)<2:
                 return app.msg_status(NO_RANGES)
             r = ranges[-2]
-            new_y = r[1]
+            new_y = r['y2']
             new_x = ed.get_line_len(new_y)
         elif what=='combined_begin':
             r = ranges[-1]
-            new_y = r[0]
-            new_x = r[2]
+            new_y = r['y']
+            new_x = r['x']
             if (new_x == cCrt) and (new_y == rCrt):
                 if len(ranges)<2:
                     return app.msg_status(NO_RANGES)
                 r = ranges[-2]
-                new_y = r[0]
-                new_x = r[2]
+                new_y = r['y']
+                new_x = r['x']
         elif what=='combined_end':
             r = ranges[-1]
-            new_y = r[1]
+            new_y = r['y2']
             new_x = ed.get_line_len(new_y)
             while (new_x == cCrt) and (new_y == rCrt):
                 ranges.pop()
                 if not ranges:
                     return app.msg_status(NO_RANGES)
                 r = ranges[-1]
-                new_y = r[1]
+                new_y = r['y2']
                 new_x = ed.get_line_len(new_y)
         else:
             print('ERROR: Wrong "what" param in CudaExt jump-to-fold-range: '+what)
