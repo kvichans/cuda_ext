@@ -1999,33 +1999,15 @@ def align_line_comments():
     Alexey:
     Command don't support sub-lexer ranges yet. Todo? Use ed.get_sublexer_ranges().
     '''
-    lex = ed.get_prop(app.PROP_LEXER_FILE, '')
-    if not lex:
-        return app.msg_status(_('Need lexer active'))
-    sign = app.lexer_proc(app.LEXER_GET_PROP, lex)['c_line']
-    if not sign:
-        return app.msg_status(_('Need lexer with line-comment chars'))
-    
-    col = ed.get_prop(app.PROP_MARGIN)
-    if col>=500:
-        col = 100
-    s = app.dlg_input_ex(2, _('Align comments'),
-        _('Align by margin value:'), str(col),
-        _('Minimal allowed column pos:'), str(20)
-        )
-    if not s:
-        return
-    try:
-        need_column = int(s[0])
-        min_column = int(s[1])
-    except:
-        return app.msg_status(_('Incorrect number(s) entered: ')+s[0]+', '+s[1])
-
-    ncount = 0
-    for nline in range(ed.get_line_count()):
+    def process_line(nline, sign, ncount):
+        ''''
+        Aligh line-comment in line with given index 'nline'.
+        Comment chars are given by param 'sign'.
+        Param 'ncount' is incremeneted if change occured.
+        '''
         line = ed.get_text_line(nline)
         if not line.strip():
-            continue
+            return
         indent = len(line)-len(line.lstrip())
         npos = -1
         while True:
@@ -2062,5 +2044,31 @@ def align_line_comments():
                 continue
             ncount += 1
             break
+        
+    lex = ed.get_prop(app.PROP_LEXER_FILE, '')
+    if not lex:
+        return app.msg_status(_('Need lexer active'))
+    sign = app.lexer_proc(app.LEXER_GET_PROP, lex)['c_line']
+    if not sign:
+        return app.msg_status(_('Need lexer with line-comment chars'))
+    
+    col = ed.get_prop(app.PROP_MARGIN)
+    if col>=500:
+        col = 100
+    s = app.dlg_input_ex(2, _('Align comments'),
+        _('Align by margin value:'), str(col),
+        _('Minimal allowed column pos:'), str(20)
+        )
+    if not s:
+        return
+    try:
+        need_column = int(s[0])
+        min_column = int(s[1])
+    except:
+        return app.msg_status(_('Incorrect number(s) entered: ')+s[0]+', '+s[1])
+
+    ncount = 0
+    for nline in range(ed.get_line_count()):
+        process_line(nline, sign, ncount)
 
     app.msg_status(_('Aligned comments: ')+str(ncount))
