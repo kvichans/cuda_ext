@@ -2075,7 +2075,7 @@ class Command:
         if fn==fn_old:
             return app.msg_status(_('Cannot save'))
         if ed.save(fn, True) and os.path.isfile(fn):
-            if apx.get_opt('save_copy_and_open', False):
+            if apx.get_opt('cudaext_save_copy_and_open', True):
                 app.file_open(fn)
             else:
                 app.msg_status(_('Saved:')+' '+fn)

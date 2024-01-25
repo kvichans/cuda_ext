@@ -1,5 +1,5 @@
 1.7.62 (2024-01-25)
-added: command "Save a copy as..." like in Notepad++ (by Alexey T.)
+added: command "Save a copy as..." like in Notepad++; it uses new option in user.json "cudaext_save_copy_and_open" (by Alexey T.)
 
 1.7.61 (2023-12-28)
 fixed: removed usage of deprecated API (old since CudaText 1.197) (by Alexey T.)
