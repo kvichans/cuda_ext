@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.61 2023-12-28'
+    '1.7.62 2024-01-25'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata, urllib.parse
@@ -2063,7 +2063,26 @@ class Command:
             pass;               log(traceback.format_exc())
             return app.msg_status(_('Error: ')+ex)
        #def open_with_defapp
-    
+
+    def save_copy(self):
+        if app.app_api_version()<'1.0.452':
+            return app.msg_status(NEED_UPDATE)
+
+        fn_old = ed.get_filename()
+        fn = app.dlg_file(False, '', os.path.dirname(fn_old), '')
+        if not fn:
+            return
+        if fn==fn_old:
+            return app.msg_status(_('Cannot save'))
+        if ed.save(fn, True) and os.path.isfile(fn):
+            if apx.get_opt('save_copy_and_open', False):
+                app.file_open(fn)
+            else:
+                app.msg_status(_('Saved:')+' '+fn)
+        else:
+            app.msg_status(_('Cannot save'))
+       #def save_copy
+
     def save_tabs_to_file(self):
         RES_ALL = 0
         RES_VIS = 1

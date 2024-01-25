@@ -1108,6 +1108,12 @@ method=open_with_defapp
 
 [item350]
 section=commands
+caption=Cuda&-Ext\Fi&le\Save a copy as...
+hotkey=
+method=save_copy
+
+[item351]
+section=commands
 caption=Cuda&-Ext\Fi&le\Save editors to a single file...
 hotkey=
 method=save_tabs_to_file
