@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.62 2024-01-25'
+    '1.7.64 2024-06-15'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata, urllib.parse
@@ -1900,7 +1900,11 @@ class Command:
                 fn = fn.replace('~'+os.sep, USER_DIR+os.sep, 1)
             return fn
 
-        hist_fs     = app.app_path(app.APP_FILE_RECENTS).splitlines() # not split('\n') because Cud's APP_FILE_RECENTS has bug on Windows
+        if app.app_api_version()>='1.0.456':
+            hist_fs = app.app_path(app.APP_FILE_RECENT_LIST)
+        else:
+            hist_fs = app.app_path(app.APP_FILE_RECENTS).splitlines() # not split('\n') because Cud's APP_FILE_RECENTS has bug on Windows
+
         hist_fts    = [(f, os.path.getmtime(full_fn(f)))
                         for f in hist_fs if os.path.isfile(full_fn(f))]
         hist_fts_default_sorting = hist_fts
