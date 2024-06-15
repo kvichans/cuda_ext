@@ -1681,12 +1681,10 @@ class Command:
                 return      # No splitter
 
             elif (what=='main'
-#           and   grouping!=app.GROUPS_3PLUS):      id_splt = 'G1'
             and   grouping!=app.GROUPS_1P2VERT
             and   grouping!=app.GROUPS_1P2HORZ):    id_splt = 'G1'
             
             elif (what=='main'
-#           and   grouping==app.GROUPS_3PLUS):      id_splt = 'G3'
             and   grouping==app.GROUPS_1P2VERT):    id_splt = 'G3'
 
             elif (what=='main'
@@ -1699,7 +1697,6 @@ class Command:
                 elif grouping==app.GROUPS_2VERT:    id_splt = 'G1'  # h-self
                 elif grouping==app.GROUPS_3HORZ:    id_splt = 'G1'  # w-self
                 elif grouping==app.GROUPS_3VERT:    id_splt = 'G1'  # h-self
-#               elif grouping==app.GROUPS_3PLUS:    id_splt = 'G3'  # w-self
                 elif grouping==app.GROUPS_1P2VERT:  id_splt = 'G3'  # w-self
                 elif grouping==app.GROUPS_1P2HORZ:  id_splt = 'G3'  # h-self
                 elif grouping==app.GROUPS_4HORZ:    id_splt = 'G1'  # w-self
@@ -1713,7 +1710,6 @@ class Command:
                 elif grouping==app.GROUPS_2VERT:    id_splt ='-G1'  # h-top
                 elif grouping==app.GROUPS_3HORZ:    id_splt = 'G2'  # w-self
                 elif grouping==app.GROUPS_3VERT:    id_splt = 'G2'  # h-self
-#               elif grouping==app.GROUPS_3PLUS:    id_splt = 'G2'  # h-self
                 elif grouping==app.GROUPS_1P2VERT:  id_splt = 'G2'  # h-self
                 elif grouping==app.GROUPS_1P2HORZ:  id_splt = 'G2'  # w-self
                 elif grouping==app.GROUPS_4HORZ:    id_splt = 'G2'  # w-self
@@ -1725,7 +1721,6 @@ class Command:
                 if False:pass
                 elif grouping==app.GROUPS_3HORZ:    id_splt ='-G2'  # w-left
                 elif grouping==app.GROUPS_3VERT:    id_splt ='-G2'  # h-top
-#               elif grouping==app.GROUPS_3PLUS:    id_splt ='-G2'  # h-top
                 elif grouping==app.GROUPS_1P2VERT:  id_splt ='-G2'  # h-top
                 elif grouping==app.GROUPS_1P2HORZ:  id_splt ='-G2'  # w-left
                 elif grouping==app.GROUPS_4HORZ:    id_splt = 'G3'  # w-self
