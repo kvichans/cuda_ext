@@ -1,6 +1,6 @@
 1.7.64 (2024-06-15)
 fixed: avoid deprecated API: APP_FILE_RECENTS
-fixed: some dialogs in plugin change (decrease) size on each call, on Linux (by Alexey T.)
+fixed: some dialogs change/decrease sizes on each call (by Alexey T.)
 
 1.7.62 (2024-01-25)
 added: command "Save a copy as..." like in Notepad++; it uses new option in user.json "cudaext_save_copy_and_open" (by Alexey T.)
