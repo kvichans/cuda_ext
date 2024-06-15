@@ -1808,6 +1808,7 @@ def _gen_form_key(fprs):                                        # Gen key from f
         
 def _form_acts(act, fprs=None, did=None, key4store=None):
     """ Save/Restore pos of form """
+    return fprs # 2024.06. this skips the body, this is to fix bug when dialogs sizes are changes on each call
     pass;                       log4fun=0                       # Order log in the function
     pass;                       log__('act, fprs, did={}',(act, fprs, did)      ,__=(log4fun,)) if _log4mod>=0 else 0
 
