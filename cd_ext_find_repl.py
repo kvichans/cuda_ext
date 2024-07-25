@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
 Version:
-    '1.7.59 2023-11-13'
+    '1.7.65 2024-07-25'
 ToDo: (see end of file)
 '''
 
@@ -1585,7 +1585,8 @@ def align_sel_by_margin(how):
 
 
 def join_lines():
-    if app.app_api_version()<'1.0.187': return app.msg_status(_('Need to update application'))
+    if app.app_api_version()<'1.0.187':
+        return app.msg_status(_('Need to update application'))
     crts    = ed.get_carets()
     if len(crts)>1:
         return app.msg_status(_("{} doesn't work with multi-carets").format(_('Command')))
@@ -1607,6 +1608,7 @@ def join_lines():
             x += 1
         ed.replace_lines(y, y+1, [s1])
         ed.set_caret(x, y)
+        app.msg_status(_("Joined line with next line"))
         return    
 
     first_ln= ed.get_text_line(rSelB)
@@ -1617,6 +1619,7 @@ def join_lines():
     joined  = ' '.join(l for l in lines if l)
     _replace_lines(ed, rSelB, rSelE, joined)
     ed.set_caret(0,rSelB+1, 0,rSelB)
+    app.msg_status(_("Joined selected lines"))
    #def join_lines
     
 
