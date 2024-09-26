@@ -187,6 +187,7 @@ class Command:
     def close_pair_and_reopen(self):            return cd_ext_tabs.close_pair_and_reopen()
     def close_saved(self):                      return cd_ext_tabs.close_saved()
     def sort_tabs_by_title(self):               return cd_ext_tabs.sort_by_title()
+    def duplicate_tab(self):                    return cd_ext_tabs.duplicate_tab()
 
     # Paragraph_cmds
     def go_prgph_bgn(self):                     return RLS.go_prgph('bgn')

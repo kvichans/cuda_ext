@@ -449,4 +449,9 @@ def sort_by_title():
     app.Editor(h_focused).focus()
     #msg_status('Sorted UI-tabs in %d group(s)'%grp_count)
    #def sort_by_title
- 
+
+def duplicate_tab():
+    txt = ed.get_text_all()
+    app.file_open('')
+    ed.set_text_all(txt)
+   #def duplicate_tab
