@@ -763,6 +763,18 @@ caption=Cuda&-Ext\Ta&bs\Sort tabs by title
 hotkey=
 method=sort_tabs_by_title
 
+[item220_3]
+section=commands
+caption=Cuda&-Ext\Ta&bs\-
+hotkey=
+method=_
+
+[item220_4]
+section=commands
+caption=Cuda&-Ext\Ta&bs\Duplicate tab
+hotkey=
+method=duplicate_tab
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Move_sep_cmds
 [item221]
