@@ -1,3 +1,6 @@
+1.7.65 (2024-09-26)
+added: command "Duplicate tab"
+
 1.7.64 (2024-06-15)
 fixed: avoid deprecated API: APP_FILE_RECENTS
 fixed: some dialogs change/decrease sizes on each call (by Alexey T.)
@@ -74,10 +77,10 @@ added: Command "Strip HTML tags" logic is improved (by Alexey T.)
 added: Command "Align carets columns by inserting spaces" - Aligns positions of multi-carets by inserting space-chars, so all carets go to the same column
 
 1.7.34 (2021-08-23)
-added: New options for user.json: 
+added: New options for user.json:
     "cuda_ext.<command>.menu.<style>": <value>
-	where 
-	    command is one of (recents, tabs_bookmark, tab_bookmark, layouts, tree_symbols) 
+	where
+	    command is one of (recents, tabs_bookmark, tab_bookmark, layouts, tree_symbols)
 	and
 	    style is one of (monofont, no_fuzzy, centered)
 	Set value to 0 or false to switch style off
@@ -159,12 +162,12 @@ fixed: "find, next" doesnt continue search after "Find clipbrd: next"
 fixed: FindInLines: editor looses focus on Enter
 
 1.7.12 (2019-12-10)
-added: Commands "Move tab left/right" 
-added: Command "Add indent and surround selection with { }" 
-fixed: instant search in dock mode 
+added: Commands "Move tab left/right"
+added: Command "Add indent and surround selection with { }"
+fixed: instant search in dock mode
 
 1.7.11 (2019-09-09)
-added: Command "Save/Restore groups and panels layout" in submenu "Splitters" 
+added: Command "Save/Restore groups and panels layout" in submenu "Splitters"
 
 1.7.10 (2019-09-02)
 changed: Need Python 3.6. See CudaExt_py35 to work with old CudaText versions
