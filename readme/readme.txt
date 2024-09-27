@@ -137,6 +137,7 @@ Menu items:
     - Close pair-tab, reopen 2 separate files
     - Close all unmodified tabs
     - Sort tabs by title
+    - Duplicate tab
 - Splitters
     - Expand side panel
     - Shrink side panel
