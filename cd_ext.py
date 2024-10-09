@@ -117,7 +117,7 @@ def dlg_menu(how, its='', sel=0, cap='', clip=0, w=0, h=0, opts_key=''):
 class SCBs:
     @staticmethod
     def copy_term():
-        """ Find and copy to CB word or 'smth'/"smth"/[smth] near/around caret.
+        r""" Find and copy to CB word or 'smth'/"smth"/[smth] near/around caret.
             Parse only (in parse order)
                 ·a|c·      abc|·   ·|abc        "word"-chars are \w             · is [^\w_]
                 'abc'|·    ·|"abc"              any quotes from "" ''           · is [^\w_]
@@ -133,7 +133,7 @@ class SCBs:
 
     @staticmethod
     def replace_term():
-        """ Find a word or 'smth'/"smth"/[smth] near/around caret 
+        r""" Find a word or 'smth'/"smth"/[smth] near/around caret 
                 and replace with CB-clip.
             Parse only (in parse order)
                 ·a|c·      abc|·   ·|abc        "word"-chars are \w             · is [^\w_]
@@ -182,7 +182,7 @@ class SCBs:
 
     @staticmethod
     def _parseTerm(ted=ed, ops={}):         #NOTE: _parseTerm
-        """ Find _term_ around caret *into* current line.
+        r""" Find _term_ around caret *into* current line.
             Parse only (in parse order)
                 ·a|c·      abc|·   ·|abc        "word"-chars are \w             · is [^\w_]
                 'abc'|·    ·|"abc"              any quotes from "" ''           · is [^\w_]
@@ -1166,7 +1166,7 @@ class Nav_cmds:
     @staticmethod
     def on_console_nav(ed_self, text):
         pass;                      #LOG and log('text={}',text)
-        match   = re.match('.*File "([^"]+)", line (\d+)', text)    ##?? variants?
+        match   = re.match(r'.*File "([^"]+)", line (\d+)', text)    ##?? variants?
         if match is None:
             return
         op_file =     match.group(1)
@@ -1212,7 +1212,7 @@ class Nav_cmds:
             print(cons_out)
         fn      = _get_filename(ed)
         if not fn:      return app.msg_status(_('Only for saved file'))
-        fn_ln_re= f('File "{}", line ', fn).replace('\\','\\\\')+'(\d+)'
+        fn_ln_re= f('File "{}", line ', fn).replace('\\','\\\\')+r'(\d+)'
         pass;                      #LOG and log('fn_ln_re={}',fn_ln_re)
         mtchs   = list(re.finditer(fn_ln_re, cons_out, re.I))
         if not mtchs:   return app.msg_status(_('In output no errors or no current file: ')+fn)

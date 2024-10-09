@@ -803,7 +803,7 @@ class FiL:
     # To fit pattern to find
     compile_pttn= lambda    pttn_s, reex, case, word: re.compile(
                             pttn_s          if reex else
-                      r'\b'+pttn_s+r'\b'    if word and re.match('^\w+$', pttn_s) else
+                      r'\b'+pttn_s+r'\b'    if word and re.match(r'^\w+$', pttn_s) else
                   re.escape(pttn_s)
                         ,   0 if case else re.I)
         
