@@ -1067,7 +1067,6 @@ method=align_line_comments
 [item341]
 section=commands
 caption=Cuda&-Ext\Fi&le\Open &recent file...
-hotkey=Ctrl+Alt+R
 method=open_recent
 
 [item342]
