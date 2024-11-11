@@ -2168,7 +2168,7 @@ class Command:
     def remove_xml_tags(self):
         rxCmt   = re.compile('<!--.*?-->', re.DOTALL)
         # rxTag   = re.compile(r'''<\w+('.*?'|".*?"|.)*?>''', re.DOTALL)
-        rxTag   = re.compile(r'''<([^>]+)>''', re.DOTALL)
+        rxTag   = re.compile(r'''<\w+('.*?'|".*?"|.)*?>|<.*?>''', re.DOTALL)
         body    = ed.get_text_all()
         if not rxCmt.search(body) and not rxTag.search(body):
             return app.msg_status(_('No tags were found'))
