@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.64 2024-06-15'
+    '1.7.68 2025-04-03'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata, urllib.parse
@@ -2068,7 +2068,14 @@ class Command:
             return app.msg_status(NEED_UPDATE)
 
         fn_old = ed.get_filename()
-        fn = app.dlg_file(False, '', os.path.dirname(fn_old), '')
+
+        # add '.bak' to suggested filename
+        parts = os.path.basename(fn_old).split('.')
+        if parts:
+            parts = parts[:-1] + ['bak', parts[-1]]
+        fn_new = '.'.join(parts)
+
+        fn = app.dlg_file(False, fn_new, os.path.dirname(fn_old), '')
         if not fn:
             return
         if fn==fn_old:
