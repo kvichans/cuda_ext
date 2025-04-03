@@ -1,3 +1,6 @@
+1.7.68 (2025-04-03)
+added: command "Save a copy as..." suggests filename, with '.bak' suffix before the final extension (by Alexey T.)
+
 1.7.67 (2024-10-09)
 fixed: wrong backslashes in str literals
 
