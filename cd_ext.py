@@ -2071,8 +2071,7 @@ class Command:
 
         # add '.bak' to suggested filename
         parts = os.path.basename(fn_old).split('.')
-        if parts:
-            parts = parts[:-1] + ['bak', parts[-1]]
+        parts.insert(len(parts)-1, 'bak')
         fn_new = '.'.join(parts)
 
         fn = app.dlg_file(False, fn_new, os.path.dirname(fn_old), '')
