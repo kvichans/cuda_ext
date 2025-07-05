@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
 Version:
-    '1.7.65 2024-07-25'
+    '1.7.66 2025-07-05'
 ToDo: (see end of file)
 '''
 
@@ -46,7 +46,7 @@ class RiL:
     FORM_C  = FORM_CB+' '+_('(Enter in first field to find)')   # RaiL
     HELP_TX = _('''
 • [Shift+]Enter in "Find" field to search [previous] next fragment.
-• Ctlr+Down/Up to copy pattern lower/upper.
+• Ctrl+Down/Up to copy pattern lower/upper.
 • Command "Restore initial selection" (Shift+Esc) tries to restore only first of initial carets.
 • RegExp engine from CudaText is used. Names of RegEx sub-groups are $1, $2...
     ''').strip()
@@ -785,11 +785,11 @@ def kit_replace_in_lines():
 class FiL:
     FORM_C  =   _('Find in Lines')
     HELP_C  = _('''
-• Search "in Lines" starts immediately (if focus in the left edit) or on Enter or Shift+Enter (if focus in the right edit).
-• A found fragment after first caret will be selected.
+• Search "in Lines" starts immediately (if focus is in the left field) or on Enter or Shift+Enter (if focus is in the right field).
+• The found fragment, after first caret, will be selected.
 • All found fragments are remembered and dialog can jump over them by [Shift+]Enter or by menu commands.
-• Ctlr+Right (or Alt+Right) copies text from the left edit to the right.
-• Ctlr+Left (or Alt+Left) copies text from the right edit to the left.
+• Ctrl+Right (or Alt+Right) copies text from the left edit to the right.
+• Ctrl+Left (or Alt+Left) copies text from the right edit to the left.
 • Option ".*" (regular expression) allows to use Python reg.ex. See "docs.python.org/3/library/re.html".
 • Option "w" (whole words) is ignored if entered string contains not a word.
 • If option "Instant search" (in menu) is tuned on, search result will be updated on start and after each change of pattern.
