@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.70 2025-08-01'
+    '1.7.71 2025-08-01'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata, urllib.parse
@@ -170,13 +170,13 @@ class SCBs:
         if SCBs.lexer==lexer and SCBs.quotes: return
         SCBs.wrdchs     = apx.get_opt('word_chars', '') + '_'
         SCBs.wrdcs_re   = re.compile(r'^[\w'+re.escape(SCBs.wrdchs)+']+')
-        SCBs.quotes     = apx.get_opt('cudaext_quotes', '"'+"'`")
-        SCBs.brckts     = apx.get_opt('cudaext_brackets', '[](){}<>')
+        SCBs.quotes     = apx.get_opt('cuda_ext_quotes', '"'+"'`")
+        SCBs.brckts     = apx.get_opt('cuda_ext_brackets', '[](){}<>')
         SCBs.opn2cls    = {SCBs.brckts[i  ]:SCBs.brckts[i+1] for i in range(0,len(SCBs.brckts),2)}
         SCBs.cls2opn    = {SCBs.brckts[i+1]:SCBs.brckts[i  ] for i in range(0,len(SCBs.brckts),2)}
         SCBs.allspec    = SCBs.wrdchs + SCBs.quotes + SCBs.brckts
         SCBs.notspec_re = re.compile(r'^[\W'+re.escape(SCBs.allspec)+']+')
-        SCBs.signs      = apx.get_opt('cudaext_signs', r'!@#$%^&*-=+;:\|,./?`~')
+        SCBs.signs      = apx.get_opt('cuda_ext_signs', r'!@#$%^&*-=+;:\|,./?`~')
         SCBs.signs_re   = re.compile(r'^['+re.escape(SCBs.signs)+']+')
        #def _prep_static_data
 
@@ -2081,7 +2081,7 @@ class Command:
         if fn==fn_old:
             return app.msg_status(_('Cannot save'))
         if ed.save(fn, True) and os.path.isfile(fn):
-            if apx.get_opt('cudaext_save_copy_and_open', True):
+            if apx.get_opt('cuda_ext_save_copy_and_open', True):
                 app.file_open(fn)
             else:
                 app.msg_status(_('Saved:')+' '+fn)
