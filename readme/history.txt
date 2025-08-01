@@ -1,6 +1,6 @@
 1.7.71 (2025-08-01)
-changed: renamed 4 old options "cudaext_xxxx" to "cuda_ext_xxxx" (because many options "cuda_ext_yyyy" existed already)
-added: new option in user.json "cuda_ext_paragraph_extra_jump" (boolean, default true); it allows commands "Paragraph: Go to beginning/end" to do extra jump if caret is already at the line begin/end (by Alexey T.)
+changed: renamed options "cuda_ext_xxxx" to "cudaext_xxxx" (because options "cudaext_yyyy" existed)
+added: new option in user.json "cudaext_paragraph_extra_jump" (boolean, default true); it allows commands "Paragraph: Go to beginning/end" to do extra jump if caret is already at the line begin/end (by Alexey T.)
 
 1.7.68 (2025-04-03)
 added: command "Save a copy as..." suggests filename, with '.bak' suffix before the final extension (by Alexey T.)
