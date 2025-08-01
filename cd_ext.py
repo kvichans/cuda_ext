@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.71 2025-08-01'
+    '1.7.72 2025-08-01'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata, urllib.parse
@@ -170,13 +170,13 @@ class SCBs:
         if SCBs.lexer==lexer and SCBs.quotes: return
         SCBs.wrdchs     = apx.get_opt('word_chars', '') + '_'
         SCBs.wrdcs_re   = re.compile(r'^[\w'+re.escape(SCBs.wrdchs)+']+')
-        SCBs.quotes     = apx.get_opt('cudaext_quotes', '"'+"'`")
-        SCBs.brckts     = apx.get_opt('cudaext_brackets', '[](){}<>')
+        SCBs.quotes     = apx.get_opt('cuda_ext.quotes', '"'+"'`")
+        SCBs.brckts     = apx.get_opt('cuda_ext.brackets', '[](){}<>')
         SCBs.opn2cls    = {SCBs.brckts[i  ]:SCBs.brckts[i+1] for i in range(0,len(SCBs.brckts),2)}
         SCBs.cls2opn    = {SCBs.brckts[i+1]:SCBs.brckts[i  ] for i in range(0,len(SCBs.brckts),2)}
         SCBs.allspec    = SCBs.wrdchs + SCBs.quotes + SCBs.brckts
         SCBs.notspec_re = re.compile(r'^[\W'+re.escape(SCBs.allspec)+']+')
-        SCBs.signs      = apx.get_opt('cudaext_signs', r'!@#$%^&*-=+;:\|,./?`~')
+        SCBs.signs      = apx.get_opt('cuda_ext.signs', r'!@#$%^&*-=+;:\|,./?`~')
         SCBs.signs_re   = re.compile(r'^['+re.escape(SCBs.signs)+']+')
        #def _prep_static_data
 
@@ -189,8 +189,8 @@ class SCBs:
                 [abc]|·    ·|(abc)              any brackets from [](){}<>      · is [^\w_'"]
             Params from def/user/lex
                 word_chars          (no)        Append chars to \w
-                cudaext_quotes      '"`         Using quotes 
-                cudaext_brackets    [](){}<>    Using brackets
+                cuda_ext.quotes      '"`         Using quotes 
+                cuda_ext.brackets    [](){}<>    Using brackets
             Params
                 ted     (ed)
                 ops     dict({})    
@@ -521,7 +521,7 @@ class Jumps_cmds:
             old_top_line= ed.get_prop(app.PROP_LINE_TOP) if app.app_api_version()>='1.0.126' else ed.get_top()
             scr_lines   = ed.get_prop(app.PROP_VISIBLE_LINES)
             crt_line    = ed.get_carets()[0][1]
-            vert_indent = apx.get_opt('cudaext_vert_indent', 0)
+            vert_indent = apx.get_opt('cuda_ext.vert_indent', 0)
 #           vert_indent = abs(apx.get_opt('find_indent_vert', 0))
         
             new_top_line= old_top_line
@@ -545,8 +545,8 @@ class Jumps_cmds:
 
         if place in ('lf', 'rt') and not wrapped:
             free_crt    = apx.get_opt('caret_after_end', False)
-            move_crt    = apx.get_opt('cudaext_horz_scroll_move_caret', False)
-            shift       = apx.get_opt('cudaext_horz_scroll_size', 30)
+            move_crt    = apx.get_opt('cuda_ext.horz_scroll_move_caret', False)
+            shift       = apx.get_opt('cuda_ext.horz_scroll_size', 30)
 #           old_lf_col  = ed.get_prop(app.PROP_COLUMN_LEFT)
             old_lf_col  = ed.get_prop(app.PROP_SCROLL_HORZ)
             
@@ -922,7 +922,7 @@ class Prgph_cmds:
         if ''==cu_line.strip() and what in ('bgn', 'end'):  return
         
         cu_skip = False
-        if apx.get_opt('cudaext_paragraph_extra_jump', True):
+        if apx.get_opt('cuda_ext.paragraph_extra_jump', True):
             if what=='end' and cu_row+1<ed.get_line_count():
                 # Skip cu-prph if caret "at end" and cmd "go end"
                 cu_skip = ''==ed.get_text_line(cu_row+1).strip() and \
@@ -2081,7 +2081,7 @@ class Command:
         if fn==fn_old:
             return app.msg_status(_('Cannot save'))
         if ed.save(fn, True) and os.path.isfile(fn):
-            if apx.get_opt('cudaext_save_copy_and_open', True):
+            if apx.get_opt('cuda_ext.save_copy_and_open', True):
                 app.file_open(fn)
             else:
                 app.msg_status(_('Saved:')+' '+fn)
