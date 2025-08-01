@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.68 2025-04-03'
+    '1.7.69 2025-08-01'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata, urllib.parse
@@ -922,14 +922,15 @@ class Prgph_cmds:
         if ''==cu_line.strip() and what in ('bgn', 'end'):  return
         
         cu_skip = False
-        if what=='end' and cu_row+1<ed.get_line_count():
-            # Skip cu-prph if caret "at end" and cmd "go end"
-            cu_skip = ''==ed.get_text_line(cu_row+1).strip() and \
-                      cCrt==len(cu_line)
-        if what=='bgn' and cu_row-1>=0:
-            # Skip cu-prph if caret "at bgn" and cmd "go bgn"
-            cu_skip = ''==ed.get_text_line(cu_row-1).strip() and \
-                      cCrt<=len(cu_line)-len(cu_line.lstrip())
+        if apx.get_opt('cuda_ext_paragraph_extra_jump', True):
+            if what=='end' and cu_row+1<ed.get_line_count():
+                # Skip cu-prph if caret "at end" and cmd "go end"
+                cu_skip = ''==ed.get_text_line(cu_row+1).strip() and \
+                          cCrt==len(cu_line)
+            if what=='bgn' and cu_row-1>=0:
+                # Skip cu-prph if caret "at bgn" and cmd "go bgn"
+                cu_skip = ''==ed.get_text_line(cu_row-1).strip() and \
+                          cCrt<=len(cu_line)-len(cu_line.lstrip())
         
         if what in ('nxt', 'prv') or cu_skip:
             # Search row in other prph
