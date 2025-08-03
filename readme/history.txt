@@ -1,6 +1,7 @@
-1.7.73 (2025-08-02)
+1.7.74 (2025-08-03)
 changed: renamed options "cudaext_xxxx" to "cuda_ext_xxxx" (about 4 options)
 added: new option in user.json "cuda_ext_paragraph_extra_jump" (boolean, default: true); it allows commands "Paragraph: Go to beginning/end" to do extra jump if caret is already at the line begin/end (by Alexey T.)
+changed: commands "Paragraph: Align: ....." mark affected paragraph line-states as 'changed' (by Alexey T.)
 
 1.7.68 (2025-04-03)
 added: command "Save a copy as..." suggests filename, with '.bak' suffix before the final extension (by Alexey T.)

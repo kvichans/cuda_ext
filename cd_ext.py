@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.73 2025-08-02'
+    '1.7.74 2025-08-03'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata, urllib.parse
@@ -1027,6 +1027,9 @@ class Prgph_cmds:
             prph_lines  = Prgph_cmds._form_prph(prph_text, how, max_col, indent, indent1)   # split and align
             pass;              #LOG and log('prph_lines={}',('\n'+'\n'.join(prph_lines)))
             ed.replace_lines(prph_bgn_r, prphs_end_r, prph_lines)
+            # set line-states to 'changed'
+            for i in range(prph_bgn_r, prphs_end_r+1):
+                ed.set_prop(app.PROP_LINE_STATE, (i, app.LINESTATE_CHANGED))
        #def align_prgph
        
     def _form_prph(text, how, max_col, indent=0, indent1=0):
