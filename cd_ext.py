@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.75 2025-08-04'
+    '1.7.76 2025-08-16'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata, urllib.parse
@@ -919,7 +919,9 @@ class Prgph_cmds:
         cu_row  = rCrt
         
         cu_line = ed.get_text_line(cu_row)
-        if ''==cu_line.strip() and what in ('bgn', 'end'):  return
+        if ''==cu_line.strip() and what in ('bgn', 'end'):
+            if not apx.get_opt('cuda_ext_paragraph_jump_from_empty', False):
+                return
         
         cu_skip = False
         if apx.get_opt('cuda_ext_paragraph_extra_jump', True):

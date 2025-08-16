@@ -8,7 +8,7 @@ lexer-override config.
   Brackets pairs. Default: "[](){}<>".
 
 * "cuda_ext_signs": str.
-  Non-word chars. Default: '!@#$%^&*-=+;:\|,./?`~'.
+  Non-word chars. Default: "!@#$%^&*-=+;:\|,./?`~".
 
 * "cuda_ext_vert_indent": integer.
   Vertical indent for "Scroll xxxx" commands. Default: 0.
@@ -20,8 +20,12 @@ lexer-override config.
   For commands "Scroll xxxx", specifies horizontal scroll value. Default: 30.
 
 * "cuda_ext_paragraph_extra_jump": boolean.
-  For commands "Paragraph: Go to xxxx" allows to do additional jump when
+  For commands "Paragraph: Go to beginning/end" allows to do additional jump when
   caret is already at the line edge. Default: true.
+
+* "cuda_ext_paragraph_jump_from_empty": boolean.
+  For commands "Paragraph: Go to beginning/end", allows the jump when caret is
+  on the empty line. Default: false.
 
 * "cuda_ext_save_copy_and_open": boolean.
   For command "Save copy as", allows to open the resulting file. Default: true.
