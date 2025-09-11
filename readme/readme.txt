@@ -24,6 +24,7 @@ Menu items:
     - Convert multi-line selection to column selection
     - Reverse selection text, by lines
 - Insert
+    - Duplicate line or selection
     - Add indented line above
     - Add indented line below
     - Add indent and surround selection with { }
