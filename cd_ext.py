@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.76 2025-08-16'
+    '1.7.77 2025-09-11'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata, urllib.parse
@@ -31,6 +31,7 @@ d       = dict
 FROM_API_VERSION    = '1.0.119'
 FROM_API_VERSION    = '1.0.182'     # PROC_SPLITTER_GET/SET, LOG_CONSOLE_GET_MEMO_LINES
 
+ONLY_NORM_SEL_MODE  = _('{} works only with normal selection')
 ONLY_SINGLE_CRT     = _("{} doesn't work with multi-carets")
 ONLY_FOR_NO_SEL     = _("{} doesn't work with selection")
 NO_PAIR_BRACKET     = _("Cannot find matching bracket for '{}'")
@@ -112,6 +113,22 @@ def dlg_menu(how, its='', sel=0, cap='', clip=0, w=0, h=0, opts_key=''):
 #   if api<='1.0.346':  #  MENU_EDITORFONT
     return      app.dlg_menu(how, its, focused=sel, caption=cap, clip=clip, w=w, h=h)
    #def dlg_menu
+
+
+def _move_caret_down(cCrtSmb, rCrt, ed_=ed, id_crt=app.CARET_SET_ONE):
+    ''' Caret will be moved to next line with save start column (if next line exists)
+        Params
+            cCrtSmb     Start pos as symbol number
+            rCrt        Start line
+            ed_         Editor
+            id_crt      CARET_SET_ONE or CARET_SET_INDEX+N for caret with index N
+    '''
+    pass;                      #LOG and log('cCrtSmb, rCrt, id_crt==app.CARET_SET_ONE={}',(cCrtSmb, rCrt, id_crt==app.CARET_SET_ONE))
+    if (rCrt+1)>=ed_.get_line_count():    return
+    colCrt  = ed.convert(app.CONVERT_CHAR_TO_COL, cCrtSmb, rCrt  )[0]
+    cCrtSmb1= ed.convert(app.CONVERT_COL_TO_CHAR, colCrt,  rCrt+1)[0]
+    ed_.set_caret(cCrtSmb1, rCrt+1, id=id_crt)
+   #def _move_caret_down
 
 #############################################################
 class SCBs:
@@ -1541,7 +1558,46 @@ class Insert_cmds:
         ed.cmd(cmds.cCommand_TextInsert, text)
         app.msg_status(_('Character inserted: U+') + hexcode)
        #def insert_char_by_hex
-    
+
+    @staticmethod
+    def duplicate_line():
+        DUPLICATION = _('Duplication')
+        if ed.get_prop(app.PROP_RO): return
+
+        if ed.get_sel_mode() != app.SEL_NORMAL:
+            return app.msg_status(ONLY_NORM_SEL_MODE.format(DUPLICATION))
+
+        crts    = ed.get_carets()
+        if len(crts)>1:
+            return app.msg_status(ONLY_SINGLE_CRT.format(DUPLICATION))
+
+        (cCrt, rCrt, cEnd, rEnd)    = crts[0]
+        bEmpSel = -1==rEnd
+        bUseFLn = apx.get_opt('cuda_ext_duplicate_full_line_if_no_sel', True)
+        bSkip   = apx.get_opt('cuda_ext_duplicate_move_down', True)
+        if bEmpSel:
+            if not bUseFLn:
+                return
+            # Dup whole row
+            row_txt    = ed.get_text_line(rCrt)
+            ed.insert(0, rCrt, row_txt+'\n')
+
+            # Move crt to next row
+            if bSkip and (rCrt+1)<ed.get_line_count():
+                _move_caret_down(cCrt, rCrt)
+            return
+
+        def minmax(v1, v2):
+            return min(v1, v2), max(v1, v2)
+
+        (rFr, cFr), (rTo, cTo)  = minmax((rCrt, cCrt), (rEnd, cEnd))
+        pass;                  #LOG and log('(cFr , rFr , cTo , rTo) ={}',(cFr , rFr , cTo , rTo))
+        sel_txt = ed.get_text_substr(cFr, rFr, cTo, rTo)
+        pass;                  #LOG and log('sel_txt={}',repr(sel_txt))
+        ed.insert(cFr, rFr, sel_txt)
+        ed.set_caret(cCrt, rCrt, cEnd, rEnd)
+       #def duplicate
+
    #class Insert_cmds
     
 class Command:
@@ -2262,6 +2318,7 @@ class Command:
     def fill_by_str(self):                      return Insert_cmds.fill_by_str()
     def copy_unicode_char_name(self):           return Insert_cmds.copy_unicode_char_name()
     def insert_char_by_hex(self):               return Insert_cmds.insert_char_by_hex()
+    def duplicate_line(self):                   return Insert_cmds.duplicate_line()
     
     def copy_term(self):                        return SCBs.copy_term()
     def replace_term(self):                     return SCBs.replace_term()

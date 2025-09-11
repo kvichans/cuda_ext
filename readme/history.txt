@@ -1,3 +1,6 @@
+1.7.77 (2025-09-11)
+added: command "Duplicate line", copy-pasted from CudaText's cudax_lib.py; and 2 new options for this command - see readme/options.txt.
+
 1.7.76 (2025-08-16)
 added: option "cuda_ext_paragraph_jump_from_empty", see the file readme/options.txt (by Alexey T.)
 

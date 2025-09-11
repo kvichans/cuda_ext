@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
 Version:
-    '1.7.62 2024-01-25'
+    '1.7.63 2025-09-11'
 '''
 
 from    .cd_ext import Command as CommandRLS
@@ -46,6 +46,7 @@ class Command:
     def fill_by_str(self):                      return RLS.fill_by_str()
     def copy_unicode_char_name(self):           return RLS.copy_unicode_char_name()
     def insert_char_by_hex(self):               return RLS.insert_char_by_hex()
+    def duplicate_line(self):                   return RLS.duplicate_line()
     
     # Find_repl_cmds
     def dlg_find_in_lines(self):                return cd_ext_find_repl.dlg_find_in_lines()

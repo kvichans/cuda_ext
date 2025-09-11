@@ -29,3 +29,9 @@ lexer-override config.
 
 * "cuda_ext_save_copy_and_open": boolean.
   For command "Save copy as", allows to open the resulting file. Default: true.
+
+* "cuda_ext_duplicate_full_line_if_no_sel": boolean.
+  For command "Duplicate line", if no selection, duplicate entire line.
+
+* "cuda_ext_duplicate_move_down": boolean.
+  For command "Duplicate line", if no selection, move caret to next line.

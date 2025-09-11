@@ -139,6 +139,11 @@ method=convert_reverse_selection
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Insert_cmds
+[item30]
+section=commands
+caption=Cuda&-Ext\&Insert\Duplicate line or selection
+method=duplicate_line
+
 [item31]
 section=commands
 caption=Cuda&-Ext\&Insert\Add indented line abo&ve
