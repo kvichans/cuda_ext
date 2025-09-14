@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.77 2025-09-11'
+    '1.7.78 2025-09-14'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata, urllib.parse
@@ -115,19 +115,19 @@ def dlg_menu(how, its='', sel=0, cap='', clip=0, w=0, h=0, opts_key=''):
    #def dlg_menu
 
 
-def _move_caret_down(cCrtSmb, rCrt, ed_=ed, id_crt=app.CARET_SET_ONE):
+def _move_caret_down(x, y, ed_=ed, id_crt=app.CARET_SET_ONE):
     ''' Caret will be moved to next line with save start column (if next line exists)
         Params
-            cCrtSmb     Start pos as symbol number
-            rCrt        Start line
-            ed_         Editor
-            id_crt      CARET_SET_ONE or CARET_SET_INDEX+N for caret with index N
+            x       Start column
+            y       Start line
+            ed_     Editor object
+            id_crt  CARET_SET_ONE or CARET_SET_INDEX+N for caret with index N
     '''
-    pass;                      #LOG and log('cCrtSmb, rCrt, id_crt==app.CARET_SET_ONE={}',(cCrtSmb, rCrt, id_crt==app.CARET_SET_ONE))
-    if (rCrt+1)>=ed_.get_line_count():    return
-    colCrt  = ed.convert(app.CONVERT_CHAR_TO_COL, cCrtSmb, rCrt  )[0]
-    cCrtSmb1= ed.convert(app.CONVERT_COL_TO_CHAR, colCrt,  rCrt+1)[0]
-    ed_.set_caret(cCrtSmb1, rCrt+1, id=id_crt)
+    pass;                      #LOG and log('x, y, id_crt==app.CARET_SET_ONE={}',(x, y, id_crt==app.CARET_SET_ONE))
+    if (y+1)>=ed_.get_line_count():    return
+    x_ = ed_.convert(app.CONVERT_CHAR_TO_COL, x , y  )[0]
+    x_ = ed_.convert(app.CONVERT_COL_TO_CHAR, x_, y+1)[0]
+    ed_.set_caret(x_, y+1, id=id_crt)
    #def _move_caret_down
 
 #############################################################
