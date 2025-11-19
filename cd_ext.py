@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.78 2025-09-14'
+    '1.7.79 2025-11-19'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata, urllib.parse
@@ -823,22 +823,24 @@ class Jumps_cmds:
 
     @staticmethod
     def dlg_bms_in_tab():
-        bm_lns  = ed.bookmark(app.BOOKMARK_GET_LIST, 0)
-        bm_lns  = [bm for bm in bm_lns if ed.bookmark(app.BOOKMARK_GET_PROP, bm)]   # Skip hidden
-        if not bm_lns:  return app.msg_status(_('No bookmarks'))
+        bms_all = ed.bookmark(app.BOOKMARK_GET_ALL, 0)
+        bms_all = [bm for bm in bms_all if bm['show_in_list']] # skip hidden bookmarks
+        if not bms_all:
+            return app.msg_status(_('No bookmarks'))
         pass;                  #log("bm_lns={}",(bm_lns))
         tab_sps = ' '*ed.get_prop(app.PROP_TAB_SIZE)
-        bms     = [ (line_num                                               # line number
-                    ,ed.get_text_line(line_num).replace('\t', tab_sps)      # line string
-                    ,ed.bookmark(app.BOOKMARK_GET_PROP, line_num)['kind']   # kind of bm
-                    )   for line_num in bm_lns]
+        bms     = [ (bm['line']                                             # line number
+                    ,ed.get_text_line(bm['line']).replace('\t', tab_sps)    # line string
+                    ,bm['kind']                                             # kind of bm
+                    ) for bm in bms_all]
         pass;                  #LOG and log('bms=¶{}',pf(bms))
         rCrt    = ed.get_carets()[0][1]
         near    = min([(abs(line_n-rCrt), ind)
                         for ind, (line_n, line_s, bm_kind) in enumerate(bms)])[1]
         ans = dlg_menu(app.DMENU_LIST+app.DMENU_EDITORFONT+app.DMENU_NO_FUZZY+app.DMENU_CENTERED
             , opts_key='cuda_ext.tab_bookmark'
-            , cap=f(_('Tab bookmarks: {}'), len(bms)), w=1000
+            , cap=f(_('Tab bookmarks: {}'), len(bms))
+            , w=1000
             , sel=near
             , its=[
                 f('{}\t{}{}'
@@ -861,8 +863,8 @@ class Jumps_cmds:
         tbms    = []
         for h_tab in app.ed_handles():
             ted     = app.Editor(h_tab)
-            bm_lns  = ted.bookmark(app.BOOKMARK_GET_LIST, 0)
-            if not bm_lns:  continue
+            bm_all  = ted.bookmark(app.BOOKMARK_GET_ALL, 0)
+            if not bm_all:  continue
             tab_grp = ted.get_prop(app.PROP_INDEX_GROUP)
             tab_num = ted.get_prop(app.PROP_INDEX_TAB)
             tab_cap = ted.get_prop(app.PROP_TAB_TITLE)
@@ -872,14 +874,14 @@ class Jumps_cmds:
                       (f('(g{},t{}) ', 1+tab_grp, 1+tab_num) if tnmd else '') + tab_cap
             tab_id  = ted.get_prop(app.PROP_TAB_ID)
             tab_sps = ' '*ed.get_prop(app.PROP_TAB_SIZE)
-            tbms   += [ (line_num                                               # line number
-                        ,ted.get_text_line(line_num).replace('\t', tab_sps)     # line string
-                        ,ted.bookmark(app.BOOKMARK_GET_PROP, line_num)['kind']  # kind of bm
+            tbms   += [ (bm['line']                                             # line number
+                        ,ted.get_text_line(bm['line']).replace('\t', tab_sps)   # line string
+                        ,bm['kind']                                             # kind of bm
                         ,tab_info                                               # src tab '(group:num) title'
                         ,tab_id                                                 # src tab ID
-                        )   for line_num in bm_lns
-                            if                 ted.bookmark(app.BOOKMARK_GET_PROP, line_num) and        # Skip hidden
-                               (what=='a' or 1<ted.bookmark(app.BOOKMARK_GET_PROP, line_num)['kind']<10)
+                        )   for bm in bm_all
+                            if                 bm['show_in_list'] and           # skip hidden
+                               (what=='a' or 1<bm['kind']<10)
                       ]
            #for h_tab
         if not tbms:    return app.msg_status(_('No numbered bookmarks in tabs') if what=='n' else _('No bookmarks in tabs'))
