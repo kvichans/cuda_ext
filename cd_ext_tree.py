@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '1.7.34 2021-08-23'
+    '1.7.80 2025-11-20'
 ToDo: (see end of file)
 '''
 
@@ -68,12 +68,12 @@ def symbol_menu_levels(levels=0):
     def tree_items_to_list(props=None, id_node=0, prefix='', more_levels=1000):
         '''Get all tree nodes to "props" starting from id_node (e.g. 0)'''
         props = [] if props is None else props 
-        nodes = app.tree_proc(h_tree, app.TREE_ITEM_ENUM, id_node)
+        nodes = app.tree_proc(h_tree, app.TREE_ITEM_ENUM_EX, id_node)
         if not nodes:
-            nodes = app.tree_proc(h_tree, app.TREE_ITEM_ENUM, id_node)
-            if not nodes:
-                return 
-        for id_kid, cap in nodes:
+            return 
+        for node in nodes:
+            id_kid  = node['id']
+            cap     = node['text']
             prop    = app.tree_proc(h_tree, app.TREE_ITEM_GET_PROPS, id_kid)
             rng     = app.tree_proc(h_tree, app.TREE_ITEM_GET_RANGE, id_kid)
             subs    = prop['sub_items']
@@ -165,15 +165,17 @@ Search starts on Enter.
     ID_TREE = get_cude_tree_id()
 #   ID_TREE = app.app_proc(app.PROC_SIDEPANEL_GET_CONTROL, 'Code tree')
     if not ID_TREE: return app.msg_status(_('No CodeTree'))
-    if not app.tree_proc(ID_TREE, app.TREE_ITEM_ENUM, 0):   # 0 is root
+    if not app.tree_proc(ID_TREE, app.TREE_ITEM_ENUM_EX, 0):   # 0 is root
         ed.cmd(cmds.cmd_TreeUpdate)                         # Try to build tree
     tree_t  = []        # [{nid:ID, sub:[{nid:ID, sub:{}, cap:'smth', path:['rt','smth']},], cap:'rt', path:[]},]
     tree_p  = []        # [,(ID, 'smth',['rt','smth']),]
     def scan_tree(id_prnt, tree_nds, path_prnt):
         nonlocal tree_p
-        kids            = app.tree_proc(ID_TREE, app.TREE_ITEM_ENUM, id_prnt)
+        kids            = app.tree_proc(ID_TREE, app.TREE_ITEM_ENUM_EX, id_prnt)
         if kids is None:    return None
-        for nid, cap in kids:
+        for kid in kids:
+            nid         = kid['id']
+            cap         = kid['text']
             path        = path_prnt + [cap]
             tree_p     += [(nid, cap, path)]
             sub         = scan_tree(nid, [], path)
@@ -386,7 +388,7 @@ def set_nearest_tree_node():
    
 
 def _get_best_tree_path(row):
-    """ Find node-path nearext to row: all nodes cover row or are all above/below nearest.
+    """ Find node-path nearest to row: all nodes covering row or are all above/below nearest.
         Return
             [(widest_node_id,cap), (node_id,cap), ..., (smallest_node_id,cap)], gap
                 list can be empty
@@ -402,14 +404,16 @@ def _get_best_tree_path(row):
     NO_ID   = -1
     def best_path(id_prnt, prnt_cap=''):
         rsp_l   = []
-        kids    = app.tree_proc(ID_TREE, app.TREE_ITEM_ENUM, id_prnt)
+        kids    = app.tree_proc(ID_TREE, app.TREE_ITEM_ENUM_EX, id_prnt)
         pass;                  #log('>>id_prnt, prnt_cap, kids={}',(id_prnt, prnt_cap, len(kids) if kids else 0))
         if kids is None:
             pass;              #log('<<no kids',())
             return [], INF
         row_bfr, kid_bfr, cap_bfr = -INF, NO_ID, ''
         row_aft, kid_aft, cap_aft = +INF, NO_ID, ''
-        for kid, cap in kids:
+        for node in kids:
+            kid = node['id']
+            cap = node['text']
             pass;              #log('kid, cap={}',(kid, cap))
             cMin, rMin, \
             cMax, rMax  = app.tree_proc(ID_TREE, app.TREE_ITEM_GET_SYNTAX_RANGE , kid) \
