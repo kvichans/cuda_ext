@@ -1,4 +1,5 @@
-1.7.81 (2026-02-23)
+1.7.82 (2026-02-24)
+changed: removed all initial hotkeys from install.inf, user complained that due to some bug (Alexey cannot repeat it) hotkeys are always installed and mess up the work
 fixed: avoid deprecated API: ed.lock (by Alexey T.)
 
 1.7.80 (2025-11-20)
