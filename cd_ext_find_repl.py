@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
 Version:
-    '1.7.66 2025-07-05'
+    '1.7.81 2026-02-23'
 ToDo: (see end of file)
 '''
 
@@ -1220,7 +1220,10 @@ def replace_all_sel_to_cb():
         user_opt= app.app_proc(app.PROC_GET_FIND_OPTIONS, '')   # Deprecated
         find_opt= find_opt + ('c' if 'c' in user_opt else '')   # As user: Case
         find_opt= find_opt + ('w' if 'w' in user_opt else '')   # As user: Word
-    ed.lock()
+    if app.app_api_version()>='1.0.473':
+        ed.action(app.EDACTION_LOCK)
+    else:
+        ed.lock()
     pass;                      #log__('seltext,clip,find_opt={!r}',(seltext,clip,find_opt)  ,__=(log4fun,_log4mod))
     ed.cmd(cmds.cmd_FinderAction, C1.join([]
         +['repall']
@@ -1228,7 +1231,10 @@ def replace_all_sel_to_cb():
         +[clip]
         +[find_opt]  # a - wrapped
     ))
-    ed.unlock()
+    if app.app_api_version()>='1.0.473':
+        ed.action(app.EDACTION_UNLOCK)
+    else:
+        ed.unlock()
     if app.app_api_version()>='1.0.248':
         app.app_proc(app.PROC_SET_FINDER_PROP, fpr)
     else:
