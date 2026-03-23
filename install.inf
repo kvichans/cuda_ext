@@ -176,13 +176,13 @@ method=paste_trimmed
 
 [item50]
 section=commands
-caption=Cuda&-Ext\&Insert\Trim spaces in selection, left
-method=trim_sel_left
+caption=Cuda&-Ext\&Insert\Trim spaces in selection, trailing
+method=trim_sel_right
 
 [item51]
 section=commands
-caption=Cuda&-Ext\&Insert\Trim spaces in selection, right
-method=trim_sel_right
+caption=Cuda&-Ext\&Insert\Trim spaces in selection, leading
+method=trim_sel_left
 
 [item52]
 section=commands
