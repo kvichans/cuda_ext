@@ -1,3 +1,6 @@
+1.7.83 (2026-03-23)
+changed: reorder Trim-commands: first 'trailing', next 'leading'
+
 1.7.82 (2026-02-24)
 changed: removed all initial hotkeys from install.inf, user complained that due to some bug (Alexey cannot repeat it) hotkeys are always installed and mess up the work
 fixed: avoid deprecated API: ed.lock (by Alexey T.)
