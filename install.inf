@@ -422,239 +422,225 @@ method=nav_by_console_err
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Tabs_cmds
-[item160]
+[item501]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Choose tab/panel to switch to
-method=go_back_dlg
-menu=0
-[item161]
-section=commands
-caption=Cuda&-Ext\Ta&bs\Activate previously active tab (go &back)
+caption=Cuda&-Ext\UI-Ta&bs, activation\Activate previously active tab (go &back)
 method=go_back
 
-[item162]
+[item502]
 section=commands
-caption=Cuda&-Ext\Ta&bs\-
-method=_
-
-[item163]
-section=commands
-caption=Cuda&-Ext\Ta&bs\Move tab to &position...
-method=move_tab
-
-[item164]
-section=commands
-caption=Cuda&-Ext\Ta&bs\Move tab left
-method=move_tab_left
-
-[item165]
-section=commands
-caption=Cuda&-Ext\Ta&bs\Move tab right
-method=move_tab_right
-
-[item172]
-section=commands
-caption=Cuda&-Ext\Ta&bs\&Find tab by title...
-method=find_tab
-
-[item173]
-section=commands
-caption=Cuda&-Ext\Ta&bs\Activate tab by &number...
+caption=Cuda&-Ext\UI-Ta&bs, activation\Activate tab by &number...
 method=to_tab_ask_num
 
-[item174]
+[item510]
 section=commands
-caption=Cuda&-Ext\Ta&bs\-
+caption=Cuda&-Ext\UI-Ta&bs, activation\-
 method=_
 
-[item175]
+[item511]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Arrange tabs across groups
-method=arrange_tabs_grps
-
-[item176]
-section=commands
-caption=Cuda&-Ext\Ta&bs\-
-method=_
-
-[item177]
-section=commands
-caption=Cuda&-Ext\Ta&bs\Activate tab #1 in group #1
+caption=Cuda&-Ext\UI-Ta&bs, activation\Activate tab #1 in group #1
 method=to_tab_g1_t1
-[item178]
+[item512]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Activate tab #2 in group #1
+caption=Cuda&-Ext\UI-Ta&bs, activation\Activate tab #2 in group #1
 method=to_tab_g1_t2
-[item179]
+[item513]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Activate tab #3 in group #1
+caption=Cuda&-Ext\UI-Ta&bs, activation\Activate tab #3 in group #1
 method=to_tab_g1_t3
-[item180]
+[item514]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Activate tab #4 in group #1
+caption=Cuda&-Ext\UI-Ta&bs, activation\Activate tab #4 in group #1
 method=to_tab_g1_t4
-[item181]
+[item515]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Activate tab #5 in group #1
+caption=Cuda&-Ext\UI-Ta&bs, activation\Activate tab #5 in group #1
 method=to_tab_g1_t5
-[item182]
+[item516]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Activate tab #6 in group #1
+caption=Cuda&-Ext\UI-Ta&bs, activation\Activate tab #6 in group #1
 method=to_tab_g1_t6
-[item183]
+[item517]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Activate tab #7 in group #1
+caption=Cuda&-Ext\UI-Ta&bs, activation\Activate tab #7 in group #1
 method=to_tab_g1_t7
-[item184]
+[item518]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Activate tab #8 in group #1
+caption=Cuda&-Ext\UI-Ta&bs, activation\Activate tab #8 in group #1
 method=to_tab_g1_t8
-[item185]
+[item519]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Activate tab #9 in group #1
+caption=Cuda&-Ext\UI-Ta&bs, activation\Activate tab #9 in group #1
 method=to_tab_g1_t9
 
-[item186]
+[item521]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Activate tab #1 in group #2
+caption=Cuda&-Ext\UI-Ta&bs, activation\Activate tab #1 in group #2
 method=to_tab_g2_t1
-[item187]
+[item522]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Activate tab #2 in group #2
+caption=Cuda&-Ext\UI-Ta&bs, activation\Activate tab #2 in group #2
 method=to_tab_g2_t2
-[item188]
+[item523]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Activate tab #3 in group #2
+caption=Cuda&-Ext\UI-Ta&bs, activation\Activate tab #3 in group #2
 method=to_tab_g2_t3
-[item189]
+[item524]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Activate tab #4 in group #2
+caption=Cuda&-Ext\UI-Ta&bs, activation\Activate tab #4 in group #2
 method=to_tab_g2_t4
-[item190]
+[item525]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Activate tab #5 in group #2
+caption=Cuda&-Ext\UI-Ta&bs, activation\Activate tab #5 in group #2
 method=to_tab_g2_t5
-[item191]
+[item526]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Activate tab #6 in group #2
+caption=Cuda&-Ext\UI-Ta&bs, activation\Activate tab #6 in group #2
 method=to_tab_g2_t6
-[item192]
+[item527]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Activate tab #7 in group #2
+caption=Cuda&-Ext\UI-Ta&bs, activation\Activate tab #7 in group #2
 method=to_tab_g2_t7
-[item193]
+[item528]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Activate tab #8 in group #2
+caption=Cuda&-Ext\UI-Ta&bs, activation\Activate tab #8 in group #2
 method=to_tab_g2_t8
-[item194]
+[item529]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Activate tab #9 in group #2
+caption=Cuda&-Ext\UI-Ta&bs, activation\Activate tab #9 in group #2
 method=to_tab_g2_t9
 
-[item195]
+[item531]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Activate last tab in group #1
+caption=Cuda&-Ext\UI-Ta&bs, activation\Activate last tab in group #1
 method=to_tab_g1_last
-[item196]
+[item532]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Activate last tab in group #2
+caption=Cuda&-Ext\UI-Ta&bs, activation\Activate last tab in group #2
 method=to_tab_g2_last
 
-[item197]
+[item535]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Activate next tab (global loop)
+caption=Cuda&-Ext\UI-Ta&bs, activation\Activate next tab (global loop)
 method=to_next_tab
-[item198]
+[item536]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Activate previous tab (global loop)
+caption=Cuda&-Ext\UI-Ta&bs, activation\Activate previous tab (global loop)
 method=to_prev_tab
 
-[item199]
+[item560]
 section=commands
-caption=Cuda&-Ext\Ta&bs\-
-method=_
-
-[item200]
-section=commands
-caption=Cuda&-Ext\Ta&bs\&Other group\Close tab in next group
+caption=Cuda&-Ext\UI-Tabs, other group\Close tab in next group
 method=close_tab_from_next_group
-[item201]
+[item561]
 section=commands
-caption=Cuda&-Ext\Ta&bs\&Other group\Close tab in previous group
+caption=Cuda&-Ext\UI-Tabs, other group\Close tab in previous group
 method=close_tab_from_prev_group
 
-[item202]
+[item562]
 section=commands
-caption=Cuda&-Ext\Ta&bs\&Other group\-
+caption=Cuda&-Ext\UI-Tabs, other group\-
 method=_
 
-[item203]
+[item566]
 section=commands
-caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to next in next group
+caption=Cuda&-Ext\UI-Tabs, other group\Switch tab to next in next group
 method=view_next_tab_from_next_group
-[item204]
+[item567]
 section=commands
-caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to next in previous group
+caption=Cuda&-Ext\UI-Tabs, other group\Switch tab to next in previous group
 method=view_next_tab_from_prev_group
-[item205]
+[item568]
 section=commands
-caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to previous in next group
+caption=Cuda&-Ext\UI-Tabs, other group\Switch tab to previous in next group
 method=view_prev_tab_from_next_group
-[item206]
+[item569]
 section=commands
-caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to previous in previous group
+caption=Cuda&-Ext\UI-Tabs, other group\Switch tab to previous in previous group
 method=view_prev_tab_from_prev_group
 
-[item207]
+[item570]
 section=commands
-caption=Cuda&-Ext\Ta&bs\&Other group\-
+caption=Cuda&-Ext\UI-Tabs, other group\-
 method=_
 
-[item208]
+[item571]
 section=commands
-caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to first in next group
+caption=Cuda&-Ext\UI-Tabs, other group\Switch tab to first in next group
 method=view_first_tab_from_next_group
-[item209]
+[item572]
 section=commands
-caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to first in previous group
+caption=Cuda&-Ext\UI-Tabs, other group\Switch tab to first in previous group
 method=view_first_tab_from_prev_group
-[item210]
+[item573]
 section=commands
-caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to last in next group
+caption=Cuda&-Ext\UI-Tabs, other group\Switch tab to last in next group
 method=view_last_tab_from_next_group
-[item211]
+[item574]
 section=commands
-caption=Cuda&-Ext\Ta&bs\&Other group\Switch tab to last in previous group
+caption=Cuda&-Ext\UI-Tabs, other group\Switch tab to last in previous group
 method=view_last_tab_from_prev_group
 
-[item219]
+[item580]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Close all untitled tabs without confirmation
+caption=Cuda&-Ext\UI-Tabs, more\Choose tab/panel to switch to
+method=go_back_dlg
+menu=0
+
+[item581]
+section=commands
+caption=Cuda&-Ext\UI-Tabs, more\Move tab to &position...
+method=move_tab
+
+[item582]
+section=commands
+caption=Cuda&-Ext\UI-Tabs, more\Move tab left
+method=move_tab_left
+
+[item583]
+section=commands
+caption=Cuda&-Ext\UI-Tabs, more\Move tab right
+method=move_tab_right
+
+[item584]
+section=commands
+caption=Cuda&-Ext\UI-Tabs, more\&Find tab by title...
+method=find_tab
+
+[item585]
+section=commands
+caption=Cuda&-Ext\UI-Tabs, more\Arrange tabs across groups
+method=arrange_tabs_grps
+
+[item586]
+section=commands
+caption=Cuda&-Ext\UI-Tabs, more\Close all untitled tabs without confirmation
 method=close_all_untitled_wo_ask
 
-[item220]
+[item587]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Close pair-tab, reopen 2 separate files
+caption=Cuda&-Ext\UI-Tabs, more\Close pair-tab, reopen 2 separate files
 method=close_pair_and_reopen
 
-[item220_1]
+[item588]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Close all unmodified tabs
+caption=Cuda&-Ext\UI-Tabs, more\Close all unmodified tabs
 method=close_saved
 
-[item220_2]
+[item591]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Sort tabs by title
+caption=Cuda&-Ext\UI-Tabs, more\Sort tabs by title
 method=sort_tabs_by_title
 
-[item220_3]
+[item592]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Sort tabs by extension
+caption=Cuda&-Ext\UI-Tabs, more\Sort tabs by extension
 method=sort_tabs_by_ext
 
-[item220_8]
+[item595]
 section=commands
-caption=Cuda&-Ext\Ta&bs\Duplicate tab
+caption=Cuda&-Ext\UI-Tabs, more\Duplicate tab
 method=duplicate_tab
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
