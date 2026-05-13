@@ -450,6 +450,30 @@ def sort_by_title():
     #msg_status('Sorted UI-tabs in %d group(s)'%grp_count)
    #def sort_by_title
 
+def sort_by_ext():
+
+    from pathlib import Path
+    hlist = app.ed_handles()
+    hlist = [app.Editor(h).get_prop(app.PROP_HANDLE_SELF) for h in hlist]
+    tablist_init = [(h, Path(app.Editor(h).get_prop(app.PROP_TAB_TITLE)).suffix) for h in hlist]
+
+    h_focused = ed.get_prop(app.PROP_HANDLE_SELF)
+
+    grp_count = 0
+    # totally app has 6+3=9 groups
+    for index_group in range(9):
+        tablist = [tab for tab in tablist_init if app.Editor(tab[0]).get_prop(app.PROP_INDEX_GROUP)==index_group]
+        if not tablist:
+            continue
+        grp_count += 1
+        tablist = sorted(tablist, key=lambda s: s[1])
+        for (index, tab) in enumerate(tablist):
+            e = app.Editor(tab[0])
+            e.set_prop(app.PROP_INDEX_TAB, index)
+
+    app.Editor(h_focused).focus()
+    #def sort_by_ext
+
 def duplicate_tab():
     txt = ed.get_text_all()
     app.file_open('')
