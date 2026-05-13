@@ -642,27 +642,17 @@ section=commands
 caption=Cuda&-Ext\Ta&bs\Close all unmodified tabs
 method=close_saved
 
-[item220_2_0]
-section=commands
-caption=Cuda&-Ext\Ta&bs\-
-method=_
-
 [item220_2]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Sort tabs by title
 method=sort_tabs_by_title
 
-[item220_2_1]
+[item220_3]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Sort tabs by extension
 method=sort_tabs_by_ext
 
-[item220_3]
-section=commands
-caption=Cuda&-Ext\Ta&bs\-
-method=_
-
-[item220_4]
+[item220_8]
 section=commands
 caption=Cuda&-Ext\Ta&bs\Duplicate tab
 method=duplicate_tab
