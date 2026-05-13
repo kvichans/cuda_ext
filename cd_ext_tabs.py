@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
 Version:
-    '1.7.84 2026-05-13'
+    '1.7.86 2026-05-14'
 ToDo: (see end of file)
 '''
 
@@ -425,11 +425,11 @@ def close_saved():
             e.cmd(cmds.cmd_FileClose)
    #def close_saved
 
-def sort_by_title():
+def sort_by(prop_func):
     
     hlist = app.ed_handles()
     hlist = [app.Editor(h).get_prop(app.PROP_HANDLE_SELF) for h in hlist]
-    tablist_init = [(h, app.Editor(h).get_prop(app.PROP_TAB_TITLE)) for h in hlist]
+    tablist_init = [(h, prop_func(app.Editor(h).get_prop(app.PROP_TAB_TITLE))) for h in hlist]
     
     h_focused = ed.get_prop(app.PROP_HANDLE_SELF)
 
@@ -447,32 +447,19 @@ def sort_by_title():
             e.set_prop(app.PROP_INDEX_TAB, index)
 
     app.Editor(h_focused).focus()
-    #msg_status('Sorted UI-tabs in %d group(s)'%grp_count)
-   #def sort_by_title
+    app.msg_status(_('Sorted UI-tabs in %d group(s)') % grp_count)
+   #def sort_by
+
+def sort_by_title():
+
+    sort_by(lambda s: s)
 
 def sort_by_ext():
 
     from pathlib import Path
-    hlist = app.ed_handles()
-    hlist = [app.Editor(h).get_prop(app.PROP_HANDLE_SELF) for h in hlist]
-    tablist_init = [(h, Path(app.Editor(h).get_prop(app.PROP_TAB_TITLE)).suffix) for h in hlist]
-
-    h_focused = ed.get_prop(app.PROP_HANDLE_SELF)
-
-    grp_count = 0
-    # totally app has 6+3=9 groups
-    for index_group in range(9):
-        tablist = [tab for tab in tablist_init if app.Editor(tab[0]).get_prop(app.PROP_INDEX_GROUP)==index_group]
-        if not tablist:
-            continue
-        grp_count += 1
-        tablist = sorted(tablist, key=lambda s: s[1])
-        for (index, tab) in enumerate(tablist):
-            e = app.Editor(tab[0])
-            e.set_prop(app.PROP_INDEX_TAB, index)
-
-    app.Editor(h_focused).focus()
-    #def sort_by_ext
+    def get_ext(s):
+        return Path(s).suffix
+    sort_by(get_ext)
 
 def duplicate_tab():
     txt = ed.get_text_all()
