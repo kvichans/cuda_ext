@@ -1,6 +1,6 @@
-1.7.85 (2026-05-13)
-added: command "Sort tabs by extension" (by ildar khasanshin)
-changed: reorganized menu items from the "Plugins / Tabs" submenu
+1.7.86 (2026-05-14)
+added: command "Sort tabs by extension" (by Alexey T. / Ildar Khasanshin)
+changed: reorganized menu items from the "Plugins / Tabs" submenu (by Alexey T.)
 
 1.7.83 (2026-03-23)
 changed: reorder Trim-commands: first 'trailing', next 'leading'
