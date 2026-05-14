@@ -429,8 +429,8 @@ def sort_by(prop_func):
     
     hlist = app.ed_handles()
     hlist = [app.Editor(h).get_prop(app.PROP_HANDLE_SELF) for h in hlist]
-    tablist_init = [(h, prop_func(app.Editor(h).get_prop(app.PROP_TAB_TITLE))) for h in hlist]
-    
+    tablist_init = [(h, prop_func(app.Editor(h).get_prop(app.PROP_TAB_TITLE)), app.Editor(h).get_prop(app.PROP_TAB_TITLE)) for h in hlist]
+
     h_focused = ed.get_prop(app.PROP_HANDLE_SELF)
 
     grp_count = 0
@@ -440,7 +440,7 @@ def sort_by(prop_func):
         if not tablist:
             continue
         grp_count += 1
-        tablist = sorted(tablist, key=lambda s: s[1])
+        tablist = sorted(tablist, key=lambda s: (s[1], s[2]))
         #print(tablist)
         for (index, tab) in enumerate(tablist):
             e = app.Editor(tab[0])
