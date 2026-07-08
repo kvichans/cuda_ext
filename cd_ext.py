@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.79 2025-11-19'
+    '1.7.88 2026-07-08'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata, urllib.parse
@@ -530,7 +530,7 @@ class Jumps_cmds:
                     new_scrl = get_pos(n, scr_lines)
                     break
 
-            ed.set_prop(app.PROP_SCROLL_VERT, new_scrl)
+            ed.set_prop(app.PROP_SCROLL_VERT_INFO, {'pos': new_scrl})
             return 
             
         if place in ('cen', 'top', 'bot') and not wrapped:
@@ -565,14 +565,14 @@ class Jumps_cmds:
             move_crt    = apx.get_opt('cuda_ext_horz_scroll_move_caret', False)
             shift       = apx.get_opt('cuda_ext_horz_scroll_size', 30)
 #           old_lf_col  = ed.get_prop(app.PROP_COLUMN_LEFT)
-            old_lf_col  = ed.get_prop(app.PROP_SCROLL_HORZ)
+            old_lf_col  = ed.get_prop(app.PROP_SCROLL_HORZ_INFO)['pos']
             
             new_lf_col  = old_lf_col + (-shift if place=='lf' else shift)
             new_lf_col  = max(new_lf_col, 0)
             pass;              #LOG and log('cols,old_l,new_l={}',(old_lf_col,new_lf_col))
             if new_lf_col==old_lf_col:                          return # Good state
 #           ed.set_prop(app.PROP_COLUMN_LEFT, str(new_lf_col))
-            ed.set_prop(app.PROP_SCROLL_HORZ, str(new_lf_col))
+            ed.set_prop(app.PROP_SCROLL_HORZ_INFO, {'pos': new_lf_col})
             
             if not (free_crt and move_crt):                     return # No need opts
             # Move caret if it isnot shown

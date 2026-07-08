@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
 Version:
-    '1.7.81 2026-02-23'
+    '1.7.88 2026-07-08'
 ToDo: (see end of file)
 '''
 
@@ -1722,7 +1722,7 @@ def _rewrap(margin, cmt_sgn, save_bl, rTx1, rTx2, sel_after):
         if new_y >= ed.get_line_count():
             ed.cmd(cmds.cCommand_ForceFinalEndOfLine, '')
         ed.set_caret(0, new_y, 0, rTx1)
-        ed.set_prop(app.PROP_SCROLL_HORZ, 0)
+        ed.set_prop(app.PROP_SCROLL_HORZ_INFO, {'pos': 0})
    #def _rewrap
 
 
