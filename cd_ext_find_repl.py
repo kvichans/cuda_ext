@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
 Version:
-    '1.7.88 2026-07-08'
+    '1.7.89 2026-08-28'
 ToDo: (see end of file)
 '''
 
@@ -1656,7 +1656,7 @@ def del_more_spaces():
    #def del_more_spaces
     
 
-def _rewrap(margin, cmt_sgn, save_bl, rTx1, rTx2, sel_after):
+def _rewrap(margin, cmt_sgn, save_bl, rTx1, rTx2, sel_after, force_split=False):
     
     tab_sz  = apx.get_opt('tab_size', 8)
     lines   = [ed.get_text_line(nln) for nln in range(rTx1, rTx2+1)]
@@ -1711,6 +1711,19 @@ def _rewrap(margin, cmt_sgn, save_bl, rTx1, rTx2, sel_after):
                 lines  += [line]
             last_pos= word[0]
     lines  += [text[last_pos:]]
+    # Split too long words (if force_split)
+    if force_split:
+        r = []
+        for line in lines:
+            if len(line) <= margin:
+                r.append(line)
+            else:
+                while len(line) > margin:
+                    r.append(line[:margin])
+                    line = line[margin:]
+                if line:
+                    r.append(line)
+        lines = r
     # Re-join
     text    = '\n'.join(cm_prfx+line for line in lines)
     pass;                      #log__('fin text={}',('\n'+text)  ,__=(log4fun,_log4mod))
@@ -1786,19 +1799,21 @@ def rewrap_sel_by_margin():
     lex     = ed.get_prop(app.PROP_LEXER_FILE, '')
     cmt_sgn = app.lexer_proc(app.LEXER_GET_PROP, lex)['c_line']     if lex else ''
 
-    ag  = DlgAg(form=d(cap=_('Re-wrap lines')       ,w=5+165+5, h=5+120+5)
+    ag  = DlgAg(form=d(cap=_('Re-wrap lines')       ,w=5+220+5, h=5+150+5)
                ,ctrls=[0
         ,('mar_',d(tp='labl',tid='marg' ,x=5        ,w=110  ,cap=_('&Margin:')      )) # &m
         ,('marg',d(tp='edit',y=5        ,x=5+105    ,w=60                           )) # 
         ,('csg_',d(tp='labl',tid='csgn' ,x=5        ,w=110  ,cap=_('&Comment sign:'))) # &c
         ,('csgn',d(tp='edit',y=5+30     ,x=5+105    ,w=60                           ))
-        ,('svbl',d(tp='chck',y=5+60     ,x=5        ,w=165  ,cap=_('&Keep indent')  )) # &s
-        ,('okok',d(tp='bttn',y=5+120-28 ,x=5        ,w=80   ,cap=_('OK'), def_bt='1',on=CB_HIDE)) #
-        ,('cncl',d(tp='bttn',y=5+120-28 ,x=5+80+5   ,w=80   ,cap=_('Cancel')        ,on=CB_HIDE))
+        ,('svbl',d(tp='chck',y=5+60     ,x=5        ,w=220  ,cap=_('&Keep indent')  )) # &s
+        ,('forc',d(tp='chck',y=5+90     ,x=5        ,w=220  ,cap=_('&Force split very long lines')  )) # &f
+        ,('okok',d(tp='bttn',y=5+150-28 ,x=5+30     ,w=80   ,cap=_('OK'), def_bt='1',on=CB_HIDE)) #
+        ,('cncl',d(tp='bttn',y=5+150-28 ,x=5+110+5  ,w=80   ,cap=_('Cancel')        ,on=CB_HIDE))
                ][1:]
                ,vals=d(marg=str(margin)
                       ,csgn=cmt_sgn
-                      ,svbl=True)
+                      ,svbl=True
+                      ,forc=False)
                ,fid='marg'
         )
     aid,vals    = ag.show()
@@ -1808,12 +1823,13 @@ def rewrap_sel_by_margin():
     margin  = int(vals['marg'])
     cmt_sgn =     vals['csgn']
     save_bl =     vals['svbl']
+    force_split = vals['forc']
     
-    rewrap_sel_by_margin_ex(margin, cmt_sgn, save_bl)
+    rewrap_sel_by_margin_ex(margin, cmt_sgn, save_bl, force_split)
    #def rewrap_sel_by_margin
 
 
-def rewrap_sel_by_margin_ex(margin, cmt_sgn, save_bl):
+def rewrap_sel_by_margin_ex(margin, cmt_sgn, save_bl, force_split=False):
     crts    = ed.get_carets()
     cCrt, rCrt, \
     cEnd, rEnd  = crts[0]
@@ -1846,7 +1862,7 @@ def rewrap_sel_by_margin_ex(margin, cmt_sgn, save_bl):
     ranges = find_paragraphs_in_range(rTx1, rTx2)
     for rng in reversed(ranges):
         for nline in reversed(range(rng[0], rng[1]+1)):
-            _rewrap(margin, cmt_sgn, save_bl, nline, nline, False)
+            _rewrap(margin, cmt_sgn, save_bl, nline, nline, False, force_split)
    #def rewrap_sel_by_margin_ex
         
 
