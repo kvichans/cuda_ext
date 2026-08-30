@@ -1,5 +1,5 @@
 1.7.89 (2026-08-31)
-added: command "Re-wrap/split lines by margin" gives new option in the dialog "Force split very long lines" (by Alexey T.)
+added: command "Re-wrap/split lines by margin" gives new option in the dialog: "Force split very long lines" (by Alexey T.)
 
 1.7.88 (2026-07-08)
 fixed: avoid deprecated API: PROP_SCROLL_(VERT|HORZ) (by Alexey T.)
