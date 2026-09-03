@@ -71,6 +71,11 @@ section=commands
 caption=Cuda&-Ext\&Find/Replace\Expand and Cop&y selection to word or "string" or (string)
 method=expand_sel_copy
 
+[item362]
+section=commands
+caption=Cuda&-Ext\&Find/Replace\Expand selection to paragraph
+method=expand_sel_paragraph
+
 [item21]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\-

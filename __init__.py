@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
 Version:
-    '1.7.63 2025-09-11'
+    '1.7.64 2026-09-03'
 '''
 
 from    .cd_ext import Command as CommandRLS
@@ -63,6 +63,7 @@ class Command:
     def replace_term(self):                     return RLS.replace_term()
     def expand_sel(self):                       return RLS.expand_sel()
     def expand_sel_copy(self):                  return RLS.expand_sel_copy()
+    def expand_sel_paragraph(self):             return RLS.expand_sel_paragraph()
     
     def align_in_lines_by_sep(self):            return cd_ext_find_repl.align_in_lines_by_sep()
     def reindent(self):                         return cd_ext_find_repl.reindent()
