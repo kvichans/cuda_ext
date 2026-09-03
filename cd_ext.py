@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.88 2026-07-08'
+    '1.7.89 2026-09-03'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata, urllib.parse
@@ -501,6 +501,43 @@ class SCBs:
             return      set_sel(cBfr-nBfrGap, rBfr, cAft+nAftGap, rAft)
         return False
        #def expand_sel
+       
+    @staticmethod
+    def expand_sel_paragraph():
+        ed = app.Editor(0)
+
+        carets = ed.get_carets()
+        if not carets:
+            return
+        x, y, x2, y2 = carets[0]
+
+        total_lines = ed.get_line_count()
+
+        start_y = y
+        while start_y > 0:
+            prev_line = ed.get_text_line(start_y - 1)
+            if prev_line is None or prev_line.strip() == '':
+                break
+            start_y -= 1
+
+        end_y = y
+        while end_y < total_lines - 1:
+            next_line = ed.get_text_line(end_y + 1)
+            if next_line is None or next_line.strip() == '':
+                break
+            end_y += 1
+
+        first_line = ed.get_text_line(start_y)
+        last_line = ed.get_text_line(end_y)
+
+        if first_line is None or last_line is None:
+            return
+
+        start_x = 0
+        end_x = len(last_line.encode('utf-8'))
+
+        ed.set_caret(start_x, start_y, end_x, end_y)
+    #def expand_sel_paragraph   
 
 #  #class SCBs
 
@@ -2326,6 +2363,7 @@ class Command:
     def replace_term(self):                     return SCBs.replace_term()
     def expand_sel(self):                       return SCBs.expand_sel(copy=False)
     def expand_sel_copy(self):                  return SCBs.expand_sel(copy=True)
+    def expand_sel_paragraph(self):             return SCBs.expand_sel_paragraph()
     
     def scroll_to(self, place):                             return Jumps_cmds.scroll_to(place)
     def jump_to_matching_bracket(self):                     return Jumps_cmds.jump_to_matching_bracket()
