@@ -2230,14 +2230,18 @@ class Command:
 
     def copy_filepath_line_number(self):
         filepath = ed.get_prop(app.PROP_FN, '')
-        caret = ed.get_carets()[0]
-        app.app_proc(app.PROC_SET_CLIP, filepath + ':' + str(caret[1]))
+        x0, y0, x1, y1 = ed.get_carets()[0]
+        if (y0, x0) >= (y1, x1):
+            x0, y0, x1, y1 = x1, y1, x0, y0
+        app.app_proc(app.PROC_SET_CLIP, filepath + ':' + str(y1 + 1))
       #def copy_filepath_line_number
 
     def copy_filename_line_number(self):
         filename = os.path.basename(ed.get_prop(app.PROP_FN, ''))
-        caret = ed.get_carets()[0]
-        app.app_proc(app.PROC_SET_CLIP, filename + ':' + str(caret[1]))
+        x0, y0, x1, y1 = ed.get_carets()[0]
+        if (y0, x0) >= (y1, x1):
+            x0, y0, x1, y1 = x1, y1, x0, y0
+        app.app_proc(app.PROC_SET_CLIP, filename + ':' + str(y1 + 1))
       #def copy_filename_line_number
     
     def remove_unprinted(self):
