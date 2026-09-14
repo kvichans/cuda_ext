@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.89 2026-09-03'
+    '1.7.91 2026-09-14'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata, urllib.parse
@@ -2227,6 +2227,18 @@ class Command:
             f.write(txt)
         app.msg_status(_('Saved: ')+fn)
        #def save_tabs_to_file
+
+    def copy_filepath_line_number(self):
+        filepath = ed.get_prop(app.PROP_FN, '')
+        caret = ed.get_carets()[0]
+        app.app_proc(app.PROC_SET_CLIP, filepath + ':' + str(caret[1]))
+      #def copy_filepath_line_number
+
+    def copy_filename_line_number(self):
+        filename = os.path.basename(ed.get_prop(app.PROP_FN, ''))
+        caret = ed.get_carets()[0]
+        app.app_proc(app.PROC_SET_CLIP, filename + ':' + str(caret[1]))
+      #def copy_filename_line_number
     
     def remove_unprinted(self):
         body    = ed.get_text_all()

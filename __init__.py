@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
 Version:
-    '1.7.64 2026-09-03'
+    '1.7.65 2026-09-14'
 '''
 
 from    .cd_ext import Command as CommandRLS
@@ -135,6 +135,8 @@ class Command:
     def open_with_defapp(self):                 return RLS.open_with_defapp()
     def save_copy(self):                        return RLS.save_copy()
     def save_tabs_to_file(self):                return RLS.save_tabs_to_file()
+    def copy_filepath_line_number(self):        return RLS.copy_filepath_line_number()
+    def copy_filename_line_number(self):        return RLS.copy_filename_line_number()
     def remove_unprinted(self):                 return RLS.remove_unprinted()
     def remove_xml_tags(self):                  return RLS.remove_xml_tags()
     def remove_lines_with(self):                return RLS.remove_lines_with()
