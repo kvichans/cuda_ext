@@ -1,3 +1,6 @@
+1.7.91 (2026-09-14)
+added: commands "Copy filepath + line number", "Copy filename + line number"
+
 1.7.90 (2026-09-03)
 added: command "Expand selection to paragraph" (by ildarkhasanshin)
 

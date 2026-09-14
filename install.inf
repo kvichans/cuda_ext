@@ -951,7 +951,18 @@ method=save_tabs_to_file
 section=commands
 caption=Cuda&-Ext\&Misc\&Execute selected text in console
 method=exec_selected_in_console
+
 [item361]
 section=commands
 caption=Cuda&-Ext\&Misc\&Fold lines without carets
 method=fold_lines_wo_carets
+
+[item362]
+section=commands
+caption=Cuda&-Ext\&Misc\Copy filepath + line number
+method=copy_filepath_line_number
+
+[item363]
+section=commands
+caption=Cuda&-Ext\&Misc\Copy filename + line number
+method=copy_filename_line_number
