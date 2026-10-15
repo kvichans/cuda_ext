@@ -468,8 +468,9 @@ def duplicate_tab():
    #def duplicate_tab
 
 def get_handles_index():
+    cur_group = ed.get_prop(app.PROP_INDEX_GROUP)
     hlist = app.ed_handles()
-    hlist = [app.Editor(h).get_prop(app.PROP_HANDLE_SELF) for h in hlist]
+    hlist = [app.Editor(h).get_prop(app.PROP_HANDLE_SELF) for h in hlist if app.Editor(h).get_prop(app.PROP_INDEX_GROUP) == cur_group]
     cur_h = ed.get_prop(app.PROP_HANDLE_SELF, '')
     try:
         return hlist, hlist.index(cur_h)
