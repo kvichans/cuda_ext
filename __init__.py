@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
 Version:
-    '1.7.65 2026-09-14'
+    '1.7.92 2026-10-17'
 '''
 
 from    .cd_ext import Command as CommandRLS
