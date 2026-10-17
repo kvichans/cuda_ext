@@ -466,3 +466,29 @@ def duplicate_tab():
     app.file_open('')
     ed.set_text_all(txt)
    #def duplicate_tab
+
+def get_handles_index():
+    cur_group = ed.get_prop(app.PROP_INDEX_GROUP)
+    hlist = app.ed_handles()
+    hlist = [app.Editor(h).get_prop(app.PROP_HANDLE_SELF) for h in hlist if app.Editor(h).get_prop(app.PROP_INDEX_GROUP) == cur_group]
+    cur_h = ed.get_prop(app.PROP_HANDLE_SELF, '')
+    try:
+        return hlist, hlist.index(cur_h)
+    except ValueError:
+        return
+
+def close_tabs_left():
+    get_h = get_handles_index()
+    if get_h is not None:
+        handles, index = get_h
+        for h in handles[:index]:
+            app.Editor(h).cmd(cmds.cmd_FileClose)
+   #def close_tabs_left
+
+def close_tabs_right():
+    get_h = get_handles_index()
+    if get_h is not None:
+        handles, index = get_h
+        for h in handles[index + 1:]:
+            app.Editor(h).cmd(cmds.cmd_FileClose)
+   #def close_tabs_right

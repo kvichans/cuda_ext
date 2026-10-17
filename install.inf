@@ -648,6 +648,16 @@ section=commands
 caption=Cuda&-Ext\UI-Tabs, more\Duplicate tab
 method=duplicate_tab
 
+[item596]
+section=commands
+caption=Cuda&-Ext\UI-Tabs, more\Close left tabs (same group)
+method=close_tabs_left
+
+[item597]
+section=commands
+caption=Cuda&-Ext\UI-Tabs, more\Close right tabs (same group)
+method=close_tabs_right
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Move_sep_cmds
 [item221]

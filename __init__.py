@@ -193,6 +193,8 @@ class Command:
     def sort_tabs_by_title(self):               return cd_ext_tabs.sort_by_title()
     def sort_tabs_by_ext(self):                 return cd_ext_tabs.sort_by_ext()
     def duplicate_tab(self):                    return cd_ext_tabs.duplicate_tab()
+    def close_tabs_left(self):                  return cd_ext_tabs.close_tabs_left()
+    def close_tabs_right(self):                 return cd_ext_tabs.close_tabs_right()
 
     # Paragraph_cmds
     def go_prgph_bgn(self):                     return RLS.go_prgph('bgn')
