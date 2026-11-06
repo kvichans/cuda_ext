@@ -46,381 +46,381 @@ section=commands
 caption=Cuda&-Ext\&Find/Replace\Replace &all in Lines with kit...
 method=kit_replace_in_lines
 
-[item16]
+[item20]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\-
 method=_
 
-[item17]
+[item21]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\&Copy word or [string] or 'string' (no selection)
 method=copy_term
 
-[item18]
+[item22]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\&Replace word or [string] or 'string' with clipboard (no selection)
 method=replace_term
 
-[item19]
+[item23]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\E&xpand selection to word or "string" or (string)
 method=expand_sel
 
-[item20]
+[item24]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\Expand and Cop&y selection to word or "string" or (string)
 method=expand_sel_copy
 
-[item20b]
+[item25]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\Expand selection to paragraph
 method=expand_sel_paragraph
 
-[item21]
+[item30]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\-
 method=_
 
-[item22]
+[item31]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\Remove all ASCII chars 0..31 (excluding 9,10,13)
 method=remove_unprinted
 
-[item23]
+[item32]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\Strip HTML tags (without Undo)
 method=remove_xml_tags
 
-[item24]
+[item33]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\Remove lines containing text...
 method=remove_lines_with
 
-[item24b]
+[item34]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\Remove lines containing RegEx...
 method=remove_lines_regex
 
-[item25]
+[item40]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\-
 method=_
 
-[item26]
+[item41]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\Set carets aligned as column...
 method=add_carets_for_rect
 
-[item27]
+[item42]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\Convert multi-line selection to column selection
 method=convert_sel_to_column
 
-[item28]
+[item43]
 section=commands
 caption=Cuda&-Ext\&Find/Replace\Reverse selection text, by lines
 method=convert_reverse_selection
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Insert_cmds
-[item30]
+[item60]
 section=commands
 caption=Cuda&-Ext\&Insert\Duplicate line or selection
 method=duplicate_line
 
-[item31]
+[item61]
 section=commands
 caption=Cuda&-Ext\&Insert\Add indented line abo&ve
 method=add_indented_line_above
 
-[item32]
+[item62]
 section=commands
 caption=Cuda&-Ext\&Insert\Add indented line &below
 method=add_indented_line_below
 
-[item33]
+[item63]
 section=commands
 caption=Cuda&-Ext\&Insert\Add indent and surround selection with { }
 method=indent_and_surround_curl_brackets
 
-[item34]
+[item70]
 section=commands
 caption=Cuda&-Ext\&Insert\-
 method=_
 
-[item44]
+[item71]
 section=commands
 caption=Cuda&-Ext\&Insert\Paste to &first column
 method=paste_to_1st_col
 
-[item45]
+[item72]
 section=commands
 caption=Cuda&-Ext\&Insert\Paste with indent ab&ove
 method=paste_with_indent_above
 
-[item46]
+[item73]
 section=commands
 caption=Cuda&-Ext\&Insert\Paste with indent belo&w
 method=paste_with_indent_below
 
-;[item47]
+;[item74]
 ;section=commands
 ;caption=Cuda&-Ext\&Insert\Paste like La&zarus IDE
 ;hotkey=
 ;method=paste_as_lazarus
 
-[item48]
+[item80]
 section=commands
 caption=Cuda&-Ext\&Insert\-
 method=_
 
-[item49]
+[item81]
 section=commands
 caption=Cuda&-Ext\&Insert\Paste trimmed text
 method=paste_trimmed
 
-[item50]
+[item82]
 section=commands
 caption=Cuda&-Ext\&Insert\Trim spaces in selection, trailing
 method=trim_sel_right
 
-[item51]
+[item83]
 section=commands
 caption=Cuda&-Ext\&Insert\Trim spaces in selection, leading
 method=trim_sel_left
 
-[item52]
+[item84]
 section=commands
 caption=Cuda&-Ext\&Insert\Trim spaces in selection, all
 method=trim_sel_all
 
-[item53]
+[item90]
 section=commands
 caption=Cuda&-Ext\&Insert\-
 method=_
 
-[item54]
+[item91]
 section=commands
 caption=Cuda&-Ext\&Insert\F&ill selection by string...
 method=fill_by_str
 
-[item55]
+[item92]
 section=commands
 caption=Cuda&-Ext\&Insert\-
 method=_
 
-[item56]
+[item93]
 section=commands
 caption=Cuda&-Ext\&Insert\Copy Unicode char name
 method=copy_unicode_char_name
 
-[item57]
+[item94]
 section=commands
 caption=Cuda&-Ext\&Insert\Insert &Unicode char...
 method=insert_char_by_hex
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Jumps_cmds
-[item71]
+[item120]
 section=commands
 caption=Cuda&-Ext\&Jump\To matching bracket
 method=jump_to_matching_bracket
 
-[item72]
+[item121]
 section=commands
 caption=Cuda&-Ext\&Jump\-
 method=_
 
-[item73]
+[item122]
 section=commands
 caption=Cuda&-Ext\&Jump\To next changed lines
 method=jump_to_next_mod_lines
 
-[item74]
+[item123]
 section=commands
 caption=Cuda&-Ext\&Jump\To previous changed lines
 method=jump_to_prev_mod_lines
 
-[item75]
+[item124]
 section=commands
 caption=Cuda&-Ext\&Jump\To next saved lines
 method=jump_to_next_sav_lines
 
-[item76]
+[item125]
 section=commands
 caption=Cuda&-Ext\&Jump\To previous saved lines
 method=jump_to_prev_sav_lines
 
-[item77]
+[item126]
 section=commands
 caption=Cuda&-Ext\&Jump\To next working lines
 method=jump_to_next_wrk_lines
 
-[item78]
+[item127]
 section=commands
 caption=Cuda&-Ext\&Jump\To previous working lines
 method=jump_to_prev_wrk_lines
 
-[item79]
+[item130]
 section=commands
 caption=Cuda&-Ext\&Jump\-
 method=_
 
-[item80]
+[item131]
 section=commands
 caption=Cuda&-Ext\&Jump\To line with number in clipboard
 method=jump_to_line_by_cb
 
-[item81]
+[item132]
 section=commands
 caption=Cuda&-Ext\&Jump\-
 method=_
 
-[item82]
+[item133]
 section=commands
 caption=Cuda&-Ext\&Jump\Left into CamelCase/snake_case
 method=jump_left_ccsc
 
-[item83]
+[item134]
 section=commands
 caption=Cuda&-Ext\&Jump\Right into CamelCase/snake_case
 method=jump_right_ccsc
 
-[item84]
+[item135]
 section=commands
 caption=Cuda&-Ext\&Jump\Left into CamelCase/snake_case and select
 method=jump_sel_left_ccsc
 
-[item85]
+[item136]
 section=commands
 caption=Cuda&-Ext\&Jump\Right into CamelCase/snake_case and select
 method=jump_sel_right_ccsc
 
-[item86]
+[item140]
 section=commands
 caption=Cuda&-Ext\&Jump\-
 method=_
 
-[item87]
+[item141]
 section=commands
 caption=Cuda&-Ext\&Jump\Bookmark list for current tab...
 method=dlg_bms_in_tab
 
-[item88]
+[item142]
 section=commands
 caption=Cuda&-Ext\&Jump\Bookmark list for all tabs...
 method=dlg_bms_in_tabs
 
-[item89]
+[item143]
 section=commands
 caption=Cuda&-Ext\&Jump\Numbered bookmark list for all tabs...
 method=dlg_nbms_in_tabs
 
-[item90]
+[item150]
 section=commands
 caption=Cuda&-Ext\&Jump\-
 method=_
 
-[item91]
+[item151]
 section=commands
 caption=Cuda&-Ext\&Jump\To start of the nearest left staple
 method=jump_staple_start
 
-[item92]
+[item152]
 section=commands
 caption=Cuda&-Ext\&Jump\To end of the nearest left staple
 method=jump_staple_end
 
-[item93]
+[item153]
 section=commands
 caption=Cuda&-Ext\&Jump\To begin of the current fold-range
 method=jump_foldrange_begin
 
-[item94]
+[item154]
 section=commands
 caption=Cuda&-Ext\&Jump\To end of the current fold-range
 method=jump_foldrange_end
 
-[item95]
+[item155]
 section=commands
 caption=Cuda&-Ext\&Jump\To begin of the parent fold-range
 method=jump_foldrange_parent_begin
 
-[item96]
+[item156]
 section=commands
 caption=Cuda&-Ext\&Jump\To end of the parent fold-range
 method=jump_foldrange_parent_end
 
-[item97]
+[item157]
 section=commands
 caption=Cuda&-Ext\&Jump\To begin of the current/parent fold-range
 method=jump_foldrange_combined_begin
 
-[item98]
+[item158]
 section=commands
 caption=Cuda&-Ext\&Jump\To end of the current/parent fold-range
 method=jump_foldrange_combined_end
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Scroll_cmds
-[item111]
+[item180]
 section=commands
 caption=Cuda&-Ext\Scr&oll\Current line to screen &center
 method=scroll_to_center
 
-[item112]
+[item181]
 section=commands
 caption=Cuda&-Ext\Scr&oll\Current line to screen &top
 method=scroll_to_top
 
-[item113]
+[item182]
 section=commands
 caption=Cuda&-Ext\Scr&oll\Current line to screen &bottom
 method=scroll_to_bottom
 
-[item114]
+[item183]
 section=commands
 caption=Cuda&-Ext\Scr&oll\-
 method=_
 
-[item115]
+[item184]
 section=commands
 caption=Cuda&-Ext\Scr&oll\Screen to &left
 method=scroll_to_left
 
-[item116]
+[item185]
 section=commands
 caption=Cuda&-Ext\Scr&oll\Screen to &right
 method=scroll_to_right
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Nav_cmds
-[item141]
+[item200]
 section=commands
 caption=Cuda&-Ext\&Navigate\Open file by &selected name
 method=open_selected
 
-[item142]
+[item201]
 section=commands
 caption=Cuda&-Ext\&Navigate\-
 method=_
 
-[item143]
+[item202]
 section=commands
 caption=Cuda&-Ext\&Navigate\Open file(s) in nearest &right tab(s)...
 method=open_file_near_right
 
-[item144]
+[item203]
 section=commands
 caption=Cuda&-Ext\&Navigate\Open file(s) in nearest &left tab(s)...
 method=open_file_near_left
 
-[item145]
+[item204]
 section=commands
 caption=Cuda&-Ext\&Navigate\-
 method=_
 
-[item146]
+[item205]
 section=commands
 caption=Cuda&-Ext\&Navigate\Navigate by &error in console
 method=nav_by_console_err
@@ -660,319 +660,319 @@ method=close_tabs_right
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Move_sep_cmds
-[item221]
+[item621]
 section=commands
 caption=Cuda&-Ext\&Splitters\Expand side panel
 method=more_tree
-[item222]
+[item622]
 section=commands
 caption=Cuda&-Ext\&Splitters\Shrink side panel
 method=less_tree
 
-[item223]
+[item623]
 section=commands
 caption=Cuda&-Ext\&Splitters\-
 method=-
-[item224]
+[item624]
 section=commands
 caption=Cuda&-Ext\&Splitters\Expand bottom panel
 method=more_bottom
-[item225]
+[item625]
 section=commands
 caption=Cuda&-Ext\&Splitters\Shrink bottom panel
 method=less_bottom
 
-[item226]
+[item626]
 section=commands
 caption=Cuda&-Ext\&Splitters\-
 method=-
-[item227]
+[item627]
 section=commands
 caption=Cuda&-Ext\&Splitters\Expand top-left group
 method=more_main_grp
-[item228]
+[item628]
 section=commands
 caption=Cuda&-Ext\&Splitters\Shrink top-left group
 method=less_main_grp
 
-[item229]
+[item629]
 section=commands
 caption=Cuda&-Ext\&Splitters\-
 method=-
-[item230]
+[item630]
 section=commands
 caption=Cuda&-Ext\&Splitters\Expand active group
 method=more_curr_grp
-[item231]
+[item631]
 section=commands
 caption=Cuda&-Ext\&Splitters\Shrink active group
 method=less_curr_grp
 
-[item232]
+[item640]
 section=commands
 caption=Cuda&-Ext\&Splitters\-
 method=_
 
-[item233]
+[item641]
 section=commands
 caption=Cuda&-Ext\&Splitters\&Remove group/panel layout...
 method=remove_layout
-[item234]
+[item642]
 section=commands
 caption=Cuda&-Ext\&Splitters\&Save group/panel layout...
 method=save_layout
-[item235]
+[item643]
 section=commands
 caption=Cuda&-Ext\&Splitters\&Restore group/panel layout...
 method=restore_layout
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Paragraph_cmds
-[item241]
+[item660]
 section=commands
 caption=Cuda&-Ext\Para&graph\Go to beginning
 method=go_prgph_bgn
 
-[item242]
+[item661]
 section=commands
 caption=Cuda&-Ext\Para&graph\Go to end
 method=go_prgph_end
 
-[item243]
+[item662]
 section=commands
 caption=Cuda&-Ext\Para&graph\Go to next
 method=go_prgph_nxt
 
-[item244]
+[item663]
 section=commands
 caption=Cuda&-Ext\Para&graph\Go to previous
 method=go_prgph_prv
 
-[item249]
+[item670]
 section=commands
 caption=Cuda&-Ext\Para&graph\-
 method=_
 
-[item250]
+[item671]
 section=commands
 caption=Cuda&-Ext\Para&graph\Align: Configure...
 method=align_prgph_cfg
 
-[item251]
+[item672]
 section=commands
 caption=Cuda&-Ext\Para&graph\Align: Left justify 
 method=align_prgph_l
 
-[item252]
+[item673]
 section=commands
 caption=Cuda&-Ext\Para&graph\Align: Right justify 
 method=align_prgph_r
 
-[item253]
+[item674]
 section=commands
 caption=Cuda&-Ext\Para&graph\Align: Center justify 
 method=align_prgph_c
 
-[item254]
+[item675]
 section=commands
 caption=Cuda&-Ext\Para&graph\Align: Fully justify 
 method=align_prgph_f
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Tree_cmds
-[item268]
+[item700]
 section=commands
 caption=Cuda&-Ext\Code &Tree\&Symbols list...
 method=symbol_menu
 
-[item269]
+[item701]
 section=commands
 caption=Cuda&-Ext\Code &Tree\Symbols list (only &1 up level)...
 method=symbol_menu_up1
 
-[item270]
+[item702]
 section=commands
 caption=Cuda&-Ext\Code &Tree\Symbols list (only &2 up level)...
 method=symbol_menu_up2
 
-[item271]
+[item710]
 section=commands
 caption=Cuda&-Ext\Code &Tree\-
 method=_
 
-[item272]
+[item711]
 section=commands
 caption=Cuda&-Ext\Code &Tree\Show &current path in statusbar
 method=tree_path_to_status
 
-[item273]
+[item712]
 section=commands
 caption=Cuda&-Ext\Code &Tree\Set &active node, nearest to caret
 method=set_nearest_tree_node
 
-[item274]
+[item713]
 section=commands
 caption=Cuda&-Ext\Code &Tree\&Find node...
 method=find_tree_node
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Align_cmds
-[item311]
+[item740]
 section=commands
 caption=Cuda&-Ext\&Align\Reindent selected lines...
 method=reindent
 
-[item312]
+[item741]
 section=commands
 caption=Cuda&-Ext\&Align\Indent lines like the first selected
 method=indent_sel_as_1st
 
-;[item313]
+;[item742]
 ;section=commands
 ;caption=Cuda&-Ext\&Align\Align indentation of selection(s)
 ;hotkey=
 ;method=indent_sel_as_bgn
 
-[item314]
+[item743]
 section=commands
 caption=Cuda&-Ext\&Align\Align in lines by separator...
 method=align_in_lines_by_sep
 
-[item315]
+[item744]
 section=commands
 caption=Cuda&-Ext\&Align\Align comma-separated columns in selected lines
 method=align_sel_by_sep
 
-[item316]
+[item745]
 section=commands
 caption=Cuda&-Ext\&Align\Align carets to rightmost caret by inserting spaces
 method=align_by_carets
 
-[item317]
+[item750]
 section=commands
 caption=Cuda&-Ext\&Align\-
 method=_
 
-[item318]
+[item751]
 section=commands
 caption=Cuda&-Ext\&Align\Join lines
 method=join_lines
 
-[item319]
+[item752]
 section=commands
 caption=Cuda&-Ext\&Align\Delete duplicate spaces
 method=del_more_spaces
 
-[item320]
+[item760]
 section=commands
 caption=Cuda&-Ext\&Align\-
 method=_
 
-[item321]
+[item761]
 section=commands
 caption=Cuda&-Ext\&Align\Re-wrap/split lines by margin...
 method=rewrap_sel_by_margin
 
-[item321a]
+[item762]
 section=commands
 caption=Cuda&-Ext\&Align\Re-wrap/split lines by margin, with defaults
 method=rewrap_sel_by_margin_def
 
-[item322]
+[item763]
 section=commands
 caption=Cuda&-Ext\&Align\Re-wrap/split comment at caret
 method=rewrap_cmt_at_caret
 
-[item323]
+[item764]
 section=commands
 caption=Cuda&-Ext\&Align\Align in lines to center by margin...
 method=align_sel_to_center_by_margin
 
-[item324]
+[item765]
 section=commands
 caption=Cuda&-Ext\&Align\Align in lines to right by margin...
 method=align_sel_to_right_by_margin
 
-[item325]
+[item766]
 section=commands
 caption=Cuda&-Ext\&Align\Align line-comments to a certain column...
 method=align_line_comments
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; File_cmds
-[item341]
+[item800]
 section=commands
 caption=Cuda&-Ext\Fi&le\Open &recent file...
 method=open_recent
 
-[item342]
+[item801]
 section=commands
 caption=Cuda&-Ext\Fi&le\-
 method=_
 
-[item343]
+[item802]
 section=commands
 caption=Cuda&-Ext\Fi&le\Re&name file...
 method=rename_file
 
-[item344]
+[item803]
 section=commands
 caption=Cuda&-Ext\Fi&le\Show in &hex viewer
 method=reopen_as_hex
 
-[item345]
+[item804]
 section=commands
 caption=Cuda&-Ext\Fi&le\Show in &text editor
 method=reopen_as_text
 
-[item346]
+[item810]
 section=commands
 caption=Cuda&-Ext\Fi&le\-
 method=_
 
-[item347]
+[item811]
 section=commands
 caption=Cuda&-Ext\Fi&le\Ne&w file and save in current folder...
 method=new_file_save_as_near_cur
 
-[item348]
+[item812]
 section=commands
 caption=Cuda&-Ext\Fi&le\Open &all files from folder with sub-folders...
 method=open_all_with_subdir
 
-[item349]
+[item813]
 section=commands
 caption=Cuda&-Ext\Fi&le\Open &current file in default application
 method=open_with_defapp
 
-[item350]
+[item814]
 section=commands
 caption=Cuda&-Ext\Fi&le\Save a copy as...
 method=save_copy
 
-[item351]
+[item815]
 section=commands
 caption=Cuda&-Ext\Fi&le\Save editors to a single file...
 method=save_tabs_to_file
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Misc_cmds
-[item360]
+[item840]
 section=commands
 caption=Cuda&-Ext\&Misc\&Execute selected text in console
 method=exec_selected_in_console
 
-[item361]
+[item841]
 section=commands
 caption=Cuda&-Ext\&Misc\&Fold lines without carets
 method=fold_lines_wo_carets
 
-[item362]
+[item842]
 section=commands
 caption=Cuda&-Ext\&Misc\Copy filepath + line number
 method=copy_filepath_line_number
 
-[item363]
+[item843]
 section=commands
 caption=Cuda&-Ext\&Misc\Copy filename + line number
 method=copy_filename_line_number
