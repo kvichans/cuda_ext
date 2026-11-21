@@ -2,7 +2,7 @@
 Authors:
     Andrey Kvichansky    (kvichans on github.com)
 Version:
-    '0.9.02 2019-07-22'
+    '0.9.03 2026-11-21'
 Content
     log                 Logger with timing and code location
     _                   i18n
@@ -295,7 +295,8 @@ def ed_of_file_open(op_file):
         return None
     for h in app.ed_handles(): 
         op_ed   = app.Editor(h)
-        if op_ed.get_filename() and os.path.samefile(op_file, op_ed.get_filename()):
+        txt = op_ed.get_prop(app.PROP_FN, '')
+        if txt and os.path.samefile(op_file, txt):
             return op_ed
     return None
    #def ed_of_file_open
@@ -527,7 +528,7 @@ def set_hist(key_or_path, value=None, module_name='_auto_detect', kill=False, to
 
 class Command:
     def execCurrentFileAsPlugin(self):
-        fn  = ed.get_filename()
+        fn  = ed.get_prop(app.PROP_FN, '')
         if not fn.endswith('.py'):
             return app.msg_status(_('Fail. Use only for python file.'))
         ed.save()

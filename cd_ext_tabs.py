@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky    (kvichans on github.com)
     Alexey Torgashin (CudaText)
 Version:
-    '1.7.92 2026-10-17'
+    '1.7.93 2026-11-21'
 ToDo: (see end of file)
 '''
 
@@ -72,7 +72,7 @@ def go_back_dlg():
     eds         = eds if eds else [ed]
     eds_hist    = [(ed_, ed_.get_prop(app.PROP_TAB_ID, '')
                        , ed_.get_prop(app.PROP_TAB_TITLE) 
-                       , ed_.get_filename()
+                       , ed_.get_prop(app.PROP_FN, '')
                    ) for ed_ in eds]
     pass;                      #log('eds_hist={}',(eds_hist))
     start_sel   = min(1, len(eds_hist)-1)
@@ -385,7 +385,7 @@ def close_all_untitled_wo_ask():
     cnt = 0
     for h in reversed(app.ed_handles()):
         e = app.Editor(h)
-        if e.get_filename('*')=="":
+        if e.get_prop(app.PROP_FN, '*')=="":
             e.set_prop(app.PROP_MODIFIED, False)
             e.focus()
             e.cmd(cmds.cmd_FileClose)
@@ -401,8 +401,8 @@ def close_pair_and_reopen():
 
     a_ed = app.Editor(ed.get_prop(app.PROP_HANDLE_PRIMARY))
     b_ed = app.Editor(ed.get_prop(app.PROP_HANDLE_SECONDARY))
-    a_file = a_ed.get_filename()
-    b_file = b_ed.get_filename()
+    a_file = a_ed.get_prop(app.PROP_FN, '')
+    b_file = b_ed.get_prop(app.PROP_FN, '')
     if not a_file or not b_file:
         app.msg_status(_('Not a paired ui-tab'))
         return

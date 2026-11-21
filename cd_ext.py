@@ -3,7 +3,7 @@ Authors:
     Andrey Kvichansky   (kvichans on github.com)
     Alexey Torgashin    (CudaText)
 Version:
-    '1.7.91 2026-09-14'
+    '1.7.93 2026-11-21'
 ToDo: (see end of file)
 '''
 import  re, os, sys, json, time, traceback, unicodedata, urllib.parse
@@ -78,9 +78,7 @@ def copy_tab_icon(fn_from, fn_to):
 
 
 def _get_filename(_ed):
-    fn  = _ed.get_filename()
-    if fn=='?':     # Not text content
-        fn  = _ed.get_filename('*') if app.app_api_version()>='1.0.287' else ''
+    fn  = _ed.get_prop(app.PROP_FN, '*') if app.app_api_version()>='1.0.483' else _ed.get_filename('*')
     return fn
    #def _get_filename
 
@@ -2126,7 +2124,7 @@ class Command:
             
         for (i, fn) in enumerate(files):
             if i%5 == 0:
-                app.app_idle()
+                app.app_proc(app.PROC_IDLE, '')
             app.app_proc(app.PROC_PROGRESSBAR, i * 100 // len(files))
             app.file_open(fn, options='/nozip /passive /nonear '+view_mode)
 
@@ -2166,7 +2164,7 @@ class Command:
         if app.app_api_version()<'1.0.452':
             return app.msg_status(NEED_UPDATE)
 
-        fn_old = ed.get_filename()
+        fn_old = ed.get_prop(app.PROP_FN, '')
 
         # add '.bak' to suggested filename
         parts = os.path.basename(fn_old).split('.')
