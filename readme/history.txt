@@ -1,4 +1,5 @@
-1.7.94 (2026-11-21)
+1.7.95 (2026-11-26)
+added: showing of tabs list now avoids showing empty tab title
 fixed: avoid deprecated API: app_idle
 fixed: avoid deprecated API: get_filename
 
