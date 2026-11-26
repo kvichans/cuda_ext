@@ -275,7 +275,12 @@ def move_tab(how=''):
 
 def find_tab():
     hlist = app.ed_handles()
-    slist = [app.Editor(h).get_prop(app.PROP_TAB_TITLE) for h in hlist]
+    slist = []
+    for h in hlist:
+        title = app.Editor(h).get_prop(app.PROP_TAB_TITLE)
+        if title in ('', ' '):
+            title = os.path.basename(app.Editor(h).get_prop(app.PROP_FN, ''))
+        slist.append(title)
     cap = _('Find tab by title')
     res = app.dlg_menu(app.DMENU_LIST, slist, caption=cap)
     if res is None: return
